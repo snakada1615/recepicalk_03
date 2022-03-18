@@ -1,23 +1,24 @@
+driSelectMulti example:
+
+```vue
 <template>
-  <b-container >
-    <b-row>
-      <b-col lg="5">
-        <dri-select-all
-          :targetSwitch.sync="singleTarget"
-          :max="max"
-          :driPopulations="nutritionTarget"
-          :driItems="DRI"
-          @changeTarget="nutritionTarget = JSON.parse(JSON.stringify($event))"
-          @changeNutrition="nutrition = $event"
-          style="max-width: 540px"
-        ></dri-select-all>
-      </b-col>
-    </b-row>
+  <b-container border-variant="primary" bg-variant="light" class="py-2">
+    <dri-select-all
+      :singleTarget.sync="singleTarget"
+      :max="max"
+      :driPopulations="nutritionTarget"
+      :driItems="DRI"
+      @changeTarget="nutritionTarget = JSON.parse(JSON.stringify($event))"
+      @changeNutrition="nutrition = $event"
+    ></dri-select-all>
+    <b-card>
+      {{nutritionTarget}}
+    </b-card>
   </b-container>
 </template>
 
 <script>
-import driSelectAll from "@/components/organisms/driSelectAll"
+  import driSelectAll from "@/components/organisms/driSelectAll";
 
 export default {
   components: {
@@ -27,12 +28,12 @@ export default {
     return {
       singleTarget: true,
       nutrition: [],
-      fields: [
+      fields:[
         {key: 'Item', sortable: false},
         {key: 'Value', sortable: false},
       ],
-      nutritionTarget: [{id: 1, count: 1}],
-      max: 10000,
+      nutritionTarget: [{ id: 1, count: 1}],
+      max:10000,
       DRI: [
         {
           En: "1088.0",
@@ -64,6 +65,9 @@ export default {
       ],
     }
   },
-  methods: {}
+  methods: {
+  }
 }
 </script>
+
+```
