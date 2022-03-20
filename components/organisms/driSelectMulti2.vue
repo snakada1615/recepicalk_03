@@ -59,11 +59,11 @@
       }
     },
     props: {
-      driPopulations: {
+      target: {
         type: Array,
         default: () => [{id: 0, count: 1}]
       },
-      driItems: {
+      items: {
         type: Array,
         default: () => [],
       },
@@ -74,7 +74,7 @@
       inputName: '',
     },
     watch: {
-      driPopulations: {
+      target: {
         deep: true,
         immediate: true,
         handler() {
@@ -126,7 +126,7 @@
       setTableItems() {
         this.tableItems.length = 0
         this.tableItems = JSON.parse(JSON.stringify(
-          this.updateTable(this.driItems, this.driPopulations)
+          this.updateTable(this.items, this.target)
         ))
       },
       updateTable(driValue, selectedValue) {

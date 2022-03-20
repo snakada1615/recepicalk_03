@@ -77,7 +77,7 @@ describe('driSelectMulti',  () => {
     await TargetNumber.at(1).setValue(5)
 
     //イベントが発火したかどうか
-    expect(wrapper.emitted('update:driPopulations')[1][0][1].count).toBe(8)
+    expect(wrapper.emitted('changeNutritionGroup')[1][0][1].count).toBe(5)
     expect(TargetNumber.at(0).element.value).toBe("3")
 
     // 対象グループの初期値を確認: ルート
