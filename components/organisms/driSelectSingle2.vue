@@ -1,9 +1,8 @@
 <template>
   <b-container>
     <b-form-select
-      :value="target[0].id"
+      v-model="targetComp"
       :options="options"
-      @input="onChange"
       size="sm"
       class="mb-2">
     </b-form-select>
@@ -42,17 +41,30 @@
           {key: 'Item', sortable: false},
           {key: 'Value', sortable: false},
         ],
-        total: [],
-      }
-    },
-    mounted() {
-      // to reflect property on initial loading
-      if (this.target.length > 0) {
-        const id = this.target[0].id
-        this.onChange(id)
       }
     },
     computed: {
+      targetComp:{
+        get(){
+          if (this.target == null){
+            return null
+          }
+          return this.target[0].id
+        },
+        set(val){
+          this.$emit('update:target', [{id: val, count:1}])
+        }
+      },
+      total:function () {
+        if (this.target == null){
+          return null
+        }
+        const res1 = [...this.setDRI(this.target[0].id)]
+        const res2 = this.target
+        //値に変化があった場合にまとめてemit
+        this.$emit('changeNutritionValue', {total: res1, target:res2})
+        return res1
+      },
       options: function () {
         let result = this.items.map(function (value) {
           return {
@@ -95,22 +107,6 @@
           return val
         }
         return setDigit(val, index)
-      },
-      onChange:function(val){
-        if (val >= 0) {
-          this.total = [...this.setDRI(val)]
-          // will not be implemented if called from 'mounted:{}'
-            /**
-             * triggers when dri selection changed
-             */
-            this.$emit('changeNutritionGroup', [{id: val, count:1}])
-            /**
-             * triggers when dri selection changed
-             */
-            this.$emit('changeNutritionValue', this.total)
-        } else {
-          console.error('invalid selection id for driTable: onChange-driTable')
-        }
       },
       setDRI: function (selectedId) {
         const vm = this
