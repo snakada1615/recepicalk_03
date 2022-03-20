@@ -1,6 +1,6 @@
 import { mount, createLocalVue } from '@vue/test-utils'
 import {afterEach, describe, expect, it} from "@jest/globals";
-import driSelectSingle2 from '@/components/organisms/driSelectSingle2.vue'
+import driSelectSingle2 from '@/components/organisms/driSelectSingle.vue'
 import BootstrapVue from 'bootstrap-vue'
 const localVue = createLocalVue();
 localVue.use(BootstrapVue)
