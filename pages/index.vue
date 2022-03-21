@@ -7,8 +7,8 @@
           :max="max"
           :driPopulations="nutritionTarget"
           :driItems="DRI"
-          @changeTarget="nutritionTarget = JSON.parse(JSON.stringify($event))"
-          @changeNutrition="nutrition = $event"
+          @update:target="nutritionTarget = JSON.parse(JSON.stringify($event))"
+          @changeNutritionValue="nutrition = $event"
           style="max-width: 540px"
         ></dri-select-all>
       </b-col>

@@ -14,20 +14,20 @@
       <dri-select-single
         :items="driItems"
         :target="driPopulations"
-        @changeNutritionGroup="updateSelection"
+        @update:target="$emit('update:target', $event)"
         @changeNutritionValue="updateNutrition"
-        @initTarget="$emit('initTarget', $event)"
+        class="single"
       >
       </dri-select-single>
     </div>
     <div v-else>
       <dri-select-multi
-        :driItems="driItems"
-        :driPopulations="driPopulations"
+        :items="driItems"
+        :target="driPopulations"
         :max="max"
-        @changeNutritionGroup="updateSelection"
+        @update:target="$emit('update:target', $event)"
         @changeNutritionValue="updateNutrition"
-        @initTarget="$emit('initTarget', $event)"
+        class="multi"
       >
       </dri-select-multi>
     </div>
@@ -75,14 +75,9 @@
       }
     },
     methods: {
-      updateSelection(val) {
-        //this.nutritionTarget = JSON.parse(JSON.stringify(val))
-        this.$emit('changeTarget', val)
-      },
       updateNutrition(val) {
-        console.log('updateNutrition')
         const res = JSON.parse(JSON.stringify(val))
-        this.$emit('changeNutrition', res)
+        this.$emit('changeNutritionValue', res)
       },
     }
   }

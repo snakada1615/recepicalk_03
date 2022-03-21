@@ -2,27 +2,27 @@
   <b-container >
     <b-row>
       <b-col lg="5">
-        <dri-select-single2
+        <dri-select-single
           :target.sync="nutritionTarget"
           :items="DRI"
-        ></dri-select-single2>
-        <dri-select-multi2
+        ></dri-select-single>
+        <dri-select-multi
           :target.sync="nutritionTarget"
           :items="DRI"
-        ></dri-select-multi2>
+        ></dri-select-multi>
       </b-col>
     </b-row>
   </b-container>
 </template>
 
 <script>
-import driSelectSingle2 from "@/components/organisms/driSelectSingle2"
-import driSelectMulti2 from "@/components/organisms/driSelectMulti2"
+import driSelectSingle from "@/components/organisms/driSelectSingle"
+import driSelectMulti from "@/components/organisms/driSelectMulti"
 
 export default {
   components: {
-    driSelectSingle2,
-    driSelectMulti2
+    driSelectSingle,
+    driSelectMulti
   },
   data() {
     return {
