@@ -1,15 +1,14 @@
-FctTable example:
+FctTableModal example:
 
 ```vue
 <template>
   <b-jumbotron bg-variant="light" border-variant="primary">
-    <fct-table
-      v-show="showFCT"
-      :items="Fctitems"
-      head-row-variant="success"
-      table-variant="light"
-      @fctClick="onFCTclick"
-    ></fct-table>
+    <FctTableModal
+      my-name="modalTest"
+      my-modal-header="Food Composition Table"
+      :items="fctItems"
+      @modalOk="onItemSelected"
+    ></FctTableModal>
     <div>selecetd item</div>
     <ul>
       <li>Name: {{selectedCrop.Name}}</li>
@@ -17,6 +16,10 @@ FctTable example:
       <li>Energy: {{selectedCrop.En}}</li>
       <li>Protein: {{selectedCrop.Pr}}</li>
     </ul>
+    <b-button
+      @click="oncClick"
+      variant="info"
+    >open dialog</b-button>
   </b-jumbotron>
 </template>
 <script>
@@ -26,7 +29,7 @@ FctTable example:
         test:false,
         showFCT:true,
         selectedCrop:{},
-        Fctitems:[
+        fctItems:[
           {
             Carbohydrate: "67.9",
             En: "315",
@@ -70,7 +73,10 @@ FctTable example:
       }
     },
     methods:{
-      onFCTclick(rec){
+      oncClick(){
+        this.$bvModal.show('modalTest')
+      },
+      onItemSelected(rec){
         this.selectedCrop = {
           'id': rec.id,
           'Name': rec.Name,
