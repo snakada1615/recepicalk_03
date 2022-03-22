@@ -16,7 +16,7 @@
 </template>
 
 <script>
-  import FctTable from "./FctTable";
+  import FctTable from "@/components/organisms/FctTable"
 
   export default {
     components: {
