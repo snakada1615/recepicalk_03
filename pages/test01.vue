@@ -10,6 +10,7 @@
           :target.sync="nutritionTarget"
           :items="DRI"
         ></dri-select-multi>
+        <test/>
       </b-col>
     </b-row>
   </b-container>
@@ -18,9 +19,11 @@
 <script>
 import driSelectSingle from "@/components/organisms/driSelectSingle"
 import driSelectMulti from "@/components/organisms/driSelectMulti"
+import test from "../components/test";
 
 export default {
   components: {
+    test,
     driSelectSingle,
     driSelectMulti
   },
