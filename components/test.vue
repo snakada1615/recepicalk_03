@@ -2,6 +2,7 @@
   <b-container>
     <b-modal
       :id="name"
+      :static="true"
     >
       <div>halo</div>
     </b-modal>

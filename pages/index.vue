@@ -14,6 +14,7 @@
         <fct-table
           :items="myItems"
         ></fct-table>
+        <test/>
       </b-col>
     </b-row>
   </b-container>
@@ -22,11 +23,13 @@
 <script>
 import driSelectAll from "@/components/organisms/driSelectAll"
 import FctTable from "@/components/organisms/FctTable"
+import test from "@/components/test"
 
 export default {
   components: {
     driSelectAll,
-    FctTable
+    FctTable,
+    test
   },
   data() {
     return {

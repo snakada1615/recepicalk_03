@@ -2,6 +2,7 @@
   <b-modal
     :id="myName"
     :title="myModalHeader"
+    :static="true"
     @ok="clickOk"
     @cancel="clickCancel"
     hide-header
@@ -10,7 +11,7 @@
       :items="items"
       head-row-variant="success"
       table-variant="light"
-      @fctClick="onFCTclick"
+      @fctClick="onFctClick"
     ></fct-table>
   </b-modal>
 </template>
@@ -40,13 +41,12 @@
       }
     },
     methods: {
-      onFCTclick(rec){
+      onFctClick(rec){
         this.selectedItem = rec
         this.$emit('click', rec)
       },
       // ...
       clickOk() {
-        console.log('OK')
         this.$emit('modalOk', this.selectedItem)
       },
       clickCancel() {
