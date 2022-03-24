@@ -1,12 +1,14 @@
+recepiTable example:
+
+```vue
 <template>
-  <b-container bg-variant="light" border-variant="primary">
+  <b-jumbotron bg-variant="light" border-variant="primary">
     <recepi-table
       :items="cropList"
       head-row-variant="success"
       table-variant="light"
       foot-row-variant="light"
       @rowClick="onRecepiclick"
-      @update:items="cropList=JSON.parse(JSON.stringify($event))"
     >
     </recepi-table>
     <div style="color: #3b8070">clicked item</div>
@@ -15,22 +17,18 @@
     <div style="color: #3b8070">add item</div>
     <ul>
       <li v-for="item in candidate">
-        <b-button @click="addData(item)" size="sm" variant="info">add</b-button> Name: {{item.Name}}, Group: {{item.Group}}, Energy: {{item.En}}, Protein: {{item.Pr}}, Vit-A: {{item.Va}}, Iron: {{item.Fe}}, Weight: {{item.Wt}}
+        <b-button @click="addData(item)" size="sm" variant="info">add</b-button> Name: {{item.Name}}, Group: {{item.Group}}, Energy: {{item.En}}, Protein: {{item.Pr}}, Vit-A: {{item.Va}}, Iron: {{item.Fe}}, Weight: {{item.Wt}} 
       </li>
     </ul>
-  </b-container>
+  </b-jumbotron>
 </template>
 <script>
-  import recepiTable from "../components/organisms/recepiTable";
   export default {
-    components:{
-      recepiTable
-    },
     data(){
       return {
         candidate:[
           {id:"1", Group: "grain", Name: "taro", En: "25", Pr: "5", Va: "109", Fe: "13", Wt: "196"},
-          {id:"2", Group: "meat", Name: "pork", En: "15", Pr: "9", Va: "58", Fe: "31", Wt: "208"}
+          {id:"2", Group: "meat", Name: "pork", En: "15", Pr: "9", Va: "58", Fe: "31", Wt: "208"}        
         ],
         cropList:[],
         clickedList:{}
@@ -48,3 +46,4 @@
   }
 
 </script>
+```
