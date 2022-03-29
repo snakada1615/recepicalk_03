@@ -11,16 +11,16 @@
             name="radio-options"
           ></b-form-radio-group>
         </b-form-group>
-        <b-button @click="getFile">click</b-button>
       </b-col>
       <b-col cols="9">
         <div>Selected: <strong>{{ selected }}</strong></div>
         <div v-if="link1">ここfirst</div>
         <div v-if="link2">
-          ここ2
-          <markdown-it-vue class="md-body" :content="content" />
+          <markdown-it-vue class="md-body" :content="content[0]" />
         </div>
-        <div v-if="link3">ここ3</div>
+        <div v-if="link3">
+          <markdown-it-vue class="md-body" :content="content[1]" />
+        </div>
         <div v-if="link4">ここ4</div>
       </b-col>
     </b-row>
@@ -45,7 +45,11 @@ export default {
         { text: 'This one is Disabled', value: 3 },
         { text: 'This is the 4th radio', value: 4 }
       ],
-      content:''
+      content:[],
+      myMarkDown:[
+        '../docs/driSelectAll.md',
+        '../docs/driSelectMulti.md'
+      ],
     }
   },
   computed:{
@@ -64,8 +68,11 @@ export default {
   },
   mounted() {
     this.$axios
-      .get("../docs/driSelectAll.md")
-      .then((response) => (this.content = response.data));
+      .get(this.myMarkDown[0])
+      .then((response) => (this.content[0] = response.data));
+    this.$axios
+      .get(this.myMarkDown[1])
+      .then((response) => (this.content[1] = response.data));
   },
   methods: {
   }
