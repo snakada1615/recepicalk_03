@@ -9,8 +9,8 @@
 </template>
 <script>
 import { marked } from 'marked'
+
 export default {
-  name: 'App',
   data(){
     return {
       markdown:  "# Hello World",
@@ -36,5 +36,3 @@ export default {
   }
 }
 </script>
-<style scoped src="@/assets/css/modest.css">
-</style>
