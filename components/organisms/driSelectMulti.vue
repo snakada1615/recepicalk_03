@@ -60,14 +60,34 @@
       }
     },
     props: {
+      /**
+       * ターゲットグループの構成：v-modelで使用
+       *  [{ id: 1, count: 1}, { id: 2, count: 5}, { id: 3, count: 0}]
+       */
       target: {
         type: Array,
         default: () => [{id: 0, count: 1}]
       },
+      /**
+       *  driのデータセット
+       *   ex.
+       *          [{
+       *            En: "1088.0",
+       *            Fe: "5.8",
+       *            max_vol: "900",
+       *            Name: "child 6-23 month",
+       *            Pr: "11.65",
+       *            Va: "400.0",
+       *            id: 0
+       *           }],
+       */
       items: {
         type: Array,
         default: () => [],
       },
+      /**
+       * target.countの上限値
+       */
       max: {
         type: Number,
         default: 1000000,
@@ -84,6 +104,12 @@
       }
     },
     methods: {
+      /**
+       * 栄養必要量の表記フォーマット
+       * @param val 変換前の数値
+       * @param index 変換パターン
+       * @returns {string|*} 戻り値（テキスト）
+       */
       formatNumber(val, index) {
         if (index === 0) {
           return 'mixed'
@@ -93,9 +119,17 @@
         }
         return setDigit(val, index)
       },
+      /**
+       * population入力値のバリデーション
+       * @param val 入力値
+       * @returns {boolean} バリデーション結果
+       */
       statusPopulationNumber(val) {
         return (val >= 0 && val <= this.max)
       },
+      /**
+       * targetプロパティの更新時に内部変数 (tablePop, tableDri)を更新
+       */
       updateAllTable() {
         this.tablePop.length = 0
         this.tablePop = JSON.parse(JSON.stringify(
@@ -105,8 +139,16 @@
         this.tableDri = JSON.parse(JSON.stringify(
           this.updateTableDri(this.tablePop)
         ))
+        /**
+         * 必要栄養量の更新を親コンポーネントに通知
+         */
         this.$emit('changeNutritionValue', {total: this.tableDri, target: this.target})
       },
+      /**
+       * DRIのテーブル（合計値）を更新
+       * @param dat 年齢別の栄養素必要量＊人数のテーブル
+       * @returns {[{Item: string, Value: string},{Item: string, Value: (number|*|number)},{Item: string, Value: (number|*|number)},{Item: string, Value: (number|*|number)},{Item: string, Value: (number|*|number)},null]}
+合計値のテーブル       */
       updateTableDri(dat){
         const vm = this
         let result = {}

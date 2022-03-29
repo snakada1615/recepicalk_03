@@ -89,7 +89,7 @@
     methods: {
       /**
        * driPopulationsの更新時に値を親コンポーネントに通知
-       * @param val
+       * @param {array} val 更新された栄養必要量
        */
       updateNutrition(val) {
         const res = JSON.parse(JSON.stringify(val))
