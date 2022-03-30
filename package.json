@@ -13,6 +13,8 @@
   "dependencies": {
     "@nuxtjs/axios": "^5.13.6",
     "@nuxtjs/pwa": "^3.3.5",
+    "@vuedoc/md": "^3.2.0",
+    "@vuedoc/parser": "^3.4.0",
     "bootstrap": "^4.6.0",
     "bootstrap-vue": "^2.21.2",
     "core-js": "^3.15.1",
@@ -31,6 +33,7 @@
     "nth-check": "2.0.1",
     "unset-value": "2.0.1",
     "@braintree/sanitize-url": "6.0.0",
-    "glob-parent": "5.1.2"
+    "glob-parent": "5.1.2",
+    "trim": "0.0.3"
   }
 }
