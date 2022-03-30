@@ -1,0 +1,65 @@
+@startuml
+title login through firebase
+
+start
+
+:(params)
+ user
+ caseId;
+:login using firebase;
+if (get credential?) then (true)
+  package "set user" {
+    :   get user info
+    from userinfo_DB;
+    if (userinfo_DB?) then(no)
+      :sync userinfo_DB
+       with cloudant;
+    else (yes)
+    endif
+    :merge credential
+      with user info;
+    :set user
+     to $store;
+  }
+else (false)
+  :failure message;
+  :stay @loginPage;
+  stop
+endif
+  :select caseId from
+   selectWorkspace;
+package "set caseId" {
+   if (new caseId?) then (false)
+     :set caseId
+      to $store;
+     :set user & caseId to
+      lastUser_DB;
+     :get userData from
+       userData_DB;
+      if (userData?) then (no)
+        :get userData
+          from remoteDb;
+      else (yes)
+      endif
+     :set userData
+       to $store;
+   else (true)
+     :set caseId
+      to $store;
+     :set user & caseId to
+      lastUser_DB;
+   package "initialize userData" {
+     :initialize userData
+      for caseId;
+     :set userData
+      to userData_DB;
+   }
+   :set userData
+     to $store;
+
+  endif
+}
+:move to '/index';
+stop
+
+@enduml

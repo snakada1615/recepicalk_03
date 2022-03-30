@@ -1,0 +1,29 @@
+@startuml
+title: workflow of dietCalk
+
+actor user
+control driTable
+control fctTable
+control foodModal
+control recepiTable
+control nutritionBar
+database pouchDB
+
+pouchDB -> fctTable: set initial value
+pouchDB -> driTable: set initial value
+pouchDB -> recepiTable: set initial value
+recepiTable -> nutritionBar: set initial value
+user -> fctTable: click food item row
+fctTable -> foodModal: send food \n item info
+foodModal -> user: show food info modal
+user -> foodModal: set food weight
+foodModal -> recepiTable: add food info
+recepiTable -> recepiTable: display food \n item list
+user -> recepiTable: delete food item as required
+user -> driTable: select target
+driTable -> recepiTable: send target dri
+recepiTable -> recepiTable: calk nutrition \n balance
+recepiTable -> nutritionBar: send nutrition \n balance
+nutritionBar -> nutritionBar: display \n barchart
+user -> pouchDB: click save button
+@enduml
