@@ -34,7 +34,7 @@
 
 **Syntax**
 
-```vuejs
+```typescript
 formatNumber(val: unknown, index: unknown): string | *
 ```
 

@@ -26,8 +26,8 @@ driPopulationsの更新時に値を親コンポーネントに通知
 
 **Syntax**
 
-```vuejs
-updateNutrition(val)
+```typescript
+updateNutrition(val: array): void
 ```
 
 **Parameters**

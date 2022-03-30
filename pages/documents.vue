@@ -1,8 +1,8 @@
 <template>
   <b-container>
     <b-row>
-      <b-col cols="3">
-        <b-form-group label="Radios using options" v-slot="{ ariaDescribedby }">
+      <b-col cols="3" class="bg-info text-white" >
+        <b-form-group label="Select component name" v-slot="{ ariaDescribedby }">
           <b-form-radio-group
             id="radio-group-1"
             v-model="selected"
@@ -13,6 +13,10 @@
         </b-form-group>
       </b-col>
       <b-col cols="9">
+        <b-card bg-variant="light" class="mb-2">
+          <div>データ更新は以下のコマンド：</div>
+          <div>vuedoc.md components/organisms/*.vue --output static/docs/</div>
+        </b-card>
         <div v-if="link1">
           <markdown-it-vue class="md-body" :content="content[0]" />
         </div>
