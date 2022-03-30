@@ -28,7 +28,6 @@ export default {
   components: {
     driSelectAll,
     FctTable,
-    test
   },
   data() {
     return {
