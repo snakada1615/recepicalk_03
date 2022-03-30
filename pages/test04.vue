@@ -66,15 +66,15 @@ export default {
       return this.selected === 4
     }
   },
-  mounted() {
-    this.$axios
-      .get(this.myMarkDown[0])
-      .then((response) => (this.content[0] = response.data));
+  async mounted() {
+    const data = await fetch(this.myMarkDown[0])
+    this.myMarkDown[0] = data
     this.$axios
       .get(this.myMarkDown[1])
       .then((response) => (this.content[1] = response.data));
   },
   methods: {
+
   }
 }
 </script>
