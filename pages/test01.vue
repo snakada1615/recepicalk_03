@@ -19,7 +19,6 @@
 <script>
 import driSelectSingle from "@/components/organisms/driSelectSingle"
 import driSelectMulti from "@/components/organisms/driSelectMulti"
-import test from "../components/test";
 
 export default {
   components: {

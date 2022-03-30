@@ -23,7 +23,6 @@
 <script>
 import driSelectAll from "@/components/organisms/driSelectAll"
 import FctTable from "@/components/organisms/FctTable"
-import test from "@/components/test"
 
 export default {
   components: {
