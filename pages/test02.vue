@@ -49,7 +49,6 @@
 </template>
 
 <script>
-import firebase from '@/plugins/firebase'
 import { getDatabase, ref, child, set, get, remove } from 'firebase/database'
 
 export default {
