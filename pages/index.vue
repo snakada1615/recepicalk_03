@@ -14,7 +14,6 @@
         <fct-table
           :items="myItems"
         ></fct-table>
-        <test/>
       </b-col>
     </b-row>
   </b-container>
