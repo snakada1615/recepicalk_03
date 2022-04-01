@@ -1,8 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app"
 
-
-// TODO: Replace the following with your app's Firebase project configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDH_RkqtAD6I-MQIcSVFVWDeeGzZUPI2pw",
   authDomain: "ifnaapp01.firebaseapp.com",
@@ -16,3 +14,4 @@ const firebaseConfig = {
 const firebase = initializeApp(firebaseConfig);
 
 export default firebase
+

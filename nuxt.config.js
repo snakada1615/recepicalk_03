@@ -29,6 +29,11 @@ export default {
     {src: '@/plugins/firebase'}
   ],
 
+  //
+  router: {
+    middleware: 'login'
+    },
+
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
 
