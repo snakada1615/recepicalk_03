@@ -31,7 +31,7 @@ export const state = () => ({
   /**
    * ログイン状態のフラグ
    */
-  isLoggedIn: '',
+  isLoggedIn: false,
   /**
    * fctのテーブル用の値
    */
@@ -199,22 +199,30 @@ export const actions = {
       })
   },
   /**
-   * ページリロードをすると認証が外れてしまうため、ログインを維持するために、onAuthを実装
+   * ログイン状態を確認し、ログインされていればユーザー情報をstoreにセット
    * @param commit
+   * @returns {Promise<unknown>}
    */
-  async onAuth({ commit }) {
-    const auth = await getAuth()
-    const user = await auth.currentUser
-    console.log(user)
-    if (user) {
-      commit('updateUserUid', user.uid)
-      commit('updateUserName', user.displayName)
-      commit('updateIsLoggedIn', true)
-      console.log('onAuth')
-    } else {
-      commit('updateUserUid', '')
-      commit('updateUserName', '')
-      commit('updateIsLoggedIn', false)
-    }
+  async initFirebaseAuth({commit}){
+    return new Promise((resolve) => {
+      let unsubscribe = getAuth().onAuthStateChanged((user) => {
+        if (user.uid){
+          commit('updateUserUid', user.uid)
+          commit('updateUserName', user.displayName)
+          commit('updateIsLoggedIn', true)
+          console.log('onAuth true')
+        } else {
+          commit('updateUserUid', '')
+          commit('updateUserName', '')
+          commit('updateIsLoggedIn', false)
+          console.log('onAuth false')
+        }
+        // user オブジェクトを resolve
+        resolve(user);
+
+        // 登録解除
+        unsubscribe();
+      });
+    });
   }
 }
