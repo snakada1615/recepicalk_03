@@ -14,6 +14,7 @@
           <b-dropdown-item to="/test02">test02</b-dropdown-item>
           <b-dropdown-item to="/test03">test03</b-dropdown-item>
           <b-dropdown-item to="/test04">test04</b-dropdown-item>
+          <b-dropdown-item to="/firetest/test02">firestore</b-dropdown-item>
           <b-dropdown-item to="/documents">documents</b-dropdown-item>
         </b-nav-item-dropdown>
 

@@ -4,7 +4,6 @@ export default async function ({store, redirect, route}) {
    */
   console.log('middleware login')
   await store.dispatch('fire/initFirebaseAuth')
-  console.log(store.state.fire.isLoggedIn)
   if (
     route.name !== 'logintest'
     && route.name !== 'index'
