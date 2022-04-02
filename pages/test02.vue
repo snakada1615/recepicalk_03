@@ -69,7 +69,8 @@
 
 <script>
 import {
-  getFirestore, doc, getDoc, setDoc, collection, addDoc, updateDoc, deleteDoc
+  getFirestore, doc, getDoc, setDoc, collection,
+  addDoc, updateDoc, deleteDoc
 } from 'firebase/firestore'
 
 export default {

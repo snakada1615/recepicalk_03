@@ -1,5 +1,6 @@
 <template>
   <b-container>
+    <b-button @click="setPersystence"></b-button>
     <div class="page">
       <label>
      <span>
@@ -69,7 +70,8 @@
 
 <script>
 import {
-  getFirestore, doc, getDoc, setDoc, collection, addDoc, updateDoc, deleteDoc
+  getFirestore, doc, getDoc, setDoc, collection,
+  addDoc, updateDoc, deleteDoc, enableIndexedDbPersistence
 } from 'firebase/firestore'
 
 export default {
@@ -87,6 +89,23 @@ export default {
     this.db = getFirestore()
   },
   methods: {
+    async setPersystence(){
+      enableIndexedDbPersistence(this.db)
+        .catch((err) => {
+          if (err.code === 'failed-precondition') {
+            console.log(
+              "// Multiple tabs open, persistence can only be enabled " +
+              "            // in one tab at a a time. "
+            )
+          } else if (err.code === 'unimplemented') {
+            console.log(
+              "// The current browser does not support all of the" +
+              "// features required to enable persistence"
+              )
+          }
+          throw err
+        });
+    },
     async insertData(){
       const ref = collection(this.db, "myMember")
       await addDoc(ref, {
