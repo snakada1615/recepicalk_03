@@ -206,7 +206,7 @@ export const actions = {
   async initFirebaseAuth({commit}){
     return new Promise((resolve) => {
       let unsubscribe = getAuth().onAuthStateChanged((user) => {
-        if (user.uid){
+        if (user){
           commit('updateUserUid', user.uid)
           commit('updateUserName', user.displayName)
           commit('updateIsLoggedIn', true)
