@@ -168,7 +168,7 @@ export const actions = {
     await signInWithPopup(auth, provider)
       .then((result) => {
         const credential = GoogleAuthProvider.credentialFromResult(result)
-        const token = credential.accessToken
+        //const token = credential.accessToken
 
         const user = result.user
         commit('updateUserUid', user.uid)
@@ -180,7 +180,7 @@ export const actions = {
         const errorCode = error.code
         const errorMessage = error.message
         commit('updateIsLoggedIn', false)
-        const credential = GoogleAuthProvider.credentialFromError(error)
+        //const credential = GoogleAuthProvider.credentialFromError(error)
 
         console.log('login error: ', errorCode, errorMessage)
       })
