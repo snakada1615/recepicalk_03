@@ -2,6 +2,7 @@
   <b-container >
     <b-row>
       <b-col lg="5">
+        <b-button to="logintest" variant="info">sign in</b-button>
         <dri-select-all
           :targetSwitch.sync="singleTarget"
           :max="max"

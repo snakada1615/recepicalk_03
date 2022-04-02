@@ -12,7 +12,7 @@ export default async function ({store, redirect, route}) {
   ) {
     alert('please login/register first')
     console.log('not login')
-    return redirect('logintest')
+    return redirect('/')
   } else {
     console.log('autologin complete:')
   }
