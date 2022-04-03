@@ -1,80 +1,30 @@
 <template>
   <b-container>
-    <b-button @click="setPersystence"></b-button>
-    <div class="page">
-      <label>
-     <span>
-       id:
-     </span>
-        <input
-          type="text"
-          v-model="user.id"
-        >
-      </label>
-      <label>
-     <span>
-       お名前:
-     </span>
-        <input
-          type="text"
-          v-model="user.name"
-        >
-      </label>
-      <label>
-     <span>
-       email:
-     </span>
-        <input
-          type="text"
-          v-model="user.email"
-        >
-      </label>
-      <button
-        type="button"
-        @click="insertData"
-        class="px-2 py-2"
-      >
-        Submit
-      </button>
-      <button
-        type="button"
-        @click="insertDataCustomId"
-        class="px-2 py-2"
-      >
-        SubmitId
-      </button>
-      <button
-        type="button"
-        @click="updateData"
-        class="px-2 py-2"
-      >
-        update
-      </button>
-      <button
-        type="button"
-        @click="getData"
-        class="px-2 py-2"
-      >
-        Get
-      </button>
-      <button
-        type="button"
-        @click="removeData"
-        class="px-2 py-2"
-      >
-        Delete
-      </button>
-    </div>
+    <b-button @click="setPersystence" variant="primary">setPersistence</b-button>
+    <network-toggle/>
+    <b-form-input v-model="user.id" placeholder="Enter ID" class="my-1"/>
+    <b-form-input v-model="user.name" placeholder="Enter 名前" class="my-1"/>
+    <b-form-input v-model="user.email" placeholder="Enter email" class="my-1"/>
+    <b-button @click="insertDataCustomId" variant="info" class="px-2 py-2">Add</b-button>
+    <b-button @click="updateData" variant="info" class="px-2 py-2">Update</b-button>
+    <b-button @click="getData" variant="info" class="px-2 py-2">Get</b-button>
+    <b-button @click="removeData" variant="info" class="px-2 py-2">Remove</b-button>
   </b-container>
 </template>
 
 <script>
 import {
-  getFirestore, doc, getDoc, setDoc, collection,
-  addDoc, updateDoc, deleteDoc, enableIndexedDbPersistence
+  doc, getDoc, setDoc, collection, getDocFromCache,
+  addDoc, updateDoc, deleteDoc, enableIndexedDbPersistence,
+  getDocFromServer
 } from 'firebase/firestore'
+import networkToggle from "@/components/organisms/networkToggle";
+import {firestoreDb} from "~/plugins/firebasePlugin";
 
 export default {
+  components: {
+    networkToggle
+  },
   data () {
     return {
       user: {
@@ -84,9 +34,6 @@ export default {
       },
       db:'',
     }
-  },
-  mounted:function (){
-    this.db = getFirestore()
   },
   methods: {
     async setPersystence(){
@@ -107,7 +54,7 @@ export default {
         });
     },
     async insertData(){
-      const ref = collection(this.db, "myMember")
+      const ref = collection(firestoreDb, "myMember")
       await addDoc(ref, {
         id: this.user.id,
         name: this.user.name,
@@ -118,7 +65,7 @@ export default {
       this.user.email = ''
     },
     async insertDataCustomId(){
-      const ref = doc(this.db, "myMember", this.user.id)
+      const ref = doc(firestoreDb, "myMember", this.user.id)
       await setDoc(ref, {
         id: this.user.id,
         name: this.user.name,
@@ -129,7 +76,7 @@ export default {
       this.user.email = ''
     },
     async updateData(){
-      const ref = doc(this.db, "myMember", this.user.id)
+      const ref = doc(firestoreDb, "myMember", this.user.id)
       await updateDoc(ref, {
         id: this.user.id,
         name: this.user.name,
@@ -140,7 +87,7 @@ export default {
       this.user.email = ''
     },
     async removeData(){
-      const ref = doc(this.db, "myMember", this.user.id)
+      const ref = doc(firestoreDb, "myMember", this.user.id)
       const docSnap = await getDoc(ref)
       if (docSnap.exists()) {
         await deleteDoc(ref)
@@ -152,7 +99,7 @@ export default {
       this.user.email = ''
     },
     async getData(){
-      const ref = doc(this.db, "myMember", this.user.id)
+      const ref = await doc(firestoreDb, "myMember", this.user.id)
       const docSnap = await getDoc(ref)
       if (docSnap.exists()) {
         this.user.name = docSnap.data().name
@@ -163,6 +110,32 @@ export default {
         this.user.email = ''
         alert('id does not match')
       }
+
+      await getDocFromCache(ref).then((doc)=>{
+        if (doc.exists()) {
+          console.log('getData from cache')
+          this.user.name = doc.data().name
+          this.user.email = doc.data().email
+        } else {
+          this.user.id = ''
+          this.user.name = ''
+          this.user.email = ''
+          alert('id does not match')
+        }
+      }).catch(async ()=>{
+        await getDocFromServer(ref).then((doc)=>{
+          if (doc.exists()) {
+            console.log('getData from server')
+            this.user.name = doc.data().name
+            this.user.email = doc.data().email
+          } else {
+            this.user.id = ''
+            this.user.name = ''
+            this.user.email = ''
+            alert('id does not match')
+          }
+        })
+      })
     }
   },
 }

@@ -1,8 +1,8 @@
 <template>
-  <div>
+  <b-container>
     <p>ステータスコード：{{ error.statusCode }}</p>
     <p>メッセージ：{{ error.message }}</p>
-  </div>
+  </b-container>
 </template>
 
 <script>
