@@ -3,6 +3,8 @@ import {
   getAuth, signInAnonymously, setPersistence, signInWithPopup,
   GoogleAuthProvider, browserLocalPersistence, signOut
 } from "firebase/auth";
+//import {doc} from "firebase/firestore";
+//import {firestoreDb} from "~/plugins/firebasePlugin";
 
 
 export const state = () => ({
@@ -82,6 +84,11 @@ export const mutations = {
   }
 }
 export const actions = {
+  /**
+   * ****************************
+   * @description ここからauth関連機能
+   * ****************************
+   */
   /**
    * ログアウト機能
    * @param commit
@@ -207,5 +214,44 @@ export const actions = {
         unsubscribe();
       });
     });
-  }
+  },
+  /**
+   * ********************************************************
+   * @description ここからfirestore関連機能
+   * ********************************************************
+   */
+  /**
+   * firebaseからデータを得てfctに代入
+   * @param commit
+   * @param state
+   * @returns {Promise<void>}
+   */
+  async fireGetFct({commit, state}) {
+    const path = state.user + '/dataset/'
+    const dat = await get(child(dbRef, path + 'myFCT01')).catch((err) => {
+      console.log(err)
+    });
+    if (!dat.exists()) {
+      console.log('no data found')
+    }
+    commit('updateFct', dat)
+  },
+  /**
+   * firebaseからデータを得てdriに代入
+   * @param commit
+   * @param state
+   * @returns {Promise<void>}
+   */
+  async fireGetDri({commit, state}) {
+    const path = state.user.name + '/dataset/'
+    const dat = await get(child(dbRef, path + 'myDri04')).catch((err) => {
+      console.log(err)
+    });
+    if (!dat.exists()) {
+      console.log('no data found')
+    }
+    commit('updateDri', dat)
+  },
+
+
 }

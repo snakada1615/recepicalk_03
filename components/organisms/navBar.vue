@@ -26,6 +26,8 @@
           <b-dropdown-item to="#" class="small">user: {{$store.state.fire.user.name}}</b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
+      <b-nav-text v-if="$nuxt.isOnline" class="text-light small"><b-icon icon="reception4"/></b-nav-text>
+      <div v-if="$nuxt.isOffline" class="text-light small"><b-icon icon="reception0"/></div>
     </b-navbar>
   </b-container>
 </template>
