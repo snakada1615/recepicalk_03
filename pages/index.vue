@@ -117,7 +117,7 @@ export default {
   },
   methods: {
     test(){
-      this.$store.dispatch('fire/initDri')
+      this.$store.dispatch('fire/initAll')
     }
   }
 }

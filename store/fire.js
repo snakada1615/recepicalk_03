@@ -7,24 +7,27 @@ import {fireGetDoc} from "~/plugins/firebasePlugin";
 //import {doc} from "firebase/firestore";
 //import {firestoreDb} from "~/plugins/firebasePlugin";
 
-function MenuItem(id, Group, Name, En, Pr, Va, Fe, Wt){
+/*
+function MenuItem(id, Group, Name, En, Pr, Va, Fe, Wt) {
   this.id = id
-  this.Group= Group
-  this.Name= Name
-  this.En= En
-  this.Pr= Pr
-  this.Va= Va
-  this.Fe= Fe
-  this.Wt= Wt
+  this.Group = Group
+  this.Name = Name
+  this.En = En
+  this.Pr = Pr
+  this.Va = Va
+  this.Fe = Fe
+  this.Wt = Wt
 }
-function Target(id, count){
+
+function Target(id, count) {
   this.id = id
   this.count = count
 }
+*/
 
 
 export const state = () => ({
-  myApp:{
+  myApp: {
     /**
      * 現在のユーザー
      */
@@ -43,23 +46,23 @@ export const state = () => ({
     /**
      * 利用するデータセット：fctとdri
      */
-    dataSet:{
+    dataSet: {
       /**
        * fctのid
        */
-      fctId:'',
+      fctId: '',
       /**
        * driのid
        */
-      driId:'',
+      driId: '',
       /**
        * fctのデータ
        */
-      fct:[],
+      fct: [],
       /**
        * driのデータ
        */
-      dri:[]
+      dri: []
     },
     /**
      * シナリオの数（各シナリオに10の食事パターンが存在）
@@ -72,11 +75,11 @@ export const state = () => ({
     /**
      * 各シナリオに対応したデータ(menu/target)
      */
-    dietCases:[],
+    menuCases: [],
     /**
      * 各シナリオに対応したデータ(answerList)
      */
-    feasibilityCases:[],
+    feasibilityCases: [],
     /**
      * 最後に保存した日時
      */
@@ -122,6 +125,22 @@ export const mutations = {
     state.myApp.dataSet.dri = JSON.parse(JSON.stringify(payload))
   },
   /**
+   * menuCasesを更新
+   * @param state
+   * @param payload
+   */
+  updateMenuCases: function(state, payload){
+    state.myApp.menuCases = JSON.parse(JSON.stringify(payload))
+  },
+  /**
+   * feasibilityCasesを更新
+   * @param state
+   * @param payload
+   */
+  updateFeasibilityCases: function(state, payload){
+    state.myApp.feasibilityCases = JSON.parse(JSON.stringify(payload))
+  },
+  /**
    * ログイン状態を更新
    * @param state
    * @param {boolean} payload ログイン状態
@@ -141,7 +160,7 @@ export const actions = {
    * @param commit
    * @returns {Promise<void>}
    */
-  async logOut({commit}){
+  async logOut({commit}) {
     const auth = getAuth();
     signOut(auth).then(() => {
       commit('updateUserUid', '')
@@ -240,10 +259,10 @@ export const actions = {
    * @param commit
    * @returns {Promise<unknown>}
    */
-  async initFirebaseAuth({commit}){
+  async initFirebaseAuth({commit}) {
     return new Promise((resolve) => {
       let unsubscribe = getAuth().onAuthStateChanged((user) => {
-        if (user){
+        if (user) {
           commit('updateUserUid', user.uid)
           commit('updateUserName', user.displayName)
           commit('updateIsLoggedIn', true)
@@ -273,9 +292,9 @@ export const actions = {
    * @param commit
    * @returns {Promise<void>}
    */
-  async initFct({commit}){
+  async initFct({commit}) {
     const fct = await fireGetDoc('dataset', 'fct01')
-    if (fct){
+    if (fct) {
       commit('updateFct', fct)
     } else {
       throw new Error('initFct fail: no data')
@@ -287,13 +306,37 @@ export const actions = {
    * @param commit
    * @returns {Promise<void>}
    */
-  async initDri({commit}){
+  async initDri({commit}) {
     const dri = await fireGetDoc('dataset', 'dri01')
-    if (dri){
+    if (dri) {
       commit('updateDri', dri)
     } else {
       throw new Error('initDri fail: no data')
     }
+  },
+  /**
+   * menuCasesを初期化（空白ArrayをsetCountの数だけ作成）
+   * @param state
+   * @param commit
+   */
+  initMenu({state, commit}){
+    const arr = new Array(state.myApp.sceneCount)
+    commit('updateMenuCases', arr)
+  },
+  /**
+   * feasibilityCasesを初期化（空白ArrayをsetCountの数だけ作成）
+   * @param state
+   * @param commit
+   */
+  initFeasibility({state, commit}){
+    const arr = new Array(state.myApp.sceneCount)
+    commit('updateFeasibilityCases', arr)
+  },
+  initAll({dispatch}){
+    dispatch('initFct')
+    dispatch('initDri')
+    dispatch('initMenu')
+    dispatch('initFeasibility')
   },
   /**
    * firebaseからデータを得てfctに代入
