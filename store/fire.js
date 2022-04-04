@@ -290,12 +290,15 @@ export const actions = {
    * fctの初期データをdataset/fct01から読み込んでstoreに反映
    *     データが存在しない場合はエラー
    * @param commit
+   * @param dispatch
    * @returns {Promise<void>}
    */
-  async initFct({commit}) {
+  async initFct({commit, dispatch}) {
     const fct = await fireGetDoc('dataset', 'fct01')
     if (fct) {
-      commit('updateFct', fct)
+      const fctArray = await dispatch('formatFct', fct)
+      console.log(fctArray)
+      commit('updateFct', fctArray)
     } else {
       throw new Error('initFct fail: no data')
     }
@@ -304,15 +307,60 @@ export const actions = {
    * driの初期データをdataset/dri01から読み込んでstoreに反映
    *     データが存在しない場合はエラー
    * @param commit
+   * @param dispatch
    * @returns {Promise<void>}
    */
-  async initDri({commit}) {
+  async initDri({commit, dispatch}) {
     const dri = await fireGetDoc('dataset', 'dri01')
     if (dri) {
-      commit('updateDri', dri)
+      const driArray = await dispatch('formatDri', dri)
+      commit('updateDri', driArray)
     } else {
       throw new Error('initDri fail: no data')
     }
+  },
+  /**
+   * JSON -→ array of objectに変換
+   * @param fct fct(JSON形式)
+   * @returns {{}[]}
+   */
+  formatFct({}, fct){
+    let res = []
+    for (let key of Object.keys(fct)) {
+      let resObj = {}
+      resObj.Carbohydrate = fct[key].Carbohydrate
+      resObj.En = fct[key].Energy
+      resObj.Fe = fct[key].FE
+      resObj.Fat = fct[key].Fat
+      resObj.Name = fct[key].Food_name
+      resObj.Pr = fct[key].Protein
+      resObj.Va = fct[key].VITA_RAE
+      resObj.Group = fct[key].food_group_unicef
+      resObj.food_grp_id = fct[key].food_grp_id
+      resObj.id = fct[key].FCT_id
+      res.push(resObj)
+    }
+    return res
+  },
+  /**
+   * JSON -→ array of objectに変換
+   * @param dri dri(JSON形式)
+   * @returns {{}[]}
+   */
+  formatDri({}, dri){
+    let res = []
+    for (let key of Object.keys(dri)) {
+      let resObj = {}
+      resObj.En = dri[key].energy
+      resObj.Fe = dri[key].fe
+      resObj.Pr = dri[key].protein
+      resObj.Va = dri[key].vita
+      resObj.Name = dri[key].nut_group
+      resObj.id = dri[key].id
+      resObj.max_vol = dri[key].max_vol
+      res.push(resObj)
+    }
+    return res
   },
   /**
    * menuCasesを初期化（空白ArrayをsetCountの数だけ作成）
