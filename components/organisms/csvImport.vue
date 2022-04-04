@@ -5,6 +5,9 @@
   </div>
 </template>
 <script>
+/**
+ * @disc csvファイルをjsonに変換して返す
+ */
 export default {
   props: {
     /**

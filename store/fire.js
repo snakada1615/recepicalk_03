@@ -3,42 +3,89 @@ import {
   getAuth, signInAnonymously, setPersistence, signInWithPopup,
   GoogleAuthProvider, browserLocalPersistence, signOut
 } from "firebase/auth";
+import {fireGetDoc} from "~/plugins/firebasePlugin";
 //import {doc} from "firebase/firestore";
 //import {firestoreDb} from "~/plugins/firebasePlugin";
 
+function MenuItem(id, Group, Name, En, Pr, Va, Fe, Wt){
+  this.id = id
+  this.Group= Group
+  this.Name= Name
+  this.En= En
+  this.Pr= Pr
+  this.Va= Va
+  this.Fe= Fe
+  this.Wt= Wt
+}
+function Target(id, count){
+  this.id = id
+  this.count = count
+}
+
 
 export const state = () => ({
-  /**
-   * ログインしているユーザー
-   */
-  user: {
-    name: 'shun',
-    email: '',
-    country: '',
-    subnational1: '',
-    subnational2: '',
-    subnational3: '',
-    organization: '',
-    title: '',
-    uid: '',
-    phoneNumber: ''
+  myApp:{
+    /**
+     * 現在のユーザー
+     */
+    user: {
+      name: '',
+      email: '',
+      country: '',
+      subnational1: '',
+      subnational2: '',
+      subnational3: '',
+      organization: '',
+      title: '',
+      uid: '',
+      phoneNumber: ''
+    },
+    /**
+     * 利用するデータセット：fctとdri
+     */
+    dataSet:{
+      /**
+       * fctのid
+       */
+      fctId:'',
+      /**
+       * driのid
+       */
+      driId:'',
+      /**
+       * fctのデータ
+       */
+      fct:[],
+      /**
+       * driのデータ
+       */
+      dri:[]
+    },
+    /**
+     * シナリオの数（各シナリオに10の食事パターンが存在）
+     */
+    sceneCount: 10,
+    /**
+     * 現在のシナリオid（各シナリオに10の食事パターンが存在）
+     */
+    scene: 0,
+    /**
+     * 各シナリオに対応したデータ(menu/target)
+     */
+    dietCases:[],
+    /**
+     * 各シナリオに対応したデータ(answerList)
+     */
+    feasibilityCases:[],
+    /**
+     * 最後に保存した日時
+     */
+    saveDate: '',
   },
-  /**
-   * 現在のシナリオid（各シナリオに10の食事パターンが存在）
-   */
-  scene: 'test',
   /**
    * ログイン状態のフラグ
    */
   isLoggedIn: false,
-  /**
-   * fctのテーブル用の値
-   */
-  fct: [],
-  /**
-   * driのテーブル用の値
-   */
-  dri: []
 })
 export const getters = {}
 export const mutations = {
@@ -48,7 +95,7 @@ export const mutations = {
    * @param payload 更新する値（JSON）
    */
   updateUserUid: function (state, payload) {
-    state.user.uid = payload
+    state.myApp.user.uid = payload
   },
   /**
    * user.nameを更新
@@ -56,7 +103,7 @@ export const mutations = {
    * @param payload 更新する値（JSON）
    */
   updateUserName: function (state, payload) {
-    state.user.name = payload
+    state.myApp.user.name = payload
   },
   /**
    * fctを更新
@@ -64,7 +111,7 @@ export const mutations = {
    * @param payload 更新する値（JSON）
    */
   updateFct: function (state, payload) {
-    state.fct = JSON.parse(JSON.stringify(payload))
+    state.myApp.dataSet.fct = JSON.parse(JSON.stringify(payload))
   },
   /**
    * driを更新
@@ -72,7 +119,7 @@ export const mutations = {
    * @param payload 更新する値（JSON）
    */
   updateDri: function (state, payload) {
-    state.dri = JSON.parse(JSON.stringify(payload))
+    state.myApp.dataSet.dri = JSON.parse(JSON.stringify(payload))
   },
   /**
    * ログイン状態を更新
@@ -221,13 +268,41 @@ export const actions = {
    * ********************************************************
    */
   /**
+   * fctの初期データをdataset/fct01から読み込んでstoreに反映
+   *     データが存在しない場合はエラー
+   * @param commit
+   * @returns {Promise<void>}
+   */
+  async initFct({commit}){
+    const fct = await fireGetDoc('dataset', 'fct01')
+    if (fct){
+      commit('updateFct', fct)
+    } else {
+      throw new Error('initFct fail: no data')
+    }
+  },
+  /**
+   * driの初期データをdataset/dri01から読み込んでstoreに反映
+   *     データが存在しない場合はエラー
+   * @param commit
+   * @returns {Promise<void>}
+   */
+  async initDri({commit}){
+    const dri = await fireGetDoc('dataset', 'dri01')
+    if (dri){
+      commit('updateDri', dri)
+    } else {
+      throw new Error('initDri fail: no data')
+    }
+  },
+  /**
    * firebaseからデータを得てfctに代入
    * @param commit
    * @param state
    * @returns {Promise<void>}
    */
   async fireGetFct({commit, state}) {
-    const path = state.user + '/dataset/'
+    const path = state.myApp.user + '/dataset/'
     const dat = await get(child(dbRef, path + 'myFCT01')).catch((err) => {
       console.log(err)
     });
@@ -243,7 +318,7 @@ export const actions = {
    * @returns {Promise<void>}
    */
   async fireGetDri({commit, state}) {
-    const path = state.user.name + '/dataset/'
+    const path = state.myApp.user.name + '/dataset/'
     const dat = await get(child(dbRef, path + 'myDri04')).catch((err) => {
       console.log(err)
     });

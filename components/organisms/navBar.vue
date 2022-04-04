@@ -23,7 +23,7 @@
           <template #button-content>
             <em>User</em>
           </template>
-          <b-dropdown-item to="#" class="small">user: {{$store.state.fire.user.name}}</b-dropdown-item>
+          <b-dropdown-item to="#" class="small">user: {{$store.state.fire.myApp.user.name}}</b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
       <b-nav-text v-if="$nuxt.isOnline" class="text-light small"><b-icon icon="reception4"/></b-nav-text>

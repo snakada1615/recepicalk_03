@@ -1,7 +1,8 @@
 // Import the functions you need from the SDKs you need
 import {initializeApp} from "firebase/app"
-import {initializeFirestore, CACHE_SIZE_UNLIMITED,
-  enableMultiTabIndexedDbPersistence
+import {
+  initializeFirestore, CACHE_SIZE_UNLIMITED,
+  enableMultiTabIndexedDbPersistence, doc, getDocFromCache, getDocFromServer
 } from "firebase/firestore"
 
 /**
@@ -63,3 +64,17 @@ enableMultiTabIndexedDbPersistence(firestore)
 //firestore.enablePersistence({synchronizeTabs:true})
 
 export const firestoreDb = firestore
+
+export async function fireGetDoc(collectionId, docId) {
+  const ref = await doc(firestoreDb, collectionId, docId)
+  const docSnap = await getDocFromCache(ref).catch(async () => {
+    return await getDocFromServer(ref)
+  })
+  if (docSnap.exists()) {
+    console.log('getData from cache')
+    return docSnap.data()
+  } else {
+    console.log('getData fail: no data in Cache')
+    return ''
+  }
+}

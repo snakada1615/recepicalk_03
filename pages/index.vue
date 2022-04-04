@@ -2,7 +2,11 @@
   <b-container >
     <b-row>
       <b-col lg="5">
+        <b-button @click="test" variant="warning">XXXXX</b-button>
         <b-button to="logintest" variant="info">sign in</b-button>
+        <b-card>
+          {{$store.state.fire.myApp.dataSet.dri}}
+        </b-card>
         <dri-select-all
           :targetSwitch.sync="singleTarget"
           :max="max"
@@ -111,6 +115,10 @@ export default {
       ]
     }
   },
-  methods: {}
+  methods: {
+    test(){
+      this.$store.dispatch('fire/initDri')
+    }
+  }
 }
 </script>
