@@ -95,7 +95,7 @@ export default {
       this.user.email = ''
     },
     async removeData() {
-      const ref = doc(firestoreDb, "myMember", this.user.id)
+      const ref = doc(firestoreDb, "users", this.user.id)
       const docSnap = await getDoc(ref)
       if (docSnap.exists()) {
         await deleteDoc(ref)

@@ -70,7 +70,7 @@ export default {
       ],
       content:[],
       myMarkDown:[
-        '../docs/driSelectAll.md',
+        '../driSelectAll.md',
         '../docs/driSelectMulti.md',
         '../docs/driSelectSingle.md',
         '../docs/fctTable.md',
@@ -114,7 +114,7 @@ export default {
   },
   methods: {
     async getAxios(val){
-      const res = await this.$axios.get(val)
+      const res = await this.$axios.get(val, { baseURL: window.location.origin })
       return res.data
     }
   }

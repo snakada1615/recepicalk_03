@@ -1,8 +1,10 @@
 <template>
   <b-container>
-    <b-button @click="anonymous">anonymous</b-button>
-    <b-button @click="auth">google</b-button>
+    <b-button @click="register">register</b-button>
+    <b-button @click="login">login</b-button>
     <b-button @click="logOut">logout</b-button>
+    <b-form-input v-model="user" placeholder="Enter username"/>
+    <b-form-input v-model="pass" placeholder="Enter password"/>
     <b-card>
       <div>
         login:
@@ -16,7 +18,19 @@
 </template>
 <script>
 export default {
+  data() {
+    return {
+      user:'',
+      pass:''
+    }
+  },
   methods:{
+    register(){
+      this.$store.dispatch('fire/registerEmail', {name: this.user, password: this.pass});
+    },
+    login(){
+      this.$store.dispatch('fire/loginEmail', {name: this.user, password: this.pass});
+    },
     auth(){
       this.$store.dispatch('fire/loginGoogle')
     },

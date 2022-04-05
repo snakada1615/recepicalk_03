@@ -5,7 +5,6 @@
         <b-button @click="test" variant="warning">XXXXX</b-button>
         <b-button to="logintest" variant="info">sign in</b-button>
         <b-card>
-          {{$store.state.fire.myApp.dataSet.dri}}
         </b-card>
         <dri-select-all
           :targetSwitch.sync="singleTarget"
@@ -55,7 +54,7 @@ export default {
   },
   methods: {
     test(){
-      this.$store.dispatch('fire/initAll')
+      //this.$store.dispatch('fire/initAll')
     }
   }
 }

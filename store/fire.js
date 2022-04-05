@@ -1,11 +1,13 @@
 //import firebase from '~/plugins/firebase'
-import {
-  getAuth, signInAnonymously, setPersistence, signInWithPopup,
-  GoogleAuthProvider, browserLocalPersistence, signOut
-} from "firebase/auth";
-import {fireGetDoc} from "~/plugins/firebasePlugin";
 //import {doc} from "firebase/firestore";
 //import {firestoreDb} from "~/plugins/firebasePlugin";
+import {
+  getAuth, signInAnonymously, setPersistence, signInWithPopup,
+  GoogleAuthProvider, browserLocalPersistence, signOut,
+  createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile
+} from "firebase/auth";
+import {fireGetDoc, firestoreDb} from "~/plugins/firebasePlugin";
+import {doc, setDoc} from "firebase/firestore";
 
 /*
 function MenuItem(id, Group, Name, En, Pr, Va, Fe, Wt) {
@@ -92,6 +94,29 @@ export const state = () => ({
 })
 export const getters = {}
 export const mutations = {
+  clearMyApp({state}){
+    state.myApp.user.name=''
+    state.myApp.user.uid = ''
+    state.myApp.dataSet.fct=[]
+    state.myApp.dataSet.dri=[]
+    state.myApp.menuCases = []
+    state.myApp.feasibilityCases = []
+    state.myApp.saveDate = ''
+  },
+  /**
+   * myAppを更新
+   * @param state
+   * @param payload 更新する値（JSON）
+   */
+  updateMyApp: function (state, payload) {
+    state.myApp = JSON.parse(JSON.stringify(payload))
+  },
+  updateUser: function ({state}, payload){
+    state.myApp.user.uid = payload.uid
+    state.myApp.user.name = payload.displayName
+    state.myApp.user.email = payload.email
+    state.myApp.user.phoneNumber = payload.phoneNumber
+  },
   /**
    * user.Uidを更新
    * @param state
@@ -151,9 +176,9 @@ export const mutations = {
 }
 export const actions = {
   /**
-   * ****************************
+   * **********************************************************************************************
    * @description ここからauth関連機能
-   * ****************************
+   * **********************************************************************************************
    */
   /**
    * ログアウト機能
@@ -163,8 +188,7 @@ export const actions = {
   async logOut({commit}) {
     const auth = getAuth();
     signOut(auth).then(() => {
-      commit('updateUserUid', '')
-      commit('updateUserName', '')
+      commit('clearMyApp')
       commit('updateIsLoggedIn', false)
     }).catch((error) => {
       // An error happened.
@@ -186,7 +210,7 @@ export const actions = {
       .then((result) => {
         const user = result.user
         commit('updateUserUid', user.uid)
-        commit('updateUserName', user.displayName)
+        commit('updateUserName', 'test user')
         commit('updateIsLoggedIn', true)
 
         console.log('guest login success')
@@ -223,9 +247,6 @@ export const actions = {
 
     await signInWithPopup(auth, provider)
       .then((result) => {
-        //const credential = GoogleAuthProvider.credentialFromResult(result)
-        //const token = credential.accessToken
-
         const user = result.user
         commit('updateUserUid', user.uid)
         commit('updateUserName', user.displayName)
@@ -255,21 +276,113 @@ export const actions = {
       })
   },
   /**
-   * ログイン状態を確認し、ログインされていればユーザー情報をstoreにセット
+   * name/passwordでログイン(signInWithEmailAndPasswordを流用)
    * @param commit
+   * @param payload ログイン情報
+   *     {payload.name, payload.password}
+   * @returns {Promise<void>}
+   */
+  async loginEmail({commit}, payload){
+    const auth = getAuth();
+    const email = payload.name + '@ifna.app'
+    const res = await signInWithEmailAndPassword(auth, email, payload.password)
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        commit('updateIsLoggedIn', false)
+        alert('login error: ' + errorCode + ': ' + errorMessage)
+      });
+    const user = res.user
+    //commit('updateUser', user)
+    commit('updateUserUid', user.uid)
+    commit('updateUserName', user.displayName)
+    commit('updateIsLoggedIn', true)
+    console.log('login success')
+
+    /**
+     * 認証状態の永続性についてはsetPersistenceで設定
+     */
+    await setPersistence(auth, browserLocalPersistence)
+      .then(() => {
+        console.log('keeping state')
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log('keeping state error: ', errorCode, errorMessage)
+      })
+  },
+  /**
+   * name/passwordでアカウント作成(signInWithEmailAndPasswordを流用)
+   * @param commit
+   * @param payload
+   * @returns {Promise<void>}
+   */
+  async registerEmail({commit}, payload){
+    const auth = getAuth();
+    const email = payload.name + '@ifna.app'
+    console.log(payload)
+    const res = await createUserWithEmailAndPassword(auth, email, payload.password)
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        commit('updateIsLoggedIn', false)
+        alert('login error: ' + errorCode + ': ' + errorMessage)
+        // ..
+      });
+    const user = res.user
+    await updateProfile(user, {
+      displayName: payload.name,
+      email: email
+    }).catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        commit('updateIsLoggedIn', false)
+        alert('login error: ' + errorCode + ': ' + errorMessage)
+        // ..
+      });
+
+    commit('updateUser', user)
+    //commit('updateUserUid', user.uid)
+    //commit('updateUserName', user.displayName)
+    commit('updateIsLoggedIn', true)
+    console.log('login success')
+    /**
+     * 認証状態の永続性についてはsetPersistenceで設定
+     */
+    await setPersistence(auth, browserLocalPersistence)
+      .then(() => {
+        console.log('keeping state')
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log('keeping state error: ', errorCode, errorMessage)
+      })
+  },
+  /**
+   * ページ遷移・リロード時にログイン状態を確認し、
+   *     ログインされていればユーザー情報をstoreにセット
+   * @param commit
+   * @param dispatch
+   * @param state
    * @returns {Promise<unknown>}
    */
-  async initFirebaseAuth({commit}) {
+  async initFirebaseAuth({commit, dispatch, state}) {
     return new Promise((resolve) => {
-      let unsubscribe = getAuth().onAuthStateChanged((user) => {
+      let unsubscribe = getAuth().onAuthStateChanged(async(user) => {
         if (user) {
-          commit('updateUserUid', user.uid)
-          commit('updateUserName', user.displayName)
           commit('updateIsLoggedIn', true)
+          //ログイン成功したら、ユーザーデータ(myApp)をfetch→store
+          await dispatch('loadMyApp', user.uid).catch(async()=>{
+            alert('no data registered, load initial dataset')
+            await dispatch('initAll', user)
+          })
           console.log('onAuth true')
         } else {
-          commit('updateUserUid', '')
-          commit('updateUserName', '')
+          if (state.myApp.length) {
+            commit('clearMyApp')
+          }
           commit('updateIsLoggedIn', false)
           console.log('onAuth false')
         }
@@ -297,7 +410,6 @@ export const actions = {
     const fct = await fireGetDoc('dataset', 'fct01')
     if (fct) {
       const fctArray = await dispatch('formatFct', fct)
-      console.log(fctArray)
       commit('updateFct', fctArray)
     } else {
       throw new Error('initFct fail: no data')
@@ -380,44 +492,57 @@ export const actions = {
     const arr = new Array(state.myApp.sceneCount)
     commit('updateFeasibilityCases', arr)
   },
-  initAll({dispatch}){
-    dispatch('initFct')
-    dispatch('initDri')
-    dispatch('initMenu')
-    dispatch('initFeasibility')
+  /**
+   * まとめて初期化
+   * @param dispatch
+   * @param state
+   * @param payload
+   * @param commit
+   */
+  async initAll({dispatch, state, commit}, payload){
+    if (!payload) {throw new Error('initAll fail: no registered user-info')}
+    //console.log(payload)
+    //await commit('updateUser', payload).catch((err) =>{console.log('catchme')})
+    commit('updateUserUid', payload.uid)
+    commit('updateUserName', payload.displayName)
+
+    await dispatch('initFct')
+    await dispatch('initDri')
+    await dispatch('initMenu')
+    await dispatch('initFeasibility')
+    await dispatch('saveAppdata')
   },
   /**
-   * firebaseからデータを得てfctに代入
+   * myAppをfirestoreからfetchしてstoreに保存
+   * @param state
    * @param commit
+   * @param payload
+   * @returns {Promise<void>}
+   */
+  async loadMyApp({state, commit}, payload){
+    const myApp = await fireGetDoc('users', payload)
+    if (myApp) {
+      commit('updateMyApp', myApp)
+    } else {
+      throw new Error('loadMyApp fail: no data on fireStore')
+    }
+  },
+  /**
+   * 現在のユーザーの全テータをfirestoreに保存
+   * <ul>
+   *   <li>client側のデータ：store-myApp以下の全ノード
+   *   <li>collection：user
+   *   <li>doc：ユーザーのuid
    * @param state
    * @returns {Promise<void>}
    */
-  async fireGetFct({commit, state}) {
-    const path = state.myApp.user + '/dataset/'
-    const dat = await get(child(dbRef, path + 'myFCT01')).catch((err) => {
-      console.log(err)
-    });
-    if (!dat.exists()) {
-      console.log('no data found')
-    }
-    commit('updateFct', dat)
-  },
-  /**
-   * firebaseからデータを得てdriに代入
-   * @param commit
-   * @param state
-   * @returns {Promise<void>}
-   */
-  async fireGetDri({commit, state}) {
-    const path = state.myApp.user.name + '/dataset/'
-    const dat = await get(child(dbRef, path + 'myDri04')).catch((err) => {
-      console.log(err)
-    });
-    if (!dat.exists()) {
-      console.log('no data found')
-    }
-    commit('updateDri', dat)
-  },
+  async saveAppdata({state}){
+    const ref = doc(firestoreDb, 'users', state.myApp.user.uid)
+    setDoc(ref, state.myApp).catch((err) => {
+      throw new Error('Error in fireAddDocWithId:'+ err)
+    })
+    console.log('saveAppdata: success')
+  }
 
 
 }
