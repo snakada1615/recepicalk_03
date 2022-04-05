@@ -7,7 +7,8 @@ import {
 
 /**
  * データベースの設定情報
- * @type {{storageBucket: string, apiKey: string, messagingSenderId: string, appId: string, projectId: string, databaseURL: string, authDomain: string}}
+ * @type {{storageBucket: string, apiKey: string, messagingSenderId:
+ *     string, appId: string, projectId: string, databaseURL: string, authDomain: string}}
  */
 const firebaseConfig = {
   apiKey: "AIzaSyDH_RkqtAD6I-MQIcSVFVWDeeGzZUPI2pw",
