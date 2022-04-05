@@ -305,6 +305,8 @@ export const actions = {
     await setPersistence(auth, browserLocalPersistence)
       .then(() => {
         console.log('keeping state')
+        //topページに移動
+        this.$router.push('/')
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -342,9 +344,9 @@ export const actions = {
         // ..
       });
 
-    commit('updateUser', user)
-    //commit('updateUserUid', user.uid)
-    //commit('updateUserName', user.displayName)
+    //commit('updateUser', user)
+    commit('updateUserUid', user.uid)
+    commit('updateUserName', user.displayName)
     commit('updateIsLoggedIn', true)
     console.log('login success')
     /**
@@ -353,6 +355,8 @@ export const actions = {
     await setPersistence(auth, browserLocalPersistence)
       .then(() => {
         console.log('keeping state')
+        //topページに移動
+        this.$router.push('/')
       })
       .catch((error) => {
         const errorCode = error.code;

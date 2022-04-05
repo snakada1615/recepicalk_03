@@ -41,6 +41,12 @@
         <div v-if="link8">
           <markdown-it-vue class="md-body" :content="content[7]" />
         </div>
+        <div v-if="link9">
+          <markdown-it-vue class="md-body" :content="content[8]" />
+        </div>
+        <div v-if="link10">
+          <markdown-it-vue class="md-body" :content="content[9]" />
+        </div>
       </b-col>
     </b-row>
   </b-container>
@@ -66,18 +72,22 @@ export default {
         { text: 'fctTableModal', value: 5 },
         { text: 'foodModal', value: 6 },
         { text: 'nutritionBar', value: 7 },
-        { text: 'recepiTable', value: 8 }
+        { text: 'recepiTable', value: 8 },
+        { text: 'csvImport', value: 9 },
+        { text: 'navBar', value: 10 }
       ],
       content:[],
       myMarkDown:[
-        '../driSelectAll.md',
+        '../docs/driSelectAll.md',
         '../docs/driSelectMulti.md',
         '../docs/driSelectSingle.md',
         '../docs/fctTable.md',
         '../docs/fctTableModal.md',
         '../docs/foodModal.md',
         '../docs/nutritionBar.md',
-        '../docs/recepiTable.md'
+        '../docs/recepiTable.md',
+        '../docs/csvImport.md',
+        '../docs/navBar.md'
       ],
     }
   },
@@ -105,6 +115,12 @@ export default {
     },
     link8:function () {
       return this.selected === 8
+    },
+    link9:function () {
+      return this.selected === 9
+    },
+    link10:function () {
+      return this.selected === 10
     }
   },
   async mounted() {
