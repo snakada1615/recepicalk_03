@@ -190,11 +190,14 @@ export const actions = {
     signOut(auth).then(() => {
       commit('clearMyApp')
       commit('updateIsLoggedIn', false)
+      //topページに移動
+      this.$router.push('/')
     }).catch((error) => {
       // An error happened.
       const errorCode = error.code
       const errorMessage = error.message
       console.log('guest login error: ', errorCode, errorMessage)
+      this.$emit('logOutError')
     })
   },
   /**
@@ -290,7 +293,8 @@ export const actions = {
         const errorCode = error.code;
         const errorMessage = error.message;
         commit('updateIsLoggedIn', false)
-        alert('login error: ' + errorCode + ': ' + errorMessage)
+        console.log('login error: ' + errorCode + ': ' + errorMessage)
+        throw error
       });
     const user = res.user
     //commit('updateUser', user)
@@ -312,6 +316,7 @@ export const actions = {
         const errorCode = error.code;
         const errorMessage = error.message;
         console.log('keeping state error: ', errorCode, errorMessage)
+        throw error
       })
   },
   /**
@@ -323,13 +328,10 @@ export const actions = {
   async registerEmail({commit}, payload){
     const auth = getAuth();
     const email = payload.name + '@ifna.app'
-    console.log(payload)
     const res = await createUserWithEmailAndPassword(auth, email, payload.password)
       .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
         commit('updateIsLoggedIn', false)
-        alert('login error: ' + errorCode + ': ' + errorMessage)
+        throw error
         // ..
       });
     const user = res.user
@@ -337,10 +339,8 @@ export const actions = {
       displayName: payload.name,
       email: email
     }).catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
         commit('updateIsLoggedIn', false)
-        alert('login error: ' + errorCode + ': ' + errorMessage)
+        throw error
         // ..
       });
 
@@ -362,6 +362,7 @@ export const actions = {
         const errorCode = error.code;
         const errorMessage = error.message;
         console.log('keeping state error: ', errorCode, errorMessage)
+        throw error
       })
   },
   /**

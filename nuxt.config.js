@@ -64,6 +64,8 @@ export default {
         'BIconGoogle',
         'BIconChatDotsFill',
         'BIconBookmarkCheck',
+        'BIconEye',
+        'BIconEyeSlash',
       ],
       componentPlugins: [
         'NavbarPlugin',
