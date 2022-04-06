@@ -19,9 +19,10 @@
         </p>
       </b-col>
     </b-row>
+    <div v-if="errorMessage" class="text-warning" size="sm">({{errorMessage}})</div>
     <b-card>
       <div>
-        login:
+        login status:
         <span v-if="$store.state.fire.isLoggedIn" class="text-success">on</span>
         <span v-else class="text-danger">off</span>
       </div>
@@ -36,7 +37,12 @@ export default {
     return {
       user: '',
       pass: '',
-      typePass: 'password'
+      typePass: 'password',
+      errorMessage:'',
+      errorMessageList: [
+        'login error: username or password does not match',
+        'registration error: username already in use'
+      ]
     }
   },
   computed:{
@@ -59,9 +65,10 @@ export default {
       await this.$store.dispatch('fire/registerEmail', {name: this.user, password: this.pass})
         .catch((err) => {
           console.log(err)
-          if (err.message.indexOf('auth/internal-error')){
+          if (err.message.indexOf('auth/email-already-in-use')){
             this.user = ''
             this.pass = ''
+            this.errorMessage = this.errorMessageList[1]
           }
         })
     },
@@ -72,6 +79,7 @@ export default {
           if (err.message.indexOf('auth/internal-error')){
             this.user = ''
             this.pass = ''
+            this.errorMessage = this.errorMessageList[0]
           }
         })
     },
