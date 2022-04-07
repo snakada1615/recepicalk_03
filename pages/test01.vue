@@ -1,21 +1,24 @@
 <template>
   <b-container>
-    Hi!
-    <reload-warning :has-changed="hasChanged"/>
+    hi: {{userRes}}
+    <b-button @click="changeDoc">change</b-button>
   </b-container>
 </template>
 
 <script>
-import reloadWarning from "../components/atoms/reloadWarning";
-
 export default {
-  data(){
+  name: 'Lifecycle',
+  data: function () {
     return {
-      hasChanged: true
+      hasChanged: true,
+      hasChanged2: false,
+      userRes:''
     }
   },
-  components:{
-    reloadWarning
-  },
+  methods: {
+    changeDoc(){
+      this.$store.dispatch('fire/setHasDocumentChanged', !this.$store.state.fire.hasDocumentChanged)
+    }
+  }
 }
 </script>

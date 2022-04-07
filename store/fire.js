@@ -91,10 +91,27 @@ export const state = () => ({
    * ログイン状態のフラグ
    */
   isLoggedIn: false,
+  /**
+   * ページ変更の有無(beforeunloadをエラーなしで通すために必要)
+   * https://www.uriports.com/blog/easy-fix-for-blocked-attempt-beforeunload-confirmation-panel/
+   */
+  hasDocumentChanged: false,
 })
 export const getters = {}
 export const mutations = {
-  clearMyApp({state}){
+  /**
+   * ページ変更の状態をセット
+   * @param state
+   * @param payload
+   */
+  setHasDocumentChanged: function(state, payload){
+    state.hasDocumentChanged = payload
+  },
+  /**
+   * myAppをクリア(ユーザー交代時など)
+   * @param state
+   */
+  clearMyApp(state){
     state.myApp.user.name=''
     state.myApp.user.uid = ''
     state.myApp.dataSet.fct=[]
@@ -111,7 +128,12 @@ export const mutations = {
   updateMyApp: function (state, payload) {
     state.myApp = JSON.parse(JSON.stringify(payload))
   },
-  updateUser: function ({state}, payload){
+  /**
+   * ユーザー情報を一括更新する
+   * @param state
+   * @param payload
+   */
+  updateUser: function (state, payload){
     state.myApp.user.uid = payload.uid
     state.myApp.user.name = payload.displayName
     state.myApp.user.email = payload.email
@@ -175,6 +197,14 @@ export const mutations = {
   }
 }
 export const actions = {
+  /**
+   * ページ変更の状態をセット
+   * @param state
+   * @param payload
+   */
+  setHasDocumentChanged: function({commit}, payload){
+    commit('setHasDocumentChanged', payload)
+  },
   /**
    * **********************************************************************************************
    * @description ここからauth関連機能
