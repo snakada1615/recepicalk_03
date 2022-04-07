@@ -13,10 +13,15 @@
   "dependencies": {
     "@nuxtjs/axios": "^5.13.6",
     "@nuxtjs/pwa": "^3.3.5",
+    "@vuedoc/md": "^3.2.0",
+    "@vuedoc/parser": "^3.4.0",
     "bootstrap": "^4.6.0",
     "bootstrap-vue": "^2.21.2",
     "core-js": "^3.15.1",
-    "nuxt": "^2.15.7"
+    "firebase": "^9.6.10",
+    "markdown-it-vue": "^1.1.7",
+    "nuxt": "^2.15.7",
+    "vue-rate-it": "^2.1.0"
   },
   "devDependencies": {
     "@vue/test-utils": "^1.2.1",
@@ -26,9 +31,12 @@
     "vue-jest": "^3.0.4"
   },
   "resolutions": {
-    "unset-value": "^2.0.1",
-    "nth-check": "^2.0.1",
-    "glob-parent": "^5.0.1",
-    "css-what": "^5.0.1"
+    "nth-check": "2.0.1",
+    "unset-value": "2.0.1",
+    "@braintree/sanitize-url": "6.0.0",
+    "glob-parent": "5.1.2",
+    "trim": "0.0.3",
+    "css-what": "5.0.1",
+    "d3-color": "3.1.0"
   }
 }

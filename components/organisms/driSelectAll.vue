@@ -14,20 +14,20 @@
       <dri-select-single
         :items="driItems"
         :target="driPopulations"
-        @changeNutritionGroup="updateSelection"
+        @update:target="$emit('update:target', $event)"
         @changeNutritionValue="updateNutrition"
-        @initTarget="$emit('initTarget', $event)"
+        class="single"
       >
       </dri-select-single>
     </div>
     <div v-else>
       <dri-select-multi
-        :driItems="driItems"
-        :driPopulations="driPopulations"
+        :items="driItems"
+        :target="driPopulations"
         :max="max"
-        @changeNutritionGroup="updateSelection"
+        @update:target="$emit('update:target', $event)"
         @changeNutritionValue="updateNutrition"
-        @initTarget="$emit('initTarget', $event)"
+        class="multi"
       >
       </dri-select-multi>
     </div>
@@ -46,43 +46,54 @@
       leftRightSwitch
     },
     props: {
+      /**
+       * driPopulationsの切替スイッチ（singleモード/multiモード）
+       */
       targetSwitch:{
         type:Boolean,
         default: true
       },
+      /**
+       * driPopulations.countの上限値
+       */
       max: {
         type: Number,
         default: 1000
       },
+      /**
+       * ターゲットグループの構成：v-modelで使用
+       *  [{ id: 1, count: 1}, { id: 2, count: 5}, { id: 3, count: 0}]
+       */
       driPopulations: {
         type: Array,
         required: true,
-        // [{ id: 1, count: 1}, { id: 2, count: 5}, { id: 3, count: 0}]
       },
+      /**
+       *  driのデータセット
+       *   ex.
+       *          [{
+       *            En: "1088.0",
+       *            Fe: "5.8",
+       *            max_vol: "900",
+       *            Name: "child 6-23 month",
+       *            Pr: "11.65",
+       *            Va: "400.0",
+       *            id: 0
+       *           }],
+       */
       driItems: {
         type: Array,
         required: true,
-        // ex.
-        // [{
-        //   En: "1088.0",
-        //   Fe: "5.8",
-        //   max_vol: "900",
-        //   Name: "child 6-23 month",
-        //   Pr: "11.65",
-        //   Va: "400.0",
-        //   id: 0
-        //  }],
       }
     },
     methods: {
-      updateSelection(val) {
-        //this.nutritionTarget = JSON.parse(JSON.stringify(val))
-        this.$emit('changeTarget', val)
-      },
+      /**
+       * driPopulationsの更新時に値を親コンポーネントに通知
+       * @param {array} val 更新された栄養必要量
+       */
       updateNutrition(val) {
-        console.log('updateNutrition')
         const res = JSON.parse(JSON.stringify(val))
-        this.$emit('changeNutrition', res)
+        this.$emit('changeNutritionValue', res)
       },
     }
   }

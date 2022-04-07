@@ -6,7 +6,7 @@
       head-row-variant="success"
       table-variant="light"
       :fixed=true
-      :items="tableItems"
+      :items="tablePop"
       :fields="fieldDRI"
       :sort-by.sync="sortBy"
       small
@@ -15,7 +15,7 @@
         <b-form-input
           v-model="data.item.number"
           :state="statusPopulationNumber(data.item.number)"
-          @input="onPopulationChange"
+          @input="$emit('update:target', tablePop2Target(tablePop))"
           type="number"
           size="sm"
         ></b-form-input>
@@ -28,8 +28,8 @@
       :fixed=true
       head-row-variant="success"
       table-variant="light"
-      :items="total"
-      :fields="fieldTotal"
+      :items="tableDri"
+      :fields="fieldTableDri"
     >
       <template #cell(Value)="data">
         <span class="text-info">{{ formatNumber(data.value, data.index) }}</span>
@@ -51,22 +51,43 @@
           {key: 'number', sortable: false},
         ],
         sortBy: 'id',
-        fieldTotal: [
+        fieldTableDri: [
           {key: 'Item', sortable: false},
           {key: 'Value', sortable: false},
         ],
-        tableItems: [],
+        tablePop: [],
+        tableDri: [],
       }
     },
     props: {
+      /**
+       * ターゲットグループの構成：v-modelで使用
+       *  [{ id: 1, count: 1}, { id: 2, count: 5}, { id: 3, count: 0}]
+       */
       target: {
         type: Array,
         default: () => [{id: 0, count: 1}]
       },
+      /**
+       *  driのデータセット
+       *   ex.
+       *          [{
+       *            En: "1088.0",
+       *            Fe: "5.8",
+       *            max_vol: "900",
+       *            Name: "child 6-23 month",
+       *            Pr: "11.65",
+       *            Va: "400.0",
+       *            id: 0
+       *           }],
+       */
       items: {
         type: Array,
         default: () => [],
       },
+      /**
+       * target.countの上限値
+       */
       max: {
         type: Number,
         default: 1000000,
@@ -78,19 +99,64 @@
         deep: true,
         immediate: true,
         handler() {
-          this.setTableItems()
+          this.updateAllTable()
         },
       }
     },
-    computed: {
-      total: function () {
+    methods: {
+      /**
+       * 栄養必要量の表記フォーマット
+       * @param val 変換前の数値
+       * @param index 変換パターン
+       * @returns {string|*} 戻り値（テキスト）
+       */
+      formatNumber(val, index) {
+        if (index === 0) {
+          return 'mixed'
+        }
+        if (index === 5) {
+          return val
+        }
+        return setDigit(val, index)
+      },
+      /**
+       * population入力値のバリデーション
+       * @param val 入力値
+       * @returns {boolean} バリデーション結果
+       */
+      statusPopulationNumber(val) {
+        return (val >= 0 && val <= this.max)
+      },
+      /**
+       * targetプロパティの更新時に内部変数 (tablePop, tableDri)を更新
+       */
+      updateAllTable() {
+        this.tablePop.length = 0
+        this.tablePop = JSON.parse(JSON.stringify(
+          this.updateTablePop(this.items, this.target)
+        ))
+        this.tableDri.length = 0
+        this.tableDri = JSON.parse(JSON.stringify(
+          this.updateTableDri(this.tablePop)
+        ))
+        /**
+         * 必要栄養量の更新を親コンポーネントに通知
+         */
+        this.$emit('changeNutritionValue', {total: this.tableDri, target: this.target})
+      },
+      /**
+       * DRIのテーブル（合計値）を更新
+       * @param dat 年齢別の栄養素必要量＊人数のテーブル
+       * @returns {[{Item: string, Value: string},{Item: string, Value: (number|*|number)},{Item: string, Value: (number|*|number)},{Item: string, Value: (number|*|number)},{Item: string, Value: (number|*|number)},null]}
+合計値のテーブル       */
+      updateTableDri(dat){
         const vm = this
         let result = {}
         result.En = 0
         result.Pr = 0
         result.Va = 0
         result.Fe = 0
-        this.tableItems.forEach(function (value) {
+        dat.forEach(function (value) {
           result.En += Number(value.En) * Number(value.number)
           result.Pr += Number(value.Pr) * Number(value.number)
           result.Va += Number(value.Va) * Number(value.number)
@@ -105,54 +171,22 @@
           {Item: 'id', Value: 0}
         ]
       },
-    },
-    mounted() {
-      // send initial value of 'total'
-      this.$emit('initTarget', this.total)
-    },
-    methods: {
-      formatNumber(val, index) {
-        if (index === 0) {
-          return 'mixed'
-        }
-        if (index === 5) {
-          return val
-        }
-        return setDigit(val, index)
-      },
-      statusPopulationNumber(val) {
-        return (val >= 0 && val <= this.max)
-      },
-      setTableItems() {
-        this.tableItems.length = 0
-        this.tableItems = JSON.parse(JSON.stringify(
-          this.updateTable(this.items, this.target)
-        ))
-      },
-      updateTable(driValue, selectedValue) {
+      updateTablePop(driValue, targetValue) {
         return driValue.map(function (driItem) {
-          const res = selectedValue.filter(
+          const res = targetValue.filter(
             item => Number(item.id) === Number(driItem.id)
           )
           driItem.number = res.length ? res[0].count : 0
           return driItem
         })
       },
-      onPopulationChange(val) {
-        /**
-         * triggers when dri selection changed
-         */
-        const res = this.tableItems.map(function (item) {
+      tablePop2Target(dat){
+        return dat.map(function (item) {
           return {
             id: item.id,
             count: Number(item.number),
           }
         })
-        this.$emit('changeNutritionGroup', res)
-        /**
-         * triggers when dri selection changed
-         */
-        this.$emit('changeNutritionValue', this.total)
       },
     }
   }

@@ -1,0 +1,52 @@
+@startuml
+title user registration (firebase with pouchDB)
+
+start
+
+:set user information
+   and caseId;
+   note left:user form
+
+:send user to firebase;
+note left: push button
+
+ if (get credential) then (yes)
+  :user check;
+   if (already exists) then (new user)
+    package "user registration"{
+    :merge credential
+    with user info
+    (name, country, etc,);
+    :set user & workspaceName
+     to $store;
+    :save user
+     to userSet_DB;
+    :save user & workspaceName
+     to lastUser_DB;
+    }
+    package "data initialization"{
+    :initialize userData
+      (DRI, FCT, dietCases,
+      feasibilitycases)
+      linked with caseId;
+    :set userData
+     to $store;
+    :create
+     userData_DB;
+    :save userData
+     to userData_DB;
+    }
+    :move to /index;
+     stop
+
+   else (existing user)
+     :user duplicate;
+   endif
+ else (no)
+   :no credential;
+ endif
+    :failure message;
+    :stay current page;
+ stop
+
+@enduml

@@ -1,0 +1,51 @@
+@startuml
+title autologin using cashed login info (PouchDB)
+
+start
+
+if (load userId
+  from loginDb) then (false)
+  :failure message;
+  stop
+
+else (true)
+  :set user to $store;
+  :set caseId to $store;
+  package "set userData" {
+    :load userData
+       from userDb;
+    :set dietCases
+       to $store;
+    :set feasibilityCases
+          to $store;
+  }
+  : load caseList
+    from userDb;
+
+endif
+
+if (lastUser not exists) then (true)
+    :loginStatus = 0;
+else if (user != null &&
+  caseId != null) then (true)
+    :loginStatus = 1;
+else if (user != null) then (yes)
+    :loginStatus = 2;
+else if (caseId != null) then (true)
+    :loginStatus = 3;
+else (false)
+    :loginStatus = 4;
+endif
+
+if (loginStatus == 1) then (no)
+  :move to '/index';
+  :wait for manual login
+   (using firebase);
+  stop
+else (yes)
+  :move to desired
+   direction;
+endif
+stop
+
+@enduml

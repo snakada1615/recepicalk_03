@@ -1,0 +1,41 @@
+installation procedure
+////////////////////////////////////////////////////////////
+///// step1 server side preparation  /////
+////   (MinAgri Ubuntu server)         /////
+/////////////////////////////////////////////////////////// 
+1-1 install apache2 
+  follow the instruction below
+ (https://www.digitalocean.com/community/tutorials/how-to-install-the-apache-web-server-on-ubuntu-20-04) => up to STEP 4 / confirm apache is working
+ 
+ 1-2 install couchDb (backup database)
+  (couchDB https://linuxhint.com/install_couchdb_ubuntu/)
+  - select "Standalone mode" during installation (not "cluster mode")
+  - set IP address to "0.0.0.0" (not "127.0.0.0")
+  - add administrator id and password
+  - confirm if database is active (step5)
+  - check access to couchdb from client computer (not ubuntu server)
+     http://x.x.x.x:5984/_utils/  (x.x.x.x => ip address of the ubuntu server) 
+  
+////////////////////////////////////////////////////////////////////////////////
+///// step2 local computer preparation                  /////
+////   (any computer other than Ubuntu server)  /////
+///////////////////////////////////////////////////////////////////////////////
+ 2-1 clone program using git command from the terminal
+ 2-1-1 install git to local computer 
+        https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
+ 2-1-2 clone nfa-tool from github to local computer
+        $mkdir nfa-tool  (any name is fine)
+        $cd nfa-tool
+        $git clone -b RW_version https://github.com/snakada1615/nuxt_pwa201122.git
+ 2-1-2 deploy nfa-tool
+       $cd nuxt_pwa_201122
+       $npm install         
+ 
+ ////////////////////////////////////////////////////////////////////////////////
+///// step3 local computer preparatin                  /////
+////   (any computer other than Ubuntu server)  /////
+///////////////////////////////////////////////////////////////////////////////
+3-1 delete all files under "/var/www/html" in ubuntu server
+3-2 copy all files under "nuxt_pwa_201122/dist" from local computer to
+      ubuntu server (/var/www/html)
+3-3 complete!

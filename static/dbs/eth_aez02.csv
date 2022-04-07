@@ -1,0 +1,25 @@
+FCT_id,food_grp_id,food_item_id,Food_grp,Food_name,local_name,Crop_ref,Edible,Energy,WATER,Protein,Fat,Carbohydrate,Fiber,ASH,CA,FE,MG,P,K,NA,ZN,CU,VITA_RAE,RETOL,B_Cart_eq,VITD,VITE,THIA,RIBF,NIA,VITB6C,FOL,VITB12,VITC,food_group_unicef
+20002,12,835,Miscellaneous,Teff@ red,Teff,0,0,357,0,11,2.5,73,4.5,2.8,113,81,0,0,0,0,3.9,1.6,0,0,0,0,0,0,0,0,0,0,0,0,Grains@ roots and tubers
+1046,1,46,Cereals and their products,Bread@ wheat@ white,Bread wheat,0,1,251,36.5,8.4,1.8,48.4,3.1,1.9,28,1.2,23,93,117,547,0.6,0.16,0,0,0,0,0.5,0.16,0.05,1.5,0.06,29,0,0,Grains@ roots and tubers
+20003,12,800,Miscellaneous,Barley,Barley,0,0,340,0,5.4,1.1,77.8,9.6,0.7,17,1,25,110,170,2,1.2,0.4,0,0,0,0,0,0,0,0,0,0,0,0,Grains@ roots and tubers
+20028,12,814,Miscellaneous,Finger millet,Finger millet,0,0,365,0,9.3,5.9,64.2,9,2.1,23,15.2,96,402,332,12,2.58,0.45,0,0,0,0,0,0,0,0,0,0,0,0,Grains@ roots and tubers
+1040,1,40,Cereals and their products,Sorghum@ white,Sorghum,0,1,370,9.4,9.3,3.9,65.5,9.9,2,24,3.9,311,249,298,14,2.08,0.18,0,0,0,0,1.1,0.36,0.17,3.4,0.25,30,0,0,Grains@ roots and tubers
+1004,1,4,Cereals and their products,Maize@ white,Maize,0,1,351,11.4,9.2,4.1,63.9,9.7,1.8,19,3.1,82,246,310,11,1.55,0.18,0,0,0,0,1.3,0.35,0.1,2.1,0.2,26,0,0,Grains@ roots and tubers
+20021,12,811,Miscellaneous,Faba bean,Faba bean,0,0,309,0,25.3,1.4,38.3,20.8,3.3,95.6,5.2,135.5,430.6,1190,25,3.55,0.82,2.4,0,0,0,0,0,0,0,0,0,0,0,Legumes and nuts
+20016,12,813,Miscellaneous,Field peas,Field pea,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,Legumes and nuts
+20033,12,808,Miscellaneous,Chick peas@ white,Chickpea,0,0,337,0,20.4,5.2,42,20.7,2.8,121.1,6.6,131.5,264.4,819.1,11.8,3.12,0.44,4.5,0,0,0,0,0,0,0,0,0,0,0,Legumes and nuts
+20029,12,818,Miscellaneous,Grass peas,Grasspea,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,Legumes and nuts
+,,,Legumes and their products,0,Noug,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Legumes and nuts
+20030,12,824,Miscellaneous,Linseed,Linseed,0,0,482,0,25,31,36.1,18,3,201,14.6,351,547,468,11,7.75,0,0,0,0,0,0,0,0,0,0,0,0,0,Legumes and nuts
+,,,Vegetables and their products,0,Gomenzer,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Other fruits and vegetables
+2083,2,83,Starchy roots@ tubers and their products,Potato,Potato,0,0.84,81,77.8,1.9,0.1,16.9,1.8,1.5,11,0.9,27,50,551,7,0.35,0.09,1,0,14,0,0.06,0.08,0.12,1.2,0.27,18,0,17.3,Grains@ roots and tubers
+2085,2,85,Starchy roots@ tubers and their products,Sweet potato@ deep yellow,Sweet potato,0,0.84,114,69.8,1.5,0.3,24.5,3,0.9,26,1.1,16,40,330,19,0.39,0.13,397,0,4770,0,0.23,0.09,0.05,0.7,0.2,52,0,31,Vitamin A rich fruits and Vegetable
+4168,4,168,Vegetables and their products,Onion,Onion,0,0.91,37,89.5,1.1,0.1,6.9,1.8,0.6,25,0.3,10,39,183,4,0.26,0.04,0,0,1,0,0.04,0.05,0.04,0.2,0.1,16,0,10.3,Other fruits and vegetables
+,,,Vegetables and their products,0,Shallot,,,75,,2.5,,,,,,,,,,,,,,,,,,,,,,,,,Other fruits and vegetables
+4165,4,165,Vegetables and their products,Garlic,Garlic,0,0.87,137,64.3,6.8,0.4,25,2.3,1.3,32,1.6,21,158,533,11,0.79,0.15,0,0,0,0,0.01,0.17,0.06,0.5,0.79,4,0,18,Other fruits and vegetables
+4171,4,171,Vegetables and their products,Tomato@ red,Tomato,0,0.91,22,93.5,1,0.2,3.3,1.4,0.6,13,0.6,13,32,255,7,0.7,0.15,52,0,624,0,0.9,0.06,0.04,0.6,0.09,21,0,29.6,Other fruits and vegetables
+4196,4,196,Vegetables and their products,Peppers@ chilli,Pepper,0,0.73,46,87.3,1.9,0.3,7.6,2.2,0.7,16,1.1,24,43,331,8,0.29,0.15,53,0,640,0,0.69,0.08,0.09,1.1,0.39,23,0,193.1,Other fruits and vegetables
+4201,4,201,Vegetables and their products,Pumpkin@ squash,Pumpkin,0,0.7,29,91.9,1,0.1,5.6,0.8,0.7,19,1.2,14,33,280,8,0.32,0.13,100,0,1200,0,1.06,0.05,0.02,0.5,0.1,8,0,8,Vitamin A rich fruits and Vegetable
+5222,5,222,Fruits and their products,Avocado@ ,Avocado,0,0.74,152,76.5,1.7,14.7,1.4,4.7,1.1,15,0.8,32,46,492,4,0.51,0.23,6,0,68,0,1.6,0.06,0.15,1.8,0.35,35,0,14,Other fruits and vegetables
+5261,5,261,Fruits and their products,Plantain@ ripe,Banana,0,0.65,142,63.3,1.2,0.3,32,2.3,1,7,0.9,37,34,500,4,0.12,0.08,43,0,518,0,0.2,0.07,0.05,0.7,0.3,22,0,18.4,Other fruits and vegetables
+5234,5,234,Fruits and their products,Mango@ orange ,Mango,0,0.71,65,82.7,0.6,0.2,13.9,2.1,0.5,17,0.7,9,18,180,3,0.11,0.06,168,0,2020,0,1.05,0.03,0.05,0.4,0.11,25,0,36.3,Vitamin A rich fruits and Vegetable
