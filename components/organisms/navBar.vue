@@ -39,6 +39,8 @@
   </b-container>
 </template>
 <script>
+import {mapGetters} from 'vuex'
+
 export default{
   methods:{
     /**
@@ -62,7 +64,10 @@ export default{
      */
     hasDocumentChanged(){
       return this.$store.state.fire.hasDocumentChanged
-    }
+    },
+    ...mapGetters({
+      myAppGetter:'fire/myAppGetter'
+    })
   },
   watch:{
     /**
@@ -74,6 +79,15 @@ export default{
         addEventListener("beforeunload", this.beforeUnloadListener, {capture: true});
       } else {
         removeEventListener("beforeunload", this.beforeUnloadListener, {capture: true});
+      }
+    },
+    /**
+     * myAppの値を監視し、変化があった場合に、hasDocumentChanged=true
+     */
+    myAppGetter: {
+      deep:true,
+      handler(){
+        this.$store.dispatch('fire/setHasDocumentChanged', true)
       }
     }
   }

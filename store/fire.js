@@ -97,7 +97,12 @@ export const state = () => ({
    */
   hasDocumentChanged: false,
 })
-export const getters = {}
+export const getters = {
+  myAppGetter(state){
+    return state.myApp
+  }
+}
+
 export const mutations = {
   /**
    * ページ変更の状態をセット
