@@ -520,7 +520,12 @@ export const actions = {
    * @param commit
    */
   initMenu({state, commit}){
-    const arr = new Array(state.myApp.sceneCount)
+    const arr = []
+    for (let i=0;i<state.myApp.sceneCount;i++){
+      const target = []
+      const menu = []
+      arr.push({target:target, menu:menu})
+    }
     commit('updateMenuCases', arr)
   },
   /**
@@ -529,8 +534,13 @@ export const actions = {
    * @param commit
    */
   initFeasibility({state, commit}){
-    const arr = new Array(state.myApp.sceneCount)
-    commit('updateFeasibilityCases', arr)
+    const arr = []
+    for (let i=0;i<state.myApp.sceneCount;i++){
+      const selectedCrop = {}
+      const ansList = [-99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99]
+      arr.push({selectedCrop:selectedCrop, ansList:ansList})
+    }
+      commit('updateFeasibilityCases', arr)
   },
   /**
    * まとめて初期化
@@ -550,7 +560,7 @@ export const actions = {
     await dispatch('initDri')
     await dispatch('initMenu')
     await dispatch('initFeasibility')
-    await dispatch('saveAppdata')
+    await dispatch('fireSaveAppdata')
   },
   /**
    * myAppをfirestoreからfetchしてstoreに保存
@@ -567,6 +577,9 @@ export const actions = {
       throw new Error('loadMyApp fail: no data on fireStore')
     }
   },
+  updateMyApp({commit}, payload){
+    commit('updateMyApp', payload)
+  },
   /**
    * 現在のユーザーの全テータをfirestoreに保存
    * <ul>
@@ -574,13 +587,15 @@ export const actions = {
    *   <li>collection：user
    *   <li>doc：ユーザーのuid
    * @param state
+   * @param dispatch
    * @returns {Promise<void>}
    */
-  async saveAppdata({state}){
+  async fireSaveAppdata({state, dispatch}){
     const ref = doc(firestoreDb, 'users', state.myApp.user.uid)
     setDoc(ref, state.myApp).catch((err) => {
       throw new Error('Error in fireAddDocWithId:'+ err)
     })
+    dispatch('setHasDocumentChanged', false)
     console.log('saveAppdata: success')
   }
 

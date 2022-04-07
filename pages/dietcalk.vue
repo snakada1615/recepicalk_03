@@ -9,7 +9,7 @@
           :targetSwitch.sync="singleTarget"
           :max="max"
           :driPopulations="nutritionTarget"
-          :driItems="DRI"
+          :driItems="myAppComputed.dataset.dri"
           @update:target="nutritionTarget = JSON.parse(JSON.stringify($event))"
           @changeNutritionValue="nutrition = $event"
           style="max-width: 540px"
@@ -20,7 +20,11 @@
           :items="FCT"
         ></fct-table>
       </b-col>
-
+    </b-row>
+    <b-row>
+      <b-col>
+        recepi
+      </b-col>
     </b-row>
   </b-container>
 </template>
@@ -28,11 +32,14 @@
 <script>
 import driSelectAll from "@/components/organisms/driSelectAll"
 import FctTable from "@/components/organisms/FctTable"
+import recepiTable from "@/components/organisms/recepiTable"
+import {mapGetters} from 'vuex'
 
 export default {
   components: {
     driSelectAll,
     FctTable,
+    recepiTable
   },
   data() {
     return {
@@ -52,6 +59,13 @@ export default {
     },
     FCT:function () {
       return this.$store.state.fire.myApp.dataSet.fct
+    },
+    ...mapGetters({
+      myAppTemp:'fire/myAppGetter'
+    }),
+    myAppComputed:{
+      set(){ return this.myAppTemp},
+      get(val){ this.$store.dispatch('fire/updateMyApp', val)}
     }
   },
   methods: {

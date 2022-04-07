@@ -6,7 +6,7 @@
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
       <!-- Right aligned nav items -->
-      <b-navbar-nav class="ml-auto" :small=true>
+      <b-navbar-nav class="ml-auto" :small=true >
         <b-nav-item-dropdown text="Menu" right>
           <b-dropdown-item to="/">top</b-dropdown-item>
           <b-dropdown-item to="/logintest">login</b-dropdown-item>
@@ -27,12 +27,14 @@
           <b-dropdown-item to="#" class="small">user: {{$store.state.fire.myApp.user.name}}</b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
-      <img
-        v-if="!hasDocumentChanged" src="/img/circle_green.png" alt="Gr"
-        style="width:20px" class="mx-2"/>
-      <img
-        v-if="hasDocumentChanged" src="/img/circle_red.png" alt="Re"
-        style="width:20px" class="mx-2"/>
+      <b-button
+        :disabled="!hasDocumentChanged"
+        @click="fireSaveAppdata"
+        pill
+        :class="{'border-white':true, primary: !hasDocumentChanged, warning: hasDocumentChanged, 'mx-2':true}"
+        size="sm"
+        style="font-size: 13px"
+      >save</b-button>
       <b-nav-text v-if="$nuxt.isOnline" class="text-light small"><b-icon icon="reception4"/></b-nav-text>
       <div v-if="$nuxt.isOffline" class="text-light small"><b-icon icon="reception0"/></div>
     </b-navbar>
@@ -51,7 +53,10 @@ export default{
     beforeUnloadListener(event){
       event.preventDefault();
       return event.returnValue = "Are you sure you want to exit before saving your data?";
-    }
+    },
+    fireSaveAppdata(){
+      this.$store.dispatch('fireSaveAppdata')
+    },
   },
   beforeDestroy() {
     // 破棄される前にイベントリスナーから削除
