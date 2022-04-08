@@ -533,14 +533,14 @@ export const actions = {
    * @param state
    * @param commit
    */
-  initFeasibility({state, commit}){
+  initFeasibility({state, commit}) {
     const arr = []
     for (let i=0;i<state.myApp.sceneCount;i++){
       const selectedCrop = {}
       const ansList = [-99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99]
       arr.push({selectedCrop:selectedCrop, ansList:ansList})
     }
-      commit('updateFeasibilityCases', arr)
+    commit('updateFeasibilityCases', arr)
   },
   /**
    * まとめて初期化
@@ -578,6 +578,11 @@ export const actions = {
     }
   },
   updateMyApp({commit}, payload){
+    if (process.client) {
+      console.log('ここはクライアント')
+    } else {
+      console.log('ここは`サーバー')
+    }
     commit('updateMyApp', payload)
   },
   /**
@@ -598,6 +603,4 @@ export const actions = {
     dispatch('setHasDocumentChanged', false)
     console.log('saveAppdata: success')
   }
-
-
 }

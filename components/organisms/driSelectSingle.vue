@@ -46,7 +46,7 @@
     computed: {
       targetComp:{
         get(){
-          if (this.target == null){
+          if (this.target == null || this.target.length === 0){
             return null
           }
           return this.target[0].id
@@ -56,7 +56,7 @@
         }
       },
       total:function () {
-        if (this.target == null){
+        if (this.target == null || this.target.length === 0){
           return null
         }
         const res1 = [...this.setDRI(this.target[0].id)]

@@ -3,21 +3,24 @@
     <b-row>
       <b-col lg="6">
         <b-button @click="save" variant="warning">save</b-button>
-        <b-card>
+        <b-card bg-variant="info">
+          {{myAppWatcher.menuCases[0].target}}
+        </b-card>
+        <b-card bg-variant="warning">
+          {{myAppWatcher.dataSet.dri}}
         </b-card>
         <dri-select-all
+          v-if="true"
           :targetSwitch.sync="singleTarget"
           :max="max"
-          :driPopulations="nutritionTarget"
-          :driItems="myAppComputed.dataset.dri"
-          @update:target="nutritionTarget = JSON.parse(JSON.stringify($event))"
-          @changeNutritionValue="nutrition = $event"
-          style="max-width: 540px"
-        ></dri-select-all>
+          :driPopulations="myAppWatcher.menuCases[0].target"
+          :driItems="myAppWatcher.dataSet.dri"
+          style="max-width: 540px"></dri-select-all>
       </b-col>
       <b-col lg="6">
         <fct-table
-          :items="FCT"
+          v-if="myAppWatcher.dataSet !== null"
+          :items="myAppWatcher.dataSet.fct"
         ></fct-table>
       </b-col>
     </b-row>
@@ -43,6 +46,7 @@ export default {
   },
   data() {
     return {
+      myAppWatcher: this.$store.state.fire.myApp,
       singleTarget: true,
       nutrition: [],
       fields: [
@@ -54,18 +58,32 @@ export default {
     }
   },
   computed:{
-    DRI:function () {
-      return this.$store.state.fire.myApp.dataSet.dri
-    },
-    FCT:function () {
-      return this.$store.state.fire.myApp.dataSet.fct
-    },
+    /**
+     * アプリで使う全変数myAppを読み込み
+     */
     ...mapGetters({
       myAppTemp:'fire/myAppGetter'
     }),
+    /**
+     * mapGettersにはget/setを組み込めないため、間に変数を追加 => myAppTemp
+     */
     myAppComputed:{
-      set(){ return this.myAppTemp},
-      get(val){ this.$store.dispatch('fire/updateMyApp', val)}
+      get(){
+        return JSON.parse(JSON.stringify(this.myAppTemp))
+      },
+      set(val){
+        console.log(val)
+        console.log(this.myAppTemp)
+        this.$store.dispatch('fire/updateMyApp', val)
+      }
+    }
+  },
+  watch:{
+    myAppWatcher:{
+      deep: true,
+      handler(val){
+        this.$store.dispatch('fire/updateMyApp', val)
+      }
     }
   },
   methods: {
