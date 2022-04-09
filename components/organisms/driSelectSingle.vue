@@ -49,17 +49,29 @@
           if (this.target == null || this.target.length === 0){
             return null
           }
-          return this.target[0].id
+          const res = this.target.filter(function (dat){
+            return dat.count > 0
+          })
+          console.log(res)
+          if (res.length === 0){res.push(this.target[0])}
+          return Number(res[0].id)
         },
         set(val){
-          this.$emit('update:target', [{id: val, count:1}])
+          const res = this.items.map(function(dat){
+            let count = 0
+            if (Number(dat.id) === Number(val)){
+              count = 1
+            }
+            return {id: dat.id, count: count}
+          })
+          this.$emit('update:target', res)
         }
       },
       total:function () {
         if (this.target == null || this.target.length === 0){
           return null
         }
-        const res1 = [...this.setDRI(this.target[0].id)]
+        const res1 = [...this.setDRI(this.targetComp)]
         const res2 = this.target
         //値に変化があった場合にまとめてemit
         this.$emit('changeNutritionValue', {total: res1, target:res2})
@@ -88,6 +100,7 @@
       //value: null,
       target:{
         type:Array,
+        required: true,
         default:() => [{id: 0, count: 1}]
       },
       /**

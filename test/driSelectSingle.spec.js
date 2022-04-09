@@ -48,7 +48,6 @@ describe('driSelectSingle',  () => {
   })
 
   const selectTarget = wrapper.findComponent({ name: 'BFormSelect' })
-  const myOption = selectTarget.findAll('option')
   const DRITable = wrapper.findComponent({ name: 'BTable' })
 
 
@@ -67,7 +66,7 @@ describe('driSelectSingle',  () => {
     expect(wrapper.props().target).toEqual([{id: 1, count: 8}])
 
     // 対象グループの初期propertyを確認: 子コンポーネント
-    expect(selectTarget.props().value).toBe(1)
+    expect(selectTarget.props().value).toEqual({id: 1, count: 8})
 
     // 対象グループの初期propertyを変更: ルート →　合計値に反映
     wrapper.setProps({ target: [{id: 2, count: 5}] }); //prop変更
