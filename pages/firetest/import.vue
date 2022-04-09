@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import csvImport from "@/components/organisms/csvImport";
+import csvImport from "@/components/molecules/csvImport";
 import {firestoreDb} from "~/plugins/firebasePlugin";
 import {doc, getDoc, setDoc} from "firebase/firestore";
 

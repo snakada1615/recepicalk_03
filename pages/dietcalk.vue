@@ -27,8 +27,8 @@
 
 <script>
 import driSelectAll from "@/components/organisms/driSelectAll"
-import FctTable from "@/components/organisms/FctTable"
-import recepiTable from "@/components/organisms/recepiTable"
+import FctTable from "@/components/molecules/FctTable"
+import recepiTable from "@/components/molecules/recepiTable"
 
 export default {
   components: {

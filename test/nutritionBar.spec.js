@@ -1,6 +1,6 @@
-import {mount, createLocalVue, createWrapper} from '@vue/test-utils';
-import {afterEach, describe, expect, it} from "@jest/globals";
-import nutritionBar from '@/components/organisms/nutritionBar.vue'
+import {mount, createLocalVue} from '@vue/test-utils';
+import { describe, expect, it} from "@jest/globals";
+import nutritionBar from '@/components/molecules/nutritionBar.vue'
 import BootstrapVue from 'bootstrap-vue'
 
 const localVue = createLocalVue();

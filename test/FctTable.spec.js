@@ -1,16 +1,9 @@
 import { mount, createLocalVue } from '@vue/test-utils';
-import {afterEach, describe, expect, it} from "@jest/globals";
-import FctTable from '@/components/organisms/FctTable.vue'
+import { describe, expect, it} from "@jest/globals";
+import FctTable from '@/components/molecules/FctTable.vue'
 import BootstrapVue from 'bootstrap-vue'
 const localVue = createLocalVue();
 localVue.use(BootstrapVue)
-
-const factory = (props) =>{
-  return mount(FctTable, {
-    localVue,
-    ...props,
-  })
-}
 
 const items = [
   {

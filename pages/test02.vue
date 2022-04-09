@@ -25,7 +25,7 @@
 
 <script>
 import driSelectAll from "@/components/organisms/driSelectAll"
-import FctTable from "@/components/organisms/FctTable"
+import FctTable from "@/components/molecules/FctTable"
 
 export default {
   components: {

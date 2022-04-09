@@ -52,7 +52,6 @@
           const res = this.target.filter(function (dat){
             return dat.count > 0
           })
-          console.log(res)
           if (res.length === 0){res.push(this.target[0])}
           return Number(res[0].id)
         },

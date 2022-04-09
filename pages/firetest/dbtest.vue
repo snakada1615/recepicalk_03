@@ -17,7 +17,6 @@ import {
   addDoc, updateDoc, deleteDoc,
   getDocFromServer
 } from 'firebase/firestore'
-import networkToggle from "@/components/organisms/networkToggle";
 import {firestoreDb} from "~/plugins/firebasePlugin";
 
 export default {

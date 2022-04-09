@@ -35,8 +35,8 @@
 </template>
 
 <script>
-  import driSelectSingle from "@/components/organisms/driSelectSingle";
-  import driSelectMulti from "@/components/organisms/driSelectMulti";
+  import driSelectSingle from "@/components/molecules/driSelectSingle";
+  import driSelectMulti from "@/components/molecules/driSelectMulti";
   import leftRightSwitch from "@/components/atoms/leftRightSwitch";
 
   export default {

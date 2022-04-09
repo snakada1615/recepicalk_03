@@ -1,6 +1,6 @@
-import {mount, createLocalVue, createWrapper} from '@vue/test-utils';
-import {afterEach, describe, expect, it} from "@jest/globals";
-import recepiTable from '@/components/organisms/recepiTable.vue'
+import {mount, createLocalVue} from '@vue/test-utils';
+import { describe, expect, it} from "@jest/globals";
+import recepiTable from '@/components/molecules/recepiTable.vue'
 import {BootstrapVue, BIconX, BIcon} from 'bootstrap-vue'
 
 const localVue = createLocalVue();

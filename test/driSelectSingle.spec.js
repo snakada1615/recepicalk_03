@@ -1,6 +1,6 @@
 import { mount, createLocalVue } from '@vue/test-utils'
 import {afterEach, describe, expect, it} from "@jest/globals";
-import driSelectSingle from '@/components/organisms/driSelectSingle.vue'
+import driSelectSingle from '@/components/molecules/driSelectSingle.vue'
 import BootstrapVue from 'bootstrap-vue'
 const localVue = createLocalVue();
 localVue.use(BootstrapVue)
@@ -66,7 +66,7 @@ describe('driSelectSingle',  () => {
     expect(wrapper.props().target).toEqual([{id: 1, count: 8}])
 
     // 対象グループの初期propertyを確認: 子コンポーネント
-    expect(selectTarget.props().value).toEqual({id: 1, count: 8})
+    expect(selectTarget.props().value).toEqual(1)
 
     // 対象グループの初期propertyを変更: ルート →　合計値に反映
     wrapper.setProps({ target: [{id: 2, count: 5}] }); //prop変更
