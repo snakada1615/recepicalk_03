@@ -89,7 +89,7 @@
         let uniqueGroup = []
         let result = []
         if (this.items){
-          this.items.forEach(function (elem, index) {
+          this.items.forEach(function (elem) {
             if (uniqueGroup.indexOf(elem.Group) === -1) {
               uniqueGroup.push(elem.Group)
               result.push({

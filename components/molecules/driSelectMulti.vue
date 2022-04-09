@@ -150,7 +150,6 @@
        * @returns {[{Item: string, Value: string},{Item: string, Value: (number|*|number)},{Item: string, Value: (number|*|number)},{Item: string, Value: (number|*|number)},{Item: string, Value: (number|*|number)},null]}
 合計値のテーブル       */
       updateTableDri(dat){
-        const vm = this
         let result = {}
         result.En = 0
         result.Pr = 0

@@ -28,7 +28,6 @@
 
 <script>
   import {FaRating} from 'vue-rate-it';
-  import align_justify from 'vue-rate-it/glyphs/align-justify';
   import stop from 'vue-rate-it/glyphs/stop';
   import navicon from 'vue-rate-it/glyphs/navicon';
 
