@@ -28,7 +28,7 @@ function Target(id, count) {
 */
 
 
-export const state = () => ({
+export const state= () => ({
   myApp: {
     /**
      * 現在のユーザー
@@ -96,7 +96,13 @@ export const state = () => ({
    * https://www.uriports.com/blog/easy-fix-for-blocked-attempt-beforeunload-confirmation-panel/
    */
   hasDocumentChanged: false,
+  /**
+   * ページ内容（myApp）がfirebaseから読み込まれたかどうか判定
+   */
+  hasMyAppLoaded: false,
+
 })
+
 export const getters = {
   myAppGetter(state){
     return state.myApp
@@ -104,6 +110,13 @@ export const getters = {
 }
 
 export const mutations = {
+  /**
+   * ユーザーデータ（myApp）が読み込まれたらTrueにセット
+   * @param state
+   */
+  myAppLoadedComplete(state){
+    state.hasMyAppLoaded = true
+  },
   /**
    * ページ変更の状態をセット
    * @param state
@@ -124,6 +137,7 @@ export const mutations = {
     state.myApp.menuCases = []
     state.myApp.feasibilityCases = []
     state.myApp.saveDate = ''
+    state.hasMyAppLoaded = false
   },
   /**
    * myAppを更新
@@ -203,6 +217,12 @@ export const mutations = {
 }
 export const actions = {
   /**
+   * ユーザーデータ（myApp）が読み込まれたらTrueにセット
+   */
+  myAppLoadedComplete({commit}){
+    commit('myAppLoadedComplete')
+  },
+  /**
    * ページ変更の状態をセット
    * @param state
    * @param payload
@@ -225,14 +245,15 @@ export const actions = {
     signOut(auth).then(() => {
       commit('clearMyApp')
       commit('updateIsLoggedIn', false)
-      //topページに移動
-      this.$router.push('/')
+      //リロード
+      window.location.reload()
+      //this.$router.push('/')
     }).catch((error) => {
       // An error happened.
       const errorCode = error.code
       const errorMessage = error.message
       console.log('guest login error: ', errorCode, errorMessage)
-      this.$emit('logOutError')
+      throw error
     })
   },
   /**
@@ -401,37 +422,44 @@ export const actions = {
       })
   },
   /**
-   * ページ遷移・リロード時にログイン状態を確認し、
-   *     ログインされていればユーザー情報をstoreにセット
+   * ページ遷移・リロードの度にログイン状態を確認(middleware:login.js)、
+   *     ログインされてる場合 → ユーザー情報がfetchされているか確認（hasMyAppLoaded）
+   *     → fetchされていない場合はfireStoreからfetch
+   *     → ログインされていない場合 →　Topページに移動
    * @param commit
    * @param dispatch
    * @param state
    * @returns {Promise<unknown>}
    */
   async initFirebaseAuth({commit, dispatch, state}) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       let unsubscribe = getAuth().onAuthStateChanged(async(user) => {
         if (user) {
           commit('updateIsLoggedIn', true)
-          //ログイン成功したら、ユーザーデータ(myApp)をfetch→store
-          await dispatch('loadMyApp', user.uid).catch(async()=>{
-            alert('no data registered, load initial dataset')
-            await dispatch('initAll', user)
-          })
-          console.log('onAuth true')
+          //ログイン成功したら、ユーザーデータ(myApp)がすでに読み込まれているかチェック
+          if (!state.hasMyAppLoaded){
+            //ユーザーデータ(myApp)が読み込まれていない場合、fireStoreからfetch
+            await dispatch('loadMyApp', user.uid).catch(async()=>{
+              alert('no data registered, load initial dataset')
+              await dispatch('initAll', user)
+              dispatch('myAppLoadedComplete')
+              console.log('initFirebaseAuth: data fetch from fireStore')
+            })
+          }
+          console.log('initFirebaseAuth:success')
+          // user オブジェクトを resolve
+          resolve(user);
         } else {
           if (state.myApp.length) {
             commit('clearMyApp')
           }
           commit('updateIsLoggedIn', false)
-          console.log('onAuth false')
+          reject(new Error('initFirebaseAuth:fail'))
         }
-        // user オブジェクトを resolve
-        resolve(user);
 
         // 登録解除
         unsubscribe();
-      });
+      })
     });
   },
   /**
@@ -573,17 +601,16 @@ export const actions = {
     const myApp = await fireGetDoc('users', payload)
     if (myApp) {
       commit('updateMyApp', myApp)
+      //初期データ読み込み時のみ、hasDocumentChangedをfalseにセット
+      commit('setHasDocumentChanged', false)
     } else {
       throw new Error('loadMyApp fail: no data on fireStore')
     }
   },
-  updateMyApp({commit}, payload){
-    if (process.client) {
-      console.log('ここはクライアント')
-    } else {
-      console.log('ここは`サーバー')
-    }
+  updateMyApp({commit, dispatch}, payload){
     commit('updateMyApp', payload)
+    //myAppの変更時は、常に setHasDocumentChanged=true をセット
+    dispatch('setHasDocumentChanged', true)
   },
   /**
    * 現在のユーザーの全テータをfirestoreに保存
@@ -600,6 +627,7 @@ export const actions = {
     setDoc(ref, state.myApp).catch((err) => {
       throw new Error('Error in fireAddDocWithId:'+ err)
     })
+    //myAppの変更内容をferestoreに保存できたらhasDocumentChangedをfalseにセット
     dispatch('setHasDocumentChanged', false)
     console.log('saveAppdata: success')
   }

@@ -31,7 +31,7 @@
         :disabled="!hasDocumentChanged"
         @click="fireSaveAppdata"
         pill
-        :class="{'border-white':true, primary: !hasDocumentChanged, warning: hasDocumentChanged, 'mx-2':true}"
+        :class="{'border-white':true, 'btn-primary': !hasDocumentChanged, 'btn-warning': hasDocumentChanged, 'mx-2':true}"
         size="sm"
         style="font-size: 13px"
       >save</b-button>
@@ -41,7 +41,6 @@
   </b-container>
 </template>
 <script>
-import {mapGetters} from 'vuex'
 
 export default{
   methods:{
@@ -55,7 +54,7 @@ export default{
       return event.returnValue = "Are you sure you want to exit before saving your data?";
     },
     fireSaveAppdata(){
-      this.$store.dispatch('fireSaveAppdata')
+      this.$store.dispatch('fire/fireSaveAppdata')
     },
   },
   beforeDestroy() {
@@ -70,9 +69,6 @@ export default{
     hasDocumentChanged(){
       return this.$store.state.fire.hasDocumentChanged
     },
-    ...mapGetters({
-      myAppGetter:'fire/myAppGetter'
-    })
   },
   watch:{
     /**
@@ -86,15 +82,6 @@ export default{
         removeEventListener("beforeunload", this.beforeUnloadListener, {capture: true});
       }
     },
-    /**
-     * myAppの値を監視し、変化があった場合に、hasDocumentChanged=true
-     */
-    myAppGetter: {
-      deep:true,
-      handler(){
-        this.$store.dispatch('fire/setHasDocumentChanged', true)
-      }
-    }
   }
 }
 </script>

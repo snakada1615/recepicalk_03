@@ -2,24 +2,17 @@
   <b-container >
     <b-row>
       <b-col lg="6">
-        <b-button @click="save" variant="warning">save</b-button>
-        <b-card bg-variant="info">
-          {{myAppWatcher.menuCases[0].target}}
-        </b-card>
-        <b-card bg-variant="warning">
-          {{myAppWatcher.dataSet.dri}}
-        </b-card>
         <dri-select-all
-          v-if="true"
           :targetSwitch.sync="singleTarget"
           :max="max"
-          :driPopulations="myAppWatcher.menuCases[0].target"
+          :driPopulations="myAppWatcher.menuCases[pageId].target"
           :driItems="myAppWatcher.dataSet.dri"
-          style="max-width: 540px"></dri-select-all>
+          @update:target = "updateTarget"
+          @changeNutrition="onNutritionChanged($event, pageId)"
+        ></dri-select-all>
       </b-col>
       <b-col lg="6">
         <fct-table
-          v-if="myAppWatcher.dataSet !== null"
           :items="myAppWatcher.dataSet.fct"
         ></fct-table>
       </b-col>
@@ -36,7 +29,6 @@
 import driSelectAll from "@/components/organisms/driSelectAll"
 import FctTable from "@/components/organisms/FctTable"
 import recepiTable from "@/components/organisms/recepiTable"
-import {mapGetters} from 'vuex'
 
 export default {
   components: {
@@ -46,49 +38,42 @@ export default {
   },
   data() {
     return {
-      myAppWatcher: this.$store.state.fire.myApp,
+      myAppWatcher: '',
       singleTarget: true,
-      nutrition: [],
       fields: [
         {key: 'Item', sortable: false},
         {key: 'Value', sortable: false},
       ],
-      nutritionTarget: [{id: 1, count: 1}],
-      max: 10000
+      max: 10000,
+      pageId: 0,
+      /**
+       * 初回読み込み時のチェック用フラグ
+       */
+      firstLoadFlag:true,
     }
   },
-  computed:{
-    /**
-     * アプリで使う全変数myAppを読み込み
-     */
-    ...mapGetters({
-      myAppTemp:'fire/myAppGetter'
-    }),
-    /**
-     * mapGettersにはget/setを組み込めないため、間に変数を追加 => myAppTemp
-     */
-    myAppComputed:{
-      get(){
-        return JSON.parse(JSON.stringify(this.myAppTemp))
-      },
-      set(val){
-        console.log(val)
-        console.log(this.myAppTemp)
-        this.$store.dispatch('fire/updateMyApp', val)
-      }
-    }
+  created(){
+    this.myAppWatcher = JSON.parse(JSON.stringify(this.$store.state.fire.myApp))
   },
   watch:{
     myAppWatcher:{
       deep: true,
       handler(val){
-        this.$store.dispatch('fire/updateMyApp', val)
+        if (this.firstLoadFlag){
+          // 初回ロード時はmyAppを更新しない
+          this.firstLoadFlag = false
+        } else {
+          this.$store.dispatch('fire/updateMyApp', val)
+        }
       }
     }
   },
   methods: {
     test(){
       //this.$store.dispatch('fire/initAll')
+    },
+    updateTarget(val){
+      this.myAppWatcher.menuCases[this.pageId].target = val
     },
     save(){
       this.$store.dispatch('fire/saveAppdata')
