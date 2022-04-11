@@ -180,8 +180,8 @@ export default {
       //this.$store.dispatch('fire/initAll')
     },
     onFctClick(val){
-      let res = this.items_modal.filter(function(dat){
-        return Number(dat.id) === Number(val)
+      let res = this.myAppWatcher.menuCases[0].menu.filter(function(dat){
+        return Number(dat.id) === Number(val.id)
       })
       if (!res.length) {res[0] = val}
       this.items_modal.length = 0
@@ -194,6 +194,7 @@ export default {
         'Va': res[0].Va,
         'Fe': res[0].Fe,
       })
+      this.value_model = res[0].Wt
       this.$bvModal.show('myFoodModal')
     },
     updateTarget(val){
