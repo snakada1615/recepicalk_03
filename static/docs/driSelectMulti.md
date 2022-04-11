@@ -21,10 +21,10 @@
 
 ## Events
 
-| Name                   | Description                                                                                                            |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `changeNutritionValue` | 必要栄養量の更新を親コンポーネントに通知<br/>**Arguments**<br/><ul><li>**`{total: this.tableDri, target: this.target}: object`**</li></ul> |
-| `update:target`        | &nbsp;                                                                                                                 |
+| Name                   | Description                                                                                                   |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `changeNutritionValue` | 必要栄養量の更新を親コンポーネントに通知<br/>**Arguments**<br/><ul><li>**`{total: res2, target: this.target}: object`**</li></ul> |
+| `update:target`        | &nbsp;                                                                                                        |
 
 ## Methods
 

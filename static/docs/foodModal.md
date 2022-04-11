@@ -26,10 +26,10 @@
 
 ## Events
 
-| Name      | Description                                                |
-| --------- | ---------------------------------------------------------- |
-| `modalOk` | <br/>**Arguments**<br/><ul><li>**`{}: unknown`**</li></ul> |
-| `input`   | &nbsp;                                                     |
+| Name      | Description                                                       |
+| --------- | ----------------------------------------------------------------- |
+| `modalOk` | <br/>**Arguments**<br/><ul><li>**`this.items[0]: any`**</li></ul> |
+| `input`   | &nbsp;                                                            |
 
 ## Methods
 
@@ -44,6 +44,8 @@ setDigit(item: unknown, unitKey: unknown): unknown
 ```
 
 ### clickOk()
+
+テーブル内の要素（items）と入力されたWtを一つのObjectに合成して返す
 
 **Syntax**
 

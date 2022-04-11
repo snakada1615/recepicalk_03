@@ -11,12 +11,12 @@
 
 ## Events
 
-| Name                   | Description                                                                             |
-| ---------------------- | --------------------------------------------------------------------------------------- |
-| `changeNutritionValue` | <br/>**Arguments**<br/><ul><li>**`JSON.parse(JSON.stringify(val)): unknown`**</li></ul> |
-| `update:targetSwitch`  |                                                                                         |
-| `update:target`        |                                                                                         |
-| `update:target`        | &nbsp;                                                                                  |
+| Name                   | Description                                                                                   |
+| ---------------------- | --------------------------------------------------------------------------------------------- |
+| `changeNutritionValue` | <br/>**Arguments**<br/><ul><li>**`JSON.parse(JSON.stringify(val.total)): unknown`**</li></ul> |
+| `update:targetSwitch`  |                                                                                               |
+| `update:target`        |                                                                                               |
+| `update:target`        | &nbsp;                                                                                        |
 
 ## Methods
 

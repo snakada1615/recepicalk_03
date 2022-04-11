@@ -2,10 +2,10 @@
 
 ## Props
 
-| Name               | Type    | Description             | Default                     |
-| ------------------ | ------- | ----------------------- | --------------------------- |
-| `target`           | `Array` | value: null,            | `() => [{id: 0, count: 1}]` |
-| `items` *required* | `Array` | list of DRI information | &nbsp;                      |
+| Name                | Type    | Description             | Default                     |
+| ------------------- | ------- | ----------------------- | --------------------------- |
+| `target` *required* | `Array` | value: null,            | `() => [{id: 0, count: 1}]` |
+| `items` *required*  | `Array` | list of DRI information | &nbsp;                      |
 
 ## Data
 
@@ -15,17 +15,17 @@
 
 ## Computed Properties
 
-| Name         | Type      | Description                                   |
-| ------------ | --------- | --------------------------------------------- |
-| `targetComp` | `unknown` | **Dependencies:** `target`                    |
-| `total`      | `unknown` | **Dependencies:** `target`, `setDRI`, `$emit` |
-| `options`    | `unknown` | **Dependencies:** `items`                     |
+| Name         | Type      | Description                                                 |
+| ------------ | --------- | ----------------------------------------------------------- |
+| `targetComp` | `unknown` | **Dependencies:** `target`                                  |
+| `total`      | `unknown` | **Dependencies:** `target`, `setDRI`, `targetComp`, `$emit` |
+| `options`    | `unknown` | **Dependencies:** `items`                                   |
 
 ## Events
 
-| Name            | Description                                                                |
-| --------------- | -------------------------------------------------------------------------- |
-| `update:target` | <br/>**Arguments**<br/><ul><li>**`[{id: val, count:1}]: array`**</li></ul> |
+| Name            | Description                                                                                                                                                                                                                                           |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `update:target` | <br/>**Arguments**<br/><ul><li>**`this.items.map(function(dat){           let count = 0           if (Number(dat.id) === Number(val)){             count = 1           }           return {id: dat.id, count: count}         }): unknown`**</li></ul> |
 
 ## Methods
 

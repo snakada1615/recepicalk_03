@@ -15,7 +15,7 @@
       <b-col cols="9">
         <b-card bg-variant="light" class="mb-2">
           <div>データ更新は以下のコマンド：</div>
-          <div>vuedoc.md components/organisms/*.vue --output static/docs/</div>
+          <div>vuedoc.md components/*/*.vue --output static/docs/</div>
         </b-card>
         <div v-if="link1">
           <markdown-it-vue class="md-body" :content="content[0]" />
