@@ -72,8 +72,18 @@
         }
         const res1 = [...this.setDRI(this.targetComp)]
         const res2 = this.target
+        const res3 = {}
+        res1.forEach(function (val){
+          res3[val.Item] = val.Value
+        })
+        const res4 = {
+          En: Number(res3.Energy),
+          Pr: Number(res3.Protein),
+          Va: Number(res3.Vit_A),
+          Fe: Number(res3.Iron),
+        }
         //値に変化があった場合にまとめてemit
-        this.$emit('changeNutritionValue', {total: res1, target:res2})
+        this.$emit('changeNutritionValue', {total: res4, target:res2})
         return res1
       },
       options: function () {

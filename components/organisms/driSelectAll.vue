@@ -92,7 +92,7 @@
        * @param {array} val 更新された栄養必要量
        */
       updateNutrition(val) {
-        const res = JSON.parse(JSON.stringify(val))
+        const res = JSON.parse(JSON.stringify(val.total))
         this.$emit('changeNutritionValue', res)
       },
     }

@@ -100,12 +100,13 @@
         }
         return res
       },
+      /**
+       * テーブル内の要素（items）と入力されたWtを一つのObjectに合成して返す
+       */
       clickOk() {
         let result = {}
-        result.item = this.items
+        result = this.items[0]
         result.Wt = this.value
-        console.log('clickOk')
-        console.log(result)
         this.$emit('modalOk', result)
       },
       clickCancel() {

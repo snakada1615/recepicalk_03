@@ -134,7 +134,7 @@
         ]
         switch (true) {
           case (item < 1000):
-            res = String(item) + units[unitKey]["1"]
+            res = String(Math.round(item)) + units[unitKey]["1"]
             break;
           case (item >= 1000 && item < 1000000):
             res = String(Math.round(item / 1000)) + units[unitKey]["2"]

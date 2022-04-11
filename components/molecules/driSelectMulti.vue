@@ -139,10 +139,20 @@
         this.tableDri = JSON.parse(JSON.stringify(
           this.updateTableDri(this.tablePop)
         ))
+        const res = {}
+        this.tableDri.forEach(function (val){
+          res[val.Item] = val.Value
+        })
+        const res2 = {
+          En: Number(res.Energy),
+          Pr: Number(res.Protein),
+          Va: Number(res.Vit_A),
+          Fe: Number(res.Iron),
+        }
         /**
          * 必要栄養量の更新を親コンポーネントに通知
          */
-        this.$emit('changeNutritionValue', {total: this.tableDri, target: this.target})
+        this.$emit('changeNutritionValue', {total: res2, target: this.target})
       },
       /**
        * DRIのテーブル（合計値）を更新
