@@ -176,8 +176,19 @@ export default {
       this.nutritionSum = val
     },
     onFoodModalOk(val){
-      this.myAppWatcher.menuCases[0].menu.push(val)
-      //this.$store.dispatch('fire/initAll')
+      let duplicated = false
+      const res = this.myAppWatcher.menuCases[0].menu.map(function(item){
+        if (Number(item.id) === Number(val.id)){
+          item.Wt = val.Wt
+          duplicated = true
+        }
+        return item
+      })
+      if (duplicated){
+        this.myAppWatcher.menuCases[0].menu = res
+      } else {
+        this.myAppWatcher.menuCases[0].menu.push(val)
+      }
     },
     onFctClick(val){
       let res = this.myAppWatcher.menuCases[0].menu.filter(function(dat){
