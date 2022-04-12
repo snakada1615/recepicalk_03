@@ -47,8 +47,8 @@ describe('driSelectSingle',  () => {
     }
   })
 
-  const selectTarget = wrapper.findComponent({ name: 'BFormSelect' })
-  const DRITable = wrapper.findComponent({ name: 'BTable' })
+  const selectTarget = wrapper.findComponent({ displayName: 'BFormSelect' })
+  const DRITable = wrapper.findComponent({ displayName: 'BTable' })
 
 
   it('is a Vue instance', async() => {

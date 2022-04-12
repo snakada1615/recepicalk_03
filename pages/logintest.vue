@@ -26,7 +26,7 @@
         <span v-if="$store.state.fire.isLoggedIn" class="text-success">on</span>
         <span v-else class="text-danger">off</span>
       </div>
-      <div>name:{{ $store.state.fire.myApp.user.name }}</div>
+      <div>name:{{ $store.state.fire.myApp.user.displayName }}</div>
       <div>uid:{{ $store.state.fire.myApp.user.uid }}</div>
     </b-card>
   </b-container>

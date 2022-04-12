@@ -47,7 +47,7 @@ describe('driSelectMulti',  () => {
     }
   })
 
-  const DRITable = wrapper.findAllComponents({ name: 'BTable' })
+  const DRITable = wrapper.findAllComponents({ displayName: 'BTable' })
   const TargetNumber = wrapper.findAllComponents('input')
 
 

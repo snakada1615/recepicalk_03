@@ -17,6 +17,10 @@
           <b-dropdown-item to="/dietcalk">dietCalk</b-dropdown-item>
           <b-dropdown-item to="/firetest/dbtest">firestore</b-dropdown-item>
           <b-dropdown-item to="/documents">documents</b-dropdown-item>
+          <b-dropdown-item-button
+            @click="resetData"
+            :disabled="!isLoggedIn"
+          >reset Data</b-dropdown-item-button>
         </b-nav-item-dropdown>
 
         <b-nav-item-dropdown right>
@@ -24,7 +28,7 @@
           <template #button-content>
             <em>User</em>
           </template>
-          <b-dropdown-item to="#" class="small">user: {{$store.state.fire.myApp.user.name}}</b-dropdown-item>
+          <b-dropdown-item to="#" class="small">user: {{ $store.state.fire.myApp.user.displayName }}</b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
       <b-button
@@ -53,9 +57,16 @@ export default{
       event.preventDefault();
       return event.returnValue = "Are you sure you want to exit before saving your data?";
     },
+    /**
+     * myAppをfireStoreに保存
+     */
     fireSaveAppdata(){
       this.$store.dispatch('fire/fireSaveAppdata')
     },
+    resetData(){
+      const user = JSON.parse(JSON.stringify(this.$store.state.fire.myApp.user))
+      this.$store.dispatch('fire/fireResetAppdata', user)
+    }
   },
   beforeDestroy() {
     // 破棄される前にイベントリスナーから削除
@@ -69,6 +80,9 @@ export default{
     hasDocumentChanged(){
       return this.$store.state.fire.hasDocumentChanged
     },
+    isLoggedIn(){
+      return this.$store.state.fire.isLoggedIn
+    }
   },
   watch:{
     /**

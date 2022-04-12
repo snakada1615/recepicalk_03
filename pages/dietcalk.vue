@@ -3,7 +3,7 @@
     <b-row>
       <b-col lg="6">
         <dri-select-all
-          :targetSwitch.sync="singleTarget"
+          :targetSwitch.sync="myAppWatcher.menuCases[pageId].isTargetSingle"
           :max="max"
           :driPopulations="myAppWatcher.menuCases[pageId].target"
           :driItems="myAppWatcher.dataSet.dri"
@@ -21,7 +21,7 @@
     <b-row>
       <b-col>
         <recepi-table
-          :items.sync="myAppWatcher.menuCases[0].menu"
+          :items.sync="myAppWatcher.menuCases[pageId].menu"
           @totalChanged="onNutritionSumChanged"
         ></recepi-table>
       </b-col>

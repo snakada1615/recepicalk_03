@@ -28,13 +28,13 @@ function Target(id, count) {
 */
 
 
-export const state= () => ({
+export const state = () => ({
   myApp: {
     /**
      * 現在のユーザー
      */
     user: {
-      name: '',
+      displayName: '',
       email: '',
       country: '',
       subnational1: '',
@@ -104,7 +104,7 @@ export const state= () => ({
 })
 
 export const getters = {
-  myAppGetter(state){
+  myAppGetter(state) {
     return state.myApp
   }
 }
@@ -114,7 +114,7 @@ export const mutations = {
    * ユーザーデータ（myApp）が読み込まれたらTrueにセット
    * @param state
    */
-  myAppLoadedComplete(state){
+  myAppLoadedComplete(state) {
     state.hasMyAppLoaded = true
   },
   /**
@@ -122,18 +122,18 @@ export const mutations = {
    * @param state
    * @param payload
    */
-  setHasDocumentChanged: function(state, payload){
+  setHasDocumentChanged: function (state, payload) {
     state.hasDocumentChanged = payload
   },
   /**
    * myAppをクリア(ユーザー交代時など)
    * @param state
    */
-  clearMyApp(state){
-    state.myApp.user.name=''
+  clearMyApp(state) {
+    state.myApp.user.displayName = ''
     state.myApp.user.uid = ''
-    state.myApp.dataSet.fct=[]
-    state.myApp.dataSet.dri=[]
+    state.myApp.dataSet.fct = []
+    state.myApp.dataSet.dri = []
     state.myApp.menuCases = []
     state.myApp.feasibilityCases = []
     state.myApp.saveDate = ''
@@ -152,9 +152,9 @@ export const mutations = {
    * @param state
    * @param payload
    */
-  updateUser: function (state, payload){
+  updateUser: function (state, payload) {
     state.myApp.user.uid = payload.uid
-    state.myApp.user.name = payload.displayName
+    state.myApp.user.displayName = payload.displayName
     state.myApp.user.email = payload.email
     state.myApp.user.phoneNumber = payload.phoneNumber
   },
@@ -172,7 +172,7 @@ export const mutations = {
    * @param payload 更新する値（JSON）
    */
   updateUserName: function (state, payload) {
-    state.myApp.user.name = payload
+    state.myApp.user.displayName = payload
   },
   /**
    * fctを更新
@@ -195,7 +195,7 @@ export const mutations = {
    * @param state
    * @param payload
    */
-  updateMenuCases: function(state, payload){
+  updateMenuCases: function (state, payload) {
     state.myApp.menuCases = JSON.parse(JSON.stringify(payload))
   },
   /**
@@ -203,7 +203,7 @@ export const mutations = {
    * @param state
    * @param payload
    */
-  updateFeasibilityCases: function(state, payload){
+  updateFeasibilityCases: function (state, payload) {
     state.myApp.feasibilityCases = JSON.parse(JSON.stringify(payload))
   },
   /**
@@ -219,7 +219,7 @@ export const actions = {
   /**
    * ユーザーデータ（myApp）が読み込まれたらTrueにセット
    */
-  myAppLoadedComplete({commit}){
+  myAppLoadedComplete({commit}) {
     commit('myAppLoadedComplete')
   },
   /**
@@ -227,7 +227,7 @@ export const actions = {
    * @param state
    * @param payload
    */
-  setHasDocumentChanged: function({commit}, payload){
+  setHasDocumentChanged: function ({commit}, payload) {
     commit('setHasDocumentChanged', payload)
   },
   /**
@@ -307,8 +307,9 @@ export const actions = {
     await signInWithPopup(auth, provider)
       .then((result) => {
         const user = result.user
-        commit('updateUserUid', user.uid)
-        commit('updateUserName', user.displayName)
+        commit('updateUser', user)
+        //commit('updateUserUid', user.uid)
+        //commit('updateUserName', user.displayName)
         commit('updateIsLoggedIn', true)
 
         console.log('login success')
@@ -341,7 +342,7 @@ export const actions = {
    *     {payload.name, payload.password}
    * @returns {Promise<void>}
    */
-  async loginEmail({commit}, payload){
+  async loginEmail({commit}, payload) {
     const auth = getAuth();
     const email = payload.name + '@ifna.app'
     const res = await signInWithEmailAndPassword(auth, email, payload.password)
@@ -353,9 +354,9 @@ export const actions = {
         throw error
       });
     const user = res.user
-    //commit('updateUser', user)
-    commit('updateUserUid', user.uid)
-    commit('updateUserName', user.displayName)
+    commit('updateUser', user)
+    //commit('updateUserUid', user.uid)
+    //commit('updateUserName', user.displayName)
     commit('updateIsLoggedIn', true)
     console.log('login success')
 
@@ -381,7 +382,7 @@ export const actions = {
    * @param payload
    * @returns {Promise<void>}
    */
-  async registerEmail({commit}, payload){
+  async registerEmail({commit}, payload) {
     const auth = getAuth();
     const email = payload.name + '@ifna.app'
     const res = await createUserWithEmailAndPassword(auth, email, payload.password)
@@ -389,20 +390,20 @@ export const actions = {
         commit('updateIsLoggedIn', false)
         throw error
         // ..
-      });
+      })
     const user = res.user
     await updateProfile(user, {
       displayName: payload.name,
       email: email
     }).catch((error) => {
-        commit('updateIsLoggedIn', false)
-        throw error
-        // ..
-      });
+      commit('updateIsLoggedIn', false)
+      throw error
+      // ..
+    });
 
-    //commit('updateUser', user)
-    commit('updateUserUid', user.uid)
-    commit('updateUserName', user.displayName)
+    commit('updateUser', user)
+    //commit('updateUserUid', user.uid)
+    //commit('updateUserName', user.displayName)
     commit('updateIsLoggedIn', true)
     console.log('login success')
     /**
@@ -433,13 +434,13 @@ export const actions = {
    */
   async initFirebaseAuth({commit, dispatch, state}) {
     return new Promise((resolve, reject) => {
-      let unsubscribe = getAuth().onAuthStateChanged(async(user) => {
+      let unsubscribe = getAuth().onAuthStateChanged(async (user) => {
         if (user) {
           commit('updateIsLoggedIn', true)
           //ログイン成功したら、ユーザーデータ(myApp)がすでに読み込まれているかチェック
-          if (!state.hasMyAppLoaded){
+          if (!state.hasMyAppLoaded) {
             //ユーザーデータ(myApp)が読み込まれていない場合、fireStoreからfetch
-            await dispatch('loadMyApp', user.uid).catch(async()=>{
+            await dispatch('loadMyApp', user.uid).catch(async () => {
               alert('no data registered, load initial dataset')
               await dispatch('initAll', user)
               dispatch('myAppLoadedComplete')
@@ -504,7 +505,7 @@ export const actions = {
    * @param fct fct(JSON形式)
    * @returns {{}[]}
    */
-  formatFct({}, fct){
+  formatFct({}, fct) {
     let res = []
     for (let key of Object.keys(fct)) {
       let resObj = {}
@@ -527,7 +528,7 @@ export const actions = {
    * @param dri dri(JSON形式)
    * @returns {{}[]}
    */
-  formatDri({}, dri){
+  formatDri({}, dri) {
     let res = []
     for (let key of Object.keys(dri)) {
       let resObj = {}
@@ -547,12 +548,13 @@ export const actions = {
    * @param state
    * @param commit
    */
-  initMenu({state, commit}){
+  initMenu({state, commit}) {
     const arr = []
-    for (let i=0;i<state.myApp.sceneCount;i++){
+    for (let i = 0; i < state.myApp.sceneCount; i++) {
       const target = []
+      const isTargetSingle = true
       const menu = []
-      arr.push({target:target, menu:menu})
+      arr.push({target: target, menu: menu, isTargetSingle: isTargetSingle})
     }
     commit('updateMenuCases', arr)
   },
@@ -563,10 +565,10 @@ export const actions = {
    */
   initFeasibility({state, commit}) {
     const arr = []
-    for (let i=0;i<state.myApp.sceneCount;i++){
+    for (let i = 0; i < state.myApp.sceneCount; i++) {
       const selectedCrop = {}
       const ansList = [-99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99]
-      arr.push({selectedCrop:selectedCrop, ansList:ansList})
+      arr.push({selectedCrop: selectedCrop, ansList: ansList})
     }
     commit('updateFeasibilityCases', arr)
   },
@@ -577,18 +579,21 @@ export const actions = {
    * @param payload
    * @param commit
    */
-  async initAll({dispatch, state, commit}, payload){
-    if (!payload) {throw new Error('initAll fail: no registered user-info')}
-    //console.log(payload)
-    //await commit('updateUser', payload).catch((err) =>{console.log('catchme')})
-    commit('updateUserUid', payload.uid)
-    commit('updateUserName', payload.displayName)
-
-    await dispatch('initFct')
-    await dispatch('initDri')
-    await dispatch('initMenu')
-    await dispatch('initFeasibility')
-    await dispatch('fireSaveAppdata')
+  async initAll({dispatch, state, commit}, payload) {
+    if (!payload) {
+      throw new Error('Error: initAll → no registered user-info')
+    }
+    try {
+      await commit('updateUser', payload)
+      await dispatch('initFct')
+      await dispatch('initDri')
+      await dispatch('initMenu')
+      await dispatch('initFeasibility')
+      await dispatch('fireSaveAppdata')
+    } catch (err) {
+      console.log('Error: initAll')
+      throw err
+    }
   },
   /**
    * myAppをfirestoreからfetchしてstoreに保存
@@ -597,7 +602,7 @@ export const actions = {
    * @param payload
    * @returns {Promise<void>}
    */
-  async loadMyApp({state, commit}, payload){
+  async loadMyApp({state, commit}, payload) {
     const myApp = await fireGetDoc('users', payload)
     if (myApp) {
       commit('updateMyApp', myApp)
@@ -607,7 +612,7 @@ export const actions = {
       throw new Error('loadMyApp fail: no data on fireStore')
     }
   },
-  updateMyApp({commit, dispatch}, payload){
+  updateMyApp({commit, dispatch}, payload) {
     commit('updateMyApp', payload)
     //myAppの変更時は、常に setHasDocumentChanged=true をセット
     dispatch('setHasDocumentChanged', true)
@@ -622,13 +627,29 @@ export const actions = {
    * @param dispatch
    * @returns {Promise<void>}
    */
-  async fireSaveAppdata({state, dispatch}){
+  async fireSaveAppdata({state, dispatch}) {
     const ref = doc(firestoreDb, 'users', state.myApp.user.uid)
     setDoc(ref, state.myApp).catch((err) => {
-      throw new Error('Error in fireAddDocWithId:'+ err)
+      throw new Error('Error in fireSaveAppdata:' + err)
     })
     //myAppの変更内容をferestoreに保存できたらhasDocumentChangedをfalseにセット
     dispatch('setHasDocumentChanged', false)
     console.log('saveAppdata: success')
+  },
+  async fireResetAppdata({commit, dispatch}, payload) {
+    const res = window.confirm('this will reset all user-data. Are you sure?')
+    if (!res) {
+      return
+    }
+    commit('clearMyApp') //全ての情報を初期化
+    await dispatch('initAll', payload).catch((err) => {
+      console.log('Error: fireResetAppdata')
+      throw err
+    })
+    commit('updateUser', payload) //user情報を戻す
+    await dispatch('fireSaveAppdata').catch((err) => {
+      throw err
+    })
+    console.log('fireResetAppdata: complete')
   }
 }
