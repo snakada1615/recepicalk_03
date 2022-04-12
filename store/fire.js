@@ -459,7 +459,7 @@ export const actions = {
         }
 
         // 登録解除
-        unsubscribe();
+        unsubscribe()
       })
     });
   },
@@ -636,6 +636,13 @@ export const actions = {
     dispatch('setHasDocumentChanged', false)
     console.log('saveAppdata: success')
   },
+  /**
+   * ユーザーデータmyAppを破棄して初期化する。開発中にmyAppのデータ構造を変えた場合に利用
+   * @param commit
+   * @param dispatch
+   * @param payload
+   * @returns {Promise<void>}
+   */
   async fireResetAppdata({commit, dispatch}, payload) {
     const res = window.confirm('this will reset all user-data. Are you sure?')
     if (!res) {

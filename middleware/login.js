@@ -4,8 +4,9 @@ export default async function ({store, redirect, route}) {
    * ログイン○、myAppのfetch×、の場合にはfireStoreからfetch(initFirebaseAuthの機能)
    */
   console.log('middleware: Check login status')
-  await store.dispatch('fire/initFirebaseAuth').catch((err)=>{
-    console.log(err)
+  await store.dispatch('fire/initFirebaseAuth').catch(()=>{
+    //console.log(err)
+    console.log('login-middleware: Error')
   })
   if (
     route.name !== 'logintest'

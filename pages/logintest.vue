@@ -1,8 +1,20 @@
 <template>
   <b-container>
-    <b-button @click="register">register</b-button>
-    <b-button @click="login">login</b-button>
-    <b-button @click="logOut">logout</b-button>
+    <b-button
+      @click="register"
+      variant="primary"
+      :disabled="!inputValidate"
+    >register</b-button>
+    <b-button
+      @click="login"
+      variant="primary"
+      :disabled="!inputValidate"
+    >login</b-button>
+    <b-button
+      @click="logOut"
+      variant="warning"
+      :disabled="logOutValidate"
+    >logout</b-button>
     <b-row class="my-2">
       <b-col cols="11">
         <b-form-input v-model="user" placeholder="Enter username" :state="stateName"/>
@@ -20,7 +32,7 @@
       </b-col>
     </b-row>
     <div v-if="errorMessage" class="text-warning" size="sm">({{errorMessage}})</div>
-    <b-card>
+    <b-card bg-variant="light">
       <div>
         login status:
         <span v-if="$store.state.fire.isLoggedIn" class="text-success">on</span>
@@ -52,6 +64,12 @@ export default {
     statePass(){
       return (this.pass.length >= 6 && this.pass.length <= 20)
     },
+    inputValidate(){
+      return this.statePass && this.stateName
+    },
+    logOutValidate(){
+      return !this.$store.state.fire.isLoggedIn
+    }
   },
   methods: {
     togglePass(){
