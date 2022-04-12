@@ -9,7 +9,7 @@
       <b-navbar-nav class="ml-auto" :small=true >
         <b-nav-item-dropdown text="Menu" right>
           <b-dropdown-item to="/">top</b-dropdown-item>
-          <b-dropdown-item to="/logintest">login</b-dropdown-item>
+          <b-dropdown-item to="/login">login</b-dropdown-item>
           <b-dropdown-item to="/test01">test01</b-dropdown-item>
           <b-dropdown-item to="/test02">test02</b-dropdown-item>
           <b-dropdown-item to="/test03">test03</b-dropdown-item>

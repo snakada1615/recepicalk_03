@@ -26,7 +26,7 @@
         ></b-carousel-slide>
       </b-carousel>
     </div>
-    <b-button to="logintest" variant="info">sign in</b-button>
+    <b-button to="login" variant="info">sign in</b-button>
 
 
     <b-card>

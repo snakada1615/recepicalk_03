@@ -2,6 +2,7 @@
   <b-container>
     <b-row>
       <b-col lg="6">
+        <div class="text-warning">page: {{pageId}}</div>
         <dri-select-all
           :targetSwitch.sync="myAppWatcher.menuCases[pageId].isTargetSingle"
           :max="max"
@@ -67,17 +68,17 @@ export default {
     return {
       /**
        * 使用する全変数のobject
-       * stateから読み込んでこのページで利用。更新された時にstateに戻す
+       * myAppから読み込んでこのページで利用。更新された時にemitを返す
        */
-      myAppWatcher: '',
+      myAppWatcher: {
+        type: Object,
+        required: true,
+        default: {}
+      },
       /**
        * ターゲットの1グループあたり設定人数の最大値
        */
       max: 10000,
-      /**
-       * 複数インスタンスを作成する場合のindex
-       */
-      pageId: 0,
       /**
        * 初回読み込み時のチェック用フラグ
        */
@@ -113,6 +114,10 @@ export default {
     }
   },
   computed: {
+    /**
+     * totalDri または nutritionSum が変化した際に、更新された値に基づいて栄養素ごとのratingを計算
+     * @returns {{}|{Pr: (number|number), En: (number|number), Va: (number|number), Fe: (number|number)}}
+     */
     rating() {
       if (!this.totalDri) {
         return {}
@@ -132,6 +137,12 @@ export default {
         Fe: Fe,
       }
     },
+    /**
+     * ratingを計算するにあたって、同一メニューを一日3回食べると仮定した場合の評価、
+     *     (recepiTableの値×3)、または1回分が一日の栄養素に与える影響の評価を
+     *     切り替える
+     * @returns {number}
+     */
     driRange: function () {
       let res = 3
       console.log('driRange:changed')
@@ -139,6 +150,23 @@ export default {
         res = 1
       }
       return res
+    },
+  },
+  props: {
+    /**
+     * データ本体。myAppWatcherで読み込んでページ内で利用
+     */
+    myApp:{
+      type: Object,
+      default: [],
+      required: true,
+    },
+    /**
+     * 複数インスタンスを作成する場合のindex
+     */
+    pageId: {
+      type: Number,
+      default: 0
     },
   },
   created() {
@@ -156,14 +184,14 @@ export default {
           // 初回ロード時はstore経由でのmyApp更新を行わない
           this.firstLoadFlag = false
         } else {
-          this.$store.dispatch('fire/updateMyApp', val)
+          this.$emit('update:myApp', val)
         }
       }
     }
   },
   methods: {
     test(val) {
-      this.myAppWatcher.menuCases[0].menu.push(val)
+      this.myAppWatcher.menuCases[this.pageId].menu.push(val)
       //this.$store.dispatch('fire/initAll')
     },
     onDriChanged(val) {
@@ -174,7 +202,7 @@ export default {
     },
     onFoodModalOk(val) {
       let duplicated = false
-      const res = this.myAppWatcher.menuCases[0].menu.map(function (item) {
+      const res = this.myAppWatcher.menuCases[this.pageId].menu.map(function (item) {
         if (Number(item.id) === Number(val.id)) {
           item.Wt = val.Wt
           duplicated = true
@@ -182,13 +210,13 @@ export default {
         return item
       })
       if (duplicated) {
-        this.myAppWatcher.menuCases[0].menu = res
+        this.myAppWatcher.menuCases[this.pageId].menu = res
       } else {
-        this.myAppWatcher.menuCases[0].menu.push(val)
+        this.myAppWatcher.menuCases[this.pageId].menu.push(val)
       }
     },
     onFctClick(val) {
-      let res = this.myAppWatcher.menuCases[0].menu.filter(function (dat) {
+      let res = this.myAppWatcher.menuCases[this.pageId].menu.filter(function (dat) {
         return Number(dat.id) === Number(val.id)
       })
       if (!res.length) {

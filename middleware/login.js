@@ -9,7 +9,7 @@ export default async function ({store, redirect, route}) {
     console.log('login-middleware: Error')
   })
   if (
-    route.name !== 'logintest'
+    route.name !== 'login'
     && route.name !== 'index'
     && !store.state.fire.isLoggedIn
   ) {

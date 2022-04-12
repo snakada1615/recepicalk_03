@@ -1,45 +1,37 @@
 <template>
   <b-container>
-    hi: {{userRes}}
-    <b-button @click="changeDoc">change</b-button>
-    <b-button @click="convJson">convJson</b-button>
+    <diet-calk-comp
+      :my-app="myApp"
+      :page-id="pageId"
+      @update:myApp="updateMyApp"
+    />
   </b-container>
 </template>
 
 <script>
+import dietCalkComp from "~/components/organisms/dietCalkComp";
+
 export default {
-  name: 'Lifecycle',
+  components: {
+    dietCalkComp,
+  },
   data: function () {
     return {
-      hasChanged: true,
-      hasChanged2: false,
-      userRes:'',
-      orgMyApp: '',
-      convMyApp: ''
+      myApp:{},
+      pageId:2
     }
   },
+  created() {
+    /**
+     * 初回ロード時にstoreからmyAppを読み込む
+     * @type {any}
+     */
+    this.myApp = JSON.parse(JSON.stringify(this.$store.state.fire.myApp))
+  },
   methods: {
-    getCircularReplacer(){
-      const seen = new WeakSet();
-      return (key, value) => {
-        if (typeof value === 'object' && value !== null) {
-          if (seen.has(value)) {
-            return;
-          }
-          seen.add(value);
-        }
-        return value;
-      };
+    updateMyApp(val){
+      this.$store.dispatch('fire/updateMyApp', val)
     },
-    convJson(){
-      this.orgMyApp = this.$store.state.fire.myApp
-      this.convMyApp = JSON.stringify(this.orgMyApp, this.getCircularReplacer())
-      console.log(this.orgMyApp)
-      console.log(this.convMyApp)
-    },
-    changeDoc(){
-      this.$store.dispatch('fire/setHasDocumentChanged', !this.$store.state.fire.hasDocumentChanged)
-    }
   }
 }
 </script>
