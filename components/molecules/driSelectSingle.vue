@@ -1,15 +1,16 @@
 <template>
   <b-container>
     <b-form-select
-      v-model="targetComp"
+      v-model="targetPop"
       :options="options"
+      @change="onSelectionChange"
       size="sm"
       class="mb-2">
     </b-form-select>
     <b-table
       striped
       small
-      :items="total"
+      :items="tableDri"
       :fields="fields1"
       :fixed=true
       head-row-variant="success"
@@ -41,51 +42,11 @@
           {key: 'Item', sortable: false},
           {key: 'Value', sortable: false},
         ],
+        targetPop:0,
+        tableDri:[]
       }
     },
     computed: {
-      targetComp:{
-        get(){
-          if (this.target == null || this.target.length === 0){
-            return null
-          }
-          const res = this.target.filter(function (dat){
-            return dat.count > 0
-          })
-          if (res.length === 0){res.push(this.target[0])}
-          return Number(res[0].id)
-        },
-        set(val){
-          const res = this.items.map(function(dat){
-            let count = 0
-            if (Number(dat.id) === Number(val)){
-              count = 1
-            }
-            return {id: dat.id, count: count}
-          })
-          this.$emit('update:target', res)
-        }
-      },
-      total:function () {
-        if (this.target == null || this.target.length === 0){
-          return null
-        }
-        const res1 = [...this.setDRI(this.targetComp)]
-        const res2 = this.target
-        const res3 = {}
-        res1.forEach(function (val){
-          res3[val.Item] = val.Value
-        })
-        const res4 = {
-          En: Number(res3.Energy),
-          Pr: Number(res3.Protein),
-          Va: Number(res3.Vit_A),
-          Fe: Number(res3.Iron),
-        }
-        //値に変化があった場合にまとめてemit
-        this.$emit('changeNutritionValue', {total: res4, target:res2})
-        return res1
-      },
       options: function () {
         let result = this.items.map(function (value) {
           return {
@@ -120,7 +81,131 @@
         required: true
       }
     },
+    watch: {
+      target: {
+        deep: true,
+        immediate: true,
+        handler() {
+          this.updateAllTable()
+        },
+      }
+    },
     methods: {
+      /**
+       * targetプロパティの更新時に内部変数 (tablePop, tableDri)を更新
+       */
+      updateAllTable() {
+        //targetが更新されたら、あわせてtargetPopを更新する
+        if (this.target == null || this.target.length === 0){
+          return null
+        }
+        const res = this.target.filter(function (dat){
+          return dat.count > 0
+        })
+        if (res.length === 0){res.push(this.target[0])}
+        this.targetPop = Number(res[0].id)
+
+        //tablePop（各グループごとのtarget人数）をセット
+        const tablePop = JSON.parse(JSON.stringify(
+          this.updateTablePop(this.items, this.target)
+        ))
+        //tablePopの数字を使って栄養素の必要量の更新
+        this.tableDri.length = 0
+        this.tableDri = JSON.parse(JSON.stringify(
+          this.updateTableDri(tablePop)
+        ))
+        //DOM表示用にtableDriのデータ構造を整形
+        const res1 = {}
+        this.tableDri.forEach(function (val){
+          res1[val.Item] = val.Value
+        })
+        //emit用のデータ整形
+        const res2 = {
+          En: Number(res1.Energy),
+          Pr: Number(res1.Protein),
+          Va: Number(res1.Vit_A),
+          Fe: Number(res1.Iron),
+        }
+        /**
+         * 必要栄養量の更新を親コンポーネントに通知
+         */
+        this.$emit('changeNutritionValue', {total: res2, target: this.target})
+      },
+      /**
+       * DRIのテーブル（合計値）を更新
+       * @param dat 年齢別の栄養素必要量＊人数のテーブル
+       * @returns
+       *     {[{Item: string, Value: string},
+       *     {Item: string, Value: (number|*|number)},
+       *     {Item: string, Value: (number|*|number)},
+       *     {Item: string, Value: (number|*|number)},
+       *     {Item: string, Value: (number|*|number)},
+       *     null]}
+       *     合計値のテーブル
+       */
+      updateTableDri(dat){
+        let result = {}
+        result.Name = ''
+        result.En = 0
+        result.Pr = 0
+        result.Va = 0
+        result.Fe = 0
+        dat.forEach(function (value) {
+          result.En += Number(value.En) * Number(value.number)
+          result.Pr += Number(value.Pr) * Number(value.number)
+          result.Va += Number(value.Va) * Number(value.number)
+          result.Fe += Number(value.Fe) * Number(value.number)
+          if (Number(value.number) === 1) {
+            result.Name = value.Name
+            result.id = value.id
+          }
+        })
+        return [
+          {Item: 'target', Value: result.Name},
+          {Item: 'Energy', Value: result.En},
+          {Item: 'Protein', Value: result.Pr},
+          {Item: 'Vit_A', Value: result.Va},
+          {Item: 'Iron', Value: result.Fe},
+          {Item: 'id', Value: 0}
+        ]
+      },
+      /**
+       * DRIの一覧表（年齢別・性別）に各グループの人数を追加して戻す
+       * @param driValue DRIの一覧表
+       * @param targetValue 各グループの対象人数のリスト
+       * @returns {*} DRIの一覧表×対象人数
+       */
+      updateTablePop(driValue, targetValue) {
+        return driValue.map(function (driItem) {
+          const res = targetValue.filter(
+            item => Number(item.id) === Number(driItem.id)
+          )
+          driItem.number = res.length ? res[0].count : 0
+          return driItem
+        })
+      },
+      /**
+       * ユーザーが対象グループを変更した際にトリガー
+       * ユーザー選択の値（Number）をもとにtarget値（Object）を
+       *     更新してemitする
+       * @param val
+       */
+      onSelectionChange(val){
+        const res = this.items.map(function(dat){
+          let count = 0
+          if (Number(dat.id) === Number(val)){
+            count = 1
+          }
+          return {id: dat.id, count: count}
+        })
+        this.$emit('update:target', res)
+      },
+      /**
+       * 表示用の整形（１列目と６列目を除いて桁数設定)
+       * @param val
+       * @param index
+       * @returns {string|*}
+       */
       formatNumber(val, index){
         if (index === 0){
           return val
@@ -130,27 +215,6 @@
         }
         return setDigit(val, index)
       },
-      setDRI: function (selectedId) {
-        const vm = this
-        let tableItem = []
-        //vm.selectedData.length = 0
-        const dat = vm.items.filter(function (item) {
-          return Number(item.id) === Number(selectedId)
-        })
-        if (dat.length !== 1) {
-          return []
-        } else {
-          tableItem.push(
-            {Item: 'target', Value: dat[0].Name},
-            {Item: 'Energy', Value: dat[0].En},
-            {Item: 'Protein', Value: dat[0].Pr},
-            {Item: 'Vit_A', Value: dat[0].Va},
-            {Item: 'Iron', Value: dat[0].Fe},
-            {Item: 'id', Value: selectedId}
-          )
-          return tableItem
-        }
-      }
     }
   }
 </script>

@@ -66,7 +66,8 @@
        */
       target: {
         type: Array,
-        default: () => [{id: 0, count: 1}]
+        default: () => [{id: 0, count: 1}],
+        required: true
       },
       /**
        *  driのデータセット
@@ -84,6 +85,7 @@
       items: {
         type: Array,
         default: () => [],
+        required: true
       },
       /**
        * target.countの上限値
@@ -157,8 +159,15 @@
       /**
        * DRIのテーブル（合計値）を更新
        * @param dat 年齢別の栄養素必要量＊人数のテーブル
-       * @returns {[{Item: string, Value: string},{Item: string, Value: (number|*|number)},{Item: string, Value: (number|*|number)},{Item: string, Value: (number|*|number)},{Item: string, Value: (number|*|number)},null]}
-合計値のテーブル       */
+       * @returns
+       *     {[{Item: string, Value: string},
+       *     {Item: string, Value: (number|*|number)},
+       *     {Item: string, Value: (number|*|number)},
+       *     {Item: string, Value: (number|*|number)},
+       *     {Item: string, Value: (number|*|number)},
+       *     null]}
+       *     合計値のテーブル
+       */
       updateTableDri(dat){
         let result = {}
         result.En = 0
@@ -180,6 +189,12 @@
           {Item: 'id', Value: 0}
         ]
       },
+      /**
+       * DRIの一覧表（年齢別・性別）に各グループの人数を追加して戻す
+       * @param driValue DRIの一覧表
+       * @param targetValue 各グループの対象人数のリスト
+       * @returns {*} DRIの一覧表×対象人数
+       */
       updateTablePop(driValue, targetValue) {
         return driValue.map(function (driItem) {
           const res = targetValue.filter(

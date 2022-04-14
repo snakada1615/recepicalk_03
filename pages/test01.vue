@@ -1,37 +1,32 @@
 <template>
   <b-container>
-    <diet-calk-comp
-      :my-app="myApp"
-      :page-id="pageId"
-      @update:myApp="updateMyApp"
-    />
+    <b-form-select
+      v-model="myText"
+      :options="options"
+      @change="onChange"
+      @input="onInput"
+    ></b-form-select>
+    <div>{{myText}}</div>
+    <b-button
+      @click="insertMe"
+    >insert</b-button>
   </b-container>
 </template>
 
 <script>
-import dietCalkComp from "~/components/organisms/dietCalkComp";
-
 export default {
-  components: {
-    dietCalkComp,
-  },
-  data: function () {
+  data(){
     return {
-      myApp:{},
-      pageId:2
+      myText: 3,
+      options: ['hage', 'chibi', 'debu', 'manuke']
     }
   },
-  created() {
-    /**
-     * 初回ロード時にstoreからmyAppを読み込む
-     * @type {any}
-     */
-    this.myApp = JSON.parse(JSON.stringify(this.$store.state.fire.myApp))
-  },
   methods: {
-    updateMyApp(val){
-      this.$store.dispatch('fire/updateMyApp', val)
-    },
+    onChange: function () {console.log('onChange triggered')},
+    onInput: function () {console.log('onInput triggered')},
+    insertMe(){
+      this.myText = 2
+    }
   }
 }
 </script>
