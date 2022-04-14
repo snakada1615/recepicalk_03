@@ -55,6 +55,7 @@ import FctTable from "@/components/molecules/FctTable"
 import recepiTable from "@/components/molecules/recepiTable"
 import foodModal from "@/components/molecules/foodModal"
 import nutritionBar from "@/components/molecules/nutritionBar"
+import {isObjectDeepEqual} from "~/plugins/helper";
 
 export default {
   components: {
@@ -179,12 +180,14 @@ export default {
   watch: {
     myAppWatcher: {
       deep: true,
-      handler(val) {
-        if (this.firstLoadFlag) {
+      handler(newVal, oldVal) {
+        //myAppWatcherが同じ値で上書きされる場合があるため、newVal/oldValが同じ値かどうか確認
+        const isChanged = !isObjectDeepEqual(newVal, oldVal)
+        if (this.firstLoadFlag || !isChanged) {
           // 初回ロード時はstore経由でのmyApp更新を行わない
           this.firstLoadFlag = false
         } else {
-          this.$emit('update:myApp', val)
+          this.$emit('update:myApp', newVal)
         }
       }
     }

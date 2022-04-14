@@ -191,6 +191,7 @@
        * @param val
        */
       onSelectionChange(val){
+        console.log('onChange')
         const res = this.items.map(function(dat){
           let count = 0
           if (Number(dat.id) === Number(val)){

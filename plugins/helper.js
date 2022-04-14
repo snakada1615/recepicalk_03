@@ -14,7 +14,7 @@ export async function objectSort(objects, key) {
 }
 
 export function setDigit(val, unitKey) {
-  let res = ''
+  let res = null
   const units = [
     {1: ' KC', 2: ' MC', 3: ' GC'},   // for dietary energy
     {1: ' g', 2: ' kg', 3: ' t'},    // for protein
@@ -53,9 +53,9 @@ export function isObjectDeepEqual(object1, object2) {
   for (const key of keys1) {
     const val1 = object1[key];
     const val2 = object2[key];
-    const areObjects = this.isObject(val1) && this.isObject(val2);
+    const areObjects = isObject(val1) && isObject(val2);
     if (
-      areObjects && !this.deepEqual(val1, val2) ||
+      areObjects && !isObjectDeepEqual(val1, val2) ||
       !areObjects && val1 !== val2
     ) {
       return false;
