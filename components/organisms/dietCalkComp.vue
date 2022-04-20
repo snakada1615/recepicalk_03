@@ -116,6 +116,15 @@ export default {
   },
   computed: {
     /**
+     * ネストしたオブジェクトの場合、watchするとnewValue=oldValueとなってしまうため、
+     *     computed valueをwatchする
+     *     （https://qiita.com/HorikawaTokiya/items/6c500f8e62bfcba3ca70）
+     * @returns {any}
+     */
+    myAppWatcherMonitor() {
+      return JSON.parse(JSON.stringify(this.myAppWatcher))
+    },
+    /**
      * totalDri または nutritionSum が変化した際に、更新された値に基づいて栄養素ごとのratingを計算
      * @returns {{}|{Pr: (number|number), En: (number|number), Va: (number|number), Fe: (number|number)}}
      */
@@ -179,7 +188,7 @@ export default {
     this.myAppWatcher = JSON.parse(JSON.stringify(this.$store.state.fire.myApp))
   },
   watch: {
-    myAppWatcher: {
+    myAppWatcherMonitor: {
       deep: true,
       handler(newVal, oldVal) {
         //myAppWatcherが同じ値で上書きされる場合があるため、newVal/oldValが同じ値かどうか確認
