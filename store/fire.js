@@ -545,15 +545,19 @@ export const actions = {
   },
   /**
    * menuCasesを初期化（空白ArrayをsetCountの数だけ作成）
+   * @param payload driのセット(array of object)
    * @param state
    * @param commit
    */
-  initMenu({state, commit}) {
+  initMenu({state, commit}, payload) {
     const arr = []
+    console.log(payload)
     for (let i = 0; i < state.myApp.sceneCount; i++) {
-      const target = []
       const isTargetSingle = true
       const menu = []
+      const target = payload.map(function(dat){
+        return {id: dat.id, count: 0}
+      })
       arr.push({target: target, menu: menu, isTargetSingle: isTargetSingle})
     }
     commit('updateMenuCases', arr)
@@ -587,9 +591,10 @@ export const actions = {
       await commit('updateUser', payload)
       await dispatch('initFct')
       await dispatch('initDri')
-      await dispatch('initMenu')
+      await dispatch('initMenu', state.myApp.dataSet.dri)
       await dispatch('initFeasibility')
       await dispatch('fireSaveAppdata')
+      console.log('initAll: all done')
     } catch (err) {
       console.log('Error: initAll')
       throw err
