@@ -556,7 +556,7 @@ export const actions = {
       const isTargetSingle = true
       const menu = []
       const target = payload.map(function(dat){
-        return {id: dat.id, count: 0}
+        return {id: dat.id, count: null}
       })
       arr.push({target: target, menu: menu, isTargetSingle: isTargetSingle})
     }
