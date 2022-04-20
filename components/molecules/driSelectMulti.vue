@@ -1,6 +1,7 @@
 <template>
   <b-container>
     <b-table
+      class="jest_table"
       striped
       bordered
       head-row-variant="success"
@@ -22,6 +23,7 @@
       </template>
     </b-table>
     <b-table
+      class="jest_table"
       striped
       bordered
       small

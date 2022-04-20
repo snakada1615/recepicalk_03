@@ -1,13 +1,15 @@
 <template>
   <b-container>
     <b-form-select
+      class="jest_select mb-2"
       v-model="targetPop"
       :options="options"
       @change="onSelectionChange"
       size="sm"
-      class="mb-2">
+      >
     </b-form-select>
     <b-table
+      class="jest_table totalDri"
       striped
       small
       :items="tableDri"
@@ -16,7 +18,6 @@
       head-row-variant="success"
       table-variant="light"
       v-bind="$attrs"
-      class="totalDri"
     >
       <template #cell(Value)="data">
         <span class="text-info">{{ formatNumber(data.value, data.index) }}</span>

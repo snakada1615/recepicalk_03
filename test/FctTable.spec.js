@@ -56,7 +56,7 @@ describe('FctTable', () =>{
         items:items,
       }
     })
-    const wrapper = wrapperOrg.findAllComponents({displayName:'BTable'})
+    const wrapper = wrapperOrg.findAllComponents('.jest_table')
 
     //BTableの行を取得
     let myRow = wrapper.at(0).findAll('table tbody tr')

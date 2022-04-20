@@ -24,6 +24,7 @@
 
     <div class="mt-3">
       <b-table
+        class="jest_table"
         striped
         bordered
         border-variant="dark"

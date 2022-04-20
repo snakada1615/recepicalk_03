@@ -47,7 +47,7 @@ describe('driSelectMulti',  () => {
     }
   })
 
-  const DRITable = wrapper.findAllComponents({ displayName: 'BTable' })
+  const DRITable = wrapper.findAllComponents('.jest_table')
   const TargetNumber = wrapper.findAllComponents('input')
 
 
@@ -57,10 +57,10 @@ describe('driSelectMulti',  () => {
     expect(wrapper.exists()).toBe(true)
 
     // <TargetNumber>が表示される
-    expect(DRITable.at(1).isVisible()).toBeTruthy()
+    expect(DRITable.at(0).isVisible()).toBeTruthy()
 
     // <b-table>が表示される
-    expect(DRITable.at(0).isVisible()).toBeTruthy()
+    expect(DRITable.at(1).isVisible()).toBeTruthy()
 
     // 対象グループの初期値を確認: ルート
     expect(wrapper.props().target).toEqual([{id: 1, count: 8}])

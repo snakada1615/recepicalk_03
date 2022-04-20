@@ -47,8 +47,8 @@ describe('driSelectSingle',  () => {
     }
   })
 
-  const selectTarget = wrapper.findComponent({ displayName: 'BFormSelect' })
-  const DRITable = wrapper.findComponent({ displayName: 'BTable' })
+  const selectTarget = wrapper.findComponent('.jest_select')
+  const DRITable = wrapper.findComponent('.jest_table')
 
 
   it('is a Vue instance', async() => {
@@ -69,9 +69,9 @@ describe('driSelectSingle',  () => {
     expect(selectTarget.props().value).toEqual(1)
 
     // 対象グループの初期propertyを変更: ルート →　合計値に反映
-    wrapper.setProps({ target: [{id: 2, count: 5}] }); //prop変更
-    const DRITotal = DRITable.props().items
-    expect(DRITotal[0].Value).toBe("lactating") //合計値の変化
+    await wrapper.setProps({ target: [{id: 2, count: 1}] }); //prop変更
+    let DRITotal = DRITable.props().items
+    expect(DRITotal[0].Value).toBe("adolescent all") //合計値の変化
 
     // 対象グループの選択を変更　→　合計値に反映 →　emit →　親コンポーネントがproperty変更すると仮定
     //await myOption.at(0).setSelected() //dropdownリストを選択
@@ -79,8 +79,9 @@ describe('driSelectSingle',  () => {
     //expect(wrapper.emitted('changeNutritionValue')).toBe(1)
     //let myEmit = wrapper.emitted('update:target')[0][0][0].id
     //expect(myEmit).toEqual(1) // emit
-    wrapper.setProps({ target: [{id: 0, count: 5}] }); // 親コンポーネントからの戻り値
-    expect(DRITotal[0].Value).toBe("lactating")
+    await wrapper.setProps({ target: [{id: 0, count: 1}] }); // 親コンポーネントからの戻り値
+    DRITotal = DRITable.props().items
+    expect(DRITotal[0].Value).toBe("child 6-23 month")
 
     // イベントが発行されたかどうか
     //expect(wrapper.emitted('changeNutritionValue')).toBeDefined().toEqual(1)
