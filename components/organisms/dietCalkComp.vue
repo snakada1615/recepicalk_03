@@ -1,8 +1,8 @@
 <template>
   <b-container>
-    <b-row>
+    <b-row class="my-2">
       <b-col>
-        <b-card bg-variant="success">
+        <b-card bg-variant="light">
           <div class="text-warning">page: {{pageId}}</div>
           <b-form-checkbox
             switch
@@ -15,12 +15,16 @@
         </b-card>
       </b-col>
     </b-row>
-    <b-row>
+    <b-row class="my-2">
       <b-col>
-        <recepi-table
-          :items.sync="myAppWatcher.menuCases[pageId].menu"
-          @totalChanged="onNutritionSumChanged"
-        ></recepi-table>
+        <b-card
+          bg-variant="light"
+        >
+          <recepi-table
+            :items.sync="myAppWatcher.menuCases[pageId].menu"
+            @totalChanged="onNutritionSumChanged"
+          ></recepi-table>
+        </b-card>
       </b-col>
     </b-row>
     <b-row>

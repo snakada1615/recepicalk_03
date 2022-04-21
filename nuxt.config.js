@@ -21,6 +21,7 @@ export default {
 
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
+    '@/assets/scss/app.scss'
   ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
@@ -46,6 +47,7 @@ export default {
     // https://go.nuxtjs.dev/bootstrap
     ['bootstrap-vue/nuxt', {
       // Add the desired icon components to the `components` array
+      css: false,
       components: [
         'BIcon',
         'BIconReception0',

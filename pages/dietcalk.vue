@@ -6,15 +6,15 @@
           v-for="item in myCount"
           :key="'Case-' + item"
           :title="String(item + 1)"
-        >tab content {{ item + 1}}
+        >
+          <diet-calk-comp
+            :my-app="myApp"
+            :page-id="pageId"
+            @update:myApp="updateMyApp"
+          />
         </b-tab>
       </b-tabs>
     </b-card>
-    <diet-calk-comp
-      :my-app="myApp"
-      :page-id="pageId"
-      @update:myApp="updateMyApp"
-    />
   </b-container>
 </template>
 
@@ -31,8 +31,8 @@ export default {
       pageId: 2,
       sceneCount: 0,
       myCount: [],
-      str_prev:'',
-      str_now:'',
+      str_prev: '',
+      str_now: '',
     }
   },
   created() {
@@ -45,7 +45,7 @@ export default {
     this.myCount = Array.from(Array(this.sceneCount).keys())
   },
   methods: {
-    changeTab(){
+    changeTab() {
       console.log('tabChange:' + this.pageId)
     },
     updateMyApp(val) {

@@ -30,7 +30,9 @@
     "@vue/vue2-jest": "*",
     "babel-core": "^7.0.0-bridge.0",
     "babel-jest": "^27.5.1",
-    "jest": "^27.0.5"
+    "jest": "^27.0.5",
+    "node-sass": "^6.0.1",
+    "sass-loader": "^10.2.1"
   },
   "resolutions": {
     "nth-check": "2.0.1",
