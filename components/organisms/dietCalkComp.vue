@@ -1,22 +1,18 @@
 <template>
   <b-container>
     <b-row>
-      <b-col lg="6">
-        <div class="text-warning">page: {{pageId}}</div>
-        <dri-select-all
-          :targetSwitch.sync="myAppWatcher.menuCases[pageId].isTargetSingle"
-          :max="max"
-          :driPopulations="myAppWatcher.menuCases[pageId].target"
-          :driItems="myAppWatcher.dataSet.dri"
-          @update:target="updateTarget"
-          @changeNutritionValue="onDriChanged($event, pageId)"
-        ></dri-select-all>
-      </b-col>
-      <b-col lg="6">
-        <fct-table
-          :items="myAppWatcher.dataSet.fct"
-          @fctClick="onFctClick"
-        ></fct-table>
+      <b-col>
+        <b-card bg-variant="success">
+          <div class="text-warning">page: {{pageId}}</div>
+          <b-form-checkbox
+            switch
+            v-model="driSwitch"
+          >evaluate [daily consumption] /[single meal]</b-form-checkbox>
+          <nutrition-bar :label="nutritionLabel[0]" :max-rating="maxRating" :rating="rating.En"/>
+          <nutrition-bar :label="nutritionLabel[1]" :max-rating="maxRating" :rating="rating.Pr"/>
+          <nutrition-bar :label="nutritionLabel[2]" :max-rating="maxRating" :rating="rating.Va"/>
+          <nutrition-bar :label="nutritionLabel[3]" :max-rating="maxRating" :rating="rating.Fe"/>
+        </b-card>
       </b-col>
     </b-row>
     <b-row>
@@ -29,14 +25,38 @@
     </b-row>
     <b-row>
       <b-col>
-        <b-form-checkbox
-          switch
-          v-model="driSwitch"
-        >evaluate [daily consumption] /[single meal]</b-form-checkbox>
-        <nutrition-bar :label="nutritionLabel[0]" :max-rating="maxRating" :rating="rating.En"/>
-        <nutrition-bar :label="nutritionLabel[1]" :max-rating="maxRating" :rating="rating.Pr"/>
-        <nutrition-bar :label="nutritionLabel[2]" :max-rating="maxRating" :rating="rating.Va"/>
-        <nutrition-bar :label="nutritionLabel[3]" :max-rating="maxRating" :rating="rating.Fe"/>
+        <b-button
+          pill
+          variant="success"
+          :pressed.sync = "showFct"
+        >add food
+        </b-button>
+        <b-button
+          pill
+          variant="warning"
+          :pressed.sync = "showDri"
+        >change target
+        </b-button>
+      </b-col>
+    </b-row>
+    <b-row>
+      <b-col lg="6">
+        <dri-select-all
+          v-show="showDri"
+          :targetSwitch.sync="myAppWatcher.menuCases[pageId].isTargetSingle"
+          :max="max"
+          :driPopulations="myAppWatcher.menuCases[pageId].target"
+          :driItems="myAppWatcher.dataSet.dri"
+          @update:target="updateTarget"
+          @changeNutritionValue="onDriChanged($event, pageId)"
+        ></dri-select-all>
+      </b-col>
+      <b-col lg="6">
+        <fct-table
+          v-show="showFct"
+          :items="myAppWatcher.dataSet.fct"
+          @fctClick="onFctClick"
+        ></fct-table>
       </b-col>
     </b-row>
     <food-modal
@@ -112,6 +132,14 @@ export default {
        * driテーブルから計算される栄養必要量の合計値
        */
       totalDri: {},
+      /**
+       * FctTable表示用のフラグ
+       */
+      showFct: false,
+      /**
+       * driSelectAll表示用のフラグ
+       */
+      showDri: false,
     }
   },
   computed: {
