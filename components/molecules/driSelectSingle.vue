@@ -98,7 +98,7 @@
       updateAllTable() {
         //targetが更新されたら、あわせてtargetPopを更新する
         if (this.target == null || this.target.length === 0){
-          return null
+          return 0
         }
         const res = this.target.filter(function (dat){
           return dat.count > 0
