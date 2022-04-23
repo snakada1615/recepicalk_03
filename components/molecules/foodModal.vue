@@ -1,5 +1,7 @@
 <template>
   <b-modal
+    v-model="showModalComputed"
+    class="jest_modal"
     :id="myName"
     :title="myModalHeader"
     @ok="clickOk"
@@ -15,6 +17,7 @@
     ></b-table>
     <b-input-group prepend="Weight in gram" size="sm">
       <b-form-input
+        class="jest_input"
         :value="value"
         @input="$emit('input', Number($event))"
         type="number"
@@ -27,30 +30,75 @@
 </template>
 
 <script>
+
   export default {
+    /**
+     * foodModal
+     *     fctTableから行の値を受け取ってmodalに表示する
+     *     ユーザーが入力したweight値をOkクリック時にemit
+     */
     props: {
+      /**
+       * modalに表示するデータarray of object、
+       *     構造は以下
+       *     [{
+       *     En: "315",
+       *     Fe: "1.9",
+       *     Pr: "3.4",
+       *     Va: "",
+       *     Name: "Yam tuber, flour",
+       *     Group: "Grains, roots and tubers",
+       *     id:"5221"
+       *     }]
+       */
       items: {
         type: Array,
+        required: true,
         default: () => [],
       },
+      /**
+       * itemに対応したweightの値
+       */
       value: {
         type: Number,
+        required: true,
         default: 0,
       },
+      /**
+       * modalのID
+       */
       myName: {
         type: String,
         required: true,
       },
+      /**
+       * modalのタイトル
+       */
       myModalHeader: {
         type: String,
       },
+      /**
+       * 入力するWeightの最大値を指定
+       */
       maxWeight: {
         type: Number,
-        required: true,
+        default: 1000,
       },
+      /**
+       * 入力値の型を指定
+       */
       myType: {
         type: String,
+        default: 'Number'
       },
+      /**
+       * モーダルの表示用トリガー
+       */
+      showModal:{
+        type: Boolean,
+        default: false,
+        required: true
+      }
     },
     computed: {
       inputName() {
@@ -59,6 +107,14 @@
       inputState() {
         return (this.value > 0 && this.value <= this.maxWeight)
       },
+      showModalComputed: {
+        get(){
+          return this.showModal
+        },
+        set(val){
+          this.$emit('update:showModal', val)
+        }
+      }
     },
     data() {
       return {
@@ -106,6 +162,7 @@
       clickOk() {
         let result = {}
         result = this.items[0]
+        console.log(this.items)
         result.Wt = this.value
         this.$emit('modalOk', result)
       },

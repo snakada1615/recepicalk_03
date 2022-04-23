@@ -64,6 +64,7 @@
       </b-col>
     </b-row>
     <food-modal
+      :show-modal.sync="showModal"
       :max-weight=500
       my-name="myFoodModal"
       :items="items_modal"
@@ -144,6 +145,10 @@ export default {
        * driSelectAll表示用のフラグ
        */
       showDri: false,
+      /**
+       * modal表示用のフラグ
+       */
+      showModal: false,
     }
   },
   computed: {
@@ -278,7 +283,8 @@ export default {
         'Fe': res[0].Fe,
       })
       this.value_model = res[0].Wt
-      this.$bvModal.show('myFoodModal')
+      //this.$bvModal.show('myFoodModal')
+      this.showModal = true
     },
     updateTarget(val) {
       this.myAppWatcher.menuCases[this.pageId].target = val
