@@ -4,14 +4,48 @@
       <b-col>
         <b-card bg-variant="light">
           <div class="text-warning">page: {{pageId}}</div>
+          <div>{{$store.getters['fire/targetNutritionGetter']}}</div>
           <b-form-checkbox
             switch
             v-model="driSwitch"
           >evaluate [daily consumption] /[single meal]</b-form-checkbox>
-          <nutrition-bar :label="nutritionLabel[0]" :max-rating="maxRating" :rating="rating.En"/>
-          <nutrition-bar :label="nutritionLabel[1]" :max-rating="maxRating" :rating="rating.Pr"/>
-          <nutrition-bar :label="nutritionLabel[2]" :max-rating="maxRating" :rating="rating.Va"/>
-          <nutrition-bar :label="nutritionLabel[3]" :max-rating="maxRating" :rating="rating.Fe"/>
+          <b-row>
+            <b-col cols="2" class="d-flex justify-content-center">Target</b-col>
+            <b-col cols="2" class="d-flex justify-content-center">Value</b-col>
+            <b-col class="d-flex justify-content-right">sufficiency rate</b-col>
+          </b-row>
+          <nutrition-bar
+            :col-width-first= 2
+            :col-width-second= 2
+            :label="nutritionLabel[0]"
+            :max-rating="maxRating"
+            :rating="rating.En"
+            :maxRatingAbsolute = "nutritionSum.En"
+          />
+          <nutrition-bar
+            :col-width-first= 2
+            :col-width-second= 2
+            :label="nutritionLabel[1]"
+            :max-rating="maxRating"
+            :rating="rating.Pr"
+            :maxRatingAbsolute = "nutritionSum.Pr"
+          />
+          <nutrition-bar
+            :col-width-first= 2
+            :col-width-second= 2
+            :label="nutritionLabel[2]"
+            :max-rating="maxRating"
+            :rating="rating.Va"
+            :maxRatingAbsolute = "nutritionSum.Va"
+          />
+          <nutrition-bar
+            :col-width-first= 2
+            :col-width-second= 2
+            :label="nutritionLabel[3]"
+            :max-rating="maxRating"
+            :rating="rating.Fe"
+            :maxRatingAbsolute = "nutritionSum.Fe"
+          />
         </b-card>
       </b-col>
     </b-row>
@@ -52,7 +86,6 @@
           :driPopulations="myAppWatcher.menuCases[pageId].target"
           :driItems="myAppWatcher.dataSet.dri"
           @update:target="updateTarget"
-          @changeNutritionValue="onDriChanged($event, pageId)"
         ></dri-select-all>
       </b-col>
       <b-col lg="6">
@@ -134,10 +167,6 @@ export default {
        */
       nutritionSum: {},
       /**
-       * driテーブルから計算される栄養必要量の合計値
-       */
-      totalDri: {},
-      /**
        * FctTable表示用のフラグ
        */
       showFct: false,
@@ -162,21 +191,21 @@ export default {
       return JSON.parse(JSON.stringify(this.myAppWatcher))
     },
     /**
-     * totalDri または nutritionSum が変化した際に、更新された値に基づいて栄養素ごとのratingを計算
+     * targetNutritionWatcher または nutritionSum が変化した際に、更新された値に基づいて栄養素ごとのratingを計算
      * @returns {{}|{Pr: (number|number), En: (number|number), Va: (number|number), Fe: (number|number)}}
      */
     rating() {
-      if (!this.totalDri) {
+      if (!this.targetNutritionWatcher) {
         return {}
       }
-      let En = this.totalDri.En ?
-        Math.round(100 * this.nutritionSum.En * this.driRange / this.totalDri.En) / 10 : 0
-      let Pr = this.totalDri.Pr ?
-        Math.round(100 * this.nutritionSum.Pr * this.driRange / this.totalDri.Pr) / 10 : 0
-      let Va = this.totalDri.Va ?
-        Math.round(100 * this.nutritionSum.Va * this.driRange / this.totalDri.Va) / 10 : 0
-      let Fe = this.totalDri.Fe ?
-        Math.round(100 * this.nutritionSum.Fe * this.driRange / this.totalDri.Fe) / 10 : 0
+      let En = this.targetNutritionWatcher.En ?
+        Math.round(100 * this.nutritionSum.En * this.driRange / this.targetNutritionWatcher.En) / 10 : 0
+      let Pr = this.targetNutritionWatcher.Pr ?
+        Math.round(100 * this.nutritionSum.Pr * this.driRange / this.targetNutritionWatcher.Pr) / 10 : 0
+      let Va = this.targetNutritionWatcher.Va ?
+        Math.round(100 * this.nutritionSum.Va * this.driRange / this.targetNutritionWatcher.Va) / 10 : 0
+      let Fe = this.targetNutritionWatcher.Fe ?
+        Math.round(100 * this.nutritionSum.Fe * this.driRange / this.targetNutritionWatcher.Fe) / 10 : 0
       return {
         En: En,
         Pr: Pr,
@@ -198,6 +227,9 @@ export default {
       }
       return res
     },
+    targetNutritionWatcher(){
+      return JSON.parse(JSON.stringify(this.targetNutrition))
+    },
   },
   props: {
     /**
@@ -207,6 +239,15 @@ export default {
       type: Object,
       default: [],
       required: true,
+    },
+    /**
+     * 栄養素ごとの目標摂取量
+     *     targetNutritionWatcherで読み込んでページ内で利用
+     */
+    targetNutrition:{
+      type: Object,
+      default: {},
+      required: true
     },
     /**
      * 複数インスタンスを作成する場合のindex
@@ -243,9 +284,6 @@ export default {
     test(val) {
       this.myAppWatcher.menuCases[this.pageId].menu.push(val)
       //this.$store.dispatch('fire/initAll')
-    },
-    onDriChanged(val) {
-      this.totalDri = val
     },
     onNutritionSumChanged(val) {
       this.nutritionSum = val
@@ -287,7 +325,7 @@ export default {
       this.showModal = true
     },
     updateTarget(val) {
-      this.myAppWatcher.menuCases[this.pageId].target = val
+      this.myAppWatcher.menuCases[this.pageId].target = JSON.parse(JSON.stringify(val))
     },
     save() {
       this.$store.dispatch('fire/saveAppdata')

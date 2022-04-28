@@ -106,6 +106,21 @@ export const state = () => ({
 export const getters = {
   myAppGetter(state) {
     return state.myApp
+  },
+  targetNutritionGetter(state) {
+    return state.myApp.menuCases.map((dat) => {
+      return dat.target.reduce((accumulator, item, index) => {
+        const dri = state.myApp.dataSet.dri[index]
+        const count = item.count
+        accumulator.En = (accumulator.En || 0) + Number(count) * Number(dri.En)
+        accumulator.Pr = (accumulator.Pr || 0) + Number(count) * Number(dri.Pr)
+        accumulator.Va = (accumulator.Va || 0) + Number(count) * Number(dri.Va)
+        accumulator.Fe = (accumulator.Fe || 0) + Number(count) * Number(dri.Fe)
+        accumulator.Wt = (accumulator.Wt || 0) + Number(count) * Number(dri.Wt)
+        return accumulator
+      }, {})
+
+    })
   }
 }
 
@@ -555,7 +570,7 @@ export const actions = {
     for (let i = 0; i < state.myApp.sceneCount; i++) {
       const isTargetSingle = true
       const menu = []
-      const target = payload.map(function(dat){
+      const target = payload.map(function (dat) {
         return {id: dat.id, count: 0}
       })
       arr.push({target: target, menu: menu, isTargetSingle: isTargetSingle})

@@ -1,20 +1,22 @@
 import modalTest from '@/components/molecules/modaltest.vue'
-import { mount, createLocalVue} from '@vue/test-utils';
+import {mount, createLocalVue} from '@vue/test-utils';
 import {describe, expect, it} from "@jest/globals";
 import BootstrapVue from 'bootstrap-vue'
+
 const localVue = createLocalVue();
 localVue.use(BootstrapVue)
 
 const wrapper = mount(modalTest, {
   localVue,
   propsData: {
-    show:false
+    show: false,
+    items:[],
   }
 });
 
-describe('modalTest', () =>{
-  it("modalTest", async()=>{
-    const modalWrapper = wrapper.findComponent({ name: 'BModal' });
+describe('modalTest', () => {
+  it("modalTest", async () => {
+    const modalWrapper = wrapper.findComponent({name: 'BModal'});
 
     //表示されていないことを確認
     expect(modalWrapper.exists()).toBe(true)
@@ -41,7 +43,8 @@ describe('modalTest', () =>{
     modalHide = modalWrapper.emitted('hide')
     expect(modalHide).toBeTruthy()
     expect(modalHide.length).toBe(1)
-    expect(modalWrapper.props('visible')).toBe(false)
+    await wrapper.setProps({show: false})
 
+    expect(modalWrapper.props('visible')).toBe(false)
   })
 })

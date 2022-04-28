@@ -10,6 +10,7 @@
           <diet-calk-comp
             :my-app="myApp"
             :page-id="pageId"
+            :target-nutrition="$store.getters['fire/targetNutritionGetter'][pageId]"
             @update:myApp="updateMyApp"
           />
         </b-tab>

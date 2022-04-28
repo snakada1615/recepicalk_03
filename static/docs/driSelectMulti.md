@@ -2,12 +2,12 @@
 
 ## Props
 
-| Name         | Type      | Description                                                                                                                                                                                                                | Default                     |
-| ------------ | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
-| `target`     | `Array`   | ターゲットグループの構成：v-modelで使用  [{ id: 1, count: 1}, { id: 2, count: 5}, { id: 3, count: 0}]                                                                                                                                      | `() => [{id: 0, count: 1}]` |
-| `items`      | `Array`   | driのデータセット   ex.          [{            En: "1088.0",            Fe: "5.8",            max_vol: "900",            Name: "child 6-23 month",            Pr: "11.65",            Va: "400.0",            id: 0           }], | `() => []`                  |
-| `max`        | `Number`  | target.countの上限値                                                                                                                                                                                                           | `1000000`                   |
-| `input-name` | `unknown` |                                                                                                                                                                                                                            | &nbsp;                      |
+| Name                | Type      | Description                                                                                                                                                                                                                | Default                     |
+| ------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| `target` *required* | `Array`   | ターゲットグループの構成：v-modelで使用  [{ id: 1, count: 1}, { id: 2, count: 5}, { id: 3, count: 0}]                                                                                                                                      | `() => [{id: 0, count: 1}]` |
+| `items` *required*  | `Array`   | driのデータセット   ex.          [{            En: "1088.0",            Fe: "5.8",            max_vol: "900",            Name: "child 6-23 month",            Pr: "11.65",            Va: "400.0",            id: 0           }], | `() => []`                  |
+| `max`               | `Number`  | target.countの上限値                                                                                                                                                                                                           | `1000000`                   |
+| `input-name`        | `unknown` |                                                                                                                                                                                                                            | &nbsp;                      |
 
 ## Data
 
@@ -86,7 +86,12 @@ DRIのテーブル（合計値）を更新
 **Syntax**
 
 ```typescript
-updateTableDri(dat: unknown): [{Item: string, Value: string},{Item: string, Value: (number | * | number)},{Item: string, Value: (number | * | number)},{Item: string, Value: (number | * | number)},{Item: string, Value: (number | * | number)},null]
+updateTableDri(dat: unknown): [{Item: string, Value: string},
+    {Item: string, Value: (number | * | number)},
+    {Item: string, Value: (number | * | number)},
+    {Item: string, Value: (number | * | number)},
+    {Item: string, Value: (number | * | number)},
+    null]
 ```
 
 **Parameters**
@@ -97,15 +102,34 @@ updateTableDri(dat: unknown): [{Item: string, Value: string},{Item: string, Valu
 **Return value**
 
 合計値のテーブル
+{Item: string, Value: (number|*|number)},
+{Item: string, Value: (number|*|number)},
+{Item: string, Value: (number|*|number)},
+{Item: string, Value: (number|*|number)},
+null]}
 合計値のテーブル
 
 ### updateTablePop()
 
+DRIの一覧表（年齢別・性別）に各グループの人数を追加して戻す
+
 **Syntax**
 
 ```typescript
-updateTablePop(driValue: unknown, targetValue: unknown): unknown
+updateTablePop(driValue: unknown, targetValue: unknown): any
 ```
+
+**Parameters**
+
+- `driValue: unknown`<br/>
+  DRIの一覧表
+
+- `targetValue: unknown`<br/>
+  各グループの対象人数のリスト
+
+**Return value**
+
+DRIの一覧表×対象人数
 
 ### tablePop2Target()
 

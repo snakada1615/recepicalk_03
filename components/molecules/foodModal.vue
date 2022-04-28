@@ -1,12 +1,12 @@
 <template>
   <b-modal
     v-model="showModalComputed"
-    class="jest_modal"
     :id="myName"
     :title="myModalHeader"
     @ok="clickOk"
     @cancel="clickCancel"
     hide-header
+    static
   >
     <b-table
       small
@@ -17,7 +17,6 @@
     ></b-table>
     <b-input-group prepend="Weight in gram" size="sm">
       <b-form-input
-        class="jest_input"
         :value="value"
         @input="$emit('input', Number($event))"
         type="number"
@@ -162,12 +161,12 @@
       clickOk() {
         let result = {}
         result = this.items[0]
-        console.log(this.items)
         result.Wt = this.value
         this.$emit('modalOk', result)
       },
       clickCancel() {
         console.log('Cancel')
+        this.$emit('modalCancel')
       },
     }
   }
