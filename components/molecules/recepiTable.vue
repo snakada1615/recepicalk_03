@@ -70,6 +70,7 @@
     props: {
       items: {
         type: Array,
+        required: true,
         default: () => [
           {id: "1", Group: "grain", Name: "taro", En: "25", Pr: "5", Va: "109", Fe: "13", Wt: "196"},
           {id: "2", Group: "meat", Name: "pork", En: "15", Pr: "9", Va: "58", Fe: "31", Wt: "208"}

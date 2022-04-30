@@ -15,7 +15,7 @@ describe('driSelectSingle',  () => {
     localVue,
     propsData:{
       target: [{id: 1, count: 8}],
-      items: [
+      driItems: [
         {
           En: "1088.0",
           Fe: "5.8",

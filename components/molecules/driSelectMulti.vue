@@ -84,7 +84,7 @@
        *            id: 0
        *           }],
        */
-      items: {
+      driItems: {
         type: Array,
         default: () => [],
         required: true
@@ -137,7 +137,7 @@
       updateAllTable() {
         this.tablePop.length = 0
         this.tablePop = JSON.parse(JSON.stringify(
-          this.updateTablePop(this.items, this.target)
+          this.updateTablePop(this.driItems, this.target)
         ))
         this.tableDri.length = 0
         this.tableDri = JSON.parse(JSON.stringify(

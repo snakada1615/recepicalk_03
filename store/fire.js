@@ -104,10 +104,7 @@ export const state = () => ({
 })
 
 export const getters = {
-  myAppGetter(state) {
-    return state.myApp
-  },
-  targetNutritionGetter(state) {
+  nutritionDemandGetter(state) {
     return state.myApp.menuCases.map((dat) => {
       return dat.target.reduce((accumulator, item, index) => {
         const dri = state.myApp.dataSet.dri[index]
@@ -119,7 +116,18 @@ export const getters = {
         accumulator.Wt = (accumulator.Wt || 0) + Number(count) * Number(dri.Wt)
         return accumulator
       }, {})
-
+    })
+  },
+  nutritionSupplyGetter(state){
+    return state.myApp.menuCases.map((datArray)=>{
+      return datArray.menu.reduce((accumulator, item) => {
+        accumulator.En = (accumulator.En || 0) + Number(item.En)
+        accumulator.Pr = (accumulator.Pr || 0) + Number(item.Pr)
+        accumulator.Va = (accumulator.Va || 0) + Number(item.Va)
+        accumulator.Fe = (accumulator.Fe || 0) + Number(item.Fe)
+        accumulator.Wt = (accumulator.Wt || 0) + Number(item.Wt)
+        return accumulator
+      }, {})
     })
   }
 }

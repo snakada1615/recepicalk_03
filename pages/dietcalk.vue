@@ -10,7 +10,7 @@
           <diet-calk-comp
             :my-app="myApp"
             :page-id="pageId"
-            :target-nutrition="$store.getters['fire/targetNutritionGetter'][pageId]"
+            :target-nutrition="$store.getters['fire/nutritionDemandGetter'][pageId]"
             @update:myApp="updateMyApp"
           />
         </b-tab>
@@ -50,6 +50,7 @@ export default {
       console.log('tabChange:' + this.pageId)
     },
     updateMyApp(val) {
+      console.log('dietcalk:updateMyApp')
       this.$store.dispatch('fire/updateMyApp', val)
     },
     formatter(val) {

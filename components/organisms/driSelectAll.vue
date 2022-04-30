@@ -12,7 +12,7 @@
     </b-form>
     <div v-if="targetSwitch">
       <dri-select-single
-        :items="driItems"
+        :driItems="driItems"
         :target="driPopulations"
         @update:target="$emit('update:target', $event)"
         @changeNutritionValue="updateNutrition"
@@ -22,7 +22,7 @@
     </div>
     <div v-else>
       <dri-select-multi
-        :items="driItems"
+        :driItems="driItems"
         :target="driPopulations"
         :max="max"
         @update:target="$emit('update:target', $event)"

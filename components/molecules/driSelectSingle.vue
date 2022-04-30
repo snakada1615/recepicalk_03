@@ -2,11 +2,14 @@
   <b-container>
     <b-form-select
       class="jest_select mb-2"
-      v-model="targetPop"
+      v-model="targetGroup"
       :options="options"
       @change="onSelectionChange"
       size="sm"
       >
+      <template #first>
+        <b-form-select-option value=0 disabled>-- Please select an option --</b-form-select-option>
+      </template>
     </b-form-select>
     <b-table
       class="jest_table totalDri"
@@ -43,13 +46,13 @@
           {key: 'Item', sortable: false},
           {key: 'Value', sortable: false},
         ],
-        targetPop:0,
+        targetGroup:0,
         tableDri:[]
       }
     },
     computed: {
       options: function () {
-        let result = this.items.map(function (value) {
+        let result = this.driItems.map(function (value) {
           return {
             'value': value.id,
             'text': value.Name
@@ -72,12 +75,12 @@
       target:{
         type:Array,
         required: true,
-        default:() => [{id: 0, count: 1}]
+        //default:() => [{id: 0, count: 1}]
       },
       /**
        * list of DRI information
        */
-      items: {
+      driItems: {
         type: Array,
         required: true
       }
@@ -91,26 +94,38 @@
         },
       }
     },
+    created() {
+      this.updateAllTable()
+    },
     methods: {
       /**
-       * targetプロパティの更新時に内部変数 (tablePop, tableDri)を更新
+       * targetプロパティの更新時に内部変数 (targetGroup, tablePop,
+       *     tableDri)を更新
        */
       updateAllTable() {
-        //targetが更新されたら、あわせてtargetPopを更新する
+        //targetが更新されたら、あわせてtargetGroupを更新する
+        //適正なデータがなければ0を返す
         if (this.target == null || this.target.length === 0){
-          return 0
+          throw new Error('driSelectSingle.updateAllTable: target data is invalid')
         }
+        //1名以上の人数が記されているグループのidを抽出
         const res = this.target.filter(function (dat){
           return dat.count > 0
         })
-        if (res.length === 0){res.push(this.target[0])}
-        this.targetPop = Number(res[0].id)
+
+        //全てのグループの人数が0名なら0を返す
+        //人数1名以上の最初のグループをリストで選択されたターゲットとする
+        if (res.length === 0){
+          this.targetGroup = 0
+        } else {
+          this.targetGroup = Number(res[0].id)
+        }
 
         //tablePop（各グループごとのtarget人数）をセット
         const tablePop = JSON.parse(JSON.stringify(
-          this.updateTablePop(this.items, this.target)
+          this.updateTablePop(this.driItems, this.targetGroup)
         ))
-        //tablePopの数字を使って栄養素の必要量の更新
+        //tablePopの数字を使って栄養素の合計必要量の更新
         this.tableDri.length = 0
         this.tableDri = JSON.parse(JSON.stringify(
           this.updateTableDri(tablePop)
@@ -173,15 +188,16 @@
       /**
        * DRIの一覧表（年齢別・性別）に各グループの人数を追加して戻す
        * @param driValue DRIの一覧表
-       * @param targetValue 各グループの対象人数のリスト
+       * @param targetValue 選ばれたグループのid
        * @returns {*} DRIの一覧表×対象人数
        */
       updateTablePop(driValue, targetValue) {
         return driValue.map(function (driItem) {
-          const res = targetValue.filter(
-            item => Number(item.id) === Number(driItem.id)
-          )
-          driItem.number = res.length ? res[0].count : 0
+          if (Number(driItem.id) === Number(targetValue)) {
+            driItem.number = 1
+          } else {
+            driItem.number = 0
+          }
           return driItem
         })
       },
@@ -192,8 +208,8 @@
        * @param val
        */
       onSelectionChange(val){
-        console.log('onChange')
-        const res = this.items.map(function(dat){
+        console.log('driSelectSingle:onChange:' + val)
+        const res = this.driItems.map(function(dat){
           let count = 0
           if (Number(dat.id) === Number(val)){
             count = 1

@@ -14,7 +14,11 @@ describe('driSelectAll',  () => {
   wrapper = mount(driSelectAll,{
     localVue,
     propsData:{
-      driPopulations: [{id: 1, count: 8}],
+      driPopulations: [
+        {id: 1, count: 1},
+        {id: 2, count: 0},
+        {id: 3, count: 2}
+      ],
       targetSwitch: false,
       driItems: [
         {
@@ -24,7 +28,7 @@ describe('driSelectAll',  () => {
           Name: "child 6-23 month",
           Pr: "11.65",
           Va: "400.0",
-          id: 0
+          id: 1
         },
         {
           En: "3066.0",
@@ -33,7 +37,7 @@ describe('driSelectAll',  () => {
           Name: "lactating",
           Pr: "61.0",
           Va: "850.0",
-          id: 1
+          id: 2
         },
         {
           En: "2913.0",
@@ -42,7 +46,7 @@ describe('driSelectAll',  () => {
           Name: "adolescent all",
           Pr: "52.65",
           Va: "600.0",
-          id: 2
+          id: 3
         }
       ]
     }
@@ -60,6 +64,11 @@ describe('driSelectAll',  () => {
     // driSelectSingle/Multiの表示確認
     expect(wrapper.findComponent('.single').exists()).toBe(false)
     expect(wrapper.findComponent('.multi').exists()).toBe(true)
+    expect(wrapper.emitted('changeNutritionValue')[0]).toEqual(
+      [
+        { En: 6914, Pr: 116.95, Va: 1600, Fe: 55.599999999999994 }
+      ]
+    )
 
     // targetSwitchの値変更
     await wrapper.setProps({targetSwitch: true})
@@ -68,5 +77,18 @@ describe('driSelectAll',  () => {
     expect(wrapper.findComponent('.single').exists()).toBe(true)
     expect(wrapper.findComponent('.multi').exists()).toBe(false)
 
+    //driSelectSingleでリストの3番目を選択
+    const select = wrapper.findComponent('.jest_select')
+    select.findAllComponents('option').at(3).element.selected = true
+    await select.trigger('change')
+
+    //選択後のemitでtargetの変化を確認
+    //初期値は{ id: 1, count: 1 }, { id: 2, count: 0 }, { id: 3, count: 2 }
+    expect(wrapper.emitted('update:target')[0][0]).toEqual(
+      [
+        { id: 1, count: 0 }, { id: 2, count: 0 }, { id: 3, count: 1 }
+      ]
+    )
+    console.log(wrapper.emitted())
   })
 })

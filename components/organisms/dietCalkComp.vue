@@ -4,7 +4,7 @@
       <b-col>
         <b-card bg-variant="light">
           <div class="text-warning">page: {{pageId}}</div>
-          <div>{{$store.getters['fire/targetNutritionGetter']}}</div>
+          <div>{{$store.state.fire.myApp.menuCases[pageId].target}}</div>
           <b-form-checkbox
             switch
             v-model="driSwitch"
@@ -79,6 +79,7 @@
     </b-row>
     <b-row>
       <b-col lg="6">
+        {{'targetSwitch:'+ myAppWatcher.menuCases[pageId].isTargetSingle + ': showDri:' + showDri}}
         <dri-select-all
           v-show="showDri"
           :targetSwitch.sync="myAppWatcher.menuCases[pageId].isTargetSingle"
@@ -221,7 +222,6 @@ export default {
      */
     driRange: function () {
       let res = 3
-      console.log('driRange:changed')
       if (this.driSwitch) {
         res = 1
       }
@@ -246,7 +246,7 @@ export default {
      */
     targetNutrition:{
       type: Object,
-      default: {},
+      default: ()=>({}),
       required: true
     },
     /**
@@ -270,6 +270,7 @@ export default {
       deep: true,
       handler(newVal, oldVal) {
         //myAppWatcherが同じ値で上書きされる場合があるため、newVal/oldValが同じ値かどうか確認
+        console.log('dietCalkComp:myAppWatcherMonitor:changed')
         const isChanged = !isObjectDeepEqual(newVal, oldVal)
         if (this.firstLoadFlag || !isChanged) {
           // 初回ロード時はstore経由でのmyApp更新を行わない
@@ -325,6 +326,7 @@ export default {
       this.showModal = true
     },
     updateTarget(val) {
+      console.log('updateTarget')
       this.myAppWatcher.menuCases[this.pageId].target = JSON.parse(JSON.stringify(val))
     },
     save() {
