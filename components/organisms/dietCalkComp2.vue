@@ -55,11 +55,25 @@
     </b-row>
     <b-row>
       <b-col>
-        <b-button @click="showDriSelect = !showDriSelect">set target</b-button>
-        <b-button>set menu</b-button>
+        <b-card
+          bg-variant="light"
+        >
+          <recepi-table
+            :items.sync="myAppWatcher.menuCases[pageIdComputed].menu"
+            @update:items="updateSupply"
+            @totalChanged="onNutritionSumChanged"
+          ></recepi-table>
+        </b-card>
       </b-col>
     </b-row>
-    <b-row v-if="showDriSelect">
+    <b-row>
+    <b-row>
+      <b-col>
+        <b-button @click="showDriSelect = !showDriSelect">set target</b-button>
+        <b-button @click="showFct=!showFct">set menu</b-button>
+      </b-col>
+    </b-row>
+    <b-row>
       <b-col>
         <dri-select-all
           v-show="showDriSelect "
@@ -71,17 +85,12 @@
         ></dri-select-all>
       </b-col>
     </b-row>
-    <b-row>
-      <b-col>
-        <b-card
-          bg-variant="light"
-        >
-          <recepi-table
-            :items.sync="myAppWatcher.menuCases[pageIdComputed].menu"
-            @update:items="updateSupply"
-            @totalChanged="onNutritionSumChanged"
-          ></recepi-table>
-        </b-card>
+      <b-col lg="6">
+        <fct-table
+          v-show="showFct"
+          :items="myAppWatcher.dataSet.fct"
+          @fctClick="onFctClick"
+        ></fct-table>
       </b-col>
     </b-row>
   </b-container>
@@ -140,6 +149,10 @@ export default {
        * driSelectAll表示用のフラグ
        */
       showDriSelect: false,
+      /**
+       * fctTable表示用のフラグ
+       */
+      showFct: false,
       /**
        * ターゲットの1グループあたり設定人数の最大値
        */
@@ -220,6 +233,10 @@ export default {
     this.rating = JSON.parse(JSON.stringify(this.ratingGetter()))
   },
   methods: {
+    /**
+     * myApp.menuCases.targetの値を集計してnutritionDemandWatcherに代入するための関数
+     * @returns {*[]} 栄養素必要量の合計値
+     */
     nutritionDemandGetter() {
       const vm = this
       return vm.myApp.menuCases.map((dat) => {
@@ -235,6 +252,10 @@ export default {
         }, {})
       })
     },
+    /**
+     * myApp.menuCases.menuの値を集計してnutritionSupplyWatcherに代入するための関数
+     * @returns {*[]} 栄養素供給量の合計値
+     */
     nutritionSupplyGetter() {
       const vm = this
       return vm.myApp.menuCases.map((datArray) => {
@@ -252,6 +273,10 @@ export default {
         }
       })
     },
+    /**
+     * nutritionSupplyとnutritionDemandの値に基づいて栄養素の充足率を算出
+     * @returns {*[]} 栄養素ごとの充足率
+     */
     ratingGetter() {
       const res = []
       for (let i = 0; i < this.maxPage; i++) {
@@ -270,6 +295,10 @@ export default {
       }
       return res
     },
+    /**
+     * tergetが変更された際に、栄養素必要量合計を再計算してemit
+     * @param val 更新されたグループ構成
+     */
     updateDemand(val) {
       const vm = this
       //作業用のmyAppコピー作成
@@ -282,6 +311,13 @@ export default {
     onNutritionSumChanged(){
       console.log('ba----')
     },
+    onFctClick(){
+      console.log('ba----')
+    },
+    /**
+     * menuが変更された際に、栄養素供給量合計を再計算してemit
+     * @param val 更新されたmenu
+     */
     updateSupply(val){
       const vm = this
       //作業用のmyAppコピー作成
