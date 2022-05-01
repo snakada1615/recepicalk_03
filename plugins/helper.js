@@ -70,5 +70,29 @@ export function isObjectDeepEqual(object1, object2) {
   return true;
 }
 
+export function validateMyApp(dat){
+  // Array
+  function isArray (item) {
+    return Object.prototype.toString.call(item) === '[object Array]';
+  }
 
+  // OBJECT
+  function isObject (item) {
+    return typeof item === 'object' && item !== null && !isArray(item);
+  }
 
+  //field in Object
+  function isKeyContained(myObject, key){
+    const keys = Object.keys(myObject)
+    return (keys.indexOf(key) >= 0)
+  }
+
+  return isObject(dat) &&
+    isKeyContained(dat, 'user') &&
+  isKeyContained(dat, 'dataSet') &&
+  isKeyContained(dat, 'sceneCount') &&
+  isKeyContained(dat, 'scene') &&
+  isKeyContained(dat, 'menuCases') &&
+  isKeyContained(dat, 'feasibilityCases') &&
+  isKeyContained(dat, 'saveDate')
+}

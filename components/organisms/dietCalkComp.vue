@@ -115,6 +115,11 @@ import FctTable from "@/components/molecules/FctTable"
 import recepiTable from "@/components/molecules/recepiTable"
 import foodModal from "@/components/molecules/foodModal"
 import nutritionBar from "@/components/molecules/nutritionBar"
+import {validateMyApp} from "@/plugins/helper";
+
+/**
+ * dietCalkComponent
+ */
 
 export default {
   components: {
@@ -190,7 +195,9 @@ export default {
      */
     myApp: {
       type: Object,
-      default: () => ({}),
+      validator: function(value){
+        return validateMyApp(value)
+      },
       required: true,
     },
     /**
@@ -269,6 +276,8 @@ export default {
     this.nutritionDemandWatcher = JSON.parse(JSON.stringify(this.nutritionDemandGetter()))
     this.nutritionSupplyWatcher = JSON.parse(JSON.stringify(this.nutritionSupplyGetter()))
     this.rating = JSON.parse(JSON.stringify(this.ratingGetter()))
+    console.log('fire.created.validate')
+    console.log(validateMyApp(this.myAppWatcher))
   },
   methods: {
     /**
