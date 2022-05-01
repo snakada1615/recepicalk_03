@@ -173,7 +173,7 @@
             res.push(val)
           }
         })
-        this.$emit('update:items', res)
+        this.$emit('itemDeleted', res)
       },
     }
   }

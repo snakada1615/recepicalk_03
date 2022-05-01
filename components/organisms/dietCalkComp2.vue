@@ -53,38 +53,46 @@
         </b-card>
       </b-col>
     </b-row>
-    <b-row>
+    <b-row class="my-2">
       <b-col>
         <b-card
           bg-variant="light"
         >
           <recepi-table
             :items.sync="myAppWatcher.menuCases[pageIdComputed].menu"
-            @update:items="updateSupply"
-            @totalChanged="onNutritionSumChanged"
+            @itemDeleted="updateSupply"
+            @rowClick="onRecepiClicked"
           ></recepi-table>
         </b-card>
       </b-col>
     </b-row>
     <b-row>
-    <b-row>
-      <b-col>
-        <b-button @click="showDriSelect = !showDriSelect">set target</b-button>
-        <b-button @click="showFct=!showFct">set menu</b-button>
-      </b-col>
-    </b-row>
-    <b-row>
-      <b-col>
-        <dri-select-all
-          v-show="showDriSelect "
-          :targetSwitch.sync="myAppWatcher.menuCases[pageIdComputed].isTargetSingle"
-          :max="maxPopulation"
-          :driPopulations="myAppWatcher.menuCases[pageIdComputed].target"
-          :driItems="myAppWatcher.dataSet.dri"
-          @update:target="updateDemand"
-        ></dri-select-all>
-      </b-col>
-    </b-row>
+      <b-row>
+        <b-col>
+          <b-button
+            @click="showDriSelect = !showDriSelect"
+            :pressed="showDriSelect"
+            variant="info"
+          >set target</b-button>
+          <b-button
+            @click="showFct=!showFct"
+            :pressed="showFct"
+            variant="info"
+          >set menu</b-button>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col>
+          <dri-select-all
+            v-show="showDriSelect"
+            :targetSwitch.sync="myAppWatcher.menuCases[pageIdComputed].isTargetSingle"
+            :max="maxPopulation"
+            :driPopulations="myAppWatcher.menuCases[pageIdComputed].target"
+            :driItems="myAppWatcher.dataSet.dri"
+            @update:target="updateDemand"
+          ></dri-select-all>
+        </b-col>
+      </b-row>
       <b-col lg="6">
         <fct-table
           v-show="showFct"
@@ -93,6 +101,14 @@
         ></fct-table>
       </b-col>
     </b-row>
+    <food-modal
+      :show-modal.sync="showModal"
+      :max-weight=500
+      my-name="myFoodModal"
+      :items="items_modal"
+      v-model="value_model"
+      @modalOk="updateSupply"
+    />
   </b-container>
 </template>
 
@@ -142,9 +158,21 @@ export default {
        */
       maxRating: 10,
       /**
+       * ターゲットの1グループあたり設定人数の最大値
+       */
+      maxPopulation: 10000,
+      /**
        * nutritionBarで評価するmenuを１日分で評価するか、一食分で評価するか判定
        */
       driSwitch: true,
+      /**
+       * 作物情報を表すobject：作物摂取量の設定ダイアログに渡すproperty
+       */
+      items_modal: [],
+      /**
+       * 作物摂取量を表す値：作物摂取量の設定ダイアログに渡すproperty
+       */
+      value_model: 0,
       /**
        * driSelectAll表示用のフラグ
        */
@@ -154,9 +182,9 @@ export default {
        */
       showFct: false,
       /**
-       * ターゲットの1グループあたり設定人数の最大値
+       * modal表示用のフラグ
        */
-      maxPopulation: 10000,
+      showModal: false,
     }
   },
   props: {
@@ -308,17 +336,57 @@ export default {
       //更新されたmyAppをemit
       this.$emit('update:myApp', dat)
     },
-    onNutritionSumChanged(){
-      console.log('ba----')
+    /**
+     * recepiTableがクリックされた際に、行の内容を組み込んでfoodModalを開く
+     * @param val
+     */
+    onRecepiClicked(val) {
+      console.log(val)
+      this.items_modal.length = 0
+      this.items_modal.push({
+        'id': val.id,
+        'Name': val.Name,
+        'Group': val.Group,
+        'En': val.En,
+        'Pr': val.Pr,
+        'Va': val.Va,
+        'Fe': val.Fe,
+      })
+      this.value_model = val.Wt
+      this.showModal = true
     },
-    onFctClick(){
-      console.log('ba----')
+    /**
+     * fctTableがクリックされた時に行の内容を組み込んでfoodModalを開く
+     * @param val
+     */
+    onFctClick(val) {
+      console.log(val)
+      //fctでクリックした行がrecepiTableの中に含まれるか確認
+      let res = this.myAppWatcher.menuCases[this.pageIdComputed].menu.filter(function (dat) {
+        return Number(dat.id) === Number(val.id)
+      })
+      //含まれない場合はデータを新規追加・編集
+      if (!res.length) {
+        res[0] = val
+      }
+      this.items_modal.length = 0
+      this.items_modal.push({
+        'id': res[0].id,
+        'Name': res[0].Name,
+        'Group': res[0].Group,
+        'En': res[0].En,
+        'Pr': res[0].Pr,
+        'Va': res[0].Va,
+        'Fe': res[0].Fe,
+      })
+      this.value_model = res[0].Wt
+      this.showModal = true
     },
     /**
      * menuが変更された際に、栄養素供給量合計を再計算してemit
      * @param val 更新されたmenu
      */
-    updateSupply(val){
+    updateSupply(val) {
       const vm = this
       //作業用のmyAppコピー作成
       let dat = JSON.parse(JSON.stringify(vm.myAppWatcher))
@@ -326,6 +394,10 @@ export default {
       dat.menuCases[vm.pageIdComputed].menu = JSON.parse(JSON.stringify(val))
       //更新されたmyAppをemit
       this.$emit('update:myApp', dat)
+    },
+    //fctとdriの表示調整
+    toggleFctDri(){
+      console.log('test')
     },
   }
 }

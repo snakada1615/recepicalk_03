@@ -11,6 +11,8 @@
     <b-table
       small
       striped
+      selectable
+      select-mode="single"
       head-row-variant="success"
       :items="items"
       :fields="fields"
@@ -165,7 +167,6 @@
         this.$emit('modalOk', result)
       },
       clickCancel() {
-        console.log('Cancel')
         this.$emit('modalCancel')
       },
     }

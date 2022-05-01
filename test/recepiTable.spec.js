@@ -52,7 +52,7 @@ describe('recepiTable', () => {
     await wrapper.vm.$nextTick()
 
     //作物リストの更新をemit
-    expect(wrapper.emitted('update:items')[0][0].length).toBe(2)
+    expect(wrapper.emitted('itemDeleted')[0][0].length).toBe(2)
 
   })
 })
