@@ -208,7 +208,6 @@
        * @param val
        */
       onSelectionChange(val){
-        console.log('driSelectSingle:onChange:' + val)
         const res = this.driItems.map(function(dat){
           let count = 0
           if (Number(dat.id) === Number(val)){

@@ -3,12 +3,11 @@
     <b-row class="my-2">
       <b-col>
         <b-card bg-variant="light">
-          PAGE:{{ pageIdComputed }}
           <b-form-select v-model="pageIdComputed" :options="pageOptions"></b-form-select>
           <div class="text-warning">page: {{ pageIdComputed }}</div>
-          <div>{{ nutritionSupplyWatcher[pageIdComputed] }}</div>
+          <div>supply: {{ nutritionSupplyWatcher[pageIdComputed] }}</div>
           <div>--------------------------------------------</div>
-          <div>{{ nutritionDemandWatcher[pageIdComputed] }}</div>
+          <div>demand: {{ nutritionDemandWatcher[pageIdComputed] }}</div>
           <b-form-checkbox
             switch
             v-model="driSwitch"
@@ -52,6 +51,24 @@
             :maxRatingAbsolute="nutritionSupplyWatcher[pageIdComputed].Fe"
           />
         </b-card>
+      </b-col>
+    </b-row>
+    <b-row>
+      <b-col>
+        <b-button @click="showDriSelect = !showDriSelect">set target</b-button>
+        <b-button>set menu</b-button>
+      </b-col>
+    </b-row>
+    <b-row v-if="showDriSelect">
+      <b-col>
+        <dri-select-all
+          v-show="showDriSelect "
+          :targetSwitch.sync="myAppWatcher.menuCases[pageIdComputed].isTargetSingle"
+          :max="maxPopulation"
+          :driPopulations="myAppWatcher.menuCases[pageIdComputed].target"
+          :driItems="myAppWatcher.dataSet.dri"
+          @update:target="updateTarget"
+        ></dri-select-all>
       </b-col>
     </b-row>
   </b-container>
@@ -107,6 +124,14 @@ export default {
        * nutritionBarで評価するmenuを１日分で評価するか、一食分で評価するか判定
        */
       driSwitch: true,
+      /**
+       * driSelectAll表示用のフラグ
+       */
+      showDriSelect: false,
+      /**
+       * ターゲットの1グループあたり設定人数の最大値
+       */
+      maxPopulation: 10000,
     }
   },
   props: {
@@ -236,20 +261,11 @@ export default {
     updateTarget(val) {
       const vm = this
       //作業用のmyAppコピー作成
-      const dat = JSON.parse(JSON.stringify(this.myAppWatcher))
-      //menuCaseの更新
-      const myMenuCase = dat.menuCases.map(function (dat, index) {
-        let dat2 = JSON.parse(JSON.stringify(dat))
-        if (index === vm.pageId) {
-          dat2 = JSON.parse(JSON.stringify(val))
-        }
-        return dat2
-      })
-      //更新されたmenuCaseを組み込む
-      dat.menuCases = JSON.parse(JSON.stringify(myMenuCase))
+      let dat = JSON.parse(JSON.stringify(vm.myAppWatcher))
+      //更新されたtargetを入れ替える
+      dat.menuCases[vm.pageIdComputed].target = JSON.parse(JSON.stringify(val))
       //更新されたmyAppをemit
       this.$emit('update:myApp', dat)
-      //this.myAppWatcher.menuCases[this.pageId].target = JSON.parse(JSON.stringify(val))
     },
     save() {
       this.$store.dispatch('fire/saveAppdata')
