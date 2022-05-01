@@ -1,26 +1,19 @@
 <template>
   <b-container>
     <b-card no-body>
-      <b-tabs card v-model="pageId" @change="changeTab">
-        <b-tab
-          v-for="item in myCount"
-          :key="'Case-' + item"
-          :title="String(item + 1)"
-        >
-          <diet-calk-comp
-            :my-app="myApp"
-            :page-id="pageId"
-            :target-nutrition="$store.getters['fire/nutritionDemandGetter'][pageId]"
-            @update:myApp="updateMyApp"
-          />
-        </b-tab>
-      </b-tabs>
+      <diet-calk-comp
+        :my-app="myApp"
+        :page-id.sync="pageId"
+        :target-nutrition="target"
+        :max-page=10
+        @update:myApp="updateMyApp"
+      />
     </b-card>
   </b-container>
 </template>
 
 <script>
-import dietCalkComp from "~/components/organisms/dietCalkComp";
+import dietCalkComp from "@/components/organisms/dietCalkComp";
 
 export default {
   components: {
@@ -28,12 +21,10 @@ export default {
   },
   data: function () {
     return {
-      myApp: {},
       pageId: 2,
       sceneCount: 0,
       myCount: [],
-      str_prev: '',
-      str_now: '',
+      target: {},
     }
   },
   created() {
@@ -41,16 +32,20 @@ export default {
      * 初回ロード時にstoreからmyAppを読み込む
      * @type {any}
      */
-    this.myApp = JSON.parse(JSON.stringify(this.$store.state.fire.myApp))
     this.sceneCount = Number(this.$store.state.fire.myApp.sceneCount)
     this.myCount = Array.from(Array(this.sceneCount).keys())
+    this.target = this.$store.getters['fire/nutritionDemandGetter']
+  },
+  computed: {
+    myApp:function(){
+      return this.$store.state.fire.myApp
+    }
   },
   methods: {
     changeTab() {
       console.log('tabChange:' + this.pageId)
     },
     updateMyApp(val) {
-      console.log('dietcalk:updateMyApp')
       this.$store.dispatch('fire/updateMyApp', val)
     },
     formatter(val) {

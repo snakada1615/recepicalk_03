@@ -63,9 +63,10 @@ export default{
     fireSaveAppdata(){
       this.$store.dispatch('fire/fireSaveAppdata')
     },
-    resetData(){
+    async resetData(){
       const user = JSON.parse(JSON.stringify(this.$store.state.fire.myApp.user))
-      this.$store.dispatch('fire/fireResetAppdata', user)
+      await this.$store.dispatch('fire/fireResetAppdata', user).catch((err) => {throw err})
+      this.$router.push('/')
     }
   },
   beforeDestroy() {

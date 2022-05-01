@@ -577,11 +577,12 @@ export const actions = {
     console.log(payload)
     for (let i = 0; i < state.myApp.sceneCount; i++) {
       const isTargetSingle = true
+      const note = ''
       const menu = []
       const target = payload.map(function (dat) {
         return {id: dat.id, count: 0}
       })
-      arr.push({target: target, menu: menu, isTargetSingle: isTargetSingle})
+      arr.push({target: target, menu: menu, note: note, isTargetSingle: isTargetSingle})
     }
     commit('updateMenuCases', arr)
   },

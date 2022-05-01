@@ -139,7 +139,6 @@
         this.totalRows = this.items.length
       },
       rowClick(record) {
-        console.log('fctTable clicked')
         this.$emit('fctClick', record)
       }
     },

@@ -1,7 +1,7 @@
 <template>
   <b-container>
     <b-card no-body>
-      <diet-calk-comp2
+      <diet-calk-comp
         :my-app="myApp"
         :page-id.sync="pageId"
         :target-nutrition="target"
@@ -13,11 +13,11 @@
 </template>
 
 <script>
-import dietCalkComp2 from "~/components/organisms/dietCalkComp2";
+import dietCalkComp from "@/components/organisms/dietCalkComp";
 
 export default {
   components: {
-    dietCalkComp2,
+    dietCalkComp,
   },
   data: function () {
     return {
