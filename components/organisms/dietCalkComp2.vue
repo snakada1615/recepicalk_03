@@ -67,8 +67,21 @@
           :max="maxPopulation"
           :driPopulations="myAppWatcher.menuCases[pageIdComputed].target"
           :driItems="myAppWatcher.dataSet.dri"
-          @update:target="updateTarget"
+          @update:target="updateDemand"
         ></dri-select-all>
+      </b-col>
+    </b-row>
+    <b-row>
+      <b-col>
+        <b-card
+          bg-variant="light"
+        >
+          <recepi-table
+            :items.sync="myAppWatcher.menuCases[pageIdComputed].menu"
+            @update:items="updateSupply"
+            @totalChanged="onNutritionSumChanged"
+          ></recepi-table>
+        </b-card>
       </b-col>
     </b-row>
   </b-container>
@@ -80,7 +93,6 @@ import FctTable from "@/components/molecules/FctTable"
 import recepiTable from "@/components/molecules/recepiTable"
 import foodModal from "@/components/molecules/foodModal"
 import nutritionBar from "@/components/molecules/nutritionBar"
-import {isEmpty, isObjectDeepEqual} from "~/plugins/helper";
 
 export default {
   components: {
@@ -258,7 +270,7 @@ export default {
       }
       return res
     },
-    updateTarget(val) {
+    updateDemand(val) {
       const vm = this
       //作業用のmyAppコピー作成
       let dat = JSON.parse(JSON.stringify(vm.myAppWatcher))
@@ -267,9 +279,18 @@ export default {
       //更新されたmyAppをemit
       this.$emit('update:myApp', dat)
     },
-    save() {
-      this.$store.dispatch('fire/saveAppdata')
-    }
+    onNutritionSumChanged(){
+      console.log('ba----')
+    },
+    updateSupply(val){
+      const vm = this
+      //作業用のmyAppコピー作成
+      let dat = JSON.parse(JSON.stringify(vm.myAppWatcher))
+      //更新されたmenuを入れ替える
+      dat.menuCases[vm.pageIdComputed].menu = JSON.parse(JSON.stringify(val))
+      //更新されたmyAppをemit
+      this.$emit('update:myApp', dat)
+    },
   }
 }
 </script>
