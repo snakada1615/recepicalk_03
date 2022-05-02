@@ -180,6 +180,12 @@ export const mutations = {
     state.myApp.user.displayName = payload.displayName
     state.myApp.user.email = payload.email
     state.myApp.user.phoneNumber = payload.phoneNumber
+    state.myApp.user.country = ''
+    state.myApp.user.subnational1 = ''
+    state.myApp.user.subnational2 = ''
+    state.myApp.user.subnational3 = ''
+    state.myApp.user.organization = ''
+    state.myApp.user.title = ''
   },
   /**
    * user.Uidを更新

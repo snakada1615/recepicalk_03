@@ -1,7 +1,9 @@
-export function test(mes) {
-  console.log(mes)
-}
-
+/**
+ * Objectをkeyでsortして返す
+ * @param objects sort対象のObject
+ * @param key sortするkey
+ * @returns {Promise<*>}
+ */
 export async function objectSort(objects, key) {
   objects.sort(function(a, b) {
     if (a[key] > b[key]) {
@@ -40,14 +42,12 @@ export function setDigit(val, unitKey) {
   return res
 }
 
-export function isObject(object) {
-  return object != null && typeof object === 'object';
-}
-
-export function isEmpty(obj) {
-  return Object.keys(obj).length === 0
-}
-
+/**
+ * 2つのObjectが同じ内容であるかチェック（再起的）
+ * @param object1 検査対象1
+ * @param object2 検査対象2
+ * @returns {boolean}
+ */
 export function isObjectDeepEqual(object1, object2) {
   const keys1 = Object.keys(object1);
   const keys2 = Object.keys(object2);
@@ -70,29 +70,100 @@ export function isObjectDeepEqual(object1, object2) {
   return true;
 }
 
+
+/**
+ * object validation
+ * Objectが特定のkeyを持つかどうかチェック
+ * @param myObject 検査対象の変数
+ * @param key チェックするkey(String表記)
+ * @returns {boolean}
+ */
+export function isKeyContained(myObject, key){
+  const keys = Object.keys(myObject)
+  return (keys.indexOf(key) >= 0)
+}
+
+/**
+ * Array validation
+ *     Arrayであるかどうかチェック
+ * @param item 検査対象の変数
+ * @returns {boolean}
+ */
+export function isArray (item) {
+  return Object.prototype.toString.call(item) === '[object Array]';
+}
+
+/**
+ * Object validation
+ *     Objectであるかどうかチェック
+ * @param item 検査対象の変数
+ * @returns {boolean}
+ */
+export function isObject (item) {
+  return typeof item === 'object' && item !== null && !isArray(item);
+}
+
+
+/**
+ * Validator for complex object
+ * @param data 検査対象のObject
+ *     （例：
+ *         const obj = {
+ *             "type":"typeName","firstName":"Steven",
+ *             "lastName":"Smith","address":{"primary":{"city":"abc",
+ *             "street":{"name":{"subName":"someName"}}}}
+ *                 };）
+ * @param types validaterを指定（必要なkeyを配列で指定する
+ *     例：const typeName = ['firstName', 'lastName', 'address', '
+ *     address.primary', 'address.primary.city',
+ *     'address.primary.street'];
+ *     ）
+ * @returns {*[]} dataに存在しないkeyを抽出
+ */
+export function validateObject(data, types){
+  let errors = [];
+  types.forEach(type => {
+    const keys = type.split('.');
+    let datum = {
+      ...data
+    };
+    // Loop through the keys
+    for (let [index, key] of keys.entries()) {
+      // Check if the key is not available in the data
+      // then push the corresponding key to the errors array
+      // and break the loop
+      //以下の行を、if (!datum[key]) { とすればkeyの存在＋値の有無をチェックする
+      if (datum[key] === undefined) {
+        errors.push(keys.slice(0, index + 1).join('.'));
+        break;
+      }
+      datum = datum[key];
+    }
+  })
+  return errors;
+}
+
+/**
+ * myAppのバリデーション
+ * @param dat 検証するmyApp
+ * @returns {false|boolean}
+ */
 export function validateMyApp(dat){
-  // Array
-  function isArray (item) {
-    return Object.prototype.toString.call(item) === '[object Array]';
+  //myAppの型設計
+  const typeName = [
+    'user', 'dataSet', 'sceneCount', 'scene', 'menuCases',
+    'feasibilityCases', 'saveDate',
+    'user.displayName', 'user.email', 'user.country',
+    'user.subnational1', 'user.subnational2', 'user.subnational3',
+    'user.organization', 'user.title', 'user.uid', 'user.phoneNumber',
+    'dataSet.fctId', 'dataSet.driId', 'dataSet.fct', 'dataSet.dri'
+  ]
+  let res = true
+  const myError = validateObject(dat, typeName)
+  if (myError.length > 0){
+    console.log(myError)
+    res = false
   }
 
-  // OBJECT
-  function isObject (item) {
-    return typeof item === 'object' && item !== null && !isArray(item);
-  }
-
-  //field in Object
-  function isKeyContained(myObject, key){
-    const keys = Object.keys(myObject)
-    return (keys.indexOf(key) >= 0)
-  }
-
-  return isObject(dat) &&
-    isKeyContained(dat, 'user') &&
-  isKeyContained(dat, 'dataSet') &&
-  isKeyContained(dat, 'sceneCount') &&
-  isKeyContained(dat, 'scene') &&
-  isKeyContained(dat, 'menuCases') &&
-  isKeyContained(dat, 'feasibilityCases') &&
-  isKeyContained(dat, 'saveDate')
+  return isObject(dat) && res
 }

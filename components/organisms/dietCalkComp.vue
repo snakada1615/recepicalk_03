@@ -205,7 +205,6 @@ export default {
      */
     pageId: {
       type: Number,
-      default: 0,
       required: true
     },
     /**
@@ -213,7 +212,6 @@ export default {
      */
     maxPage: {
       type: Number,
-      default: 0,
       required: true
     }
   },
