@@ -129,7 +129,8 @@ export const getters = {
         return accumulator
       }, {})
     })
-  }
+  },
+
 }
 
 export const mutations = {
@@ -596,13 +597,17 @@ export const actions = {
    * feasibilityCasesを初期化（空白ArrayをsetCountの数だけ作成）
    * @param state
    * @param commit
+   * @param payload driテーブルんp情報
    */
-  initFeasibility({state, commit}) {
+  initFeasibility({state, commit}, payload) {
     const arr = []
     for (let i = 0; i < state.myApp.sceneCount; i++) {
-      const selectedCrop = {}
+      const target = payload.map(function (dat) {
+        return {id: dat.id, count: 0}
+      })
+      const selectedCrop = []
       const ansList = [-99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99]
-      arr.push({selectedCrop: selectedCrop, ansList: ansList})
+      arr.push({selectedCrop: selectedCrop, ansList: ansList, target: target})
     }
     commit('updateFeasibilityCases', arr)
   },
@@ -622,7 +627,7 @@ export const actions = {
       await dispatch('initFct')
       await dispatch('initDri')
       await dispatch('initMenu', state.myApp.dataSet.dri)
-      await dispatch('initFeasibility')
+      await dispatch('initFeasibility', state.myApp.dataSet.dri)
       await dispatch('fireSaveAppdata')
       console.log('initAll: all done')
     } catch (err) {

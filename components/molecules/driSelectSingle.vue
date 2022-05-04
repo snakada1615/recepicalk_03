@@ -37,7 +37,7 @@
    * table shows DRI information to match with items selected from dropdown menu
    *
    */
-  import { setDigit, isKeyContained } from "@/plugins/helper"
+  import {setDigit, validateObject} from "@/plugins/helper"
 
   export default {
     data() {
@@ -77,8 +77,7 @@
         required: true,
         validator:function (items) {
           return items.every(function (item){
-            return isKeyContained(item, 'id') &&
-              isKeyContained(item, 'count')
+            return validateObject(item, ['id', 'count'])
           })
         }
         //default:() => [{id: 0, count: 1}]

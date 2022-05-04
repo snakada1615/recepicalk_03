@@ -1,36 +1,21 @@
 <template>
   <b-container >
     <b-row>
-      <b-col lg="5">
-        <b-button @click="test" variant="warning">XXXXX</b-button>
-        <b-button to="logintest" variant="info">sign in</b-button>
-        <b-card>
-        </b-card>
-        <dri-select-all
-          :targetSwitch.sync="singleTarget"
-          :max="max"
-          :driPopulations="nutritionTarget"
-          :driItems="DRI"
-          @update:target="nutritionTarget = JSON.parse(JSON.stringify($event))"
-          @changeNutritionValue="nutrition = $event"
-          style="max-width: 540px"
-        ></dri-select-all>
-        <fct-table
-          :items="FCT"
-        ></fct-table>
-      </b-col>
+      <feasibility-check-component2
+        :my-app="$store.state.fire.myApp"
+        :page-id.sync="pageId"
+        :max-page=10
+      />
     </b-row>
   </b-container>
 </template>
 
 <script>
-import driSelectAll from "@/components/organisms/driSelectAll"
-import FctTable from "@/components/molecules/FctTable"
+import feasibilityCheckComponent2 from "@/components/organisms/feasibilityCheckComponent2";
 
 export default {
   components: {
-    driSelectAll,
-    FctTable,
+    feasibilityCheckComponent2
   },
   data() {
     return {
@@ -40,6 +25,7 @@ export default {
         {key: 'Item', sortable: false},
         {key: 'Value', sortable: false},
       ],
+      pageId:2,
       nutritionTarget: [{id: 1, count: 1}],
       max: 10000
     }

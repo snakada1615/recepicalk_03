@@ -106,6 +106,7 @@ export function isObject (item) {
 
 /**
  * Validator for complex object
+ * ネストしたObjectに必要なKeyが含まれているかを検証
  * @param data 検査対象のObject
  *     （例：
  *         const obj = {
