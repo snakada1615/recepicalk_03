@@ -1,6 +1,6 @@
 <template>
   <b-container>
-    <b-navbar type="dark" variant="info" class="mb-2" :sticky=true>
+    <b-navbar type="dark" variant="info" class="mb-2" sticky>
       <b-navbar-brand to="/"><b-icon icon="BIconHouseFill"/><span class="small"> Nutrients App</span></b-navbar-brand>
 
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
