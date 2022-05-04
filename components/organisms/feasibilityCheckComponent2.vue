@@ -23,13 +23,74 @@
             </b-col>
             <b-col
               cols="7" class="border"
-              :class="{'border-dark':targetCrop[pageIdComputed].Name, 'border-danger':!targetCrop[pageIdComputed].Name}">
-              <div class="font-weight-bold text-info">{{ targetCrop[pageIdComputed] ? targetCrop[pageIdComputed].Name : ''}}</div>
+              :class="{'border-dark':cropName[pageIdComputed], 'border-danger':!cropName[pageIdComputed]}">
+              <div class="font-weight-bold text-info">{{ cropName[pageIdComputed] }}</div>
             </b-col>
             <b-col cols="3">
               <b-button @click="showDialogue" size="sm" variant="info">select crop</b-button>
             </b-col>
           </b-row>
+        </b-card>
+      </b-col>
+    </b-row>
+    <b-row class="mt-2">
+      <b-col class="mx-0 mb-0 py-2 bg-dark rounded text-light font-weight-bold">
+        Feasibility questions
+      </b-col>
+    </b-row>
+    <b-row>
+      <b-col class="px-0 mx-0">
+        <b-card
+          v-for="(qaGroup, index) in qaList"
+          :key="index"
+          style="min-width: 530px;"
+          header-bg-variant="success"
+          bg-variant="light"
+          border-variant="success"
+          class="mx-1 px-0 my-2">
+          <template #header>
+            <div>{{ qaGroup.categoryText }}</div>
+          </template>
+          <div v-show="index===0" class="mb-2">
+            <dri-select-single
+              :driItems="itemsDRI"
+              :target="targetGroup[pageIdComputed]"
+              @update:target="updateSelection"
+              @changeNutritionValue="updateNutrition"
+            >
+            </dri-select-single>
+            <b-card class="px-0 mx-0">
+              <b-row class="mt-0 bg-success mb-3">
+                <b-col cols="3" class="text-center mr-2 font-weight-bold">Nutrition</b-col>
+                <b-col cols="3" class="font-weight-bold">Balance</b-col>
+              </b-row>
+              <b-row v-for="(nut, index) in nutritionRatingSet" :key="index">
+                <nutrition-bar
+                  :cropName="nut.name"
+                  :max="10"
+                  :nutritionTarget="nut.target"
+                  :rating="nut.rating"
+                ></nutrition-bar>
+              </b-row>
+            </b-card>
+          </div>
+          <ul class="pl-2 my-0">
+            <li
+              v-for="(qa, index2) in qaGroup.itemsQA"
+              :key="index2"
+              :class="{'mt-3':index2!==0}"
+            >
+              {{ qa.questionText }}
+              <b-form-select
+                v-model="ansListWatcher[pageIdComputed][qa.id-1]"
+                :options="qa.answerList"
+                size="sm"
+                :state="ansListWatcher[pageIdComputed][qa.id-1] !== -99"
+                @change="$emit('ansListChange','ansListWatcher[pageIdComputed]')"
+              >
+              </b-form-select>
+            </li>
+          </ul>
         </b-card>
       </b-col>
     </b-row>
@@ -42,10 +103,11 @@
   </b-container>
 </template>
 <script>
-import FctTableModal from "@/components/molecules/FctTableModal";
+import FctTableModal from "@/components/organisms/FctTableModal.vue";
 import nutritionBar from "@/components/molecules/nutritionBar";
 import driSelectSingle from "@/components/molecules/driSelectSingle";
 import {validateMyApp} from "@/plugins/helper";
+import feasibilityCheckComponent from "@/components/organisms/feasibilityCheckComponent";
 
 export default {
   components: {
@@ -54,17 +116,22 @@ export default {
     driSelectSingle,
   },
   methods: {
-    nutritionRatingGetter(){
+    nutritionRatingGetter() {
       return this.myAppWatcher
     },
     ansListGetter() {
-      return this.myAppWatcher.feasibilityCases.map(function (item) {
+      return this.myApp.feasibilityCases.map(function (item) {
         return item.ansList
       })
     },
     targetCropGetter() {
-      return this.myAppWatcher.feasibilityCases.map(function (item) {
-        return item.selectedItem
+      return this.myApp.feasibilityCases.map(function (item) {
+        return item.selectedCrop
+      })
+    },
+    targetGroupGetter() {
+      return this.myApp.feasibilityCases.map(function (item) {
+        return item.target
       })
     },
     onTargetChanged(value, pageId) {
@@ -77,46 +144,109 @@ export default {
       }
     },
     onItemSelected(value) {
-      this.$emit('update:selectedItem', value)
-      //this.selectedItem = value
-      this.nutritionSum.En = value.En || 0
-      this.nutritionSum.Pr = value.Pr || 0
-      this.nutritionSum.Va = value.Va || 0
-      this.nutritionSum.Fe = value.Fe || 0
-      this.nutritionSum.Wt = value.Wt || 0
+      let res = {}
+      res.Name = value.Name || 0
+      res.id = value.id || 0
+      res.En = value.En || 0
+      res.Pr = value.Pr || 0
+      res.Va = value.Va || 0
+      res.Fe = value.Fe || 0
+      res.Wt = 100
+
+      //作業用のmyAppコピー作成
+      let dat = JSON.parse(JSON.stringify(this.myAppWatcher))
+      //更新されたmenuを入れ替える
+      dat.feasibilityCases[this.pageIdComputed].selectedCrop[0] = res
+      //更新されたmyAppをemit
+      this.$emit('update:myApp', dat)
     },
     showDialogue() {
       this.$bvModal.show('modalTest')
     },
     updateSelection(val) {
-      //this.nutritionTarget = JSON.parse(JSON.stringify(val))
-      this.$emit('changeTarget', val)
+      //作業用のmyAppコピー作成
+      let dat = JSON.parse(JSON.stringify(this.myAppWatcher))
+      //更新されたmenuを入れ替える
+      dat.feasibilityCases[this.pageIdComputed].target = val
+      //更新されたmyAppをemit
+      this.$emit('update:myApp', dat)
     },
     updateNutrition(val) {
       this.nutritionTarget = JSON.parse(JSON.stringify(val.total))
       this.$emit('changeNutritionValue', this.nutritionTarget)
       //this.$emit('changeNutrition', res)
     },
+    summarizeQA(keys, dat) {
+      let res = Array(this.qaCategoryCount).fill(0);
+      keys.forEach(function (key) {
+        res[key.categoryID - 1] += (dat[key.itemID - 1] > 0 ? dat[key.itemID - 1] : 0)
+      })
+      return res
+    },
+    updateScore(){
+      let res = []
+      const vm = this
+      vm.myApp.feasibilityCases.forEach(function (val){
+        res.push(vm.summarizeQA(vm.ansId, val.ansList))
+      })
+      return res
+    },
+    updateAnsId(){
+      const vm = this
+      let res = []
+      vm.qaList.forEach(function (category) {
+        category.itemsQA.forEach(function (item) {
+          res.push({
+            'categoryID': category.categoryID,
+            'itemID': item.id
+          })
+        })
+      })
+      return res
+    },
   },
   created() {
-    this.myAppWatcher = JSON.parse(JSON.stringify(this.myApp))
-    this.ansListWatcher = JSON.parse(JSON.stringify(this.ansListGetter()))
-    this.targetCrop = JSON.parse(JSON.stringify(this.targetCropGetter()))
-    console.log(this.targetCrop)
-    this.items = JSON.parse(JSON.stringify(
-      this.myAppWatcher.dataSet.fct.map(function (val) {
-        return val.doc
-      })
-    ))
-    this.itemsDRI = JSON.parse(JSON.stringify(this.myAppWatcher.dataSet.dri))
+    this.ansId = this.updateAnsId()
+    this.items = JSON.parse(JSON.stringify(this.myApp.dataSet.fct))
+    this.itemsDRI = JSON.parse(JSON.stringify(this.myApp.dataSet.dri))
+  },
+  watch: {
+    myApp: {
+      deep: true,
+      immediate: true,
+      handler(val) {
+        this.myAppWatcher = JSON.parse(JSON.stringify(this.myApp))
+        this.ansListWatcher = this.ansListGetter()
+        this.targetCrop = this.targetCropGetter()
+        this.targetGroup = this.targetGroupGetter()
+        this.cropName = this.targetCrop.map(function (item) {
+          return item.length > 0 ? item[0].Name : ''
+        })
+        this.qaScore = this.updateScore()
+      }
+    }
   },
   computed: {
-    cropName: function () {
-      return this.myApp
+    /**
+     * QAリストのカテゴリ数
+     * @returns {*}
+     */
+    qaCategoryCount: function () {
+      console.log(this.ansId)
+      if (this.ansId.length === 0){ return 0 }
+      return this.ansId.reduce((a, b) => a.categoryID < b.categoryID ? a.categoryID : b.categoryID)
     },
+/*
     qaScore: function () {
       let sum = []
       let vm = this
+      let res = []
+      vm.myAppWatcher.feasibilityCases.map(function (item) {
+        item.ansList.map(function (item) {
+          res.push({'categoryID': category.categoryID, 'itemID': item.id})
+
+        })
+      })
       vm.qaList.forEach(function (categories) {
         let sumTemp = 0
         categories.itemsQA.forEach(function (question) {
@@ -139,6 +269,7 @@ export default {
       })
       return sum
     },
+*/
     nutritionRatingSet: function () {
       return [
         {
@@ -197,8 +328,16 @@ export default {
        * myAppから読み込んでこのページで利用。更新された時にemitを返す
        */
       myAppWatcher: {},
+      /**
+       * (カテゴリ、質問ID)の一蘭
+       * @returns {*[]}
+       */
+      ansId: [],
+      qaScore: [],
       ansListWatcher: [],
-      targetCrop:[],
+      targetGroup: [],
+      targetCrop: [],
+      cropName: [],
       items: [],
       itemsDRI: [],
       nutritionTarget: {
@@ -216,7 +355,8 @@ export default {
       },
       qaList: [
         {
-          categoryID: 1, categoryText: 'Nutrient balance',
+          categoryID: 1,
+          categoryText: 'Nutrient balance',
           itemsQA: [
             {
               id: 1,

@@ -14,12 +14,13 @@
           <li>array[index]=valueを用いた値変更の場合</li>
           <li>監視対象のエレメントをcomputedの式に含めていない場合</li>
           <li>Objectに新規要素を追加した場合:Object.newKey = newValue</li>
-          <li>Objectに追加した新規要素:this.$set(Object, newKey, newValue)</li>
+          <li>Objectに追加した新規要素:this.$set(Object, newKey, newValue)は、新規追加時のみ
+            triggerされ、その後の値の変化は捕捉されない</li>
         </ol>
         <div>これらに対応するため以下に留意</div>
         <ol>
-          <li>Array.splice()の利用 </li>
-          <li>Object.Assign()の利用 </li>
+          <li>Array.splice()の利用</li>
+          <li>Object.Assign()の利用</li>
           <li>Object全体でなく監視対象のelementを記載</li>
         </ol>
       </b-card>
@@ -79,6 +80,16 @@
       <b-button variant="success" @click="changeObject5()" class="my-1">change Object5
       </b-button>
       <div>新しい要素（parent5）を追加。: Object.assign({}, Object, {'key': newValue})</div>
+    </div>
+    <div>
+      <b-button variant="success" @click="changeObject6()" class="my-1">change Object6
+      </b-button>
+      <div>Object全体を、同じキー構造の別Objectで入れ替え</div>
+    </div>
+    <div>
+      <b-button variant="success" @click="changeObject7()" class="my-1">change Object7
+      </b-button>
+      <div>Object全体を、異なるキー構造の別Objectで入れ替え</div>
     </div>
     <hr>
   </b-container>
@@ -158,6 +169,30 @@ export default {
         this.myArray = Object.assign({}, this.myArray, {parent5: this.myArray.parent5 +1})
       } else {
         this.myArray = Object.assign({}, this.myArray, {parent5: 0})
+      }
+      console.log(this.myArray)
+    },
+    changeObject6() {
+      this.myArray = {
+        parent1: 100,
+        parent2: 99,
+        child: {
+          firstChild: [5, 4, 3, 2, 1],
+          secondChild: [70, 52, 46, 32, 14],
+        }
+      }
+      console.log(this.myArray)
+    },
+    changeObject7() {
+      this.myArray = {
+        parent1: 100,
+        parent2: 99,
+        parent257:1827,
+        child: {
+          firstChild: [5, 4, 3, 2, 1],
+          secondChild: [70, 52, 46, 32, 14],
+          thirdChild: [0,0,0,0],
+        }
       }
       console.log(this.myArray)
     },

@@ -134,7 +134,7 @@
   </b-container>
 </template>
 <script>
-import FctTableModal from "@/components/molecules/FctTableModal";
+import FctTableModal from "@/components/organisms/FctTableModal.vue";
 import nutritionBar from "@/components/molecules/nutritionBar";
 import driSelectSingle from "@/components/molecules/driSelectSingle";
 import {validateMyApp} from "@/plugins/helper";

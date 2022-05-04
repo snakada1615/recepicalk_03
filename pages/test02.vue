@@ -5,6 +5,7 @@
         :my-app="$store.state.fire.myApp"
         :page-id.sync="pageId"
         :max-page=10
+        @update:myApp="updateMyApp"
       />
     </b-row>
   </b-container>
@@ -41,7 +42,10 @@ export default {
   methods: {
     test(){
       //this.$store.dispatch('fire/initAll')
-    }
+    },
+    updateMyApp(val) {
+      this.$store.dispatch('fire/updateMyApp', val)
+    },
   }
 }
 </script>
