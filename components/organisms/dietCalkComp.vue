@@ -74,40 +74,38 @@
       </b-col>
     </b-row>
     <b-row>
-      <b-row>
-        <b-col>
-          <b-button
-            @click="showDriSelect = !showDriSelect"
-            :pressed="showDriSelect"
-            variant="info"
-          >set target</b-button>
-          <b-button
-            @click="showFct=!showFct"
-            :pressed="showFct"
-            variant="info"
-          >set menu</b-button>
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col>
-          <dri-select-all
-            v-show="showDriSelect"
-            :targetSwitch.sync="myAppWatcher.menuCases[pageIdComputed].isTargetSingle"
-            :max="maxPopulation"
-            :driPopulations="myAppWatcher.menuCases[pageIdComputed].target"
-            :driItems="myAppWatcher.dataSet.dri"
-            @update:target="updateDemand"
-          ></dri-select-all>
-        </b-col>
-      </b-row>
-      <b-col lg="6">
-        <fct-table
-          v-show="showFct"
-          :items="myAppWatcher.dataSet.fct"
-          @fctClick="onFctClick"
-        ></fct-table>
+      <b-col>
+        <b-button
+          @click="showDriSelect = !showDriSelect"
+          :pressed="showDriSelect"
+          variant="info"
+        >set target
+        </b-button>
+        <b-button
+          @click="$bvModal.show('fctModal')"
+          variant="info"
+        >set menu
+        </b-button>
       </b-col>
     </b-row>
+    <b-row>
+      <b-col>
+        <dri-select-all
+          v-show="showDriSelect"
+          :targetSwitch.sync="myAppWatcher.menuCases[pageIdComputed].isTargetSingle"
+          :max="maxPopulation"
+          :driPopulations="myAppWatcher.menuCases[pageIdComputed].target"
+          :driItems="myAppWatcher.dataSet.dri"
+          @update:target="updateDemand"
+        ></dri-select-all>
+      </b-col>
+    </b-row>
+    <FctTableModal
+      my-name="fctModal"
+      my-modal-header="Food Composition Table"
+      :items="myAppWatcher.dataSet.fct"
+      @modalOk="onFctClick"
+    ></FctTableModal>
     <food-modal
       :show-modal.sync="showModal"
       :max-weight=500
@@ -123,6 +121,7 @@
 import driSelectAll from "@/components/organisms/driSelectAll"
 import FctTable from "@/components/molecules/FctTable"
 import recepiTable from "@/components/molecules/recepiTable"
+import FctTableModal from "@/components/organisms/FctTableModal.vue";
 import foodModal from "@/components/molecules/foodModal"
 import nutritionBar from "@/components/molecules/nutritionBar"
 import {validateMyApp} from "@/plugins/helper";
@@ -135,6 +134,7 @@ export default {
   components: {
     driSelectAll,
     FctTable,
+    FctTableModal,
     recepiTable,
     foodModal,
     nutritionBar
@@ -190,10 +190,6 @@ export default {
        */
       showDriSelect: false,
       /**
-       * fctTable表示用のフラグ
-       */
-      showFct: false,
-      /**
        * modal表示用のフラグ
        */
       showModal: false,
@@ -209,7 +205,7 @@ export default {
      */
     myApp: {
       type: Object,
-      validator: function(value){
+      validator: function (value) {
         return validateMyApp(value)
       },
       required: true,
@@ -438,7 +434,7 @@ export default {
       //menuを更新する
       let existing = false
       let newMenu = []
-      newMenu = vm.myAppWatcher.menuCases[vm.pageIdComputed].menu.map((item)=>{
+      newMenu = vm.myAppWatcher.menuCases[vm.pageIdComputed].menu.map((item) => {
         if (item.id === val.id) {
           existing = true
           return JSON.parse(JSON.stringify(val))
@@ -446,7 +442,7 @@ export default {
           return item
         }
       })
-      if (!existing){
+      if (!existing) {
         newMenu.push(val)
       }
       //作業用のmyAppコピー作成
@@ -460,7 +456,7 @@ export default {
      * menuが削除された際に、栄養素供給量合計を再計算してemit
      * @param val 更新されたmenu
      */
-    deleteSupply(val){
+    deleteSupply(val) {
       //作業用のmyAppコピー作成
       let dat = JSON.parse(JSON.stringify(this.myAppWatcher))
       //更新されたmenuを入れ替える
@@ -469,7 +465,7 @@ export default {
       this.$emit('update:myApp', dat)
     },
     //fctとdriの表示調整
-    toggleFctDri(){
+    toggleFctDri() {
       console.log('test')
     },
   }
