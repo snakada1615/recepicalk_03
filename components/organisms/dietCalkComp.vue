@@ -4,7 +4,17 @@
       <b-col>
         <b-card bg-variant="light">
           <b-form-select v-model="pageIdComputed" :options="pageOptions"></b-form-select>
-          <div class="text-warning">page:{{ pageIdComputed }}</div>
+          <div class="d-flex flex-row">
+            <b-form-input
+              v-model="pageMemo[pageIdComputed]"
+              placeholder="memo for this page"
+              class="my-1"></b-form-input>
+            <b-button
+              @click="updatePageMemo(pageMemo[pageIdComputed])"
+              size="sm"
+              class="mx-1 my-1">update
+            </b-button>
+          </div>
           <b-form-checkbox
             switch
             v-model="driSwitch"
@@ -187,6 +197,10 @@ export default {
        * modal表示用のフラグ
        */
       showModal: false,
+      /**
+       * 各ページの捕捉情報
+       */
+      pageMemo: '',
     }
   },
   props: {
@@ -263,6 +277,9 @@ export default {
         this.nutritionDemandWatcher = JSON.parse(JSON.stringify(this.nutritionDemandGetter()))
         this.nutritionSupplyWatcher = JSON.parse(JSON.stringify(this.nutritionSupplyGetter()))
         this.rating = JSON.parse(JSON.stringify(this.ratingGetter()))
+        this.pageMemo = this.myAppWatcher.menuCases.map(function (item) {
+          return item.note
+        })
       }
     },
   },
@@ -274,10 +291,23 @@ export default {
     this.nutritionDemandWatcher = JSON.parse(JSON.stringify(this.nutritionDemandGetter()))
     this.nutritionSupplyWatcher = JSON.parse(JSON.stringify(this.nutritionSupplyGetter()))
     this.rating = JSON.parse(JSON.stringify(this.ratingGetter()))
-    console.log('fire.created.validate')
-    console.log(validateMyApp(this.myAppWatcher))
+    this.pageMemo = this.myAppWatcher.menuCases.map(function (item) {
+      return item.note
+    })
   },
   methods: {
+    /**
+     * ページメモの更新：
+     * @param newVal
+     */
+    updatePageMemo(newVal) {
+      //作業用のmyAppコピー作成
+      let dat = JSON.parse(JSON.stringify(this.myAppWatcher))
+      //更新されたmenuを入れ替える
+      dat.menuCases[this.pageIdComputed].note = newVal
+      //更新されたmyAppをemit
+      this.$emit('update:pageMemo', dat)
+    },
     /**
      * myApp.menuCases.targetの値を集計してnutritionDemandWatcherに代入するための関数
      * @returns {*[]} 栄養素必要量の合計値

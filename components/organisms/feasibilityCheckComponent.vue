@@ -4,6 +4,17 @@
       <b-col class="mx-0 mb-0 py-2 bg-dark rounded text-light font-weight-bold">
         Feasibility assessment result
         <b-form-select v-model="pageIdComputed" :options="pageOptions"></b-form-select>
+        <div class="d-flex flex-row">
+          <b-form-input
+            v-model="pageMemo[pageIdComputed]"
+            placeholder="memo for this page"
+            class="my-1"></b-form-input>
+          <b-button
+            @click="updatePageMemo(pageMemo[pageIdComputed])"
+            size="sm"
+            class="mx-1 my-1">update
+          </b-button>
+        </div>
       </b-col>
     </b-row>
     <b-row>
@@ -23,15 +34,14 @@
             </b-col>
             <b-col
               cols="7" class="border"
-              :class="{'border-dark':targetCrop[pageIdComputed].Name, 'border-danger':!targetCrop[pageIdComputed].Name}">
-              <div class="font-weight-bold text-info">{{ targetCrop[pageIdComputed].Name }}</div>
+              :class="{'border-dark':cropName[pageIdComputed], 'border-danger':!cropName[pageIdComputed]}">
+              <div class="font-weight-bold text-info">{{ cropName[pageIdComputed] }}</div>
             </b-col>
             <b-col cols="3">
               <b-button @click="showDialogue" size="sm" variant="info">select crop</b-button>
             </b-col>
           </b-row>
         </b-card>
-
         <b-card
           style="min-width: 530px;"
           header-bg-variant="success"
@@ -43,27 +53,28 @@
           </template>
           <b-row>
             <b-col class="text-center">Crop name:</b-col>
-            <b-col class="text-info">{{ targetCrop[pageIdComputed].Name }}</b-col>
+            <b-col class="text-info">{{ cropName[pageIdComputed] }}</b-col>
           </b-row>
           <b-row>
             <b-col cols="6" class="text-center">total score:</b-col>
-            <b-col cols="6">{{ qaScore[qaScore.length - 1].value }} / 50</b-col>
+            <b-col cols="6">{{ qaScore[pageIdComputed][qaScore[pageIdComputed].length - 1].value }} / 50</b-col>
           </b-row>
-          <b-row v-for="(qa, index) in qaScore" :key="index">
+          <b-row v-for="(qa, index) in qaScore[pageIdComputed]" :key="index">
             <nutrition-bar
               v-if="qa.id > 0"
               :colWidthFirst=6
               :colwidthSecond="0"
-              :cropName="qa.text"
+              :show-max-number="false"
               :max="10"
               :nutritionTarget="0"
+              :cropName="qa.text"
               :rating="qa.value"
+              :label="qa.text"
             ></nutrition-bar>
           </b-row>
         </b-card>
       </b-col>
     </b-row>
-
     <b-row class="mt-2">
       <b-col class="mx-0 mb-0 py-2 bg-dark rounded text-light font-weight-bold">
         Feasibility questions
@@ -85,8 +96,8 @@
           <div v-show="index===0" class="mb-2">
             <dri-select-single
               :driItems="itemsDRI"
-              :target="targetCrop[pageIdComputed]"
-              @changeNutritionGroup="updateSelection"
+              :target="targetGroup[pageIdComputed]"
+              @update:target="onTargetGroupChanged"
               @changeNutritionValue="updateNutrition"
             >
             </dri-select-single>
@@ -95,10 +106,10 @@
                 <b-col cols="3" class="text-center mr-2 font-weight-bold">Nutrition</b-col>
                 <b-col cols="3" class="font-weight-bold">Balance</b-col>
               </b-row>
-              <b-row v-for="(nut, index) in nutritionRatingSet" :key="index">
+              <b-row v-for="(nut, index) in nutritionRatingSet[pageIdComputed]" :key="index">
                 <nutrition-bar
-                  :cropName="nut.name"
-                  :max="10"
+                  :label="nut.name"
+                  :maxRatingAbsolute="nut.supply"
                   :nutritionTarget="nut.target"
                   :rating="nut.rating"
                 ></nutrition-bar>
@@ -113,11 +124,11 @@
             >
               {{ qa.questionText }}
               <b-form-select
-                v-model="ansListWatcher[pageIdComputed][qa.id-1]"
+                :value="ansListWatcher[pageIdComputed][qa.id-1]"
                 :options="qa.answerList"
                 size="sm"
                 :state="ansListWatcher[pageIdComputed][qa.id-1] !== -99"
-                @change="$emit('ansListChange','ansListWatcher[pageIdComputed]')"
+                @change="onAnsChanged({'id':qa.id, 'val':$event})"
               >
               </b-form-select>
             </li>
@@ -137,7 +148,7 @@
 import FctTableModal from "@/components/organisms/FctTableModal.vue";
 import nutritionBar from "@/components/molecules/nutritionBar";
 import driSelectSingle from "@/components/molecules/driSelectSingle";
-import {validateMyApp} from "@/plugins/helper";
+import {getNutritionDemand, getNutritionSupply, validateMyApp} from "@/plugins/helper";
 
 export default {
   components: {
@@ -146,115 +157,262 @@ export default {
     driSelectSingle,
   },
   methods: {
-    nutritionRatingGetter(){
-      return this.myAppWatcher
-    },
-    ansListGetter() {
-      return this.myAppWatcher.feasibilityCases.map(function (item) {
-        return item.ansList
+    /**
+     * ansListをmyAppから読み込んでwatch
+     * @returns {any[]}
+     */
+    updateAnsList() {
+      return this.myApp.feasibilityCases.map(function (item) {
+        return JSON.parse(JSON.stringify(item.ansList))
       })
     },
-    targetCropGetter() {
-      return this.myAppWatcher.feasibilityCases.map(function (item) {
-        return item.selectedItem
+    /**
+     * targetCropをmyAppから読み込んでwatch
+     * @returns {any[]}
+     */
+    updateTargetCrop() {
+      return this.myApp.feasibilityCases.map(function (item) {
+        return JSON.parse(JSON.stringify(item.selectedCrop))
       })
     },
-    onTargetChanged(value, pageId) {
-      console.log('onTargetChanged')
-      if (pageId !== this.pageId || !value.length) {
-        return
-      }
-      if (this.nutritionTarget) {
-        this.nutritionTarget = [...value]
-      }
+    /**
+     * targetGroupをmyAppから読み込んでwatch
+     * @returns {any[]}
+     */
+    updateTargetGroup() {
+      return this.myApp.feasibilityCases.map(function (item) {
+        return JSON.parse(JSON.stringify(item.target))
+      })
     },
+    /**
+     * targetGroupの更新に伴い栄養摂取目標を更新
+     * @param val
+     */
+    updateNutrition(val) {
+      this.nutritionDemand = JSON.parse(JSON.stringify(val.total))
+      //this.$emit('changeNutritionValue', this.nutritionDemand)
+      //this.$emit('changeNutrition', res)
+    },
+    /**
+     * ansListをmyAppから読み込んでscoreに変換
+     * @returns {*[]}
+     */
+    updateScore() {
+      let res = []
+      const vm = this
+      vm.myApp.feasibilityCases.forEach(function (val) {
+        res.push(vm.summarizeQA(vm.ansId, val.ansList))
+      })
+      return res
+    },
+    /**
+     * QAのカテゴリとIDをセットにしてArrayに追加（カテゴリ事の集計に用いる）
+     * @returns {*[]}
+     */
+    updateAnsId() {
+      const vm = this
+      let res = []
+      vm.qaList.forEach(function (category) {
+        category.itemsQA.forEach(function (item) {
+          res.push({
+            'categoryID': category.categoryID,
+            'itemID': item.id
+          })
+        })
+      })
+      return res
+    },
+    /**
+     * 選択された作物から栄養供給量を計算
+     * @param crops
+     * @returns {*}
+     */
+    updateNutritionSupply(crops) {
+      return crops.map((cropList) => {
+        return getNutritionSupply(cropList)
+      })
+    },
+    /**
+     * targetグループから栄養摂取目標を計算
+     * @param targetGroup
+     * @param dri
+     * @returns {*}
+     */
+    updateNutritionDemand(targetGroup, dri) {
+      return targetGroup.map(function (target) {
+        return getNutritionDemand(target, dri)
+      })
+    },
+    /**
+     * 栄養摂取目標と栄養供給量から栄養スコアを計算
+     * @param nutritionDemand
+     * @param nutritionSupply
+     */
+    updateNutritionRating(nutritionDemand, nutritionSupply) {
+      return [
+        {
+          name: 'Energy',
+          target: nutritionDemand.En ? Number(nutritionDemand.En) : 0,
+          supply: nutritionSupply.En ? nutritionSupply.En : 0,
+          rating: nutritionDemand.En ?
+            Math.round(nutritionSupply.En / nutritionDemand.En * 10) : 0
+        },
+        {
+          name: 'Protein',
+          target: nutritionDemand.Pr ? Number(nutritionDemand.Pr) : 0,
+          supply: nutritionSupply.Pr ? nutritionSupply.Pr : 0,
+          rating: nutritionDemand.Pr ?
+            Math.round(nutritionSupply.Pr / nutritionDemand.Pr * 10) : 0
+        },
+        {
+          name: 'VitA',
+          target: nutritionDemand.Va ? Number(nutritionDemand.Va) : 0,
+          supply: nutritionSupply.Va ? nutritionSupply.Va : 0,
+          rating: nutritionDemand.Va ?
+            Math.round(nutritionSupply.Va / nutritionDemand.Va * 10) : 0
+        },
+        {
+          name: 'Fe',
+          target: nutritionDemand.Fe ? Number(nutritionDemand.Fe) : 0,
+          supply: nutritionSupply.Fe ? nutritionSupply.Fe : 0,
+          rating: nutritionDemand.Fe ?
+            Math.round(nutritionSupply.Fe / nutritionDemand.Fe * 10) : 0
+        },
+      ]
+    },
+    /**
+     * ページメモの更新：
+     * @param newVal
+     */
+    updatePageMemo(newVal) {
+      //作業用のmyAppコピー作成
+      let dat = JSON.parse(JSON.stringify(this.myAppWatcher))
+      //更新されたmenuを入れ替える
+      dat.feasibilityCases[this.pageIdComputed].note = newVal
+      //更新されたmyAppをemit
+      this.$emit('update:pageMemo', dat)
+    },
+    /**
+     * targetGroupの更新をmyAppに組み込んでemitで通知
+     * @param val
+     */
+    onTargetGroupChanged(val) {
+      //作業用のmyAppコピー作成
+      let dat = JSON.parse(JSON.stringify(this.myAppWatcher))
+      //更新されたmenuを入れ替える
+      dat.feasibilityCases[this.pageIdComputed].target = val
+      //更新されたmyAppをemit
+      this.$emit('update:myApp', dat)
+    },
+    /**
+     * cropの選択の変更をmyAppに組み込んでemitで通知
+     * @param value
+     */
     onItemSelected(value) {
-      this.$emit('update:selectedItem', value)
-      //this.selectedItem = value
-      this.nutritionSum.En = value.En || 0
-      this.nutritionSum.Pr = value.Pr || 0
-      this.nutritionSum.Va = value.Va || 0
-      this.nutritionSum.Fe = value.Fe || 0
-      this.nutritionSum.Wt = value.Wt || 0
+      let res = {}
+      res.Name = value.Name || 0
+      res.id = value.id || 0
+      res.En = Number(value.En) || 0
+      res.Pr = Number(value.Pr) || 0
+      res.Va = Number(value.Va) || 0
+      res.Fe = Number(value.Fe) || 0
+      res.Wt = 100
+
+      //作業用のmyAppコピー作成
+      let dat = JSON.parse(JSON.stringify(this.myAppWatcher))
+      //更新されたmenuを入れ替える
+      dat.feasibilityCases[this.pageIdComputed].selectedCrop[0] = res
+      //更新されたmyAppをemit
+      this.$emit('update:myApp', dat)
+    },
+    /**
+     * Ansの更新をmyAppに組み込んでemitで通知
+     * @param dat
+     */
+    onAnsChanged(dat) {
+      //作業用のmyAppコピー作成
+      let res = JSON.parse(JSON.stringify(this.myAppWatcher))
+      //更新されたmenuを入れ替える
+      res.feasibilityCases[this.pageIdComputed].ansList.splice(dat.id - 1, 1, dat.val)
+      //更新されたmyAppをemit
+      this.$emit('update:myApp', res)
     },
     showDialogue() {
       this.$bvModal.show('modalTest')
     },
-    updateSelection(val) {
-      //this.nutritionTarget = JSON.parse(JSON.stringify(val))
-      this.$emit('changeTarget', val)
-    },
-    updateNutrition(val) {
-      this.nutritionTarget = JSON.parse(JSON.stringify(val.total))
-      this.$emit('changeNutritionValue', this.nutritionTarget)
-      //this.$emit('changeNutrition', res)
-    },
-  },
-  created() {
-    this.myAppWatcher = JSON.parse(JSON.stringify(this.myApp))
-    this.ansListWatcher = JSON.parse(JSON.stringify(this.ansListGetter()))
-    this.targetCrop = JSON.parse(JSON.stringify(this.targetCropGetter()))
-    console.log(this.targetCrop)
-    this.items = JSON.parse(JSON.stringify(
-      this.myAppWatcher.dataSet.fct.map(function (val) {
-        return val.doc
+    /**
+     * カテゴリ毎のスコアを集計して戻す
+     * @param keys カテゴリとQA_idのペア
+     * @param dat ansList[pageId]
+     * @returns {any[]}
+     */
+    summarizeQA(keys, dat) {
+      const vm = this
+      let res = Array(this.qaCategoryCount).fill(0);
+      let res2 = []
+      //カテゴリ毎の集計
+      keys.forEach(function (key) {
+        res[key.categoryID - 1] += (dat[key.itemID - 1] > 0 ? dat[key.itemID - 1] : 0)
       })
-    ))
-    this.itemsDRI = JSON.parse(JSON.stringify(this.myAppWatcher.dataSet.dri))
-  },
-  computed: {
-    qaScore: function () {
-      let sum = []
-      let vm = this
-      vm.qaList.forEach(function (categories) {
-        let sumTemp = 0
-        categories.itemsQA.forEach(function (question) {
-          if (vm.ansListWatcher[vm.pageIdComputed][question.id - 1] > 0) {
-            sumTemp += vm.ansListWatcher[vm.pageIdComputed][question.id - 1]
-          }
-        })
-        sum.push({
-          id: categories.categoryID,
-          text: categories.categoryText,
-          value: Math.round(10 * sumTemp / (3 * categories.itemsQA.length))
-        })
+      //集計結果と合わせてカテゴリ情報をObjectにまとめる
+      res2 = res.map(function (item, index) {
+        const qaCategory = vm.qaList[index]
+        return {
+          id: qaCategory.categoryID,
+          text: qaCategory.categoryText,
+          value: Math.round(10 * item / (3 * qaCategory.itemsQA.length))
+        }
       })
-      // add total score
-      const sumTemp = sum.reduce((p, x) => p + x.value, 0)
-      sum.push({
+      // 合計値をobjectに加える
+      const sumTemp = res2.reduce((p, x) => p + x.value, 0)
+      res2.push({
         id: 0,
         text: 'total score',
         value: sumTemp
       })
-      return sum
+      return res2
     },
-    nutritionRatingSet: function () {
-      return [
-        {
-          name: 'Energy',
-          target: this.nutritionTarget[1] ? Number(this.nutritionTarget[1].Value) : 0,
-          rating: this.nutritionTarget[1] ?
-            Math.round(this.nutritionSum.En / this.nutritionTarget[1].Value * 10) : 0
-        },
-        {
-          name: 'Protein',
-          target: this.nutritionTarget[2] ? Number(this.nutritionTarget[2].Value) : 0,
-          rating: this.nutritionTarget[2] ?
-            Math.round(this.nutritionSum.Pr / this.nutritionTarget[2].Value * 10) : 0
-        },
-        {
-          name: 'VitA',
-          target: this.nutritionTarget[3] ? Number(this.nutritionTarget[3].Value) : 0,
-          rating: this.nutritionTarget[3] ?
-            Math.round(this.nutritionSum.Va / this.nutritionTarget[3].Value * 10) : 0
-        },
-        {
-          name: 'Fe',
-          target: this.nutritionTarget[4] ? Number(this.nutritionTarget[4].Value) : 0,
-          rating: this.nutritionTarget[4] ?
-            Math.round(this.nutritionSum.Fe / this.nutritionTarget[4].Value * 10) : 0
-        },
-      ]
+  },
+  created() {
+  },
+  watch: {
+    myApp: {
+      deep: true,
+      immediate: true,
+      handler() {
+        const vm = this
+        this.myAppWatcher = JSON.parse(JSON.stringify(this.myApp))
+        this.ansListWatcher = this.updateAnsList()
+        this.ansId = this.updateAnsId()
+        this.items = JSON.parse(JSON.stringify(this.myApp.dataSet.fct))
+        this.itemsDRI = JSON.parse(JSON.stringify(this.myApp.dataSet.dri))
+        this.targetCrop = this.updateTargetCrop()
+        this.targetGroup = this.updateTargetGroup()
+        this.nutritionDemand = this.updateNutritionDemand(this.targetGroup, this.itemsDRI)
+        this.nutritionSum = this.updateNutritionSupply(this.targetCrop)
+        this.cropName = this.targetCrop.map(function (item) {
+          return item.length > 0 ? item[0].Name : ''
+        })
+        this.nutritionRatingSet = vm.nutritionDemand.map(function (demand, index) {
+          return vm.updateNutritionRating(demand, vm.nutritionSum[index])
+        })
+        this.qaScore = this.updateScore()
+        this.pageMemo = this.myApp.feasibilityCases.map(function (item) {
+          return item.note
+        })
+      }
+    }
+  },
+  computed: {
+    /**
+     * QAリストのカテゴリ数
+     * @returns {*}
+     */
+    qaCategoryCount: function () {
+      if (this.ansId.length === 0) {
+        return 0
+      }
+      return this.ansId.reduce((a, b) => a.categoryID < b.categoryID ? a.categoryID : b.categoryID)
     },
     /**
      * 現在のページ番号
@@ -286,26 +444,62 @@ export default {
        * myAppから読み込んでこのページで利用。更新された時にemitを返す
        */
       myAppWatcher: {},
+      /**
+       * (カテゴリ、質問ID)の一蘭
+       * @returns {*[]}
+       */
+      ansId: [],
+      /**
+       * 質問への回答のカテゴリごとの合計
+       */
+      qaScore: [],
+      /**
+       * 質問への回答一覧
+       */
       ansListWatcher: [],
-      targetCrop:[],
+      /**
+       * 対象グループ
+       */
+      targetGroup: [],
+      /**
+       * 選択された作物
+       */
+      targetCrop: [],
+      /**
+       * 選択された作物名
+       */
+      cropName: [],
+      /**
+       * fctの一覧
+       */
       items: [],
+      /**
+       * driの一覧
+       */
       itemsDRI: [],
-      nutritionTarget: {
-        En: 10,
-        Pr: 10,
-        Va: 10,
-        Fe: 10,
-      },
-      nutritionSum: {
-        En: 10,
-        Pr: 10,
-        Va: 10,
-        Fe: 10,
-        Wt: 10,
-      },
+      /**
+       * 栄養摂取目標
+       */
+      nutritionDemand: [],
+      /**
+       * 栄養供給量
+       */
+      nutritionSum: [],
+      /**
+       * 栄養素の充足率
+       */
+      nutritionRatingSet: [],
+      /**
+       * ページメモ
+       */
+      pageMemo: '',
+      /**
+       * 質問と回答一覧
+       */
       qaList: [
         {
-          categoryID: 1, categoryText: 'Nutrient balance',
+          categoryID: 1,
+          categoryText: 'Nutrient balance',
           itemsQA: [
             {
               id: 1,

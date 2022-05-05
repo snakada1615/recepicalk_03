@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import feasibilityCheckComponent2 from "@/components/organisms/feasibilityCheckComponent2";
+import feasibilityCheckComponent2 from "@/components/organisms/feasibilityCheckComponent";
 
 export default {
   components: {

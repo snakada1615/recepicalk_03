@@ -6,6 +6,7 @@
         :page-id.sync="pageId"
         :max-page=10
         @update:myApp="updateMyApp"
+        @update:pageMemo="updatePageMemo"
       />
     </b-card>
   </b-container>
@@ -48,7 +49,11 @@ export default {
     },
     formatter(val) {
       return Number(val)
-    }
+    },
+    updatePageMemo(val) {
+      this.$store.dispatch('fire/updateMyApp', val)
+      this.$store.dispatch('fire/fireSaveAppdata')
+    },
   }
 }
 </script>

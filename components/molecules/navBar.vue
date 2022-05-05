@@ -15,7 +15,7 @@
           <b-dropdown-item to="/test03">test03</b-dropdown-item>
           <b-dropdown-item to="/test04">test04</b-dropdown-item>
           <b-dropdown-item to="/dietcalk">dietCalk</b-dropdown-item>
-          <b-dropdown-item to="/firetest/dbtest">firestore</b-dropdown-item>
+          <b-dropdown-item to="/feasibilityCheck">crop feasibility</b-dropdown-item>
           <b-dropdown-item to="/documents">documents</b-dropdown-item>
           <b-dropdown-item-button
             @click="resetData"

@@ -237,6 +237,14 @@ export const mutations = {
     state.myApp.feasibilityCases = JSON.parse(JSON.stringify(payload))
   },
   /**
+   * feasibilityCaseのメモを更新
+   * @param state
+   * @param payload
+   */
+  updateFeasibilityMemo: function (state, payload){
+    state.myApp.feasibilityCases[payload.pageId].pageMemo = payload.pageMemo
+  },
+  /**
    * ログイン状態を更新
    * @param state
    * @param {boolean} payload ログイン状態
@@ -606,8 +614,9 @@ export const actions = {
         return {id: dat.id, count: 0}
       })
       const selectedCrop = []
+      const note = ''
       const ansList = [-99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99]
-      arr.push({selectedCrop: selectedCrop, ansList: ansList, target: target})
+      arr.push({selectedCrop: selectedCrop, note: note, ansList: ansList, target: target})
     }
     commit('updateFeasibilityCases', arr)
   },
@@ -656,6 +665,14 @@ export const actions = {
     commit('updateMyApp', payload)
     //myAppの変更時は、常に setHasDocumentChanged=true をセット
     dispatch('setHasDocumentChanged', true)
+  },
+  /**
+   * feasibilityCaseのメモを更新
+   * @param commit
+   * @param payload
+   */
+  updateFeasibilityMemo({dispatch}, payload){
+    dispatch('updateFeasibilityMemo', payload)
   },
   /**
    * 現在のユーザーの全テータをfirestoreに保存
