@@ -84,7 +84,7 @@
         <b-button
           @click="$bvModal.show('fctModal')"
           variant="info"
-        >set menu
+        >add crop
         </b-button>
       </b-col>
     </b-row>
