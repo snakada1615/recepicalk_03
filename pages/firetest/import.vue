@@ -8,7 +8,6 @@
     >
       <b-input v-model="collection" placeholder="Enter collection name" class="my-1"/>
       <b-input v-model="dbName" placeholder="Enter doc name" class="my-1"/>
-      <b-input v-model="keyCol" placeholder="Enter key column" class="my-1"/>
       <b-button @click="getData" class="my-1">load</b-button>
     </b-card>
     <b-card
@@ -17,14 +16,18 @@
       header-text-variant="light"
       class="my-2"
     >
+      <b-input v-model="keyCol" placeholder="Enter key column" class="my-1"/>
       <csv-import :show-data="false" @getCsv="dataCsv=$event" class="my-1"></csv-import>
       <b-button @click="insertData" class="my-1">import to firebase</b-button>
     </b-card>
     <b-card>
-      {{dataJson}}
+      <json-viewer
+        v-if="dataJson"
+        :value="dataJson"
+      />
     </b-card>
     <b-card>
-      {{dataFire}}
+      {{dataJson}}
     </b-card>
   </b-container>
 </template>
@@ -33,10 +36,12 @@
 import csvImport from "@/components/molecules/csvImport";
 import {firestoreDb} from "~/plugins/firebasePlugin";
 import {doc, getDoc, setDoc} from "firebase/firestore";
+import JsonViewer from 'vue-json-viewer'
 
 export default {
   components: {
-    csvImport
+    csvImport,
+    JsonViewer,
   },
   data() {
     return {

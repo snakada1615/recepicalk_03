@@ -21,6 +21,7 @@
     "firebase": "^9.6.10",
     "markdown-it-vue": "^1.1.7",
     "nuxt": "^2.15.7",
+    "vue-json-viewer": "^2.2.22",
     "vue-rate-it": "^2.1.0"
   },
   "devDependencies": {
