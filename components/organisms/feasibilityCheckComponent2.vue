@@ -40,6 +40,9 @@
     </b-row>
     <b-row>
       <b-col class="px-0 mx-0">
+        <b-card>
+          {{qaScore[pageIdComputed]}}
+        </b-card>
         <b-card
           v-for="(qaGroup, index) in qaList"
           :key="index"
@@ -55,7 +58,7 @@
             <dri-select-single
               :driItems="itemsDRI"
               :target="targetGroup[pageIdComputed]"
-              @update:target="updateSelection"
+              @update:target="onTargetGroupChanged"
               @changeNutritionValue="updateNutrition"
             >
             </dri-select-single>
@@ -82,11 +85,11 @@
             >
               {{ qa.questionText }}
               <b-form-select
-                v-model="ansListWatcher[pageIdComputed][qa.id-1]"
+                :value="ansListWatcher[pageIdComputed][qa.id-1]"
                 :options="qa.answerList"
                 size="sm"
                 :state="ansListWatcher[pageIdComputed][qa.id-1] !== -99"
-                @change="$emit('ansListChange','ansListWatcher[pageIdComputed]')"
+                @change="onAnsChanged({'id':qa.id, 'val':$event})"
               >
               </b-form-select>
             </li>
@@ -115,30 +118,145 @@ export default {
     driSelectSingle,
   },
   methods: {
-    ansListGetter() {
+    /**
+     * ansListをmyAppから読み込んでwatch
+     * @returns {any[]}
+     */
+    updateAnsList() {
       return this.myApp.feasibilityCases.map(function (item) {
-        return item.ansList
+        return JSON.parse(JSON.stringify(item.ansList))
       })
     },
-    targetCropGetter() {
+    /**
+     * targetCropをmyAppから読み込んでwatch
+     * @returns {any[]}
+     */
+    updateTargetCrop() {
       return this.myApp.feasibilityCases.map(function (item) {
-        return item.selectedCrop
+        return JSON.parse(JSON.stringify(item.selectedCrop))
       })
     },
-    targetGroupGetter() {
+    /**
+     * targetGroupをmyAppから読み込んでwatch
+     * @returns {any[]}
+     */
+    updateTargetGroup() {
       return this.myApp.feasibilityCases.map(function (item) {
-        return item.target
+        return JSON.parse(JSON.stringify(item.target))
       })
     },
-    onTargetChanged(value, pageId) {
-      console.log('onTargetChanged')
-      if (pageId !== this.pageId || !value.length) {
-        return
-      }
-      if (this.nutritionTarget) {
-        this.nutritionTarget = [...value]
-      }
+    /**
+     * targetGroupの更新に伴い栄養摂取目標を更新
+     * @param val
+     */
+    updateNutrition(val) {
+      this.nutritionDemand = JSON.parse(JSON.stringify(val.total))
+      //this.$emit('changeNutritionValue', this.nutritionDemand)
+      //this.$emit('changeNutrition', res)
     },
+    /**
+     * ansListをmyAppから読み込んでscoreに変換
+     * @returns {*[]}
+     */
+    updateScore() {
+      let res = []
+      const vm = this
+      vm.myApp.feasibilityCases.forEach(function (val) {
+        res.push(vm.summarizeQA(vm.ansId, val.ansList))
+      })
+      return res
+    },
+    /**
+     * QAのカテゴリとIDをセットにしてArrayに追加（カテゴリ事の集計に用いる）
+     * @returns {*[]}
+     */
+    updateAnsId() {
+      const vm = this
+      let res = []
+      vm.qaList.forEach(function (category) {
+        category.itemsQA.forEach(function (item) {
+          res.push({
+            'categoryID': category.categoryID,
+            'itemID': item.id
+          })
+        })
+      })
+      return res
+    },
+    /**
+     * 選択された作物から栄養供給量を計算
+     * @param crops
+     * @returns {*}
+     */
+    updateNutritionSupply(crops) {
+      return crops.map((cropList) => {
+        return getNutritionSupply(cropList)
+      })
+    },
+    /**
+     * targetグループから栄養摂取目標を計算
+     * @param targetGroup
+     * @param dri
+     * @returns {*}
+     */
+    updateNutritionDemand(targetGroup, dri) {
+      return targetGroup.map(function (target) {
+        return getNutritionDemand(target, dri)
+      })
+    },
+    /**
+     * 栄養摂取目標と栄養供給量から栄養スコアを計算
+     * @param nutritionDemand
+     * @param nutritionSupply
+     */
+    updateNutritionRating(nutritionDemand, nutritionSupply) {
+      return [
+        {
+          name: 'Energy',
+          target: nutritionDemand.En ? Number(nutritionDemand.En) : 0,
+          supply: nutritionSupply.En ? nutritionSupply.En : 0,
+          rating: nutritionDemand.En ?
+            Math.round(nutritionSupply.En / nutritionDemand.En * 10) : 0
+        },
+        {
+          name: 'Protein',
+          target: nutritionDemand.Pr ? Number(nutritionDemand.Pr) : 0,
+          supply: nutritionSupply.Pr ? nutritionSupply.Pr : 0,
+          rating: nutritionDemand.Pr ?
+            Math.round(nutritionSupply.Pr / nutritionDemand.Pr * 10) : 0
+        },
+        {
+          name: 'VitA',
+          target: nutritionDemand.Va ? Number(nutritionDemand.Va) : 0,
+          supply: nutritionSupply.Va ? nutritionSupply.Va : 0,
+          rating: nutritionDemand.Va ?
+            Math.round(nutritionSupply.Va / nutritionDemand.Va * 10) : 0
+        },
+        {
+          name: 'Fe',
+          target: nutritionDemand.Fe ? Number(nutritionDemand.Fe) : 0,
+          supply: nutritionSupply.Fe ? nutritionSupply.Fe : 0,
+          rating: nutritionDemand.Fe ?
+            Math.round(nutritionSupply.Fe / nutritionDemand.Fe * 10) : 0
+        },
+      ]
+    },
+    /**
+     * targetGroupの更新をmyAppに組み込んでemitで通知
+     * @param val
+     */
+    onTargetGroupChanged(val) {
+      //作業用のmyAppコピー作成
+      let dat = JSON.parse(JSON.stringify(this.myAppWatcher))
+      //更新されたmenuを入れ替える
+      dat.feasibilityCases[this.pageIdComputed].target = val
+      //更新されたmyAppをemit
+      this.$emit('update:myApp', dat)
+    },
+    /**
+     * cropの選択の変更をmyAppに組み込んでemitで通知
+     * @param value
+     */
     onItemSelected(value) {
       let res = {}
       console.log(value)
@@ -158,112 +276,55 @@ export default {
       //更新されたmyAppをemit
       this.$emit('update:myApp', dat)
     },
+    /**
+     * Ansの更新をmyAppに組み込んでemitで通知
+     * @param dat
+     */
+    onAnsChanged(dat) {
+      //作業用のmyAppコピー作成
+      let res = JSON.parse(JSON.stringify(this.myAppWatcher))
+      //更新されたmenuを入れ替える
+      res.feasibilityCases[this.pageIdComputed].ansList.splice(dat.id - 1, 1, dat.val)
+      //更新されたmyAppをemit
+      this.$emit('update:myApp', res)
+    },
     showDialogue() {
       this.$bvModal.show('modalTest')
     },
-    updateSelection(val) {
-      //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(this.myAppWatcher))
-      //更新されたmenuを入れ替える
-      dat.feasibilityCases[this.pageIdComputed].target = val
-      //更新されたmyAppをemit
-      this.$emit('update:myApp', dat)
-    },
-    updateNutrition(val) {
-      this.nutritionTarget = JSON.parse(JSON.stringify(val.total))
-      //this.$emit('changeNutritionValue', this.nutritionTarget)
-      //this.$emit('changeNutrition', res)
-    },
+    /**
+     * カテゴリ毎のスコアを集計して戻す
+     * @param keys カテゴリとQA_idのペア
+     * @param dat ansList[pageId]
+     * @returns {any[]}
+     */
     summarizeQA(keys, dat) {
+      const vm = this
       let res = Array(this.qaCategoryCount).fill(0);
+      let res2 = []
+      //カテゴリ毎の集計
       keys.forEach(function (key) {
         res[key.categoryID - 1] += (dat[key.itemID - 1] > 0 ? dat[key.itemID - 1] : 0)
       })
-      return res
-    },
-    updateScore(){
-      let res = []
-      const vm = this
-      vm.myApp.feasibilityCases.forEach(function (val){
-        res.push(vm.summarizeQA(vm.ansId, val.ansList))
+      //集計結果と合わせてカテゴリ情報をObjectにまとめる
+      res2 = res.map(function (item, index){
+        const qaCategory = vm.qaList[index]
+        return {
+          id: qaCategory.categoryID,
+          text: qaCategory.categoryText,
+          value: Math.round(10 * item / (3 * qaCategory.itemsQA.length))
+        }
       })
-      return res
-    },
-    updateAnsId(){
-      const vm = this
-      let res = []
-      vm.qaList.forEach(function (category) {
-        category.itemsQA.forEach(function (item) {
-          res.push({
-            'categoryID': category.categoryID,
-            'itemID': item.id
-          })
-        })
+      // 合計値をobjectに加える
+      const sumTemp = res2.reduce((p, x) => p + x.value, 0)
+      res2.push({
+        id: 0,
+        text: 'total score',
+        value: sumTemp
       })
-      return res
-    },
-
-    /**
-     * 選択された作物から栄養供給量を計算
-     * @param crops
-     * @returns {*}
-     */
-    updataNutritionSupply(crops){
-      return crops.map((cropList)=>{
-        return getNutritionSupply(cropList)
-      })
-    },
-    /**
-     * targetグループから栄養摂取目標を計算
-     * @param targetGroup
-     * @param dri
-     * @returns {*}
-     */
-    updateNutritionTarget(targetGroup, dri){
-      return targetGroup.map(function (target) {
-        return getNutritionDemand(target, dri)
-      })
-    },
-    /**
-     * 栄養摂取目標と栄養供給量から栄養スコアを計算
-     * @param nutritionTarget
-     * @param nutritionSupply
-     */
-    updateNutritionRating(nutritionTarget, nutritionSupply){
-      return [
-        {
-          name: 'Energy',
-          target: nutritionTarget.En ? Number(nutritionTarget.En) : 0,
-          supply: nutritionSupply.En ? nutritionSupply.En : 0,
-          rating: nutritionTarget.En ?
-            Math.round(nutritionSupply.En / nutritionTarget.En * 10) : 0
-        },
-        {
-          name: 'Protein',
-          target: nutritionTarget.Pr ? Number(nutritionTarget.Pr) : 0,
-          supply: nutritionSupply.Pr ? nutritionSupply.Pr : 0,
-          rating: nutritionTarget.Pr ?
-            Math.round(nutritionSupply.Pr / nutritionTarget.Pr * 10) : 0
-        },
-        {
-          name: 'VitA',
-          target: nutritionTarget.Va ? Number(nutritionTarget.Va) : 0,
-          supply: nutritionSupply.Va ? nutritionSupply.Va : 0,
-          rating: nutritionTarget.Va ?
-            Math.round(nutritionSupply.Va / nutritionTarget.Va * 10) : 0
-        },
-        {
-          name: 'Fe',
-          target: nutritionTarget.Fe ? Number(nutritionTarget.Fe) : 0,
-          supply: nutritionSupply.Fe ? nutritionSupply.Fe : 0,
-          rating: nutritionTarget.Fe ?
-            Math.round(nutritionSupply.Fe / nutritionTarget.Fe * 10) : 0
-        },
-      ]
+      return res2
     },
   },
   created() {
-    this.ansId = this.updateAnsId()
   },
   watch: {
     myApp: {
@@ -272,17 +333,18 @@ export default {
       handler() {
         const vm = this
         this.myAppWatcher = JSON.parse(JSON.stringify(this.myApp))
-        this.ansListWatcher = this.ansListGetter()
+        this.ansListWatcher = this.updateAnsList()
+        this.ansId = this.updateAnsId()
         this.items = JSON.parse(JSON.stringify(this.myApp.dataSet.fct))
         this.itemsDRI = JSON.parse(JSON.stringify(this.myApp.dataSet.dri))
-        this.targetCrop = this.targetCropGetter()
-        this.targetGroup = this.targetGroupGetter()
-        this.nutritionTarget = this.updateNutritionTarget(this.targetGroup, this.itemsDRI)
-        this.nutritionSum = this.updataNutritionSupply(this.targetCrop)
+        this.targetCrop = this.updateTargetCrop()
+        this.targetGroup = this.updateTargetGroup()
+        this.nutritionDemand = this.updateNutritionDemand(this.targetGroup, this.itemsDRI)
+        this.nutritionSum = this.updateNutritionSupply(this.targetCrop)
         this.cropName = this.targetCrop.map(function (item) {
           return item.length > 0 ? item[0].Name : ''
         })
-        this.nutritionRatingSet = vm.nutritionTarget.map(function (demand, index) {
+        this.nutritionRatingSet = vm.nutritionDemand.map(function (demand, index) {
           return vm.updateNutritionRating(demand, vm.nutritionSum[index])
         })
         this.qaScore = this.updateScore()
@@ -295,44 +357,45 @@ export default {
      * @returns {*}
      */
     qaCategoryCount: function () {
-      console.log(this.ansId)
-      if (this.ansId.length === 0){ return 0 }
+      if (this.ansId.length === 0) {
+        return 0
+      }
       return this.ansId.reduce((a, b) => a.categoryID < b.categoryID ? a.categoryID : b.categoryID)
     },
-/*
-    qaScore: function () {
-      let sum = []
-      let vm = this
-      let res = []
-      vm.myAppWatcher.feasibilityCases.map(function (item) {
-        item.ansList.map(function (item) {
-          res.push({'categoryID': category.categoryID, 'itemID': item.id})
+    /*
+        qaScore: function () {
+          let sum = []
+          let vm = this
+          let res = []
+          vm.myAppWatcher.feasibilityCases.map(function (item) {
+            item.ansList.map(function (item) {
+              res.push({'categoryID': category.categoryID, 'itemID': item.id})
 
-        })
-      })
-      vm.qaList.forEach(function (categories) {
-        let sumTemp = 0
-        categories.itemsQA.forEach(function (question) {
-          if (vm.ansListWatcher[vm.pageIdComputed][question.id - 1] > 0) {
-            sumTemp += vm.ansListWatcher[vm.pageIdComputed][question.id - 1]
-          }
-        })
-        sum.push({
-          id: categories.categoryID,
-          text: categories.categoryText,
-          value: Math.round(10 * sumTemp / (3 * categories.itemsQA.length))
-        })
-      })
-      // add total score
-      const sumTemp = sum.reduce((p, x) => p + x.value, 0)
-      sum.push({
-        id: 0,
-        text: 'total score',
-        value: sumTemp
-      })
-      return sum
-    },
-*/
+            })
+          })
+          vm.qaList.forEach(function (categories) {
+            let sumTemp = 0
+            categories.itemsQA.forEach(function (question) {
+              if (vm.ansListWatcher[vm.pageIdComputed][question.id - 1] > 0) {
+                sumTemp += vm.ansListWatcher[vm.pageIdComputed][question.id - 1]
+              }
+            })
+            sum.push({
+              id: categories.categoryID,
+              text: categories.categoryText,
+              value: Math.round(10 * sumTemp / (3 * categories.itemsQA.length))
+            })
+          })
+          // add total score
+          const sumTemp = sum.reduce((p, x) => p + x.value, 0)
+          sum.push({
+            id: 0,
+            text: 'total score',
+            value: sumTemp
+          })
+          return sum
+        },
+    */
     /**
      * 現在のページ番号
      */
@@ -399,7 +462,7 @@ export default {
       /**
        * 栄養摂取目標
        */
-      nutritionTarget: [],
+      nutritionDemand: [],
       /**
        * 栄養供給量
        */
