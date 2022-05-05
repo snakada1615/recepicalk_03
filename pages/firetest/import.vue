@@ -6,9 +6,13 @@
       header-text-variant="light"
       class="my-2"
     >
-      <b-input v-model="collection" placeholder="Enter collection name" class="my-1"/>
-      <b-input v-model="dbName" placeholder="Enter doc name" class="my-1"/>
-      <b-button @click="getData" class="my-1">load</b-button>
+      <div class="d-flex flex-row align-items-center">
+        <div>collection</div>
+        <b-input v-model="collection2" placeholder="Enter collection name" class="my-1 mx-1"/></div>
+      <div class="d-flex flex-row align-items-center">
+        <div>document</div>
+        <b-input v-model="dbName2" placeholder="Enter doc name" class="my-1 mx-1"/></div>
+      <b-button @click="getData(collection2, dbName2)" class="my-1">load</b-button>
     </b-card>
     <b-card
       header="Load data from CSV and import to firebase"
@@ -16,13 +20,21 @@
       header-text-variant="light"
       class="my-2"
     >
-      <b-input v-model="keyCol" placeholder="Enter key column" class="my-1"/>
+      <div class="d-flex flex-row align-items-center">
+        <div>collection</div>
+        <b-input v-model="collection1" placeholder="Enter collection name" class="my-1 mx-1"/>
+      </div>
+      <div class="d-flex flex-row align-items-center">
+        <div>document</div>
+        <b-input v-model="dbName1" placeholder="Enter doc name" class="my-1 mx-1"/></div>
+      <div class="d-flex flex-row align-items-center">
+        <div>index_Col</div>
+        <b-input v-model="keyCol" placeholder="Enter key column" class="my-1 mx-1"/></div>
       <csv-import :show-data="false" @getCsv="dataCsv=$event" class="my-1"></csv-import>
-      <b-button @click="insertData" class="my-1">import to firebase</b-button>
+      <b-button @click="insertData(collection1, dbName1, dataJson)" class="my-1">import to firebase</b-button>
     </b-card>
-    <b-card>
+    <b-card v-if="dataJson">
       <json-viewer
-        v-if="dataJson"
         :value="dataJson"
       />
     </b-card>
@@ -50,13 +62,21 @@ export default {
        */
       dataCsv:'',
       /**
-       * コレクション名
+       * コレクション名(csv登録用)
        */
-      collection:'',
+      collection1:'',
       /**
-       * ドキュメント名
+       * ドキュメント名(csv登録用)
        */
-      dbName:'',
+      dbName1:'',
+      /**
+       * コレクション名(firebaseからの読み込み用)
+       */
+      collection2:'',
+      /**
+       * ドキュメント名(firebaseからの読み込み用)
+       */
+      dbName2:'',
       /**
        * キーフィールドの指定
        */
@@ -89,12 +109,11 @@ export default {
      * dataJsonをfirebaseに登録
      * @returns {Promise<void>}
      */
-    async insertData(){
+    async insertData(myCollection, myDoc, myDat){
       if (this.dbName === '' || this.dataCsv.length === 0){ return }
-      const vm = this
-      const ref = doc(firestoreDb, vm.collection, vm.dbName)
+      const ref = doc(firestoreDb, myCollection, myDoc)
       await setDoc(ref,
-        vm.dataJson
+        myDat
       ).catch(error => {
         throw error
       }).then(()=>{
@@ -105,8 +124,8 @@ export default {
      * collection, dbNameで指定したドキュメントをfirebaseから読み込み
      * @returns {Promise<void>}
      */
-    async getData(){
-      const ref = await doc(firestoreDb, this.collection, this.dbName)
+    async getData(myCollection, myDoc){
+      const ref = await doc(firestoreDb, myCollection, myDoc)
       await getDoc(ref).then((doc) => {
         if (doc.exists()) {
           this.dataFire = doc.data()
