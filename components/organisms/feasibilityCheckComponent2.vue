@@ -31,6 +31,37 @@
             </b-col>
           </b-row>
         </b-card>
+        <b-card
+          style="min-width: 530px;"
+          header-bg-variant="success"
+          bg-variant="light"
+          border-variant="success"
+          class="mx-1 px-0 my-2">
+          <template #header>
+            <div>Feasibility score</div>
+          </template>
+          <b-row>
+            <b-col class="text-center">Crop name:</b-col>
+            <b-col class="text-info">{{ cropName[pageIdComputed] }}</b-col>
+          </b-row>
+          <b-row>
+            <b-col cols="6" class="text-center">total score:</b-col>
+            <b-col cols="6">{{ qaScore[pageIdComputed][qaScore[pageIdComputed].length - 1].value }} / 50</b-col>
+          </b-row>
+          <b-row v-for="(qa, index) in qaScore[pageIdComputed]" :key="index">
+            <nutrition-bar
+              v-if="qa.id > 0"
+              :colWidthFirst=6
+              :colwidthSecond="0"
+              :show-max-number="false"
+              :max="10"
+              :nutritionTarget="0"
+              :cropName="qa.text"
+              :rating="qa.value"
+              :label="qa.text"
+            ></nutrition-bar>
+          </b-row>
+        </b-card>
       </b-col>
     </b-row>
     <b-row class="mt-2">
@@ -40,9 +71,6 @@
     </b-row>
     <b-row>
       <b-col class="px-0 mx-0">
-        <b-card>
-          {{qaScore[pageIdComputed]}}
-        </b-card>
         <b-card
           v-for="(qaGroup, index) in qaList"
           :key="index"
@@ -259,7 +287,6 @@ export default {
      */
     onItemSelected(value) {
       let res = {}
-      console.log(value)
       res.Name = value.Name || 0
       res.id = value.id || 0
       res.En = Number(value.En) || 0
@@ -267,7 +294,6 @@ export default {
       res.Va = Number(value.Va) || 0
       res.Fe = Number(value.Fe) || 0
       res.Wt = 100
-      console.log(res)
 
       //作業用のmyAppコピー作成
       let dat = JSON.parse(JSON.stringify(this.myAppWatcher))
@@ -362,40 +388,6 @@ export default {
       }
       return this.ansId.reduce((a, b) => a.categoryID < b.categoryID ? a.categoryID : b.categoryID)
     },
-    /*
-        qaScore: function () {
-          let sum = []
-          let vm = this
-          let res = []
-          vm.myAppWatcher.feasibilityCases.map(function (item) {
-            item.ansList.map(function (item) {
-              res.push({'categoryID': category.categoryID, 'itemID': item.id})
-
-            })
-          })
-          vm.qaList.forEach(function (categories) {
-            let sumTemp = 0
-            categories.itemsQA.forEach(function (question) {
-              if (vm.ansListWatcher[vm.pageIdComputed][question.id - 1] > 0) {
-                sumTemp += vm.ansListWatcher[vm.pageIdComputed][question.id - 1]
-              }
-            })
-            sum.push({
-              id: categories.categoryID,
-              text: categories.categoryText,
-              value: Math.round(10 * sumTemp / (3 * categories.itemsQA.length))
-            })
-          })
-          // add total score
-          const sumTemp = sum.reduce((p, x) => p + x.value, 0)
-          sum.push({
-            id: 0,
-            text: 'total score',
-            value: sumTemp
-          })
-          return sum
-        },
-    */
     /**
      * 現在のページ番号
      */
