@@ -64,10 +64,10 @@
                 <b-col cols="3" class="text-center mr-2 font-weight-bold">Nutrition</b-col>
                 <b-col cols="3" class="font-weight-bold">Balance</b-col>
               </b-row>
-              <b-row v-for="(nut, index) in nutritionRatingSet" :key="index">
+              <b-row v-for="(nut, index) in nutritionRatingSet[pageIdComputed]" :key="index">
                 <nutrition-bar
-                  :cropName="nut.name"
-                  :max="10"
+                  :label="nut.name"
+                  :maxRatingAbsolute="nut.supply"
                   :nutritionTarget="nut.target"
                   :rating="nut.rating"
                 ></nutrition-bar>
@@ -106,8 +106,7 @@
 import FctTableModal from "@/components/organisms/FctTableModal.vue";
 import nutritionBar from "@/components/molecules/nutritionBar";
 import driSelectSingle from "@/components/molecules/driSelectSingle";
-import {validateMyApp} from "@/plugins/helper";
-import feasibilityCheckComponent from "@/components/organisms/feasibilityCheckComponent";
+import {getNutritionDemand, getNutritionSupply, validateMyApp} from "@/plugins/helper";
 
 export default {
   components: {
@@ -116,9 +115,6 @@ export default {
     driSelectSingle,
   },
   methods: {
-    nutritionRatingGetter() {
-      return this.myAppWatcher
-    },
     ansListGetter() {
       return this.myApp.feasibilityCases.map(function (item) {
         return item.ansList
@@ -145,13 +141,15 @@ export default {
     },
     onItemSelected(value) {
       let res = {}
+      console.log(value)
       res.Name = value.Name || 0
       res.id = value.id || 0
-      res.En = value.En || 0
-      res.Pr = value.Pr || 0
-      res.Va = value.Va || 0
-      res.Fe = value.Fe || 0
+      res.En = Number(value.En) || 0
+      res.Pr = Number(value.Pr) || 0
+      res.Va = Number(value.Va) || 0
+      res.Fe = Number(value.Fe) || 0
       res.Wt = 100
+      console.log(res)
 
       //作業用のmyAppコピー作成
       let dat = JSON.parse(JSON.stringify(this.myAppWatcher))
@@ -173,7 +171,7 @@ export default {
     },
     updateNutrition(val) {
       this.nutritionTarget = JSON.parse(JSON.stringify(val.total))
-      this.$emit('changeNutritionValue', this.nutritionTarget)
+      //this.$emit('changeNutritionValue', this.nutritionTarget)
       //this.$emit('changeNutrition', res)
     },
     summarizeQA(keys, dat) {
@@ -204,23 +202,88 @@ export default {
       })
       return res
     },
+
+    /**
+     * 選択された作物から栄養供給量を計算
+     * @param crops
+     * @returns {*}
+     */
+    updataNutritionSupply(crops){
+      return crops.map((cropList)=>{
+        return getNutritionSupply(cropList)
+      })
+    },
+    /**
+     * targetグループから栄養摂取目標を計算
+     * @param targetGroup
+     * @param dri
+     * @returns {*}
+     */
+    updateNutritionTarget(targetGroup, dri){
+      return targetGroup.map(function (target) {
+        return getNutritionDemand(target, dri)
+      })
+    },
+    /**
+     * 栄養摂取目標と栄養供給量から栄養スコアを計算
+     * @param nutritionTarget
+     * @param nutritionSupply
+     */
+    updateNutritionRating(nutritionTarget, nutritionSupply){
+      return [
+        {
+          name: 'Energy',
+          target: nutritionTarget.En ? Number(nutritionTarget.En) : 0,
+          supply: nutritionSupply.En ? nutritionSupply.En : 0,
+          rating: nutritionTarget.En ?
+            Math.round(nutritionSupply.En / nutritionTarget.En * 10) : 0
+        },
+        {
+          name: 'Protein',
+          target: nutritionTarget.Pr ? Number(nutritionTarget.Pr) : 0,
+          supply: nutritionSupply.Pr ? nutritionSupply.Pr : 0,
+          rating: nutritionTarget.Pr ?
+            Math.round(nutritionSupply.Pr / nutritionTarget.Pr * 10) : 0
+        },
+        {
+          name: 'VitA',
+          target: nutritionTarget.Va ? Number(nutritionTarget.Va) : 0,
+          supply: nutritionSupply.Va ? nutritionSupply.Va : 0,
+          rating: nutritionTarget.Va ?
+            Math.round(nutritionSupply.Va / nutritionTarget.Va * 10) : 0
+        },
+        {
+          name: 'Fe',
+          target: nutritionTarget.Fe ? Number(nutritionTarget.Fe) : 0,
+          supply: nutritionSupply.Fe ? nutritionSupply.Fe : 0,
+          rating: nutritionTarget.Fe ?
+            Math.round(nutritionSupply.Fe / nutritionTarget.Fe * 10) : 0
+        },
+      ]
+    },
   },
   created() {
     this.ansId = this.updateAnsId()
-    this.items = JSON.parse(JSON.stringify(this.myApp.dataSet.fct))
-    this.itemsDRI = JSON.parse(JSON.stringify(this.myApp.dataSet.dri))
   },
   watch: {
     myApp: {
       deep: true,
       immediate: true,
-      handler(val) {
+      handler() {
+        const vm = this
         this.myAppWatcher = JSON.parse(JSON.stringify(this.myApp))
         this.ansListWatcher = this.ansListGetter()
+        this.items = JSON.parse(JSON.stringify(this.myApp.dataSet.fct))
+        this.itemsDRI = JSON.parse(JSON.stringify(this.myApp.dataSet.dri))
         this.targetCrop = this.targetCropGetter()
         this.targetGroup = this.targetGroupGetter()
+        this.nutritionTarget = this.updateNutritionTarget(this.targetGroup, this.itemsDRI)
+        this.nutritionSum = this.updataNutritionSupply(this.targetCrop)
         this.cropName = this.targetCrop.map(function (item) {
           return item.length > 0 ? item[0].Name : ''
+        })
+        this.nutritionRatingSet = vm.nutritionTarget.map(function (demand, index) {
+          return vm.updateNutritionRating(demand, vm.nutritionSum[index])
         })
         this.qaScore = this.updateScore()
       }
@@ -270,34 +333,6 @@ export default {
       return sum
     },
 */
-    nutritionRatingSet: function () {
-      return [
-        {
-          name: 'Energy',
-          target: this.nutritionTarget[1] ? Number(this.nutritionTarget[1].Value) : 0,
-          rating: this.nutritionTarget[1] ?
-            Math.round(this.nutritionSum.En / this.nutritionTarget[1].Value * 10) : 0
-        },
-        {
-          name: 'Protein',
-          target: this.nutritionTarget[2] ? Number(this.nutritionTarget[2].Value) : 0,
-          rating: this.nutritionTarget[2] ?
-            Math.round(this.nutritionSum.Pr / this.nutritionTarget[2].Value * 10) : 0
-        },
-        {
-          name: 'VitA',
-          target: this.nutritionTarget[3] ? Number(this.nutritionTarget[3].Value) : 0,
-          rating: this.nutritionTarget[3] ?
-            Math.round(this.nutritionSum.Va / this.nutritionTarget[3].Value * 10) : 0
-        },
-        {
-          name: 'Fe',
-          target: this.nutritionTarget[4] ? Number(this.nutritionTarget[4].Value) : 0,
-          rating: this.nutritionTarget[4] ?
-            Math.round(this.nutritionSum.Fe / this.nutritionTarget[4].Value * 10) : 0
-        },
-      ]
-    },
     /**
      * 現在のページ番号
      */
@@ -333,26 +368,49 @@ export default {
        * @returns {*[]}
        */
       ansId: [],
+      /**
+       * 質問への回答のカテゴリごとの合計
+       */
       qaScore: [],
+      /**
+       * 質問への回答一覧
+       */
       ansListWatcher: [],
+      /**
+       * 対象グループ
+       */
       targetGroup: [],
+      /**
+       * 選択された作物
+       */
       targetCrop: [],
+      /**
+       * 選択された作物名
+       */
       cropName: [],
+      /**
+       * fctの一覧
+       */
       items: [],
+      /**
+       * driの一覧
+       */
       itemsDRI: [],
-      nutritionTarget: {
-        En: 10,
-        Pr: 10,
-        Va: 10,
-        Fe: 10,
-      },
-      nutritionSum: {
-        En: 10,
-        Pr: 10,
-        Va: 10,
-        Fe: 10,
-        Wt: 10,
-      },
+      /**
+       * 栄養摂取目標
+       */
+      nutritionTarget: [],
+      /**
+       * 栄養供給量
+       */
+      nutritionSum: [],
+      /**
+       * 栄養素の充足率
+       */
+      nutritionRatingSet: [],
+      /**
+       * 質問と回答一覧
+       */
       qaList: [
         {
           categoryID: 1,

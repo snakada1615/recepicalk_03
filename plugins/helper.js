@@ -168,3 +168,36 @@ export function validateMyApp(dat){
 
   return isObject(dat) && res
 }
+
+/**
+ * ターゲットグループの構成とdri一蘭から栄養需要を計算する
+ * @param target ターゲット構成[id, count]
+ * @param dri
+ * @returns {*}
+ */
+export function getNutritionDemand(target, dri) {
+    return target.reduce((accumulator, item, index) => {
+      const count = item.count
+      accumulator.En += Number(count) * Number(dri[index].En)
+      accumulator.Pr += Number(count) * Number(dri[index].Pr)
+      accumulator.Va += Number(count) * Number(dri[index].Va)
+      accumulator.Fe += Number(count) * Number(dri[index].Fe)
+      return accumulator
+    }, {'En':0, 'Pr':0, 'Va':0, 'Fe':0})
+}
+
+/**
+ * 選択された作物一蘭から栄養供給量を計算
+ * @param datArray [En, Pr, Va, Fe, Wt]
+ * @returns {T}
+ */
+export function getNutritionSupply(datArray){
+  return datArray.reduce((accumulator, item) => {
+    accumulator.En = (accumulator.En || 0) + Number(item.En)
+    accumulator.Pr = (accumulator.Pr || 0) + Number(item.Pr)
+    accumulator.Va = (accumulator.Va || 0) + Number(item.Va)
+    accumulator.Fe = (accumulator.Fe || 0) + Number(item.Fe)
+    accumulator.Wt = (accumulator.Wt || 0) + Number(item.Wt)
+    return accumulator
+  }, {})
+}

@@ -72,8 +72,7 @@
        */
       maxRating: {
         type: Number,
-        default: 10,
-        required: true
+        default: 10
       },
       /**
        * increment shown on the barchart
