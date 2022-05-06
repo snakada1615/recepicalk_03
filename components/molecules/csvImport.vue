@@ -36,7 +36,7 @@ export default {
       const file = event.target.files[0];
 
       file.text().then((csv) => {
-        const array = csv.split("\n");
+        const array = csv.split(/\r\n|\n/);
         const header = array[0].split(",");
         const body = array.slice(1).map((arr) => arr.split(","));
 

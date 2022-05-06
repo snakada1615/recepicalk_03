@@ -168,6 +168,34 @@ export function validateMyApp(dat){
 
   return isObject(dat) && res
 }
+/**
+ * FCTのバリデーション
+ * @param dat 検証するFCT
+ * @returns {false|boolean}
+ */
+export function validateFct(dat){
+  //FCTの型設計
+  const typeName = [
+    'Carbohydrate',
+    'Energy',
+    'FE',
+    'Fat',
+    'Food_name',
+    'Protein',
+    'VITA_RAE',
+    'food_group_unicef',
+    'food_grp_id',
+    'FCT_id'
+  ]
+  let res = true
+  const myError = validateObject(dat, typeName)
+  if (myError.length > 0){
+    console.log(myError)
+    res = false
+  }
+
+  return isObject(dat) && res
+}
 
 /**
  * ターゲットグループの構成とdri一蘭から栄養需要を計算する

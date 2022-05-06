@@ -52,11 +52,11 @@ export const state = () => ({
       /**
        * fctのid
        */
-      fctId: '',
+      fctId: 'fct01',
       /**
        * driのid
        */
-      driId: '',
+      driId: 'dri01',
       /**
        * fctのデータ
        */
@@ -134,6 +134,22 @@ export const getters = {
 }
 
 export const mutations = {
+  /**
+   * fctIdを更新
+   * @param state
+   * @param payload
+   */
+  updateFctId: function(state, payload){
+    state.myApp.dataSet.fctId = payload
+  },
+  /**
+   * driIdを更新
+   * @param state
+   * @param payload
+   */
+  updateDriId: function(state, payload){
+    state.myApp.dataSet.driId = payload
+  },
   /**
    * ユーザーデータ（myApp）が読み込まれたらTrueにセット
    * @param state
@@ -254,6 +270,22 @@ export const mutations = {
   }
 }
 export const actions = {
+  /**
+   * FctIdを更新
+   * @param commit
+   * @param payload
+   */
+  updateFctId({commit}, payload){
+    commit('updateFctId', payload)
+  },
+  /**
+   * DriIdを更新
+   * @param commit
+   * @param payload
+   */
+  updateDriId({commit}, payload){
+    commit('updateDriId', payload)
+  },
   /**
    * ユーザーデータ（myApp）が読み込まれたらTrueにセット
    */
@@ -513,8 +545,9 @@ export const actions = {
    * @param dispatch
    * @returns {Promise<void>}
    */
-  async initFct({commit, dispatch}) {
-    const fct = await fireGetDoc('dataset', 'fct01')
+  async initFct({commit, dispatch, state}) {
+    console.log(state.myApp.dataSet.fctId)
+    const fct = await fireGetDoc('dataset', state.myApp.dataSet.fctId)
     if (fct) {
       const fctArray = await dispatch('formatFct', fct)
       commit('updateFct', fctArray)
@@ -529,8 +562,9 @@ export const actions = {
    * @param dispatch
    * @returns {Promise<void>}
    */
-  async initDri({commit, dispatch}) {
-    const dri = await fireGetDoc('dataset', 'dri01')
+  async initDri({commit, dispatch, state}) {
+    console.log(state.myApp.dataSet)
+    const dri = await fireGetDoc('dataset', state.myApp.dataSet.driId)
     if (dri) {
       const driArray = await dispatch('formatDri', dri)
       commit('updateDri', driArray)

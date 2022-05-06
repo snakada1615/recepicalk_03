@@ -1,0 +1,21 @@
+﻿FCT_id,food_grp_id,Food_name,food_group_unicef,Energy,Protein,Fat,Carbohydrate,FE,VITA_RAE
+20002,12,Teff@ red,Grains@ roots and tubers ,357,11,2.5,73,81,0
+1046,1,Bread@ wheat@ white,Grains@ roots and tubers ,251,8.4,1.8,48.4,1.2,0
+20003,12,Barley,Grains@ roots and tubers ,340,5.4,1.1,77.8,1,0
+20028,12,Finger millet,Grains@ roots and tubers ,365,9.3,5.9,64.2,15.2,0
+1040,1,Sorghum@ white,Grains@ roots and tubers ,370,9.3,3.9,65.5,3.9,0
+1004,1,Maize@ white,Grains@ roots and tubers ,351,9.2,4.1,63.9,3.1,0
+20021,12,Faba bean,Legumes and nuts ,309,25.3,1.4,38.3,5.2,2.4
+20016,12,Field peas,Legumes and nuts ,0,0,0,0,0,0
+20033,12,Chick peas@ white,Legumes and nuts ,337,20.4,5.2,42,6.6,4.5
+20029,12,Grass peas,Legumes and nuts ,0,0,0,0,0,0
+20030,12,Linseed,Legumes and nuts ,482,25,31,36.1,14.6,0
+2085,2,Potato,Grains@ roots and tubers ,81,1.9,0.1,16.9,0.9,1
+4168,2,Sweet potato@ deep yellow,Vitamin A rich fruits and Vegetable ,114,1.5,0.3,24.5,1.1,397
+4171,4,Garlic,Other fruits and vegetables ,137,6.8,0.4,25,1.6,0
+4196,4,Tomato@ red,Other fruits and vegetables ,22,1,0.2,3.3,0.6,52
+4201,4,Peppers@ chilli,Other fruits and vegetables ,46,1.9,0.3,7.6,1.1,53
+5222,4,Pumpkin@ squash,Vitamin A rich fruits and Vegetable ,29,1,0.1,5.6,1.2,100
+5261,5,Avocado@ ,Other fruits and vegetables ,152,1.7,14.7,1.4,0.8,6
+5234,5,Plantain@ ripe,Other fruits and vegetables ,142,1.2,0.3,32,0.9,43
+5567,5,Mango@ orange ,Vitamin A rich fruits and Vegetable ,65,0.6,0.2,13.9,0.7,168

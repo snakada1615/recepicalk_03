@@ -12,7 +12,14 @@
       <div class="d-flex flex-row align-items-center">
         <div>document</div>
         <b-input v-model="dbName2" placeholder="Enter doc name" class="my-1 mx-1"/></div>
-      <b-button @click="getData(collection2, dbName2)" class="my-1">load from firebase</b-button>
+      <div  class="d-flex flex-row align-items-center">
+        <b-button @click="getData(collection2, dbName2)" class="my-1 mx-1">load from firebase</b-button>
+        <b-button
+          @click="setNewFct(dbName2)"
+          class="my-1 mx-1"
+          :disabled = "!dataFire"
+        >use this FCT</b-button>
+      </div>
     </b-card>
     <b-card v-if="dataFire" bg-variant="light">
       <json-viewer
@@ -36,12 +43,18 @@
       <div class="d-flex flex-row align-items-center">
         <div>index_Col</div>
         <b-input v-model="keyCol" placeholder="Enter key column" class="my-1 mx-1"/></div>
-      <b-button @click="insertData(collection1, dbName1, dataJson)" class="my-1">import to firebase</b-button>
+      <b-button
+        @click="insertData(collection1, dbName1, dataJson)"
+        class="my-1"
+        :disabled="!importOk"
+      >import to firebase</b-button>
     </b-card>
     <b-card v-if="dataJson" bg-variant="light">
       <json-viewer
         :value="dataJson"
       />
+      <div>{{'データはFCTに適合して'+(fctValidate ? 'います':'いません')}}</div>
+      <div v-if="!fctValidate">足りない要素は、コンソールを確認してください</div>
     </b-card>
     <b-card
       header="get fileList from firebase"
@@ -63,6 +76,7 @@ import csvImport from "@/components/molecules/csvImport";
 import {firestoreDb} from "~/plugins/firebasePlugin";
 import {doc, getDoc, setDoc, collection, getDocs} from "firebase/firestore";
 import JsonViewer from 'vue-json-viewer'
+import {validateFct} from "@/plugins/helper";
 
 export default {
   components: {
@@ -71,10 +85,16 @@ export default {
   },
   data() {
     return {
+      /**
+       * アプリで利用するデータベースのcollection一覧（form-selectで利用）
+       */
       collectionList:[
         {value:'dataset', text: 'dataset'},
         {value:'users', text: 'user data'},
       ],
+      /**
+       * collectionの下に登録されたdocumentの一覧
+       */
       myList:[],
       /**
        * csvファイルから読み込んだデータ本体
@@ -132,9 +152,37 @@ export default {
         res += '<div>' + item + '<div>'
       })
       return res
-    }
+    },
+    /**
+     * 読み込んだCSVがFCTの構造に必要なフィールドを含んでいるか検証
+     * @param dat CSVの一行目のObjectを渡す
+     * @returns {boolean}
+     */
+    fctValidate:function(){
+      return validateFct(this.dataCsv[0])
+    },
+    /**
+     * csvをfirebaseに読み込めるかどうかのフラグ
+     */
+    importOk: function () {
+      return this.fctValidate && this.collection1 && this.dbName1 && this.keyCol
+    },
   },
   methods: {
+    /**
+     * fctを別のファイルに切り替えて初期化
+     * @param fctName
+     * @returns {Promise<void>}
+     */
+    async setNewFct(fctName){
+      const res = window.confirm('this will delete and initialize data. is it ok?')
+      if (res){
+        await this.$store.dispatch('fire/updateFctId', fctName)
+        const user = JSON.parse(JSON.stringify(this.$store.state.fire.myApp.user))
+        await this.$store.dispatch('fire/fireResetAppdata', user).catch((err) => {throw err})
+        await this.$router.push('/')
+      }
+    },
     /**
      * dataJsonをfirebaseに登録
      * @returns {Promise<void>}
@@ -155,7 +203,6 @@ export default {
      * @returns {Promise<void>}
      */
     async getData(myCollection, myDoc){
-      console.log('here')
       const ref = await doc(firestoreDb, myCollection, myDoc)
       await getDoc(ref).then((doc) => {
         if (doc.exists()) {
