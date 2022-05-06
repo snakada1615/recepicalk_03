@@ -8,11 +8,16 @@
     >
       <div class="d-flex flex-row align-items-center">
         <div>collection</div>
-        <b-input v-model="collection2" placeholder="Enter collection name" class="my-1 mx-1"/></div>
+        <b-select v-model="collection2" :options="collectionList" class="my-1 mx-1"/></div>
       <div class="d-flex flex-row align-items-center">
         <div>document</div>
         <b-input v-model="dbName2" placeholder="Enter doc name" class="my-1 mx-1"/></div>
-      <b-button @click="getData(collection2, dbName2)" class="my-1">load</b-button>
+      <b-button @click="getData(collection2, dbName2)" class="my-1">load from firebase</b-button>
+    </b-card>
+    <b-card v-if="dataFire" bg-variant="light">
+      <json-viewer
+        :value="dataFire"
+      />
     </b-card>
     <b-card
       header="Load data from CSV and import to firebase"
@@ -20,9 +25,10 @@
       header-text-variant="light"
       class="my-2"
     >
+      <csv-import :show-data="false" @getCsv="dataCsv=$event" class="my-1"></csv-import>
       <div class="d-flex flex-row align-items-center">
         <div>collection</div>
-        <b-input v-model="collection1" placeholder="Enter collection name" class="my-1 mx-1"/>
+        <b-select v-model="collection1" :options="collectionList" class="my-1 mx-1"/>
       </div>
       <div class="d-flex flex-row align-items-center">
         <div>document</div>
@@ -30,16 +36,24 @@
       <div class="d-flex flex-row align-items-center">
         <div>index_Col</div>
         <b-input v-model="keyCol" placeholder="Enter key column" class="my-1 mx-1"/></div>
-      <csv-import :show-data="false" @getCsv="dataCsv=$event" class="my-1"></csv-import>
       <b-button @click="insertData(collection1, dbName1, dataJson)" class="my-1">import to firebase</b-button>
     </b-card>
-    <b-card v-if="dataJson">
+    <b-card v-if="dataJson" bg-variant="light">
       <json-viewer
         :value="dataJson"
       />
     </b-card>
-    <b-card>
-      {{dataJson}}
+    <b-card
+      header="get fileLlist from firebase"
+      header-bg-variant="success"
+      header-text-variant="light"
+      class="my-2"
+    >
+      <div class="d-flex flex-row align-items-center">
+        <div>collection</div>
+        <b-select v-model="collection3" :options="collectionList" class="my-1 mx-1"/></div>
+      <b-button @click="getFileList(collection3)">file list</b-button>
+      <div><span v-html="myListHtml"></span></div>
     </b-card>
   </b-container>
 </template>
@@ -47,7 +61,7 @@
 <script>
 import csvImport from "@/components/molecules/csvImport";
 import {firestoreDb} from "~/plugins/firebasePlugin";
-import {doc, getDoc, setDoc} from "firebase/firestore";
+import {doc, getDoc, setDoc, collection, getDocs} from "firebase/firestore";
 import JsonViewer from 'vue-json-viewer'
 
 export default {
@@ -57,6 +71,11 @@ export default {
   },
   data() {
     return {
+      collectionList:[
+        {value:'dataset', text: 'dataset'},
+        {value:'users', text: 'user data'},
+      ],
+      myList:[],
       /**
        * csvファイルから読み込んだデータ本体
        */
@@ -85,6 +104,10 @@ export default {
        * firebaseから読み込んだデータ本体
        */
       dataFire:'',
+      /**
+       * コレクション名(firebaseからの読み込み用)
+       */
+      collection3:'',
     }
   },
   computed:{
@@ -100,6 +123,13 @@ export default {
         if (myKey !== ""){
           res[myKey] = val
         }
+      })
+      return res
+    },
+    myListHtml: function(){
+      let res = ''
+      this.myList.forEach(function(item){
+        res += '<div>' + item + '<div>'
       })
       return res
     }
@@ -125,14 +155,23 @@ export default {
      * @returns {Promise<void>}
      */
     async getData(myCollection, myDoc){
+      console.log('here')
       const ref = await doc(firestoreDb, myCollection, myDoc)
       await getDoc(ref).then((doc) => {
         if (doc.exists()) {
           this.dataFire = doc.data()
+
         } else {
           alert('id does not match')
         }
       })
+    },
+    async getFileList(myCollection){
+      const querySnapshot = await getDocs(collection(firestoreDb, myCollection));
+      this.myList.length = 0
+      querySnapshot.forEach((doc) => {
+        this.myList.push(doc.id)
+      });
     }
   }
 }
