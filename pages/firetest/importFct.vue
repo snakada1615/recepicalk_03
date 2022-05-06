@@ -1,5 +1,6 @@
 <template>
   <b-container>
+    <!--   現在firestoreに含まれるドキュメントを抽出     -->
     <b-card
       header="Load data from firebase"
       header-bg-variant="success"
@@ -8,17 +9,20 @@
     >
       <div class="d-flex flex-row align-items-center">
         <div>collection</div>
-        <b-select v-model="collection2" :options="collectionList" class="my-1 mx-1"/></div>
+        <b-select v-model="collection2" :options="collectionList" class="my-1 mx-1"/>
+      </div>
       <div class="d-flex flex-row align-items-center">
         <div>document</div>
-        <b-input v-model="dbName2" placeholder="Enter doc name" class="my-1 mx-1"/></div>
-      <div  class="d-flex flex-row align-items-center">
+        <b-input v-model="dbName2" placeholder="Enter doc name" class="my-1 mx-1"/>
+      </div>
+      <div class="d-flex flex-row align-items-center">
         <b-button @click="getData(collection2, dbName2)" class="my-1 mx-1">load from firebase</b-button>
         <b-button
           @click="setNewFct(dbName2)"
           class="my-1 mx-1"
-          :disabled = "!dataFire"
-        >use this FCT</b-button>
+          :disabled="!dataFire"
+        >use this FCT
+        </b-button>
       </div>
     </b-card>
     <b-card v-if="dataFire" bg-variant="light">
@@ -26,6 +30,8 @@
         :value="dataFire"
       />
     </b-card>
+
+    <!--  csvを読み込んでfireStoreに登録  -->
     <b-card
       header="Load data from CSV and import to firebase"
       header-bg-variant="success"
@@ -39,23 +45,28 @@
       </div>
       <div class="d-flex flex-row align-items-center">
         <div>document</div>
-        <b-input v-model="dbName1" placeholder="Enter doc name" class="my-1 mx-1"/></div>
+        <b-input v-model="dbName1" placeholder="Enter doc name" class="my-1 mx-1"/>
+      </div>
       <div class="d-flex flex-row align-items-center">
         <div>index_Col</div>
-        <b-input v-model="keyCol" placeholder="Enter key column" class="my-1 mx-1"/></div>
+        <b-input v-model="keyCol" placeholder="Enter key column" class="my-1 mx-1"/>
+      </div>
       <b-button
         @click="insertData(collection1, dbName1, dataJson)"
         class="my-1"
         :disabled="!importOk"
-      >import to firebase</b-button>
+      >import to firebase
+      </b-button>
     </b-card>
     <b-card v-if="dataJson" bg-variant="light">
       <json-viewer
         :value="dataJson"
       />
-      <div>{{'データはFCTに適合して'+(fctValidate ? 'います':'いません')}}</div>
+      <div>{{ 'データはFCTに適合して' + (fctValidate ? 'います' : 'いません') }}</div>
       <div v-if="!fctValidate">足りない要素は、コンソールを確認してください</div>
     </b-card>
+
+    <!--  指定したコレクション内に含まれるドキュメントの一覧  -->
     <b-card
       header="get fileList from firebase"
       header-bg-variant="success"
@@ -64,7 +75,8 @@
     >
       <div class="d-flex flex-row align-items-center">
         <div>collection</div>
-        <b-select v-model="collection3" :options="collectionList" class="my-1 mx-1"/></div>
+        <b-select v-model="collection3" :options="collectionList" class="my-1 mx-1"/>
+      </div>
       <b-button @click="getFileList(collection3)">file list</b-button>
       <div><span v-html="myListHtml"></span></div>
     </b-card>
@@ -88,77 +100,82 @@ export default {
       /**
        * アプリで利用するデータベースのcollection一覧（form-selectで利用）
        */
-      collectionList:[
-        {value:'dataset', text: 'dataset'},
-        {value:'users', text: 'user data'},
+      collectionList: [
+        {value: 'dataset', text: 'dataset'},
+        {value: 'users', text: 'user data'},
       ],
       /**
        * collectionの下に登録されたdocumentの一覧
        */
-      myList:[],
+      myList: [],
       /**
        * csvファイルから読み込んだデータ本体
        */
-      dataCsv:'',
+      dataCsv: '',
       /**
        * コレクション名(csv登録用)
        */
-      collection1:'',
+      collection1: '',
       /**
        * ドキュメント名(csv登録用)
        */
-      dbName1:'',
+      dbName1: '',
       /**
        * コレクション名(firebaseからの読み込み用)
        */
-      collection2:'',
+      collection2: '',
       /**
        * ドキュメント名(firebaseからの読み込み用)
        */
-      dbName2:'',
+      dbName2: '',
       /**
        * キーフィールドの指定
        */
-      keyCol:'',
+      keyCol: '',
       /**
        * firebaseから読み込んだデータ本体
        */
-      dataFire:'',
+      dataFire: '',
       /**
        * コレクション名(firebaseからの読み込み用)
        */
-      collection3:'',
+      collection3: '',
     }
   },
-  computed:{
+  computed: {
     /**
      * dataCsvをJsonに変換
      * @returns {{}}
      */
-    dataJson:function () {
-      if (this.dataCsv.length === 0) { return }
+    dataJson: function () {
+      if (this.dataCsv.length === 0) {
+        return
+      }
       const res = {}
-      this.dataCsv.forEach((val)=>{
+      this.dataCsv.forEach((val) => {
         const myKey = val[this.keyCol]
-        if (myKey !== ""){
+        if (myKey !== "") {
           res[myKey] = val
         }
       })
       return res
     },
-    myListHtml: function(){
+    /**
+     * myListをhtmlに変換
+     * @returns {string}
+     */
+    myListHtml: function () {
       let res = ''
-      this.myList.forEach(function(item){
+      this.myList.forEach(function (item) {
         res += '<div>' + item + '<div>'
       })
       return res
     },
     /**
      * 読み込んだCSVがFCTの構造に必要なフィールドを含んでいるか検証
-     * @param dat CSVの一行目のObjectを渡す
      * @returns {boolean}
      */
-    fctValidate:function(){
+    fctValidate: function () {
       return validateFct(this.dataCsv[0])
     },
     /**
@@ -174,12 +191,14 @@ export default {
      * @param fctName
      * @returns {Promise<void>}
      */
-    async setNewFct(fctName){
+    async setNewFct(fctName) {
       const res = window.confirm('this will delete and initialize data. is it ok?')
-      if (res){
+      if (res) {
         await this.$store.dispatch('fire/updateFctId', fctName)
         const user = JSON.parse(JSON.stringify(this.$store.state.fire.myApp.user))
-        await this.$store.dispatch('fire/fireResetAppdata', user).catch((err) => {throw err})
+        await this.$store.dispatch('fire/fireResetAppdata', user).catch((err) => {
+          throw err
+        })
         await this.$router.push('/')
       }
     },
@@ -187,22 +206,24 @@ export default {
      * dataJsonをfirebaseに登録
      * @returns {Promise<void>}
      */
-    async insertData(myCollection, myDoc, myDat){
-      if (this.dbName === '' || this.dataCsv.length === 0){ return }
+    async insertData(myCollection, myDoc, myDat) {
+      if (this.dbName === '' || this.dataCsv.length === 0) {
+        return
+      }
       const ref = doc(firestoreDb, myCollection, myDoc)
       await setDoc(ref,
         myDat
       ).catch(error => {
         throw error
-      }).then(()=>{
-        console.log("import complete: "+this.dbName)
+      }).then(() => {
+        console.log("import complete: " + this.dbName)
       })
     },
     /**
      * collection, dbNameで指定したドキュメントをfirebaseから読み込み
      * @returns {Promise<void>}
      */
-    async getData(myCollection, myDoc){
+    async getData(myCollection, myDoc) {
       const ref = await doc(firestoreDb, myCollection, myDoc)
       await getDoc(ref).then((doc) => {
         if (doc.exists()) {
@@ -213,7 +234,12 @@ export default {
         }
       })
     },
-    async getFileList(myCollection){
+    /**
+     * 指定するコレクションに含まれるドキュメントの一覧を抽出
+     * @param myCollection
+     * @returns {Promise<void>}
+     */
+    async getFileList(myCollection) {
       const querySnapshot = await getDocs(collection(firestoreDb, myCollection));
       this.myList.length = 0
       querySnapshot.forEach((doc) => {

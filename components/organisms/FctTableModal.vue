@@ -1,8 +1,9 @@
 <template>
   <b-modal
+    v-model="showModalComputed"
     :id="myName"
     :title="myModalHeader"
-    :static="true"
+    static
     @ok="clickOk"
     @cancel="clickCancel"
     hide-header
@@ -30,10 +31,30 @@
       },
       myModalHeader: {
         type: String,
+        required: true
       },
       items:{
         type:Array,
+        required: true
       },
+      /**
+       * モーダルの表示用トリガー
+       */
+      showModal:{
+        type: Boolean,
+        default: false,
+        required: true
+      }
+    },
+    computed: {
+      showModalComputed: {
+        get(){
+          return this.showModal
+        },
+        set(val){
+          this.$emit('update:showModal', val)
+        }
+      }
     },
     data(){
       return {

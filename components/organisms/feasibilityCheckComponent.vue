@@ -1,5 +1,6 @@
 <template>
   <b-container class="px-0" style="max-width: 540px;">
+    <!--   ページ情報とページの切り替え   -->
     <b-row class="mt-2">
       <b-col class="mx-0 mb-0 py-2 bg-dark rounded text-light font-weight-bold">
         Feasibility assessment result
@@ -17,6 +18,8 @@
         </div>
       </b-col>
     </b-row>
+
+    <!--  作物の選択パネル -->
     <b-row>
       <b-col class="px-0 mx-0">
         <b-card
@@ -42,6 +45,8 @@
             </b-col>
           </b-row>
         </b-card>
+
+        <!--   スコアの総括票     -->
         <b-card
           style="min-width: 530px;"
           header-bg-variant="success"
@@ -75,6 +80,8 @@
         </b-card>
       </b-col>
     </b-row>
+
+    <!--  ここから質問項目のはじまり  -->
     <b-row class="mt-2">
       <b-col class="mx-0 mb-0 py-2 bg-dark rounded text-light font-weight-bold">
         Feasibility questions
@@ -82,6 +89,11 @@
     </b-row>
     <b-row>
       <b-col class="px-0 mx-0">
+
+        <!--
+　        qaListの項目に沿って質問と回答一案（ドロップダウン）を表示
+  　      項目のインデックスが0の時だけNutritionBarを表示
+           -->
         <b-card
           v-for="(qaGroup, index) in qaList"
           :key="index"
@@ -93,6 +105,7 @@
           <template #header>
             <div>{{ qaGroup.categoryText }}</div>
           </template>
+          <!--    質問番号が0の場合に以下の項目を表示      -->
           <div v-show="index===0" class="mb-2">
             <dri-select-single
               :driItems="itemsDRI"
@@ -139,6 +152,7 @@
     <FctTableModal
       my-name="modalTest"
       my-modal-header="Food Composition Table"
+      :show-modal.sync="showFct"
       :items="items"
       @modalOk="onItemSelected"
     ></FctTableModal>
@@ -338,7 +352,7 @@ export default {
       this.$emit('update:myApp', res)
     },
     showDialogue() {
-      this.$bvModal.show('modalTest')
+      this.showFct = !this.showFct
     },
     /**
      * カテゴリ毎のスコアを集計して戻す
@@ -493,6 +507,10 @@ export default {
        * ページメモ
        */
       pageMemo: '',
+      /**
+       * fctTableModal表示用のフラグ
+       */
+      showFct: false,
       /**
        * 質問と回答一覧
        */

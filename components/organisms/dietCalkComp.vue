@@ -77,32 +77,20 @@
       <b-col>
         <b-button
           @click="showDriSelect = !showDriSelect"
-          :pressed="showDriSelect"
           variant="info"
         >set target
         </b-button>
         <b-button
-          @click="$bvModal.show('fctModal')"
+          @click="showFct = !showFct"
           variant="info"
         >add crop
         </b-button>
       </b-col>
     </b-row>
-    <b-row>
-      <b-col>
-        <dri-select-all
-          v-show="showDriSelect"
-          :targetSwitch.sync="myAppWatcher.menuCases[pageIdComputed].isTargetSingle"
-          :max="maxPopulation"
-          :driPopulations="myAppWatcher.menuCases[pageIdComputed].target"
-          :driItems="myAppWatcher.dataSet.dri"
-          @update:target="updateDemand"
-        ></dri-select-all>
-      </b-col>
-    </b-row>
     <FctTableModal
       my-name="fctModal"
       my-modal-header="Food Composition Table"
+      :show-modal.sync="showFct"
       :items="myAppWatcher.dataSet.fct"
       @modalOk="onFctClick"
     ></FctTableModal>
@@ -114,6 +102,16 @@
       v-model="value_model"
       @modalOk="addSupply"
     />
+    <dri-select-modal
+      my-modal-header="nutrition target"
+      my-name="driModal"
+      :show-modal.sync="showDriSelect"
+      :targetSwitch.sync="myAppWatcher.menuCases[pageIdComputed].isTargetSingle"
+      :max="maxPopulation"
+      :driPopulations="myAppWatcher.menuCases[pageIdComputed].target"
+      :driItems="myAppWatcher.dataSet.dri"
+      @update:target="updateDemand"
+    />
   </b-container>
 </template>
 
@@ -124,6 +122,7 @@ import recepiTable from "@/components/molecules/recepiTable"
 import FctTableModal from "@/components/organisms/FctTableModal.vue";
 import foodModal from "@/components/molecules/foodModal"
 import nutritionBar from "@/components/molecules/nutritionBar"
+import driSelectModal from "@/components/organisms/driSelectModal";
 import {validateMyApp} from "@/plugins/helper";
 
 /**
@@ -137,7 +136,8 @@ export default {
     FctTableModal,
     recepiTable,
     foodModal,
-    nutritionBar
+    nutritionBar,
+    driSelectModal
   },
   data() {
     return {
@@ -189,6 +189,10 @@ export default {
        * driSelectAll表示用のフラグ
        */
       showDriSelect: false,
+      /**
+       * fctTableModal表示用のフラグ
+       */
+      showFct: false,
       /**
        * modal表示用のフラグ
        */
