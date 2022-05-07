@@ -34,6 +34,6 @@ fireSaveAppdata(): void
 **Syntax**
 
 ```typescript
-resetData(): void
+async resetData(): Promise
 ```
 

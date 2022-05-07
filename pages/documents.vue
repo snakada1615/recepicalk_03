@@ -16,36 +16,12 @@
         <b-card bg-variant="light" class="mb-2">
           <div>データ更新は以下のコマンド：</div>
           <div>vuedoc.md components/*/*.vue --output static/docs/</div>
+          <div>find *.md > filelist.txt　（docs.command参照）</div>
         </b-card>
-        <div v-if="link1">
-          <markdown-it-vue class="md-body" :content="content[0]" />
-        </div>
-        <div v-if="link2">
-          <markdown-it-vue class="md-body" :content="content[1]" />
-        </div>
-        <div v-if="link3">
-          <markdown-it-vue class="md-body" :content="content[2]" />
-        </div>
-        <div v-if="link4">
-          <markdown-it-vue class="md-body" :content="content[3]" />
-        </div>
-        <div v-if="link5">
-          <markdown-it-vue class="md-body" :content="content[4]" />
-        </div>
-        <div v-if="link6">
-          <markdown-it-vue class="md-body" :content="content[5]" />
-        </div>
-        <div v-if="link7">
-          <markdown-it-vue class="md-body" :content="content[6]" />
-        </div>
-        <div v-if="link8">
-          <markdown-it-vue class="md-body" :content="content[7]" />
-        </div>
-        <div v-if="link9">
-          <markdown-it-vue class="md-body" :content="content[8]" />
-        </div>
-        <div v-if="link10">
-          <markdown-it-vue class="md-body" :content="content[9]" />
+        <div v-for="index in content.length">
+          <div v-if="selected === index-1">
+            <markdown-it-vue class="md-body" :content="content[index-1]" />
+          </div>
         </div>
       </b-col>
     </b-row>
@@ -55,6 +31,7 @@
 <script>
 import MarkdownItVue from 'markdown-it-vue'
 import 'markdown-it-vue/dist/markdown-it-vue.css'
+import axios from 'axios'
 
 
 export default {
@@ -63,76 +40,40 @@ export default {
   },
   data() {
     return {
-      selected: 'first',
-      options: [
-        { text: 'driSelectAll', value: 1 },
-        { text: 'driSelectMulti', value: 2 },
-        { text: 'driSelectSingle', value: 3 },
-        { text: 'fctTable', value: 4 },
-        { text: 'fctTableModal', value: 5 },
-        { text: 'foodModal', value: 6 },
-        { text: 'nutritionBar', value: 7 },
-        { text: 'recepiTable', value: 8 },
-        { text: 'csvImport', value: 9 },
-        { text: 'navBar', value: 10 }
-      ],
-      content:[],
-      myMarkDown:[
-        '../docs/driSelectAll.md',
-        '../docs/driSelectMulti.md',
-        '../docs/driSelectSingle.md',
-        '../docs/fctTable.md',
-        '../docs/fctTableModal.md',
-        '../docs/foodModal.md',
-        '../docs/nutritionBar.md',
-        '../docs/recepiTable.md',
-        '../docs/csvImport.md',
-        '../docs/navBar.md'
-      ],
+      selected: 0,
     }
   },
-  computed:{
-    link1:function () {
-      return this.selected === 1
-    },
-    link2:function () {
-      return this.selected === 2
-    },
-    link3:function () {
-      return this.selected === 3
-    },
-    link4:function () {
-      return this.selected === 4
-    },
-    link5:function () {
-      return this.selected === 5
-    },
-    link6:function () {
-      return this.selected === 6
-    },
-    link7:function () {
-      return this.selected === 7
-    },
-    link8:function () {
-      return this.selected === 8
-    },
-    link9:function () {
-      return this.selected === 9
-    },
-    link10:function () {
-      return this.selected === 10
+  async asyncData() {
+    let myMarkDownTemp = []
+    let optionsTemp = []
+    let contentsTemp = []
+    async function getAxios(val){
+      const res = await axios.get(val, { baseURL: window.location.origin })
+      return res.data
     }
-  },
-  async mounted() {
-    for (let i = 0; i < this.myMarkDown.length; i++){
-      this.content[i] = await this.getAxios(this.myMarkDown[i])
+    await getAxios('../docs/filelist.txt').then(async (val)=>{
+      myMarkDownTemp.length = 0
+      optionsTemp.length = 0
+      val.split(/\r\n|\n/).forEach((item, index)=>{
+        if (item){
+          myMarkDownTemp.push('../docs/' + item)
+          optionsTemp.push({
+            'text': item,
+            'value': index
+          })
+        }
+      })
+      for (let i = 0; i < myMarkDownTemp.length; i++){
+        contentsTemp[i] = await getAxios(myMarkDownTemp[i])
+      }
+    })
+    return {
+      myMarkDown: myMarkDownTemp,
+      options: optionsTemp,
+      content: contentsTemp,
     }
   },
   methods: {
-    async getAxios(val){
-      const res = await this.$axios.get(val, { baseURL: window.location.origin })
-      return res.data
-    }
   }
 }
 </script>

@@ -2,11 +2,12 @@
 
 ## Props
 
-| Name                 | Type     | Description |
-| -------------------- | -------- | ----------- |
-| `my-name` *required* | `String` |             |
-| `my-modal-header`    | `String` |             |
-| `items`              | `Array`  | &nbsp;      |
+| Name                         | Type      | Description  | Default |
+| ---------------------------- | --------- | ------------ | ------- |
+| `my-name` *required*         | `String`  |              |         |
+| `my-modal-header` *required* | `String`  |              |         |
+| `items` *required*           | `Array`   |              |         |
+| `show-modal` *required*      | `Boolean` | モーダルの表示用トリガー | `false` |
 
 ## Data
 
@@ -14,12 +15,19 @@
 | -------------- | -------- | ----------- | ------------- |
 | `selectedItem` | `string` |             | `""`          |
 
+## Computed Properties
+
+| Name                | Type      | Description                   |
+| ------------------- | --------- | ----------------------------- |
+| `showModalComputed` | `unknown` | **Dependencies:** `showModal` |
+
 ## Events
 
-| Name      | Description                                                         |
-| --------- | ------------------------------------------------------------------- |
-| `click`   | <br/>**Arguments**<br/><ul><li>**`rec: unknown`**</li></ul>         |
-| `modalOk` | <br/>**Arguments**<br/><ul><li>**`selectedItem: string`**</li></ul> |
+| Name               | Description                                                         |
+| ------------------ | ------------------------------------------------------------------- |
+| `update:showModal` | <br/>**Arguments**<br/><ul><li>**`val: unknown`**</li></ul>         |
+| `click`            | <br/>**Arguments**<br/><ul><li>**`rec: unknown`**</li></ul>         |
+| `modalOk`          | <br/>**Arguments**<br/><ul><li>**`selectedItem: string`**</li></ul> |
 
 ## Methods
 

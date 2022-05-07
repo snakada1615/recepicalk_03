@@ -2,37 +2,38 @@
 
 ## Props
 
-| Name                | Type    | Description             | Default                     |
-| ------------------- | ------- | ----------------------- | --------------------------- |
-| `target` *required* | `Array` | value: null,            | `() => [{id: 0, count: 1}]` |
-| `items` *required*  | `Array` | list of DRI information | &nbsp;                      |
+| Name                   | Type    | Description             |
+| ---------------------- | ------- | ----------------------- |
+| `target` *required*    | `Array` | value: null,            |
+| `dri-items` *required* | `Array` | list of DRI information |
 
 ## Data
 
-| Name        | Type     | Description | Initial value                                                          |
-| ----------- | -------- | ----------- | ---------------------------------------------------------------------- |
-| `fields1`   | `array`  |             | `[ {key: 'Item', sortable: false}, {key: 'Value', sortable: false}, ]` |
-| `targetPop` | `number` |             | `0`                                                                    |
-| `tableDri`  | `array`  |             | `[]`                                                                   |
+| Name          | Type     | Description | Initial value                                                          |
+| ------------- | -------- | ----------- | ---------------------------------------------------------------------- |
+| `fields1`     | `array`  |             | `[ {key: 'Item', sortable: false}, {key: 'Value', sortable: false}, ]` |
+| `targetGroup` | `number` |             | `0`                                                                    |
+| `tableDri`    | `array`  |             | `[]`                                                                   |
 
 ## Computed Properties
 
-| Name      | Type      | Description               |
-| --------- | --------- | ------------------------- |
-| `options` | `unknown` | **Dependencies:** `items` |
+| Name      | Type      | Description                  |
+| --------- | --------- | ---------------------------- |
+| `options` | `unknown` | **Dependencies:** `driItems` |
 
 ## Events
 
-| Name                   | Description                                                                                                                                                                                                                               |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `changeNutritionValue` | 必要栄養量の更新を親コンポーネントに通知<br/>**Arguments**<br/><ul><li>**`{total: res2, target: this.target}: object`**</li></ul>                                                                                                                             |
-| `update:target`        | <br/>**Arguments**<br/><ul><li>**`this.items.map(function(dat){         let count = 0         if (Number(dat.id) === Number(val)){           count = 1         }         return {id: dat.id, count: count}       }): unknown`**</li></ul> |
+| Name                   | Description                                                                                                                                                                                                                                  |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `changeNutritionValue` | 必要栄養量の更新を親コンポーネントに通知<br/>**Arguments**<br/><ul><li>**`{total: res2, target: this.target}: object`**</li></ul>                                                                                                                                |
+| `update:target`        | <br/>**Arguments**<br/><ul><li>**`this.driItems.map(function(dat){         let count = 0         if (Number(dat.id) === Number(val)){           count = 1         }         return {id: dat.id, count: count}       }): unknown`**</li></ul> |
 
 ## Methods
 
 ### updateAllTable()
 
-targetプロパティの更新時に内部変数 (tablePop, tableDri)を更新
+targetプロパティの更新時に内部変数 (targetGroup, tablePop,
+tableDri)を更新
 
 **Syntax**
 
@@ -86,7 +87,7 @@ updateTablePop(driValue: unknown, targetValue: unknown): any
   DRIの一覧表
 
 - `targetValue: unknown`<br/>
-  各グループの対象人数のリスト
+  選ばれたグループのid
 
 **Return value**
 
