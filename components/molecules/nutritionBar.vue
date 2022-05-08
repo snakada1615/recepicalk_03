@@ -5,7 +5,7 @@
         <div>{{ label }}</div>
       </b-col>
       <b-col :cols="colWidthSecond" class="px-0 d-flex justify-content-center">
-        <div v-show="showMaxNumber" >{{ maxRatingAbsolute }}</div>
+        <div v-show="showMaxNumber" >{{ maxRatingAbsoluteComputed }}</div>
       </b-col>
       <b-col class="px-0 d-flex justify-content-start">
         <fa-rating :glyph="myicon"
@@ -34,6 +34,7 @@
   import {FaRating} from 'vue-rate-it';
   import stop from 'vue-rate-it/glyphs/stop';
   import navicon from 'vue-rate-it/glyphs/navicon';
+
 
   export default {
     components: {
@@ -99,6 +100,14 @@
         default: 0
       },
       /**
+       * maxRatingAbsoluteの桁数設定
+       *     10の倍数（1,10,100,0.1,0.01,0.001）で指定
+       */
+      digitMaxRatingAbsolute: {
+        type: Number,
+        default: 1
+      },
+      /**
        * labelを表示するための列幅
        */
       colWidthFirst: {
@@ -118,10 +127,24 @@
         myicon: '', // declare the icon
       }
     },
+    computed: {
+      maxRatingAbsoluteComputed(){
+        return this.orgRound(this.maxRatingAbsolute, this.digitMaxRatingAbsolute)
+      }
+    },
     created() {
       this.myicon = stop
     },
     methods: {
+      /**
+       * 任意の桁で四捨五入する関数
+       * @param {number} value 四捨五入する数値
+       * @param {number} base どの桁で四捨五入するか（10→10の位、0.1→小数第１位）
+       * @return {number} 四捨五入した値
+       */
+      orgRound(value, base) {
+        return Math.round(value * base) / base;
+      },
       /**
        * rating表示用のアイコンの設定
        * @param index
