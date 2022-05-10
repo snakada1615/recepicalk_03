@@ -85,7 +85,10 @@ export const state = () => ({
     /**
      * 最後に保存した日時
      */
-    saveDate: '',
+    saveDate: {
+      jsDate:0,
+      date:''
+    },
   },
   /**
    * ログイン状態のフラグ
@@ -135,6 +138,15 @@ export const getters = {
 
 export const mutations = {
   /**
+   * 保存した日付を記録
+   * @param state
+   */
+  updateSaveDate: function(state){
+    let time = Date.now()
+    state.myApp.saveDate.jsDate = time
+    state.myApp.saveDate.date = Date(time)
+  },
+  /**
    * fctIdを更新
    * @param state
    * @param payload
@@ -176,7 +188,7 @@ export const mutations = {
     state.myApp.dataSet.dri = []
     state.myApp.menuCases = []
     state.myApp.feasibilityCases = []
-    state.myApp.saveDate = ''
+    state.myApp.saveDate = {}
     state.hasMyAppLoaded = false
   },
   /**
@@ -270,6 +282,13 @@ export const mutations = {
   }
 }
 export const actions = {
+  /**
+   * 保存した日付を記録
+   * @param state
+   */
+  updateSaveDate({commit}){
+    commit('updateSaveDate')
+  },
   /**
    * FctIdを更新
    * @param commit
@@ -541,6 +560,7 @@ export const actions = {
   /**
    * fctの初期データをdataset/fct01から読み込んでstoreに反映
    *     データが存在しない場合はエラー
+   * @param state
    * @param commit
    * @param dispatch
    * @returns {Promise<void>}
@@ -560,6 +580,7 @@ export const actions = {
    *     データが存在しない場合はエラー
    * @param commit
    * @param dispatch
+   * @param state
    * @returns {Promise<void>}
    */
   async initDri({commit, dispatch, state}) {
@@ -719,6 +740,7 @@ export const actions = {
    * @returns {Promise<void>}
    */
   async fireSaveAppdata({state, dispatch}) {
+    dispatch('updateSaveDate')
     const ref = doc(firestoreDb, 'users', state.myApp.user.uid)
     setDoc(ref, state.myApp).catch((err) => {
       throw new Error('Error in fireSaveAppdata:' + err)

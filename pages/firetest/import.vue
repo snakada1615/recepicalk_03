@@ -38,9 +38,12 @@
         <b-input v-model="keyCol" placeholder="Enter key column" class="my-1 mx-1"/></div>
       <b-button @click="insertData(collection1, dbName1, dataJson)" class="my-1">import to firebase</b-button>
     </b-card>
-    <b-card v-if="dataJson" bg-variant="light">
+    <b-card>
+      {{dataCsv}}
+    </b-card>
+    <b-card v-if="dataJson2" bg-variant="light">
       <json-viewer
-        :value="dataJson"
+        :value="dataJson2"
       />
     </b-card>
     <b-card
@@ -125,6 +128,26 @@ export default {
         }
       })
       return res
+    },
+    dataJson2:function () {
+      if (this.dataCsv.length === 0) { return }
+      let parent = {}
+      let child = {}
+      let grandChild = {}
+/*
+      this.dataCsv.reduce((acc, rowItem)=>({
+        ...acc, ['parent1']: rowItem[]
+      }), {})
+*/
+      this.dataCsv.forEach((rowItem)=>{
+        const key1 = rowItem[0]
+        const key2 = rowItem[1]
+        grandChild['name'] = rowItem[2]
+        child[key2] = Object.assign({}, child[key2], rowItem)
+        parent[key1] = Object.assign({}, parent[key1], child[key2])
+        //res = Object.assign({}, res, {'rowItem[0]': { 'rowItem[1]' : 'rowItem[3]'}})
+      })
+      return parent
     },
     myListHtml: function(){
       let res = ''
