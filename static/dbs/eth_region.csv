@@ -1,0 +1,841 @@
+﻿region1,region2,region3
+Oromia,Addis Ababa,Addis Ketema
+Oromia,Addis Ababa,Akaki - Kalit
+Oromia,Addis Ababa,Arada
+Oromia,Addis Ababa,Bole
+Oromia,Addis Ababa,Gulele
+Oromia,Addis Ababa,Kirkos
+Oromia,Addis Ababa,Kolfe - Keran
+Oromia,Addis Ababa,Lideta
+Oromia,Addis Ababa,Nefas Silk
+Oromia,Addis Ababa,Yeka
+SNNPR,Alaba Special,Halaba
+SNNPR,Alaba Special,Halaba Town
+SNNPR,Amaro Special,Amaro
+SNNPR,Basketo Special,Basketo
+SNNPR,Bench Maji,Bero
+SNNPR,Bench Maji,Debub Bench
+SNNPR,Bench Maji,Guraferda
+SNNPR,Bench Maji,Maji
+SNNPR,Bench Maji,Meinit Goldeya
+SNNPR,Bench Maji,Meinit Shasha
+SNNPR,Bench Maji,Mizan Aman Town
+SNNPR,Bench Maji,Semen Bench
+SNNPR,Bench Maji,Shay Bench
+SNNPR,Bench Maji,Sheko
+SNNPR,Bench Maji,Surma
+SNNPR,Burji Special,Burji
+SNNPR,Dawro,Genabosa
+SNNPR,Dawro,Isara
+SNNPR,Dawro,Loma
+SNNPR,Dawro,Mareka
+SNNPR,Dawro,Tercha Town
+SNNPR,Dawro,Tocha
+SNNPR,Derashe Special,Derashe
+SNNPR,Gamo Gofa,Abobo
+SNNPR,Gamo Gofa,Arba Minch Town
+SNNPR,Gamo Gofa,Arba Minch Zuriya
+SNNPR,Gamo Gofa,Ayida
+SNNPR,Gamo Gofa,Bonke
+SNNPR,Gamo Gofa,Boreda
+SNNPR,Gamo Gofa,Chencha
+SNNPR,Gamo Gofa,Demba Gofa
+SNNPR,Gamo Gofa,Deramalo
+SNNPR,Gamo Gofa,Dita
+SNNPR,Gamo Gofa,Gezegofa
+SNNPR,Gamo Gofa,Kemba
+SNNPR,Gamo Gofa,Kucha
+SNNPR,Gamo Gofa,Melekoza
+SNNPR,Gamo Gofa,Merab Abaya
+SNNPR,Gamo Gofa,Sawla Town
+SNNPR,Gamo Gofa,Uba Debre Tsehay
+SNNPR,Gedeo,Bule
+SNNPR,Gedeo,Dila Town
+SNNPR,Gedeo,Dila Zuria
+SNNPR,Gedeo,Gedeb
+SNNPR,Gedeo,Kochire
+SNNPR,Gedeo,Wenago
+SNNPR,Gedeo,Yergachefe Town
+SNNPR,Gedeo,Yirgachefe Woreda
+SNNPR,Gurage,Abeshge
+SNNPR,Gurage,Butajira Town
+SNNPR,Gurage,Cheha
+SNNPR,Gurage,Endegagn
+SNNPR,Gurage,Enemorna Ener
+SNNPR,Gurage,Ezha
+SNNPR,Gurage,Gedebano Gutazer Wellene
+SNNPR,Gurage,Geta
+SNNPR,Gurage,Gumer
+SNNPR,Gurage,Kebena
+SNNPR,Gurage,Mareko
+SNNPR,Gurage,Mesekan
+SNNPR,Gurage,Muhor Na Aklil
+SNNPR,Gurage,Sodo
+SNNPR,Gurage,Welkite Town
+SNNPR,Hadiya,Analimo
+SNNPR,Hadiya,Duna
+SNNPR,Hadiya,Gibe
+SNNPR,Hadiya,Gomibora
+SNNPR,Hadiya,Hosaena Town
+SNNPR,Hadiya,Lemo
+SNNPR,Hadiya,Merab Badwacho
+SNNPR,Hadiya,Misha
+SNNPR,Hadiya,Misrak Badawacho
+SNNPR,Hadiya,Shashago
+SNNPR,Hadiya,Soro
+SNNPR,Hawassa City Transitional Administration,Hawassa City Administration
+SNNPR,Keffa,Adyo
+SNNPR,Keffa,Bitta
+SNNPR,Keffa,Bonga Town
+SNNPR,Keffa,Chena
+SNNPR,Keffa,Cheta
+SNNPR,Keffa,Decha
+SNNPR,Keffa,Gesha Deka
+SNNPR,Keffa,Gewata
+SNNPR,Keffa,Gimbo
+SNNPR,Keffa,Sayilem
+SNNPR,Keffa,Telo
+SNNPR,Kembata Tembaro,Angacha
+SNNPR,Kembata Tembaro,Deniboya
+SNNPR,Kembata Tembaro,Doyo Gena
+SNNPR,Kembata Tembaro,Durame Town
+SNNPR,Kembata Tembaro,Hadero Tunito
+SNNPR,Kembata Tembaro,Kacha Bira
+SNNPR,Kembata Tembaro,Kedida Gamela
+SNNPR,Kembata Tembaro,Tembaro
+SNNPR,Konso Special,Konso
+SNNPR,Konta Special,Konta
+SNNPR,Segen,Alle
+SNNPR,Sheka,Anderacha
+SNNPR,Sheka,Masha
+SNNPR,Sheka,Masha Town Admin
+SNNPR,Sheka,Tepi Town Admin
+SNNPR,Sheka,Yeki
+SNNPR,Sidama,Aleta Cheko
+SNNPR,Sidama,Aleta Wendo
+SNNPR,Sidama,Aleta Wondo Town
+SNNPR,Sidama,Arbegona
+SNNPR,Sidama,Aroresa
+SNNPR,Sidama,Bensa
+SNNPR,Sidama,Bona Zuria
+SNNPR,Sidama,Boricha
+SNNPR,Sidama,Bursa
+SNNPR,Sidama,Chere
+SNNPR,Sidama,Dale
+SNNPR,Sidama,Dara
+SNNPR,Sidama,Gorche
+SNNPR,Sidama,Hawassa Zuria
+SNNPR,Sidama,Hawella Tulla Subsity
+SNNPR,Sidama,Hula
+SNNPR,Sidama,Loko Abeya
+SNNPR,Sidama,Malga
+SNNPR,Sidama,Shebedino
+SNNPR,Sidama,Wendo Genet
+SNNPR,Sidama,Wensho
+SNNPR,Sidama,Yirgalem Town Adm.
+SNNPR,Silti,Alicho Werero
+SNNPR,Silti,Dalocha
+SNNPR,Silti,East Azenet Berbere
+SNNPR,Silti,Lanfuro
+SNNPR,Silti,Sankura
+SNNPR,Silti,Silti
+SNNPR,Silti,West Azenet Berbere
+SNNPR,Silti,Worabe Town
+SNNPR,Silti,Wulbareg
+SNNPR,South Omo,Bena Tsemay
+SNNPR,South Omo,Dasenech
+SNNPR,South Omo,Hamer
+SNNPR,South Omo,Jinka Town Admin
+SNNPR,South Omo,Male
+SNNPR,South Omo,North Ari
+SNNPR,South Omo,Nyangatom
+SNNPR,South Omo,Selamago
+SNNPR,South Omo,South Ari
+SNNPR,Wolayita,Areka Town
+SNNPR,Wolayita,Boditi Town
+SNNPR,Wolayita,Boloso Bombe
+SNNPR,Wolayita,Boloso Sore
+SNNPR,Wolayita,Damot Gale
+SNNPR,Wolayita,Damot Pulasa
+SNNPR,Wolayita,Damot Sore
+SNNPR,Wolayita,Damot Woyide
+SNNPR,Wolayita,Deguna Fanigo
+SNNPR,Wolayita,Humbo
+SNNPR,Wolayita,Kindo Didaye
+SNNPR,Wolayita,Kindo Koyisha
+SNNPR,Wolayita,Ofa
+SNNPR,Wolayita,Sodo Town
+SNNPR,Wolayita,Sodo Zuria
+SNNPR,Yem Special,Yem
+SNNPR,Yem Special,Yem
+Tigray,Central,Abi Adi Town
+Tigray,Central,Adwa Rural
+Tigray,Central,Adwa Town
+Tigray,Central,Ahferom
+Tigray,Central,Axum Town
+Tigray,Central,Degua Temben
+Tigray,Central,Kola Temben
+Tigray,Central,Laelay Maychew
+Tigray,Central,Mereb Leke
+Tigray,Central,Nader Adet
+Tigray,Central,Tahtay Maychew
+Tigray,Central,Tanqua Abergele
+Tigray,Central,Wer'e Leke
+Tigray,Eastern,Adigrat Town
+Tigray,Eastern,Atsbi Wonberta
+Tigray,Eastern,Erob
+Tigray,Eastern,Ganta Afeshum
+Tigray,Eastern,Gulo Mekeda
+Tigray,Eastern,Hawuzen
+Tigray,Eastern,Kilte Awlaleo
+Tigray,Eastern,Saesie Tsaeda Emba
+Tigray,Eastern,Wukro Town
+Tigray,Mekele Special,Adhaki
+Tigray,Mekele Special,Ayder
+Tigray,Mekele Special,Hadnet
+Tigray,Mekele Special,Hawelti
+Tigray,Mekele Special,Kedamay Weyane
+Tigray,Mekele Special,Kuha
+Tigray,Mekele Special,Semen
+Tigray,North Western,Asegede Tsimbila
+Tigray,North Western,Laelay Adiyabo
+Tigray,North Western,Medebay Zana
+Tigray,North Western,Sheraro Town
+Tigray,North Western,Shire
+Tigray,North Western,Tahtay Adiyabo
+Tigray,North Western,Tahtay Koraro
+Tigray,North Western,Tselemti
+Tigray,Southern,Alaje
+Tigray,Southern,Alamata Town
+Tigray,Southern,Endamekoni
+Tigray,Southern,Enderta
+Tigray,Southern,Hintalo Wajirat
+Tigray,Southern,Korem Town
+Tigray,Southern,Maychew Town
+Tigray,Southern,Ofla
+Tigray,Southern,Raya Alamata
+Tigray,Southern,Raya Azebo
+Tigray,Southern,Seharti Samre
+Tigray,Western,Kafta Humera
+Tigray,Western,Setit Humera
+Tigray,Western,Tsegede
+Tigray,Western,Welkayit
+Afar,Zone 1,Afambo
+Afar,Zone 1,Aysaita
+Afar,Zone 1,Chifra
+Afar,Zone 1,Dubti
+Afar,Zone 1,Elidar
+Afar,Zone 1,Kurri
+Afar,Zone 1,Mile
+Afar,Zone 2,Ab Ala
+Afar,Zone 2,Adaa'r
+Afar,Zone 2,Afdera
+Afar,Zone 2,Berahile
+Afar,Zone 2,Bidu
+Afar,Zone 2,Dalul
+Afar,Zone 2,Erebti
+Afar,Zone 2,Koneba
+Afar,Zone 2,Logiya-Semera
+Afar,Zone 2,Megale
+Afar,Zone 3,Amibara
+Afar,Zone 3,Argoba Special
+Afar,Zone 3,Awash City
+Afar,Zone 3,Awash Fentale
+Afar,Zone 3,Bure Mudaytu
+Afar,Zone 3,Dulecha
+Afar,Zone 3,Gewane
+Afar,Zone 4,Awra
+Afar,Zone 4,Ewa
+Afar,Zone 4,Gulina
+Afar,Zone 4,Teru
+Afar,Zone 4,Yalo
+Afar,Zone 5,Dalfagi
+Afar,Zone 5,Dewe
+Afar,Zone 5,Hadelela
+Afar,Zone 5,Simurobi Gele'alo
+Afar,Zone 5,Telalak
+Amhara,Argoba Special,Argoba
+Amhara,Awi,Ankasha Guagusa
+Amhara,Awi,Banja Shekudad
+Amhara,Awi,Chagni Town
+Amhara,Awi,Dangila
+Amhara,Awi,Dangila Town
+Amhara,Awi,Fagita Lekoma
+Amhara,Awi,Guagusa Shikudad
+Amhara,Awi,Guangua
+Amhara,Awi,Injibara Town
+Amhara,Awi,Jawi
+Amhara,Awi,Zigem
+Amhara,Bahir Dar Special,Bahir Dar Town
+Amhara,East Gojjam,Aneded
+Amhara,East Gojjam,Awabel
+Amhara,East Gojjam,Baso Liben
+Amhara,East Gojjam,Bibugn
+Amhara,East Gojjam,Debay Tilatgen
+Amhara,East Gojjam,Debre Elias
+Amhara,East Gojjam,Debre Markos Town
+Amhara,East Gojjam,Dejen
+Amhara,East Gojjam,Enarj Enawga
+Amhara,East Gojjam,Enebse Sar Midir
+Amhara,East Gojjam,Enemay
+Amhara,East Gojjam,Goncha Siso Enese
+Amhara,East Gojjam,Gozamin
+Amhara,East Gojjam,Hulet Ej Enese
+Amhara,East Gojjam,Machakel
+Amhara,East Gojjam,Mota Town
+Amhara,East Gojjam,Shebel Berenta
+Amhara,East Gojjam,Sinan
+Amhara,North Gondar,Adi Arkay
+Amhara,North Gondar,Alefa
+Amhara,North Gondar,Beyeda
+Amhara,North Gondar,Chilga
+Amhara,North Gondar,Dabat
+Amhara,North Gondar,Debark
+Amhara,North Gondar,Debark Town
+Amhara,North Gondar,Dembia
+Amhara,North Gondar,Gendawuha Town
+Amhara,North Gondar,Gondar Zuria
+Amhara,North Gondar,Gonder Town
+Amhara,North Gondar,Janamora
+Amhara,North Gondar,Lay Armachoho
+Amhara,North Gondar,Merab Armachoho
+Amhara,North Gondar,Merab Belesa
+Amhara,North Gondar,Metema
+Amhara,North Gondar,Misrak Belesa
+Amhara,North Gondar,Quara
+Amhara,North Gondar,Tach Armachoho
+Amhara,North Gondar,Takusa
+Amhara,North Gondar,Tegede
+Amhara,North Gondar,Tselemet
+Amhara,North Gondar,Wegera
+Amhara,North Shewa,Angolala Tera
+Amhara,North Shewa,Ankober
+Amhara,North Shewa,Antsokiya Gemza
+Amhara,North Shewa,Asagirt
+Amhara,North Shewa,Basona Werana
+Amhara,North Shewa,Berehet
+Amhara,North Shewa,Debre Berhan Town
+Amhara,North Shewa,Efrata Gidim
+Amhara,North Shewa,Ensaro
+Amhara,North Shewa,Gishe
+Amhara,North Shewa,Hagere Mariam Kesem
+Amhara,North Shewa,Kewet
+Amhara,North Shewa,Menz Gera Midir
+Amhara,North Shewa,Menz Keya Gebreal
+Amhara,North Shewa,Menz Lalo Midir
+Amhara,North Shewa,Menz Mama Midir
+Amhara,North Shewa,Merhabete
+Amhara,North Shewa,Mida Woremo
+Amhara,North Shewa,Minjar Shenkora
+Amhara,North Shewa,Mojana Waderea
+Amhara,North Shewa,Moretna Jiru
+Amhara,North Shewa,Saya Debirna Wayu
+Amhara,North Shewa,Shoa Robit
+Amhara,North Shewa,Tarma Ber
+Amhara,North Wello,Bugna
+Amhara,North Wello,Dawunt
+Amhara,North Wello,Delanta
+Amhara,North Wello,Gidan
+Amhara,North Wello,Gubalafto
+Amhara,North Wello,Habru
+Amhara,North Wello,Kobo
+Amhara,North Wello,Kobo Town
+Amhara,North Wello,Lalibela Town
+Amhara,North Wello,Lasta
+Amhara,North Wello,Meket
+Amhara,North Wello,Wadla
+Amhara,North Wello,Woldiya Town
+Amhara,Oromia,Artuma Fursi
+Amhara,Oromia,Bati
+Amhara,Oromia,Bati Town
+Amhara,Oromia,Dawa Chefa
+Amhara,Oromia,Dawe Harewa
+Amhara,Oromia,Jile Timuga
+Amhara,Oromia,Kemisie Town
+Amhara,South Gondar,Andabete
+Amhara,South Gondar,Debre Tabor Town
+Amhara,South Gondar,Dera
+Amhara,South Gondar,Ebinat
+Amhara,South Gondar,Estie
+Amhara,South Gondar,Farta
+Amhara,South Gondar,Fogera
+Amhara,South Gondar,Lay Gayint
+Amhara,South Gondar,Libokemkem
+Amhara,South Gondar,Simada
+Amhara,South Gondar,Tach Gayint
+Amhara,South Gondar,Woreta Town
+Amhara,South Wello,Albuko
+Amhara,South Wello,Ambasel
+Amhara,South Wello,Borena
+Amhara,South Wello,Dessie Town
+Amhara,South Wello,Dessie Zuria
+Amhara,South Wello,Jama
+Amhara,South Wello,Kalu
+Amhara,South Wello,Kelela
+Amhara,South Wello,Kombolcha Town
+Amhara,South Wello,Kutaber
+Amhara,South Wello,Legahida
+Amhara,South Wello,Legambo
+Amhara,South Wello,Mehal Saynt
+Amhara,South Wello,Mekdela
+Amhara,South Wello,Sayint
+Amhara,South Wello,Tehuledere
+Amhara,South Wello,Tenta
+Amhara,South Wello,Wegidi
+Amhara,South Wello,Were Ilu
+Amhara,South Wello,Werebabu
+Amhara,Waghemira,Abergele
+Amhara,Waghemira,Dehena
+Amhara,Waghemira,Gazgibla
+Amhara,Waghemira,Sehala
+Amhara,Waghemira,Sekota
+Amhara,Waghemira,Sekota Town
+Amhara,Waghemira,Ziquala
+Amhara,West Gojjam,Bahir Dar Zuria
+Amhara,West Gojjam,Bure Town
+Amhara,West Gojjam,Bure Zuria
+Amhara,West Gojjam,Debub Achefer
+Amhara,West Gojjam,Dega Damot
+Amhara,West Gojjam,Dembecha
+Amhara,West Gojjam,Finote Selam Town
+Amhara,West Gojjam,Gonji Kolele
+Amhara,West Gojjam,Jabi Tehnan
+Amhara,West Gojjam,Mecha
+Amhara,West Gojjam,Quarit
+Amhara,West Gojjam,Sekela
+Amhara,West Gojjam,Semen Achefer
+Amhara,West Gojjam,Wonberma
+Amhara,West Gojjam,Yilma Na Densa
+Bensh-G,Asossa,Asossa
+Bensh-G,Asossa,Bambasi
+Bensh-G,Asossa,Homesha
+Bensh-G,Asossa,Kurmuk
+Bensh-G,Asossa,Menge
+Bensh-G,Asossa,Odabuldi-Guli
+Bensh-G,Asossa,Sherkole
+Bensh-G,Asossa City Administration,Assossa Town
+Bensh-G,Kemashi,Agelo Meti
+Bensh-G,Kemashi,Belojegonfoy
+Bensh-G,Kemashi,Kemashi
+Bensh-G,Kemashi,Sirba Abay
+Bensh-G,Kemashi,Yaso
+Bensh-G,Mao Komo Special,Mao Komo Special
+Bensh-G,Metekel,Bulen
+Bensh-G,Metekel,Dangur
+Bensh-G,Metekel,Dibate
+Bensh-G,Metekel,Guba
+Bensh-G,Metekel,Mandura
+Bensh-G,Metekel,Pawe
+Bensh-G,Metekel,Wenbera
+Dire Dawa,Dire Dawa,Addis Ketema
+Dire Dawa,Dire Dawa,Biyoawale
+Dire Dawa,Dire Dawa,Dire Dawa Town
+Dire Dawa,Dire Dawa,Gende Kore
+Dire Dawa,Dire Dawa,Jeldessa
+Dire Dawa,Dire Dawa,Legehare
+Dire Dawa,Dire Dawa,M/jebdu
+Dire Dawa,Dire Dawa,Sabian
+Dire Dawa,Dire Dawa,Wahil
+Gambella,Agnewak,Dima
+Gambella,Agnewak,Gambella Zuria
+Gambella,Agnewak,Gog
+Gambella,Agnewak,Jor
+Gambella,Etang Special,Etang
+Gambella,Gambella Town Administration,Gambella Town
+Gambella,Mezhenger,Godare
+Gambella,Mezhenger,Mengesh
+Gambella,Nuwer,Akobo
+Gambella,Nuwer,Jikawo
+Gambella,Nuwer,Lare
+Gambella,Nuwer,Makuey
+Gambella,Nuwer,Wantawa
+Harari,Harari,Abadir
+Harari,Harari,Aboker
+Harari,Harari,Amir Nur
+Harari,Harari,Dire Teyara
+Harari,Harari,Erer
+Harari,Harari,Hakim
+Harari,Harari,Jinela
+Harari,Harari,Shenkor
+Harari,Harari,Sofi
+Oromia,Arsi,Amigna
+Oromia,Arsi,Aseko
+Oromia,Arsi,Asela Town
+Oromia,Arsi,Bale Gasegar
+Oromia,Arsi,Bekoji City
+Oromia,Arsi,Chole
+Oromia,Arsi,Deksis
+Oromia,Arsi,Digluna Tijo
+Oromia,Arsi,Dodota
+Oromia,Arsi,Enkelo Wabe
+Oromia,Arsi,Gololcha
+Oromia,Arsi,Guna
+Oromia,Arsi,Hitosa
+Oromia,Arsi,Jeju
+Oromia,Arsi,Limuna Bilbilo
+Oromia,Arsi,Lude Hitosa
+Oromia,Arsi,Merti
+Oromia,Arsi,Munesa
+Oromia,Arsi,Robe
+Oromia,Arsi,Seru
+Oromia,Arsi,Shirka
+Oromia,Arsi,Sire
+Oromia,Arsi,Sude
+Oromia,Arsi,Tena
+Oromia,Arsi,Tiyo
+Oromia,Arsi,Ziway Dugda
+Oromia,Bale,Agarfa
+Oromia,Bale,Berbere
+Oromia,Bale,Dawe Kachen
+Oromia,Bale,Dawe Serer
+Oromia,Bale,Dinsho
+Oromia,Bale,Dolo Mena
+Oromia,Bale,Gasera
+Oromia,Bale,Ginir Town
+Oromia,Bale,Ginir Town
+Oromia,Bale,Goba Rural
+Oromia,Bale,Goba Town
+Oromia,Bale,Gololcha
+Oromia,Bale,Goro
+Oromia,Bale,Guradamole
+Oromia,Bale,Harena Buluk
+Oromia,Bale,Meda Welabu
+Oromia,Bale,Rayitu
+Oromia,Bale,Robe Town
+Oromia,Bale,Seweyna
+Oromia,Bale,Sinana
+Oromia,Borena,Abaya
+Oromia,Borena,Arero
+Oromia,Borena,Bule Hora Rural
+Oromia,Borena,Bule Hora Town
+Oromia,Borena,Dhas
+Oromia,Borena,Dillo
+Oromia,Borena,Dire
+Oromia,Borena,Dugida Dawa
+Oromia,Borena,Gelana
+Oromia,Borena,Melka Soda
+Oromia,Borena,Miyo
+Oromia,Borena,Moyale
+Oromia,Borena,Teletele
+Oromia,Borena,Yabelo Rural
+Oromia,Borena,Yabelo Town
+Oromia,East Hararge,Aweday Town
+Oromia,East Hararge,Babile
+Oromia,East Hararge,Bedeno
+Oromia,East Hararge,Chinaksan
+Oromia,East Hararge,Deder Rural
+Oromia,East Hararge,Deder Town
+Oromia,East Hararge,Fedis
+Oromia,East Hararge,Girawa
+Oromia,East Hararge,Gola Oda
+Oromia,East Hararge,Goro Gutu
+Oromia,East Hararge,Gursum
+Oromia,East Hararge,Haro Maya Rural
+Oromia,East Hararge,Haro Maya Town
+Oromia,East Hararge,Jarso
+Oromia,East Hararge,Kersa
+Oromia,East Hararge,Kombolcha
+Oromia,East Hararge,Kumbi
+Oromia,East Hararge,Kurfa Chele
+Oromia,East Hararge,Melka Belo
+Oromia,East Hararge,Meta
+Oromia,East Hararge,Meyu
+Oromia,East Hararge,Midga Tola
+Oromia,East Shewa,Ada A
+Oromia,East Shewa,Adama Rural
+Oromia,East Shewa,Adama Town
+Oromia,East Shewa,Adami Tulu Jido Kombolcha
+Oromia,East Shewa,Batu
+Oromia,East Shewa,Bishoftu Town
+Oromia,East Shewa,Bora
+Oromia,East Shewa,Boset
+Oromia,East Shewa,Dugda
+Oromia,East Shewa,Fentale
+Oromia,East Shewa,Gimbichu
+Oromia,East Shewa,Liben Chukala
+Oromia,East Shewa,Lome
+Oromia,East Shewa,Metahara City
+Oromia,East Shewa,Mojo Town
+Oromia,East Wellega,Boneya Boshe
+Oromia,East Wellega,Diga
+Oromia,East Wellega,Gida Ayana
+Oromia,East Wellega,Gobu Seyo
+Oromia,East Wellega,Gudeya Bila
+Oromia,East Wellega,Guto Gida
+Oromia,East Wellega,Haro Limu
+Oromia,East Wellega,Ibantu
+Oromia,East Wellega,Jima Arjo
+Oromia,East Wellega,Keremu
+Oromia,East Wellega,Leka Dulecha
+Oromia,East Wellega,Limu
+Oromia,East Wellega,Nekemte Town
+Oromia,East Wellega,Nunu Kumba
+Oromia,East Wellega,Sasiga
+Oromia,East Wellega,Sibu Sire
+Oromia,East Wellega,Wama Hagelo
+Oromia,East Wellega,Wayu Tuka
+Oromia,Finfine Zuria,Akaki
+Oromia,Finfine Zuria,Berek
+Oromia,Finfine Zuria,Burayu
+Oromia,Finfine Zuria,Duken Town
+Oromia,Finfine Zuria,Gelan
+Oromia,Finfine Zuria,Holeta Town
+Oromia,Finfine Zuria,Lega Tafo
+Oromia,Finfine Zuria,Lega Tafo
+Oromia,Finfine Zuria,Mulo
+Oromia,Finfine Zuria,Sebeta Hawas
+Oromia,Finfine Zuria,Sendafa Town
+Oromia,Finfine Zuria,Sululta
+Oromia,Finfine Zuria,Sululta Town
+Oromia,Finfine Zuria,Wolmera
+Oromia,Guji,Adola
+Oromia,Guji,Adola Town
+Oromia,Guji,Anasora
+Oromia,Guji,Bore
+Oromia,Guji,Dima
+Oromia,Guji,Girja
+Oromia,Guji,Goro Dola
+Oromia,Guji,Hambela Wamena
+Oromia,Guji,Kercha
+Oromia,Guji,Liben
+Oromia,Guji,Negele Town
+Oromia,Guji,Odo Shakiso
+Oromia,Guji,Sebu Boru
+Oromia,Guji,Shakiso Town
+Oromia,Guji,Uraga
+Oromia,Guji,Wadera
+Oromia,Horo Gudru Welega,Abay Chomen
+Oromia,Horo Gudru Welega,Abe Dongoro
+Oromia,Horo Gudru Welega,Amuru
+Oromia,Horo Gudru Welega,Guduru
+Oromia,Horo Gudru Welega,Hababo Guduru
+Oromia,Horo Gudru Welega,Horo
+Oromia,Horo Gudru Welega,Jardega Jarte
+Oromia,Horo Gudru Welega,Jima Genete
+Oromia,Horo Gudru Welega,Jima Rare
+Oromia,Horo Gudru Welega,Shambu Town
+Oromia,Illu Aba Bora,Ale
+Oromia,Illu Aba Bora,Alge Sachi
+Oromia,Illu Aba Bora,Bedele Rural
+Oromia,Illu Aba Bora,Bedele Town
+Oromia,Illu Aba Bora,Bicho
+Oromia,Illu Aba Bora,Bilo Nopha
+Oromia,Illu Aba Bora,Borecha
+Oromia,Illu Aba Bora,Bure
+Oromia,Illu Aba Bora,Chewaka
+Oromia,Illu Aba Bora,Chora
+Oromia,Illu Aba Bora,Dabo Hana
+Oromia,Illu Aba Bora,Darimu
+Oromia,Illu Aba Bora,Dedesa
+Oromia,Illu Aba Bora,Dega
+Oromia,Illu Aba Bora,Didu
+Oromia,Illu Aba Bora,Doreni
+Oromia,Illu Aba Bora,Gechi
+Oromia,Illu Aba Bora,Huka Halu
+Oromia,Illu Aba Bora,Hurumu
+Oromia,Illu Aba Bora,Mako
+Oromia,Illu Aba Bora,Metu Rural
+Oromia,Illu Aba Bora,Metu Town
+Oromia,Illu Aba Bora,Nono Sele
+Oromia,Illu Aba Bora,Yayu
+Oromia,Jimma,Agaro Town
+Oromia,Jimma,Chora Botor
+Oromia,Jimma,Dedo
+Oromia,Jimma,Gera
+Oromia,Jimma,Gomma
+Oromia,Jimma,Gumay
+Oromia,Jimma,Jima Town
+Oromia,Jimma,Kersa
+Oromia,Jimma,Limu Kosa
+Oromia,Jimma,Limu Seka
+Oromia,Jimma,Mana
+Oromia,Jimma,Nono Benja
+Oromia,Jimma,Omonada
+Oromia,Jimma,Seka Chekorsa
+Oromia,Jimma,Setema
+Oromia,Jimma,Shebe Senbo
+Oromia,Jimma,Sigamo
+Oromia,Jimma,Sokoru
+Oromia,Jimma,Tiro Afeta
+Oromia,Kelem Welega,Anfilo
+Oromia,Kelem Welega,Dale Sadi
+Oromia,Kelem Welega,Dale Wabera
+Oromia,Kelem Welega,Denbi Dollo Town
+Oromia,Kelem Welega,Gawo Kebe
+Oromia,Kelem Welega,Gidami
+Oromia,Kelem Welega,Hawa Gelan
+Oromia,Kelem Welega,Jimma Horo
+Oromia,Kelem Welega,Lalo Kile
+Oromia,Kelem Welega,Seyo
+Oromia,Kelem Welega,Yemalogi Welel
+Oromia,North Shewa,Abichuna Gnaa
+Oromia,North Shewa,Aleltu
+Oromia,North Shewa,Debere Libanos
+Oromia,North Shewa,Degem
+Oromia,North Shewa,Dera
+Oromia,North Shewa,Fiche Town
+Oromia,North Shewa,Girar Jarso
+Oromia,North Shewa,Hidabu Abote
+Oromia,North Shewa,Jida
+Oromia,North Shewa,Kimbibit
+Oromia,North Shewa,Kuyu
+Oromia,North Shewa,Were Jarso
+Oromia,North Shewa,Wuchale
+Oromia,North Shewa,Yaya Gulele
+Oromia,South West Shewa,Ameya
+Oromia,South West Shewa,Becho
+Oromia,South West Shewa,Dawo
+Oromia,South West Shewa,Goro
+Oromia,South West Shewa,Ilu
+Oromia,South West Shewa,Kersa Ena Malima
+Oromia,South West Shewa,Sebeta Town
+Oromia,South West Shewa,Seden Sodo
+Oromia,South West Shewa,Sodo Dachi
+Oromia,South West Shewa,Tole
+Oromia,South West Shewa,Woliso Rural
+Oromia,South West Shewa,Woliso Town
+Oromia,South West Shewa,Wonchi
+Oromia,West Hararge,Anchar
+Oromia,West Hararge,Bedesa
+Oromia,West Hararge,Boke
+Oromia,West Hararge,Burqua Dhintu
+Oromia,West Hararge,Chiro Rural
+Oromia,West Hararge,Chiro Town
+Oromia,West Hararge,Daro Lebu
+Oromia,West Hararge,Doba
+Oromia,West Hararge,Gemches
+Oromia,West Hararge,Guba Koricha
+Oromia,West Hararge,Habro
+Oromia,West Hararge,Hawi Gudina
+Oromia,West Hararge,Mesela
+Oromia,West Hararge,Mieso
+Oromia,West Hararge,Odabultum
+Oromia,West Hararge,Tulo
+Oromia,West Arsi,Adaba
+Oromia,West Arsi,Arsi Negele Rural
+Oromia,West Arsi,Arsi Negele Town
+Oromia,West Arsi,Bishan Guracha
+Oromia,West Arsi,Dodola Rural
+Oromia,West Arsi,Dodola Town
+Oromia,West Arsi,Gedeb Asasa
+Oromia,West Arsi,Kofele
+Oromia,West Arsi,Kokosa
+Oromia,West Arsi,Kore
+Oromia,West Arsi,Nansebo
+Oromia,West Arsi,Shala
+Oromia,West Arsi,Shashemene Rural
+Oromia,West Arsi,Siraro
+Oromia,West Arsi,Wondo
+Oromia,West Shewa,Abuna Gindeberet
+Oromia,West Shewa,Ada Berga
+Oromia,West Shewa,Ambo Rural
+Oromia,West Shewa,Ambo Town
+Oromia,West Shewa,Bako Tibe
+Oromia,West Shewa,Cheliya
+Oromia,West Shewa,Dano
+Oromia,West Shewa,Dendi
+Oromia,West Shewa,Dire Inchini
+Oromia,West Shewa,Ejere
+Oromia,West Shewa,Elfata
+Oromia,West Shewa,Ginde Beret
+Oromia,West Shewa,Illu Galan
+Oromia,West Shewa,Jeldu
+Oromia,West Shewa,Jibat
+Oromia,West Shewa,Meta Robi
+Oromia,West Shewa,Midakegn
+Oromia,West Shewa,Nono
+Oromia,West Shewa,Toke Kutayu
+Oromia,West Wellega,Ayira
+Oromia,West Wellega,Babo Gambel
+Oromia,West Wellega,Begi
+Oromia,West Wellega,Boji Chekorsa
+Oromia,West Wellega,Boji Dirmeji
+Oromia,West Wellega,Genji
+Oromia,West Wellega,Gimbi Rural
+Oromia,West Wellega,Gimbi Town
+Oromia,West Wellega,Guliso
+Oromia,West Wellega,Haru
+Oromia,West Wellega,Homa
+Oromia,West Wellega,Jarso
+Oromia,West Wellega,Kiltu Kara
+Oromia,West Wellega,Kondala
+Oromia,West Wellega,Lalo Asabi
+Oromia,West Wellega,Mendi
+Oromia,West Wellega,Menesibu
+Oromia,West Wellega,Nejo Rural
+Oromia,West Wellega,Nejo Town
+Oromia,West Wellega,Nole Kaba
+Oromia,West Wellega,Seyo Nole
+Oromia,West Wellega,Yubdo
+Somali,Afder,Barey
+Somali,Afder,Chereti
+Somali,Afder,Elkere
+Somali,Afder,Goraboqaksa
+Somali,Afder,Guradamole
+Somali,Afder,Hargele
+Somali,Afder,Lagahida
+Somali,Afder,Qarsadula
+Somali,Afder,Raso
+Somali,Afder,West Imay
+Somali,Dollo,Bokh
+Somali,Dollo,Danod
+Somali,Dollo,Daratole
+Somali,Dollo,Galadin
+Somali,Dollo,Warder
+Somali,Fafan,Awbare
+Somali,Fafan,Babile
+Somali,Fafan,Goljano
+Somali,Fafan,Gursum
+Somali,Fafan,Jigjiga Council
+Somali,Fafan,Kebribeyah
+Somali,Fafan,Mustehil
+Somali,Fafan,Shabeley
+Somali,Fafan,Tuliguled
+Somali,Jarar,Ararso
+Somali,Jarar,Aware
+Somali,Jarar,Burqod
+Somali,Jarar,Daror
+Somali,Jarar,Degahabur City
+Somali,Jarar,Degahbur woreda
+Somali,Jarar,Degahmadow
+Somali,Jarar,Gashamo
+Somali,Jarar,Gunagado
+Somali,Jarar,Yocale
+Somali,Korahe,Doloado
+Somali,Korahe,Kebridehar
+Somali,Korahe,Kebridehar City
+Somali,Korahe,Marsin
+Somali,Korahe,Shaygosh
+Somali,Korahe,Shilabo
+Somali,Liben,Deka suftu
+Somali,Liben,Erer
+Somali,Liben,Filtu
+Somali,Liben,Hudet
+Somali,Liben,Moyale
+Somali,Liben,Mubarek
+Somali,Nogob,Afdem
+Somali,Nogob,Ayshia
+Somali,Nogob,Duhun
+Somali,Nogob,Fik
+Somali,Nogob,Garbo
+Somali,Nogob,Hamaro
+Somali,Nogob,Meiso
+Somali,Nogob,Sagag
+Somali,Nogob,Salahad
+Somali,Shabele,Adadle
+Somali,Shabele,Berocano
+Somali,Shabele,Dhanan
+Somali,Shabele,East Emi
+Somali,Shabele,Elwayne
+Somali,Shabele,Gode city
+Somali,Shabele,Gode Woreda
+Somali,Shabele,Hadhagala
+Somali,Shabele,Kelafo
+Somali,Shabele,Qubi
+Somali,Siti,Dambal
+Somali,Siti,Dobowayn
+Somali,Siti,Dolobay
+Somali,Siti,Ferfer
+Somali,Siti,Harshim
+Somali,Siti,Mayamulku
+Somali,Siti,Shinile
