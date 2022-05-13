@@ -45,7 +45,6 @@
 </template>
 
 <script>
-import axios from "axios";
 
 export default {
   props: {
@@ -112,11 +111,15 @@ export default {
     }
   },
   computed: {
+    /**
+     * dataCsvをObjectに変換
+     * @returns {*}
+     */
     regionObj: function () {
       if (this.dataCsv.length === 0) {
         return
       }
-      return this.dataCsv.reduce((accum, item) => {
+      return Object.entries(this.dataCsv).reduce((accum, [key, item]) => {
         const index1 = Object.keys(accum).indexOf(item.region1)
         if (index1 === -1) {
           accum[item.region1] = {[item.region2]: new Array(item.region3)}
@@ -166,26 +169,9 @@ export default {
     },
   },
   async fetch() {
-    //axiosでファイル内容を取得
-    async function getAxios(val) {
-      const res = await axios.get(val, {baseURL: window.location.origin})
-      return res.data
-    }
-
-    await getAxios(this.fileName).then(async (val) => {
-      const array = val.split(/\r\n|\n/);
-      const header = array[0].split(",");
-      const body = array.slice(1).map((arr) => arr.split(","));
-
-      this.dataCsv = body.map((b) => {
-        let result = {};
-        header.forEach((head, index) => {
-          result[[head]] = b[index];
-        });
-        return result;
-      });
-    })
+    this.dataCsv = await this.$store.dispatch('fire/initRegion')
   },
-  methods: {}
+  methods: {
+  }
 }
 </script>

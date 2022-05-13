@@ -58,6 +58,10 @@ export const state = () => ({
        */
       driId: 'dri01',
       /**
+       * regionのid(firestore)
+       */
+      regionId: 'eth_region',
+      /**
        * fctのデータ
        */
       fct: [],
@@ -594,6 +598,22 @@ export const actions = {
     }
   },
   /**
+   * RegionのデータをfireStoreから取得して返す
+   * @param state
+   * @returns {Promise<*>}
+   */
+  async initRegion({state}) {
+    console.log(state.myApp.dataSet.driId)
+    console.log(state.myApp.dataSet.regionId)
+    const region = await fireGetDoc('dataset', state.myApp.dataSet.regionId)
+    if (region) {
+      //const driArray = await dispatch('formatDri', dri)
+      return region
+    } else {
+      throw new Error('initRegion fail: no data')
+    }
+  },
+  /**
    * JSON -→ array of objectに変換
    * @param fct fct(JSON形式)
    * @returns {{}[]}
@@ -644,7 +664,6 @@ export const actions = {
    */
   initMenu({state, commit}, payload) {
     const arr = []
-    console.log(payload)
     for (let i = 0; i < state.myApp.sceneCount; i++) {
       const isTargetSingle = true
       const note = ''
@@ -687,6 +706,8 @@ export const actions = {
       throw new Error('Error: initAll → no registered user-info')
     }
     try {
+      console.log('state.myApp')
+      console.log(state.myApp)
       await commit('updateUser', payload)
       await dispatch('initFct')
       await dispatch('initDri')
