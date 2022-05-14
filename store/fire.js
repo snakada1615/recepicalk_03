@@ -58,6 +58,10 @@ export const state = () => ({
        */
       driId: 'dri01',
       /**
+       * CountryNamesのid(firestore)
+       */
+      CountryNamesId: 'countryNames',
+      /**
        * regionのid(firestore)
        */
       regionId: 'eth_region',
@@ -167,6 +171,14 @@ export const mutations = {
     state.myApp.dataSet.driId = payload
   },
   /**
+   * regionIdを更新
+   * @param state
+   * @param payload
+   */
+  updateRegionId: function(state, payload){
+    state.myApp.dataSet.regionId = payload
+  },
+  /**
    * ユーザーデータ（myApp）が読み込まれたらTrueにセット
    * @param state
    */
@@ -204,11 +216,31 @@ export const mutations = {
     state.myApp = JSON.parse(JSON.stringify(payload))
   },
   /**
-   * ユーザー情報を一括更新する
+   * ユーザー情報をpayloadで与えられた内容で更新する
    * @param state
    * @param payload
    */
   updateUser: function (state, payload) {
+    if (!payload.uid || !payload.displayName) {
+      throw new Error('user data is invalid in fire.js - updateUser')
+    }
+    state.myApp.user.uid = payload.uid
+    state.myApp.user.displayName = payload.displayName
+    state.myApp.user.email = payload.email
+    state.myApp.user.phoneNumber = payload.phoneNumber || ''
+    state.myApp.user.country = payload.country || ''
+    state.myApp.user.subnational1 = payload.subnational1 || ''
+    state.myApp.user.subnational2 = payload.subnational2 || ''
+    state.myApp.user.subnational3 = payload.subnational3 || ''
+    state.myApp.user.organization = payload.organization || ''
+    state.myApp.user.title = payload.title || ''
+  },
+  /**
+   * ユーザー情報をfireAuthから得たログイン情報に基づいて初期化する
+   * @param state
+   * @param payload
+   */
+  initUser: function (state, payload) {
     state.myApp.user.uid = payload.uid
     state.myApp.user.displayName = payload.displayName
     state.myApp.user.email = payload.email
@@ -286,6 +318,14 @@ export const mutations = {
   }
 }
 export const actions = {
+  /**
+   * ユーザー情報をpayloadで与えられた内容で更新する
+   * @param commit
+   * @param payload
+   */
+  updateUser: function ({commit}, payload) {
+    commit('updateUser', payload)
+  },
   /**
    * 保存した日付を記録
    * @param state
@@ -400,7 +440,7 @@ export const actions = {
     await signInWithPopup(auth, provider)
       .then((result) => {
         const user = result.user
-        commit('updateUser', user)
+        commit('initUser', user)
         //commit('updateUserUid', user.uid)
         //commit('updateUserName', user.displayName)
         commit('updateIsLoggedIn', true)
@@ -447,7 +487,7 @@ export const actions = {
         throw error
       });
     const user = res.user
-    commit('updateUser', user)
+    commit('initUser', user)
     //commit('updateUserUid', user.uid)
     //commit('updateUserName', user.displayName)
     commit('updateIsLoggedIn', true)
@@ -494,7 +534,7 @@ export const actions = {
       // ..
     });
 
-    commit('updateUser', user)
+    commit('initUser', user)
     //commit('updateUserUid', user.uid)
     //commit('updateUserName', user.displayName)
     commit('updateIsLoggedIn', true)
@@ -598,16 +638,30 @@ export const actions = {
     }
   },
   /**
+   * CountryNamesのデータをfireStoreから取得して返す
+   * @param state
+   * @returns {Promise<*>}
+   */
+  async initCountryNames({state}) {
+    const countries = await fireGetDoc('dataset', state.myApp.dataSet.CountryNamesId).catch((err)=>{
+      throw Error(err)
+    })
+    if (countries) {
+      return countries
+    } else {
+      throw new Error('initCountryNames fail: no data')
+    }
+  },
+  /**
    * RegionのデータをfireStoreから取得して返す
    * @param state
    * @returns {Promise<*>}
    */
   async initRegion({state}) {
-    console.log(state.myApp.dataSet.driId)
-    console.log(state.myApp.dataSet.regionId)
-    const region = await fireGetDoc('dataset', state.myApp.dataSet.regionId)
+    const region = await fireGetDoc('dataset', state.myApp.dataSet.regionId).catch((err)=>{
+      throw Error(err)
+    })
     if (region) {
-      //const driArray = await dispatch('formatDri', dri)
       return region
     } else {
       throw new Error('initRegion fail: no data')
@@ -708,7 +762,7 @@ export const actions = {
     try {
       console.log('state.myApp')
       console.log(state.myApp)
-      await commit('updateUser', payload)
+        await commit('initUser', payload)
       await dispatch('initFct')
       await dispatch('initDri')
       await dispatch('initMenu', state.myApp.dataSet.dri)
@@ -787,7 +841,7 @@ export const actions = {
       console.log('Error: fireResetAppdata')
       throw err
     })
-    commit('updateUser', payload) //user情報を戻す
+    commit('initUser', payload) //user情報を戻す
     await dispatch('fireSaveAppdata').catch((err) => {
       throw err
     })

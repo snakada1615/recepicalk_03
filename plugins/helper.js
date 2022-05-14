@@ -157,7 +157,8 @@ export function validateMyApp(dat){
     'user.displayName', 'user.email', 'user.country',
     'user.subnational1', 'user.subnational2', 'user.subnational3',
     'user.organization', 'user.title', 'user.uid', 'user.phoneNumber',
-    'dataSet.fctId', 'dataSet.driId', 'dataSet.fct', 'dataSet.dri'
+    'dataSet.fctId', 'dataSet.driId', 'dataSet.regionId',
+    'dataSet.fct', 'dataSet.dri'
   ]
   let res = true
   const myError = validateObject(dat, typeName)

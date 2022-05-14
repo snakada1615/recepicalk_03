@@ -1,6 +1,6 @@
 <template>
   <b-container>
-    <b-card v-if="regionObj" bg-variant="light">
+    <b-card v-if="regionObj" class="border-0">
       <b-row>
         <b-col cols="2">
           <div>{{label1}}</div>
@@ -48,14 +48,6 @@
 
 export default {
   props: {
-    /**
-     * region情報を記載したcsvファイル
-     */
-    fileName: {
-      type: String,
-      required: true,
-      default: '../dbs/eth_region.csv'
-    },
     /**
      * 選択された地域1
      */
@@ -105,14 +97,22 @@ export default {
   data() {
     return {
       /**
-       * csvファイルから読み込んだデータ本体
+       * fireStoreから読み込んだデータ本体
        */
       dataCsv: '',
+      /**
+       * 初回読み込み時のRegion2用のフラグ
+       */
+      initialFlagRegion2: true,
+      /**
+       * 初回読み込み時のRegion3用のフラグ
+       */
+      initialFlagRegion3: true
     }
   },
   computed: {
     /**
-     * dataCsvをObjectに変換
+     * dataCsvを配列に変換(Object -> Array of Object)
      * @returns {*}
      */
     regionObj: function () {
@@ -134,19 +134,39 @@ export default {
         return accum
       }, [])
     },
+    /**
+     * Regionの最上位の階層リスト（b-form-selectで使う）
+     * @returns {string[]|*[]}
+     */
     regions1: function () {
       const res = Object.keys(this.regionObj)
       return res ? res : []
     },
+    /**
+     * Regionの2番目の階層（b-form-selectで使う）
+     *     プロパティkey2, key3の変更はemitで通知
+     * @returns {*[]|string[]}
+     */
     regions2: function () {
       if (!this.key1Temp) {
         return []
       }
-      this.$emit('update:key2', '')
-      this.$emit('update:key3', '')
+      //key1の値に対応してregion2を更新
       const res = Object.keys(this.regionObj[this.key1Temp])
+
+      //key2が[region2]に含まれない値の場合、key2, key3を初期化する
+      if (res.indexOf(this.key2) === -1){
+        this.$emit('update:key2', '')
+        this.$emit('update:key3', '')
+      }
       return res ? res : []
     },
+
+    /**
+     * Regionの3番目の階層（b-form-selectで使う）
+     *     プロパティkey2, key3の変更はemitで通知
+     * @returns {*|*[]}
+     */
     regions3: function () {
       if (!this.key1Temp) {
         return []
@@ -154,20 +174,49 @@ export default {
       if (!this.key2Temp) {
         return []
       }
-      this.$emit('update:key3', '')
+
+      //key2の値に対応してregion3を更新
       const res = this.regionObj[this.key1Temp][this.key2Temp]
+
+      //key2が[region2]に含まれない値の場合、key2, key3を初期化する
+      if (!res) {
+        this.$emit('update:key2', '')
+        this.$emit('update:key3', '')
+      } else {
+        //key3が[region3]に含まれない値の場合、key3を初期化する
+        if (!res.indexOf(this.key3)){
+          this.$emit('update:key3', '')
+        }
+      }
       return res ? res : []
     },
+
+    /**
+     * プロパティの代替変数
+     * @returns {string}
+     */
     key1Temp: function () {
       return this.key1
     },
+    /**
+     * プロパティの代替変数
+     * @returns {string}
+     */
     key2Temp: function () {
       return this.key2
     },
+    /**
+     * プロパティの代替変数
+     * @returns {string}
+     */
     key3Temp: function () {
       return this.key3
     },
   },
+  /**
+   * 起動時にfireStoreからRegionデータ読み込み
+   * @returns {Promise<void>}
+   */
   async fetch() {
     this.dataCsv = await this.$store.dispatch('fire/initRegion')
   },

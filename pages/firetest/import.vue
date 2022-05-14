@@ -42,17 +42,9 @@
       </div>
       <b-button @click="insertData(collection1, dbName1, dataJson)" class="my-1">import to firebase</b-button>
     </b-card>
-    <b-card v-if="dataJson2" bg-variant="light">
-      <b-form-select v-if="dataJson2" v-model="key1" :options = "regions1"/>
-      <b-form-select v-if="dataJson2" v-model="key2" :options = "regions2"/>
-      <b-form-select v-if="dataJson2" v-model="key3" :options = "regions3"/>
-      {{key1}}
-      {{key2}}
-      {{key3}}
-    </b-card>
-    <b-card v-if="dataJson2" bg-variant="light">
+    <b-card v-if="dataJson" bg-variant="light">
       <json-viewer
-        :value="dataJson2"
+        :value="dataJson"
       />
     </b-card>
     <b-card
