@@ -28,7 +28,16 @@
           <template #button-content>
             <em>User</em>
           </template>
-          <b-dropdown-item to="#" class="small">user: {{ $store.state.fire.myApp.user.displayName }}</b-dropdown-item>
+          <b-dropdown-item
+            to="/"
+            class="small"
+            v-for="item in userInfo"
+          >
+            <div class="d-flex justify-content-around">
+              <div class="text-info">{{ Object.keys(item)[0] }}:</div>
+              <div>{{Object.values(item)[0]}}</div>
+            </div>
+          </b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
       <b-button
@@ -81,9 +90,29 @@ export default{
     hasDocumentChanged(){
       return this.$store.state.fire.hasDocumentChanged
     },
+    /**
+     * ログイン状態のフラグ
+     * @returns {boolean}
+     */
     isLoggedIn(){
       return this.$store.state.fire.isLoggedIn
-    }
+    },
+    userInfo(){
+      return Object.entries(this.$store.state.fire.myApp.user).filter(([key, value])=>{
+        return (
+          ['displayName', 'country',
+          'subnational1', 'subnational2',
+          'subnational3',
+          'organization', 'title'].indexOf(key) >=0 )
+      }).map(([key,value])=>{
+        let res = {}
+        let myKey = key
+        if (key  === 'displayName') myKey = 'ID'
+        res[myKey] = value
+        console.log(res)
+        return res
+      })
+    },
   },
   watch:{
     /**

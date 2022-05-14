@@ -16,8 +16,7 @@
           v-if="user.country === 'Ethiopia'"
           :key3.sync="user.subnational3"
           :key2.sync="user.subnational2"
-          :key1.sync="user.subnational1"
-          :file-name="fileName"/>
+          :key1.sync="user.subnational1"/>
       </b-row>
       <b-row class="my-1">
         <b-col cols="3">organization</b-col>
@@ -41,6 +40,10 @@
 </template>
 
 <script>
+/**
+ * @desc storeから読み込んだuserデータ（store.myApp.user）をformに落として
+ * 更新、updateボタンでstore, fireStoreを同時に更新
+ */
 import regionSelect from "@/components/atoms/regionSelect";
 import countryNames from "@/components/atoms/countryNames";
 
@@ -65,7 +68,6 @@ export default {
         subnational2:'',
         subnational3:'',
       },
-      fileName: '../dbs/eth_region.csv',
       /**
        * csvファイルから読み込んだデータ本体
        */
@@ -77,7 +79,9 @@ export default {
   },
   methods: {
     async updateUserInfo(){
+      //storeのアップデート
       await this.$store.dispatch('fire/updateUser', this.user)
+      //fireStoreへの保存
       await this.$store.dispatch('fire/fireSaveAppdata')
     }
   }

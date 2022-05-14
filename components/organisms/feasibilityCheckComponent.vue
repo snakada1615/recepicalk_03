@@ -627,7 +627,7 @@ export default {
           itemsQA: [
             {
               id: 9,
-              questionText: 'Is there need for specific infrastructure (irrigation / postharvest, etc.)?',
+              questionText: 'Is there need for specific infrastructure (irrigation / post harvest, etc.)?',
               answerList: [
                 {value: -99, text: 'please select', disabled: true},
                 {value: 3, text: 'no'},
@@ -702,6 +702,6 @@ export default {
       type: Number,
       required: true
     },
-  },
+  }
 }
 </script>

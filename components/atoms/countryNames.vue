@@ -6,6 +6,9 @@
   ></b-form-select>
 </template>
 <script>
+/**
+ * fireStoreから国一覧のリストを読み込んでform-selectで表示
+ */
   export default{
     data() {
       return {
