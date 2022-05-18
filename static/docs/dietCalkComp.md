@@ -1,6 +1,16 @@
 # dietCalkComp
 
-dietCalkComponent
+6つのコンポーネントを組み合わせて食事評価
+1. driSelectModa\
+対象グループの選択→栄養必要量の決定
+2. FctTableModal\
+利用する品目の選択→栄養供給量の決定
+3. foodModal\
+利用する品目の摂取量決定→栄養供給量の決定
+4. recepiTable\
+選択された品目一覧を示す
+5. nutritionBar\
+栄養素の充足状況をバーチャートで示す
 
 ## Props
 

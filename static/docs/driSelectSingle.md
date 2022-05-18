@@ -1,5 +1,8 @@
 # driSelectSingle
 
+対象となる年齢、性別を選択することで、当該グループの栄養必要量をemit
+人数は常に1人
+
 ## Props
 
 | Name                   | Type    | Description             |
@@ -9,24 +12,24 @@
 
 ## Data
 
-| Name          | Type     | Description | Initial value                                                          |
-| ------------- | -------- | ----------- | ---------------------------------------------------------------------- |
-| `fields1`     | `array`  |             | `[ {key: 'Item', sortable: false}, {key: 'Value', sortable: false}, ]` |
-| `targetGroup` | `number` |             | `0`                                                                    |
-| `tableDri`    | `array`  |             | `[]`                                                                   |
+| Name          | Type     | Description                   | Initial value                                                          |
+| ------------- | -------- | ----------------------------- | ---------------------------------------------------------------------- |
+| `fields1`     | `array`  | 栄養必要量を表示するテーブルのフィールド設定        | `[ {key: 'Item', sortable: false}, {key: 'Value', sortable: false}, ]` |
+| `targetGroup` | `number` | リストボックスで選択された番号               | `0`                                                                    |
+| `tableDri`    | `array`  | targetGroupの値に基づいて計算された栄養素必要量 | `[]`                                                                   |
 
 ## Computed Properties
 
-| Name      | Type      | Description                  |
-| --------- | --------- | ---------------------------- |
-| `options` | `unknown` | **Dependencies:** `driItems` |
+| Name      | Type      | Description                                       |
+| --------- | --------- | ------------------------------------------------- |
+| `options` | `unknown` | dri一覧を表示用に整形したもの<br/>**Dependencies:** `driItems` |
 
 ## Events
 
-| Name                   | Description                                                                                                                                                                                                                                  |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `changeNutritionValue` | 必要栄養量の更新を親コンポーネントに通知<br/>**Arguments**<br/><ul><li>**`{total: res2, target: this.target}: object`**</li></ul>                                                                                                                                |
-| `update:target`        | <br/>**Arguments**<br/><ul><li>**`this.driItems.map(function(dat){         let count = 0         if (Number(dat.id) === Number(val)){           count = 1         }         return {id: dat.id, count: count}       }): unknown`**</li></ul> |
+| Name                   | Description                                                                                                                                                                                                                                     |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `changeNutritionValue` | 必要栄養量の更新を親コンポーネントに通知\<br/>**Arguments**<br/><ul><li>**`{total: res2, target: this.target}: object`**</li></ul>                                                                                                                                  |
+| `update:target`        | <br/>**Arguments**<br/><ul><li>**`this.driItems.map(function (dat) {         let count = 0         if (Number(dat.id) === Number(val)) {           count = 1         }         return {id: dat.id, count: count}       }): unknown`**</li></ul> |
 
 ## Methods
 

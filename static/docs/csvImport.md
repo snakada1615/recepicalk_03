@@ -1,6 +1,6 @@
 # csvImport
 
-- **disc** - csvファイルをjsonに変換して返す
+csvファイルをjsonに変換して返す
 
 ## Props
 

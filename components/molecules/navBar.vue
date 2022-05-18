@@ -9,20 +9,20 @@
       <b-navbar-nav class="ml-auto" :small=true >
         <b-nav-item-dropdown text="Menu" right>
           <b-dropdown-item to="/">top</b-dropdown-item>
+          <b-dropdown-item to="/whatsNfa">what's NFA</b-dropdown-item>
           <b-dropdown-item to="/login">login</b-dropdown-item>
-          <b-dropdown-item to="/test01">test01</b-dropdown-item>
-          <b-dropdown-item to="/test02">test02</b-dropdown-item>
-          <b-dropdown-item to="/test03">test03</b-dropdown-item>
-          <b-dropdown-item to="/test04">test04</b-dropdown-item>
+          <b-dropdown-item to="/userinfo">user info</b-dropdown-item>
           <b-dropdown-item to="/dietcalk">dietCalk</b-dropdown-item>
           <b-dropdown-item to="/feasibilityCheck">crop feasibility</b-dropdown-item>
           <b-dropdown-item to="/documents">documents</b-dropdown-item>
+          <b-dropdown-item to="/firtest/importFct">update FCT</b-dropdown-item>
           <b-dropdown-item-button
             @click="resetData"
             :disabled="!isLoggedIn"
           >reset Data</b-dropdown-item-button>
         </b-nav-item-dropdown>
 
+        <!--  ここからuser情報の表示  -->
         <b-nav-item-dropdown right>
           <!-- Using 'button-content' slot -->
           <template #button-content>
@@ -32,6 +32,7 @@
             to="/"
             class="small"
             v-for="item in userInfo"
+            :key="Object.values(item)[0]"
           >
             <div class="d-flex justify-content-around">
               <div class="text-info">{{ Object.keys(item)[0] }}:</div>
@@ -109,7 +110,6 @@ export default{
         let myKey = key
         if (key  === 'displayName') myKey = 'ID'
         res[myKey] = value
-        console.log(res)
         return res
       })
     },

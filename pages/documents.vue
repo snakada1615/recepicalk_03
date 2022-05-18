@@ -18,7 +18,7 @@
         <b-card bg-variant="light" class="mb-2">
           <div>データ更新は以下のコマンド：</div>
           <div>vuedoc.md components/*/*.vue --output static/docs/</div>
-          <div>find *.md > filelist.txt　（docs.command参照）</div>
+          <div>find *.md > filelist.txt　（docs.commandの実行でも良い）</div>
         </b-card>
         <div v-for="index in content.length">
           <div v-show="selected === index-1">
@@ -35,7 +35,9 @@ import MarkdownItVue from 'markdown-it-vue'
 import 'markdown-it-vue/dist/markdown-it-vue.css'
 import axios from 'axios'
 
-
+/**
+ * @desc コンポーネントのコメント記載情報をJSDocで抽出して成形・表示
+ */
 export default {
   components: {
     MarkdownItVue

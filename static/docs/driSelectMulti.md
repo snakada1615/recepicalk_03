@@ -1,23 +1,24 @@
 # driSelectMulti
 
+対象となる年齢、性別、人数を選択することで、当該グループの栄養必要量をemit
+
 ## Props
 
-| Name                   | Type      | Description                                                                                                                                                                                                                | Default                     |
-| ---------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
-| `target` *required*    | `Array`   | ターゲットグループの構成：v-modelで使用  [{ id: 1, count: 1}, { id: 2, count: 5}, { id: 3, count: 0}]                                                                                                                                      | `() => [{id: 0, count: 1}]` |
-| `dri-items` *required* | `Array`   | driのデータセット   ex.          [{            En: "1088.0",            Fe: "5.8",            max_vol: "900",            Name: "child 6-23 month",            Pr: "11.65",            Va: "400.0",            id: 0           }], | `() => []`                  |
-| `max`                  | `Number`  | target.countの上限値                                                                                                                                                                                                           | `1000000`                   |
-| `input-name`           | `unknown` |                                                                                                                                                                                                                            | &nbsp;                      |
+| Name                   | Type     | Description                                                                                                                                                                                                                | Default                     |
+| ---------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| `target` *required*    | `Array`  | ターゲットグループの構成：v-modelで使用   [{ id: 1, count: 1}, { id: 2, count: 5}, { id: 3, count: 0}]                                                                                                                                     | `() => [{id: 0, count: 1}]` |
+| `dri-items` *required* | `Array`  | driのデータセット   ex.          [{            En: "1088.0",            Fe: "5.8",            max_vol: "900",            Name: "child 6-23 month",            Pr: "11.65",            Va: "400.0",            id: 0           }], | `() => []`                  |
+| `max`                  | `Number` | target.countの上限値                                                                                                                                                                                                           | `1000000`                   |
 
 ## Data
 
-| Name            | Type     | Description | Initial value                                                                                                                              |
-| --------------- | -------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `fieldDRI`      | `array`  |             | `[ {key: 'id', sortable: true, tdClass: 'd-none', thClass: 'd-none'}, {key: 'Name', sortable: false}, {key: 'number', sortable: false}, ]` |
-| `sortBy`        | `string` |             | `"id"`                                                                                                                                     |
-| `fieldTableDri` | `array`  |             | `[ {key: 'Item', sortable: false}, {key: 'Value', sortable: false}, ]`                                                                     |
-| `tablePop`      | `array`  |             | `[]`                                                                                                                                       |
-| `tableDri`      | `array`  |             | `[]`                                                                                                                                       |
+| Name            | Type     | Description                 | Initial value                                                                                                                              |
+| --------------- | -------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `fieldDRI`      | `array`  | 表示用のフィールド定義                 | `[ {key: 'id', sortable: true, tdClass: 'd-none', thClass: 'd-none'}, {key: 'Name', sortable: false}, {key: 'number', sortable: false}, ]` |
+| `sortBy`        | `string` | sortのためのkey列を定義             | `"id"`                                                                                                                                     |
+| `fieldTableDri` | `array`  | 栄養必要量の合計値を示すテーブルのフィールド定義    | `[ {key: 'Item', sortable: false}, {key: 'Value', sortable: false}, ]`                                                                     |
+| `tablePop`      | `array`  | 最初のテーブルを埋めるデータ（年齢・性別毎の人数）   | `[]`                                                                                                                                       |
+| `tableDri`      | `array`  | 2番目のテーブルを埋めるデータ（栄養素毎の合計必要量） | `[]`                                                                                                                                       |
 
 ## Events
 
@@ -133,9 +134,11 @@ DRIの一覧表×対象人数
 
 ### tablePop2Target()
 
+tablePopをテーブルに表示するための整形
+
 **Syntax**
 
 ```typescript
-tablePop2Target(dat: unknown): unknown
+tablePop2Target(dat: unknown): any
 ```
 

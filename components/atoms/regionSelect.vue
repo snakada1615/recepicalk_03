@@ -45,7 +45,10 @@
 </template>
 
 <script>
-
+/**
+ * @desc storeからregion一覧を読み込んでリストボックスで選択し、プロパティとして値を返す
+ *
+ */
 export default {
   props: {
     /**

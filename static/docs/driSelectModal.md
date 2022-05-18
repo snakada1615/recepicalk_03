@@ -1,28 +1,24 @@
 # driSelectModal
 
+driSelectAllをモーダル化したもの
+
 ## Props
 
-| Name                         | Type      | Description  | Default |
-| ---------------------------- | --------- | ------------ | ------- |
-| `show-modal` *required*      | `Boolean` | モーダルの表示用トリガー | `false` |
-| `my-name` *required*         | `String`  |              |         |
-| `my-modal-header` *required* | `String`  |              |         |
-| `dri-items` *required*       | `Array`   |              |         |
-| `dri-populations` *required* | `Array`   |              |         |
-| `max` *required*             | `Number`  |              |         |
-| `target-switch` *required*   | `Boolean` |              | &nbsp;  |
-
-## Data
-
-| Name           | Type     | Description | Initial value |
-| -------------- | -------- | ----------- | ------------- |
-| `selectedItem` | `string` |             | `""`          |
+| Name                         | Type      | Description                          | Default |
+| ---------------------------- | --------- | ------------------------------------ | ------- |
+| `show-modal` *required*      | `Boolean` | モーダルの表示用トリガー                         | `false` |
+| `my-name` *required*         | `String`  | モーダル表示用のID                           |         |
+| `my-modal-header` *required* | `String`  | モーダルのヘッダー用テキスト                       |         |
+| `dri-items` *required*       | `Array`   | dri表示用のデータ                           |         |
+| `dri-populations` *required* | `Array`   | 対象者を表すArray（グループ毎の人数）                |         |
+| `max` *required*             | `Number`  | 一グループあたり設定できる人数の最大値                  |         |
+| `target-switch` *required*   | `Boolean` | driSelectAllとdriSelectMultiの切り替え用フラグ | &nbsp;  |
 
 ## Computed Properties
 
-| Name                | Type      | Description                   |
-| ------------------- | --------- | ----------------------------- |
-| `showModalComputed` | `unknown` | **Dependencies:** `showModal` |
+| Name                | Type      | Description                                                      |
+| ------------------- | --------- | ---------------------------------------------------------------- |
+| `showModalComputed` | `unknown` | モーダル表示用のフラグを扱うためのComputed Prop<br/>**Dependencies:** `showModal` |
 
 ## Events
 

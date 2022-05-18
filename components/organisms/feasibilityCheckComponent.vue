@@ -164,6 +164,13 @@ import nutritionBar from "@/components/molecules/nutritionBar";
 import driSelectSingle from "@/components/molecules/driSelectSingle";
 import {getNutritionDemand, getNutritionSupply, validateMyApp} from "@/plugins/helper";
 
+/**
+ * @desc 3つのコンポーネントを組み合わせて特定の品目のfeasibility scoreを算出する
+ * 1. FctTableModal - 作物を選択した場合、これに応じた栄養素供給量を返す
+ * 2. driSelectSingle - 対象グループを選択した場合、これに応じた栄養素必要量を返す
+ * 3. nutritionBar - 上記2つから、栄養素の銃速度をバーチャートで示す
+ *
+ */
 export default {
   components: {
     FctTableModal,
@@ -691,6 +698,9 @@ export default {
       },
       required: true,
     },
+    /**
+     * 現在のページ番号
+     */
     pageId: {
       type: Number,
       default: 1

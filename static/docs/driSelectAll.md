@@ -1,5 +1,12 @@
 # driSelectAll
 
+driSelectAll
+driSelectSingleとdriSelectMultiを組み合わせて切り替え可能なコンポーネントにしたもの
+1. driSelectSingle\
+対象者を1名に限定した場合
+2. driSelectMult\
+対象者を各グループから複数名選択可能。家族構成等を入力可能
+
 ## Props
 
 | Name                         | Type      | Description                                                                                                                                                                                                                | Default |

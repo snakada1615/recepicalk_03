@@ -2,10 +2,11 @@
 
 ## Computed Properties
 
-| Name                 | Type     | Description                                                                      |
-| -------------------- | -------- | -------------------------------------------------------------------------------- |
-| `hasDocumentChanged` | `object` | データ更新の有無($store.state.fire.hasDocumentChanged)を確認<br/>**Dependencies:** `$store` |
-| `isLoggedIn`         | `object` | **Dependencies:** `$store`                                                       |
+| Name                 | Type      | Description                                                                      |
+| -------------------- | --------- | -------------------------------------------------------------------------------- |
+| `hasDocumentChanged` | `object`  | データ更新の有無($store.state.fire.hasDocumentChanged)を確認<br/>**Dependencies:** `$store` |
+| `isLoggedIn`         | `object`  | ログイン状態のフラグ<br/>**Dependencies:** `$store`                                        |
+| `userInfo`           | `unknown` | **Dependencies:** `$store`                                                       |
 
 ## Methods
 
