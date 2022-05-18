@@ -1,25 +1,36 @@
 <template>
   <b-container>
     <b-navbar type="dark" variant="info" class="mb-2" sticky>
-      <b-navbar-brand to="/"><b-icon icon="BIconHouseFill"/><span class="small"> Nutrients App</span></b-navbar-brand>
+      <b-navbar-brand to="/">
+        <b-icon icon="BIconHouseFill"/>
+        <span class="small"> Nutrients App</span></b-navbar-brand>
 
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
       <!-- Right aligned nav items -->
-      <b-navbar-nav class="ml-auto" :small=true >
+      <b-navbar-nav class="ml-auto" :small=true>
         <b-nav-item-dropdown text="Menu" right>
           <b-dropdown-item to="/">top</b-dropdown-item>
           <b-dropdown-item to="/whatsNfa">what's NFA</b-dropdown-item>
           <b-dropdown-item to="/login">login</b-dropdown-item>
           <b-dropdown-item to="/userinfo">user info</b-dropdown-item>
-          <b-dropdown-item to="/dietcalk">dietCalk</b-dropdown-item>
-          <b-dropdown-item to="/feasibilityCheck">crop feasibility</b-dropdown-item>
+          <b-dropdown-item
+            to="/dietcalk"
+            :disabled="!isLoggedIn"
+          >dietCalk
+          </b-dropdown-item>
+          <b-dropdown-item
+            to="/feasibilityCheck"
+            :disabled="!isLoggedIn"
+          >crop feasibility
+          </b-dropdown-item>
           <b-dropdown-item to="/documents">documents</b-dropdown-item>
           <b-dropdown-item to="/firtest/importFct">update FCT</b-dropdown-item>
           <b-dropdown-item-button
             @click="resetData"
             :disabled="!isLoggedIn"
-          >reset Data</b-dropdown-item-button>
+          >reset Data
+          </b-dropdown-item-button>
         </b-nav-item-dropdown>
 
         <!--  ここからuser情報の表示  -->
@@ -36,7 +47,7 @@
           >
             <div class="d-flex justify-content-around">
               <div class="text-info">{{ Object.keys(item)[0] }}:</div>
-              <div>{{Object.values(item)[0]}}</div>
+              <div>{{ Object.values(item)[0] }}</div>
             </div>
           </b-dropdown-item>
         </b-nav-item-dropdown>
@@ -48,34 +59,41 @@
         :class="{'border-white':true, 'btn-primary': !hasDocumentChanged, 'btn-warning': hasDocumentChanged, 'mx-2':true}"
         size="sm"
         style="font-size: 13px"
-      >save</b-button>
-      <b-nav-text v-if="$nuxt.isOnline" class="text-light small"><b-icon icon="reception4"/></b-nav-text>
-      <div v-if="$nuxt.isOffline" class="text-light small"><b-icon icon="reception0"/></div>
+      >save
+      </b-button>
+      <b-nav-text v-if="$nuxt.isOnline" class="text-light small">
+        <b-icon icon="reception4"/>
+      </b-nav-text>
+      <div v-if="$nuxt.isOffline" class="text-light small">
+        <b-icon icon="reception0"/>
+      </div>
     </b-navbar>
   </b-container>
 </template>
 <script>
 
-export default{
-  methods:{
+export default {
+  methods: {
     /**
      * ページの遷移前にユーザーに確認し、
      * @param event
      * @returns {string}
      */
-    beforeUnloadListener(event){
+    beforeUnloadListener(event) {
       event.preventDefault();
       return event.returnValue = "Are you sure you want to exit before saving your data?";
     },
     /**
      * myAppをfireStoreに保存
      */
-    fireSaveAppdata(){
+    fireSaveAppdata() {
       this.$store.dispatch('fire/fireSaveAppdata')
     },
-    async resetData(){
+    async resetData() {
       const user = JSON.parse(JSON.stringify(this.$store.state.fire.myApp.user))
-      await this.$store.dispatch('fire/fireResetAppdata', user).catch((err) => {throw err})
+      await this.$store.dispatch('fire/fireResetAppdata', user).catch((err) => {
+        throw err
+      })
       this.$router.push('/')
     }
   },
@@ -88,38 +106,38 @@ export default{
      * データ更新の有無($store.state.fire.hasDocumentChanged)を確認
      * @returns {boolean}
      */
-    hasDocumentChanged(){
+    hasDocumentChanged() {
       return this.$store.state.fire.hasDocumentChanged
     },
     /**
      * ログイン状態のフラグ
      * @returns {boolean}
      */
-    isLoggedIn(){
+    isLoggedIn() {
       return this.$store.state.fire.isLoggedIn
     },
-    userInfo(){
-      return Object.entries(this.$store.state.fire.myApp.user).filter(([key, value])=>{
+    userInfo() {
+      return Object.entries(this.$store.state.fire.myApp.user).filter(([key, value]) => {
         return (
           ['displayName', 'country',
-          'subnational1', 'subnational2',
-          'subnational3',
-          'organization', 'title'].indexOf(key) >=0 )
-      }).map(([key,value])=>{
+            'subnational1', 'subnational2',
+            'subnational3',
+            'organization', 'title'].indexOf(key) >= 0)
+      }).map(([key, value]) => {
         let res = {}
         let myKey = key
-        if (key  === 'displayName') myKey = 'ID'
+        if (key === 'displayName') myKey = 'ID'
         res[myKey] = value
         return res
       })
     },
   },
-  watch:{
+  watch: {
     /**
      * データが更新された場合（hasDocumentChanged）のみ、beforeunloadを追加
      * @param {boolean} value
      */
-    hasDocumentChanged(value){
+    hasDocumentChanged(value) {
       if (value) {
         addEventListener("beforeunload", this.beforeUnloadListener, {capture: true});
       } else {
