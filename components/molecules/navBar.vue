@@ -32,7 +32,7 @@
           >reset Data
           </b-dropdown-item-button>
         </b-nav-item-dropdown>
-
+        <div></div>
         <!--  ここからuser情報の表示  -->
         <b-nav-item-dropdown right>
           <!-- Using 'button-content' slot -->
@@ -44,6 +44,7 @@
             class="small"
             v-for="item in userInfo"
             :key="Object.values(item)[0]"
+            v-if="Object.values(item)[0] !== ''"
           >
             <div class="d-flex justify-content-around">
               <div class="text-info">{{ Object.keys(item)[0] }}:</div>
