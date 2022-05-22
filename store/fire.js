@@ -720,8 +720,10 @@ export const actions = {
     const arr = []
     for (let i = 0; i < state.myApp.sceneCount; i++) {
       const isTargetSingle = true
+      const menuName = ''
       const note = ''
       const menu = []
+      const workFlow = []
       const target = payload.map(function (dat) {
         return {id: dat.id, count: 0}
       })
