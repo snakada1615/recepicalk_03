@@ -99,7 +99,8 @@
       :max-weight=500
       my-name="myFoodModal"
       :items="items_modal"
-      v-model="value_model"
+      :value.sync="value_model"
+      :menu-name.sync="menuName_modal"
       @modalOk="addSupply"
     />
     <dri-select-modal
@@ -192,6 +193,10 @@ export default {
        * 作物摂取量を表す値：作物摂取量の設定ダイアログに渡すproperty
        */
       value_model: 0,
+      /**
+       * 当該作物がどのメニュに含まれるかを示す変数
+       */
+      menuName_modal: '',
       /**
        * driSelectAll表示用のフラグ
        */
@@ -395,7 +400,6 @@ export default {
      * @param val
      */
     onRecepiClicked(val) {
-      console.log(val)
       this.items_modal.length = 0
       this.items_modal.push({
         'id': val.id,
@@ -406,6 +410,7 @@ export default {
         'Va': val.Va,
         'Fe': val.Fe,
       })
+      this.menuName_modal = val.menuName
       this.value_model = val.Wt
       this.showModal = true
     },
@@ -414,25 +419,17 @@ export default {
      * @param val
      */
     onFctClick(val) {
-      //fctでクリックした行がrecepiTableの中に含まれるか確認
-      let res = this.myAppWatcher.menuCases[this.pageIdComputed].menu.filter(function (dat) {
-        return Number(dat.id) === Number(val.id)
-      })
-      //含まれない場合はデータを新規追加・編集
-      if (!res.length) {
-        res[0] = val
-      }
       this.items_modal.length = 0
       this.items_modal.push({
-        'id': res[0].id,
-        'Name': res[0].Name,
-        'Group': res[0].Group,
-        'En': res[0].En,
-        'Pr': res[0].Pr,
-        'Va': res[0].Va,
-        'Fe': res[0].Fe,
+        'id': val.id,
+        'Name': val.Name,
+        'Group': val.Group,
+        'En': val.En,
+        'Pr': val.Pr,
+        'Va': val.Va,
+        'Fe': val.Fe,
       })
-      this.value_model = res[0].Wt
+      this.value_model = 0
       this.showModal = true
     },
     /**
@@ -446,7 +443,7 @@ export default {
       let existing = false
       let newMenu = []
       newMenu = vm.myAppWatcher.menuCases[vm.pageIdComputed].menu.map((item) => {
-        if (item.id === val.id) {
+        if (item.id === val.id && item.menuName === val.menuName){
           existing = true
           return JSON.parse(JSON.stringify(val))
         } else {
@@ -456,6 +453,7 @@ export default {
       if (!existing) {
         newMenu.push(val)
       }
+      console.log(newMenu)
       //作業用のmyAppコピー作成
       let dat = JSON.parse(JSON.stringify(vm.myAppWatcher))
       //更新されたmenuを入れ替える

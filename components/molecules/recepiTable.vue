@@ -15,46 +15,70 @@
         v-bind="$attrs">
 
         <!-- A custom formatted footer cell for field 'name' -->
+        <template #head(menuName)="data">
+          <span>Menu</span>
+        </template>
+        <template #foot(menuName)="data">
+          <span>Menu</span>
+        </template>
+        <!-- A custom formatted footer cell for field 'name' -->
+        <template #head(Name)="data">
+          <span>ingredients</span>
+        </template>
+        <template #foot(Name)="data">
+          <span>total</span>
+        </template>
+        <!-- A custom formatted footer cell for field 'En' -->
+        <template #foot(En)="data">
+          <span class="text-info" style="font-size: small">{{ setDigit(Number(nutritionSum.En),3) }}</span>
+        </template>
+        <!-- A custom formatted footer cell for field 'Pr' -->
+        <template #foot(Pr)="data">
+          <span class="text-info" style="font-size: small">{{ setDigit(Number(nutritionSum.Pr),0) }}</span>
+        </template>
+        <!-- A custom formatted footer cell for field 'Va' -->
+        <template #foot(Va)="data">
+          <span class="text-info" style="font-size: small">{{ setDigit(Number(nutritionSum.Va),1) }}</span>
+        </template>
+        <!-- A custom formatted footer cell for field 'Fe' -->
+        <template #foot(Fe)="data">
+          <span class="text-info" style="font-size: small">{{ setDigit(Number(nutritionSum.Fe),2) }}</span>
+        </template>
+        <!-- A custom formatted footer cell for field 'Wt' -->
+        <template #foot(Wt)="data">
+          <span class="text-info" style="font-size: small">{{ setDigit(Number(nutritionSum.Wt),0) }}</span>
+        </template>
+
+        <!-- A custom formatted cell for field 'name' -->
         <template #cell(Name)="data">
-          <span class="text-info">{{ data.value }}</span>
+          <span class="text-info" style="font-size: small">{{ data.value }}</span>
           <b-button class="px-0 py-0 mx-0 my-0" variant="light" @click="delClick(data.index)">
             <b-badge variant="gray-400" class="px-0 py-0">
               <b-icon icon="X"></b-icon>
             </b-badge>
           </b-button>
         </template>
-        <template #foot(Name)="data">
-          <span>total</span>
+        <!-- A custom formatted cell for field 'menuName' -->
+        <template #cell(menuName)="data">
+          <span class="text-info" style="font-size: small">{{ data.value }}</span>
         </template>
-        <template #foot(En)="data">
-          <span class="text-info" style="font-size: small">{{ setDigit(Number(nutritionSum.En),3) }}</span>
-        </template>
-        <template #foot(Pr)="data">
-          <span class="text-info" style="font-size: small">{{ setDigit(Number(nutritionSum.Pr),0) }}</span>
-        </template>
-        <template #foot(Va)="data">
-          <span class="text-info" style="font-size: small">{{ setDigit(Number(nutritionSum.Va),1) }}</span>
-        </template>
-        <template #foot(Fe)="data">
-          <span class="text-info" style="font-size: small">{{ setDigit(Number(nutritionSum.Fe),2) }}</span>
-        </template>
-        <template #foot(Wt)="data">
-          <span class="text-info" style="font-size: small">{{ setDigit(Number(nutritionSum.Wt),0) }}</span>
-        </template>
-
-        <!-- A custom formatted cell for field 'name' -->
+        <!-- A custom formatted cell for field 'En' -->
         <template #cell(En)="data">
           <span class="text-info" style="font-size: small">{{ setDigit(Number(data.value), 3) }}</span>
         </template>
+        <!-- A custom formatted cell for field 'Pr' -->
         <template #cell(Pr)="data">
           <span class="text-info" style="font-size: small">{{ setDigit(Number(data.value), 0) }}</span>
         </template>
+        <!-- A custom formatted cell for field 'Va' -->
         <template #cell(Va)="data">
           <span class="text-info" style="font-size: small">{{ setDigit(Number(data.value), 1) }}</span>
         </template>
+        <!-- A custom formatted cell for field 'Fe' -->
         <template #cell(Fe)="data">
           <span class="text-info" style="font-size: small">{{ setDigit(Number(data.value), 2) }}</span>
         </template>
+        <!-- A custom formatted cell for field 'Wt' -->
         <template #cell(Wt)="data">
           <span class="text-info" style="font-size: small">{{ setDigit(Number(data.value), 0) }}</span>
         </template>
@@ -65,30 +89,20 @@
 </template>
 
 <script>
+/**
+ * @desc 選択された品目一覧を表示するテーブル
+ * 横幅がタブレット以上の場合には料理名を表示、スマホの場合は材料名のみ表示
+ */
 
-  export default {
+export default {
     props: {
+      /**
+       * 食品名及び栄養成分の一覧を含む配列
+       */
       items: {
         type: Array,
         required: true,
-        default: () => [
-          {id: "1", Group: "grain", Name: "taro", En: "25", Pr: "5", Va: "109", Fe: "13", Wt: "196"},
-          {id: "2", Group: "meat", Name: "pork", En: "15", Pr: "9", Va: "58", Fe: "31", Wt: "208"}
-        ],
       },
-      FoodGrp: {
-        type: Array,
-        default: () => [
-          {name: 'Grains, roots and tubers'},
-          {name: 'Legumes and nuts'},
-          {name: 'Vitamin A rich fruits and Vegetable'},
-          {name: 'Other fruits and vegetables'},
-          {name: 'Flesh foods'},
-          {name: 'Dairy products'},
-          {name: 'Eggs'},
-          {name: 'non-category'}
-        ],
-      }
     },
     watch: {
       items: {
@@ -110,11 +124,17 @@
     },
     data() {
       return {
+        /**
+         * itemに含まれる全ての作物の栄養成分の合計値
+         */
         nutritionSum: {},
-        showNutritionSum: {},
+        /**
+         * テーブルのフィールド毎の書式設定
+         */
         fields: [
           {key: 'id', sortable: false, tdClass: 'd-none', thClass: 'd-none'},
           {key: 'Group', sortable: true, tdClass: 'd-none', thClass: 'd-none'},
+          {key: 'menuName', sortable: true, tdClass: 'text-center', thClass: 'text-center'},
           {key: 'Name', sortable: true},
           {key: 'En', sortable: true, tdClass: 'text-center', thClass: 'text-center'},
           {key: 'Pr', sortable: true, tdClass: 'text-center', thClass: 'text-center'},
@@ -125,6 +145,12 @@
       }
     },
     methods: {
+      /**
+       * 各栄養素の値の表示用に、桁数を調整
+       * @param item
+       * @param unitKey
+       * @returns {string}
+       */
       setDigit(item, unitKey) {
         let res = ''
         const units = [
@@ -150,6 +176,11 @@
         }
         return res
       },
+      /**
+       * itemの各要素の値から合計値を計算
+       * @param array
+       * @returns {*}
+       */
       updateSum(array) {
         return array.reduce((accumulator, item) => {
           accumulator.En = (accumulator.En || 0) + Number(item.En)
@@ -160,12 +191,23 @@
           return accumulator
         }, {})
       },
+      /**
+       * itemの構成が変わるたびに、合計値をemit
+       */
       onInput() {
         this.$emit('totalChanged', this.nutritionSum)
       },
+      /**
+       * テーブルの特定行がクリックされた場合、当該行の内容をemit
+       * @param record
+       */
       rowClick(record) {
         this.$emit('rowClick', record)
       },
+      /**
+       * 特定行の×ボタンをクリックした場合に、当該行を削除
+       * @param id
+       */
       delClick(id) {
         let res = []
         this.items.forEach(function (val, index) {

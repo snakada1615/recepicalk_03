@@ -8,6 +8,11 @@
     hide-header
     static
   >
+    <b-input
+      :value="menuName"
+      @input="$emit('update:menuName', $event)"
+      placeholder="name of the dish"
+    />
     <b-table
       small
       striped
@@ -20,7 +25,7 @@
     <b-input-group prepend="Weight in gram" size="sm">
       <b-form-input
         :value="value"
-        @input="$emit('input', Number($event))"
+        @input="$emit('update:value', Number($event))"
         type="number"
         :state="inputState"
         size="sm"
@@ -63,7 +68,13 @@
       value: {
         type: Number,
         required: true,
-        default: 0,
+      },
+      /**
+       * 当該作物がどのメニューの材料に含まれているのか記載
+       */
+      menuName:{
+        type: String,
+        required: true,
       },
       /**
        * modalのID
@@ -119,6 +130,7 @@
     },
     data() {
       return {
+        myMenuName:'',
         fields: [
           {key: 'id', sortable: false, tdClass: 'd-none', thClass: 'd-none'},
           {key: 'Name', sortable: true, thStyle: {width: "290px"}},
@@ -164,6 +176,7 @@
         let result = {}
         result = this.items[0]
         result.Wt = this.value
+        result.menuName = this.menuName
         this.$emit('modalOk', result)
       },
       clickCancel() {

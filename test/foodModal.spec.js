@@ -8,6 +8,7 @@ localVue.use(BootstrapVue)
 
 const value = 0
 const myName = 'modal01'
+const menuName = 'tendon'
 const items =[]
 const items2 = [
   {
@@ -25,7 +26,8 @@ const items2 = [
   },
 ]
 
-describe('foodModal', () => {
+
+  describe('foodModal', () => {
   it("foodModal", async () => {
     const wrapperOrg = mount(foodModal, {
       localVue,
@@ -33,6 +35,7 @@ describe('foodModal', () => {
         value: value,
         myName: myName,
         items: items,
+        menuName: menuName,
         showModal: false
       }
     })
@@ -54,7 +57,8 @@ describe('foodModal', () => {
 
     //表示内容を更新
     await wrapperOrg.setProps({items: JSON.parse(JSON.stringify(items2))})
-    await wrapperOrg.setProps({value: 30})
+    await wrapperOrg.setProps({value: 30}) // 重量の変更
+    await wrapperOrg.setProps({menuName: 'sandowich'}) //メニュー名の変更
     //表示内容を確認
     expect(Table.html()).toMatch(/Yam tuber, flour/)
 
@@ -63,6 +67,7 @@ describe('foodModal', () => {
 
     //emitを確認(setPropsで30を代入している)
     expect(wrapperOrg.emitted('modalOk')[0][0].Wt).toBe(30)
+    expect(wrapperOrg.emitted('modalOk')[0][0].menuName).toBe('sandowich')
     expect(wrapperOrg.emitted('update:showModal')[0][0]).toBe(false)
     await wrapperOrg.setProps({showModal: false})
 

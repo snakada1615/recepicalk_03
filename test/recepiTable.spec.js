@@ -9,12 +9,12 @@ localVue.component('BIcon', BIcon)
 localVue.component('BIconX', BIconX)
 
 let crops=[
-  {id:"1", Group: "grain", Name: "taro", En: "25", Pr: "5", Va: "109", Fe: "13", Wt: "196"},
-  {id:"2", Group: "meat", Name: "pork", En: "15", Pr: "9", Va: "58", Fe: "31", Wt: "208"}
+  {id:"1", Group: "grain", Name: "taro", En: "25", Pr: "5", Va: "109", Fe: "13", Wt: "196", menuName: "Curry"},
+  {id:"2", Group: "meat", Name: "pork", En: "15", Pr: "9", Va: "58", Fe: "31", Wt: "208", menuName: "Oyako-don"}
 ]
 
 let newItem = {
-  id:"3", Group: "veggie", Name: "Yasai", En: "15", Pr: "9", Va: "58", Fe: "31", Wt: "208"
+  id:"3", Group: "veggie", Name: "Yasai", En: "15", Pr: "9", Va: "58", Fe: "31", Wt: "208", menuName: "Curry"
 }
 
 
@@ -44,6 +44,11 @@ describe('recepiTable', () => {
     myRows = wrapper.findAll('table tbody tr')
     myCols = myRows.at(2).findAll('td')
     expect(myCols.at(2).text()).toBe('Yasai')
+
+    //作物リストをクリック
+    //クリックした作物の内容をemit
+    await myRows.at(1).trigger('click')
+    expect(wrapper.emitted().rowClick[0][0].menuName).toBe('Oyako-don')
 
     //作物を削除
     let myButton = myRows.at(2).findAll('td button')
