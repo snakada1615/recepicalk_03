@@ -7,7 +7,7 @@
           <div class="d-flex flex-row">
             <b-form-input
               v-model="pageMemo[pageIdComputed]"
-              placeholder="memo for this page"
+              placeholder="note for this family"
               class="my-1"></b-form-input>
             <b-button
               @click="updatePageMemo(pageMemo[pageIdComputed])"
@@ -15,11 +15,6 @@
               class="mx-1 my-1">update
             </b-button>
           </div>
-          <b-form-checkbox
-            switch
-            v-model="driSwitch"
-          >evaluate [daily consumption] /[single meal]
-          </b-form-checkbox>
           <b-row>
             <b-col cols="2" class="d-flex justify-content-center">Target</b-col>
             <b-col cols="2" class="d-flex justify-content-center">Supply</b-col>
@@ -30,32 +25,32 @@
             :col-width-second=2
             :label="nutritionLabel[0]"
             :max-rating="maxRating"
-            :rating="rating[pageIdComputed].En"
-            :maxRatingAbsolute="nutritionSupplyWatcher[pageIdComputed].En"
+            :rating="rating[pageIdComputed][nutritionLabel[0]]"
+            :maxRatingAbsolute="nutritionSupplyWatcher[pageIdComputed][nutritionLabel[0]]"
           />
           <nutrition-bar
             :col-width-first=2
             :col-width-second=2
             :label="nutritionLabel[1]"
             :max-rating="maxRating"
-            :rating="rating[pageIdComputed].Pr"
-            :maxRatingAbsolute="nutritionSupplyWatcher[pageIdComputed].Pr"
+            :rating="rating[pageIdComputed][nutritionLabel[1]]"
+            :maxRatingAbsolute="nutritionSupplyWatcher[pageIdComputed][nutritionLabel[1]]"
           />
           <nutrition-bar
             :col-width-first=2
             :col-width-second=2
             :label="nutritionLabel[2]"
             :max-rating="maxRating"
-            :rating="rating[pageIdComputed].Va"
-            :maxRatingAbsolute="nutritionSupplyWatcher[pageIdComputed].Va"
+            :rating="rating[pageIdComputed][nutritionLabel[2]]"
+            :maxRatingAbsolute="nutritionSupplyWatcher[pageIdComputed][nutritionLabel[2]]"
           />
           <nutrition-bar
             :col-width-first=2
             :col-width-second=2
             :label="nutritionLabel[3]"
             :max-rating="maxRating"
-            :rating="rating[pageIdComputed].Fe"
-            :maxRatingAbsolute="nutritionSupplyWatcher[pageIdComputed].Fe"
+            :rating="rating[pageIdComputed][nutritionLabel[3]]"
+            :maxRatingAbsolute="nutritionSupplyWatcher[pageIdComputed][nutritionLabel[3]]"
           />
         </b-card>
       </b-col>
