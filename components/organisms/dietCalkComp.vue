@@ -2,7 +2,7 @@
   <b-container>
     <b-row class="my-2">
       <b-col>
-        <b-card bg-variant="light">
+        <b-card bg-variant="light" class="my-2">
           <b-form-select v-model="pageIdComputed" :options="pageOptions"></b-form-select>
           <div class="d-flex flex-row">
             <b-form-input
@@ -15,43 +15,34 @@
               class="mx-1 my-1">update
             </b-button>
           </div>
-          <b-row>
-            <b-col cols="2" class="d-flex justify-content-center">Target</b-col>
-            <b-col cols="2" class="d-flex justify-content-center">Supply</b-col>
-            <b-col class="d-flex justify-content-right">sufficiency rate</b-col>
-          </b-row>
-          <nutrition-bar
-            :col-width-first=2
-            :col-width-second=2
-            :label="nutritionLabel[0]"
-            :max-rating="maxRating"
-            :rating="rating[pageIdComputed][nutritionLabel[0]]"
-            :maxRatingAbsolute="nutritionSupplyWatcher[pageIdComputed][nutritionLabel[0]]"
-          />
-          <nutrition-bar
-            :col-width-first=2
-            :col-width-second=2
-            :label="nutritionLabel[1]"
-            :max-rating="maxRating"
-            :rating="rating[pageIdComputed][nutritionLabel[1]]"
-            :maxRatingAbsolute="nutritionSupplyWatcher[pageIdComputed][nutritionLabel[1]]"
-          />
-          <nutrition-bar
-            :col-width-first=2
-            :col-width-second=2
-            :label="nutritionLabel[2]"
-            :max-rating="maxRating"
-            :rating="rating[pageIdComputed][nutritionLabel[2]]"
-            :maxRatingAbsolute="nutritionSupplyWatcher[pageIdComputed][nutritionLabel[2]]"
-          />
-          <nutrition-bar
-            :col-width-first=2
-            :col-width-second=2
-            :label="nutritionLabel[3]"
-            :max-rating="maxRating"
-            :rating="rating[pageIdComputed][nutritionLabel[3]]"
-            :maxRatingAbsolute="nutritionSupplyWatcher[pageIdComputed][nutritionLabel[3]]"
-          />
+          <b-card title="dietary diversity" class="my-2">
+            <div
+              v-for="(grp, index) in foodGroup"
+              class="border my-1 px-1"
+              :class="{
+                'bg-warning': !diversityStatus[pageIdComputed][index][grp],
+                'bg-success': diversityStatus[pageIdComputed][index][grp]
+              }"
+            >
+              {{ grp }}
+            </div>
+          </b-card>
+          <b-card title="Key Nutrients Sufficiency" class="my-2">
+            <b-row>
+              <b-col cols="2" class="d-flex justify-content-center">Target</b-col>
+              <b-col cols="2" class="d-flex justify-content-center">Supply</b-col>
+              <b-col class="d-flex justify-content-right">sufficiency rate</b-col>
+            </b-row>
+            <nutrition-bar
+              v-for="index in 4" :key="index"
+              :col-width-first=2
+              :col-width-second=2
+              :label="nutritionLabel[index-1]"
+              :max-rating="maxRating"
+              :rating="rating[pageIdComputed][nutritionLabel[index-1]]"
+              :maxRatingAbsolute="nutritionSupplyWatcher[pageIdComputed][nutritionLabel[index-1]]"
+            />
+          </b-card>
         </b-card>
       </b-col>
     </b-row>
@@ -96,7 +87,7 @@
       :items="items_modal"
       :value.sync="value_model"
       :menu-name.sync="menuName_modal"
-      :portion-units = "myAppWatcher.dataSet.portionUnit"
+      :portion-units="myAppWatcher.dataSet.portionUnit"
       @modalOk="addSupply"
     />
     <dri-select-modal
@@ -273,6 +264,29 @@ export default {
       }
       return res
     },
+    foodGroup() {
+      return this.myApp.dataSet.fct.reduce((accumulator, dat) => {
+        if (accumulator.indexOf(dat.Group) < 0) {
+          accumulator.push(dat.Group)
+        }
+        return accumulator
+      }, [])
+    },
+    diversityStatus() {
+      const vm = this
+      return this.myApp.menuCases.map((foodsTemp) => {
+        let res = vm.foodGroup.map((groupTemp) => {
+          return {[groupTemp]: false}
+        })
+        foodsTemp.menu.forEach((dat1) => {
+          const indexTemp = vm.foodGroup.indexOf(dat1.Group)
+          if (indexTemp >= 0) {
+            res[indexTemp][dat1.Group] = true
+          }
+        })
+        return res
+      })
+    }
   },
   watch: {
     /**
@@ -439,7 +453,7 @@ export default {
       let existing = false
       let newMenu = []
       newMenu = vm.myAppWatcher.menuCases[vm.pageIdComputed].menu.map((item) => {
-        if (item.id === val.id && item.menuName === val.menuName){
+        if (item.id === val.id && item.menuName === val.menuName) {
           existing = true
           return JSON.parse(JSON.stringify(val))
         } else {
