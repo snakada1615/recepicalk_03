@@ -197,6 +197,28 @@ export function validateFct(dat){
 
   return isObject(dat) && res
 }
+/**
+ * portionUnitのバリデーション
+ * @param dat 検証するportionUnit
+ * @returns {false|boolean}
+ */
+export function validatePortionUnit(dat){
+  //portionUnitの型設計
+  const typeName = [
+    'id',
+    'FCT_id',
+    'unit_weight',
+    'count_method'
+  ]
+  let res = true
+  const myError = validateObject(dat, typeName)
+  if (myError.length > 0){
+    console.log(myError)
+    res = false
+  }
+
+  return isObject(dat) && res
+}
 
 /**
  * ターゲットグループの構成とdri一蘭から栄養需要を計算する

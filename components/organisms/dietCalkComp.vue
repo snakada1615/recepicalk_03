@@ -101,6 +101,7 @@
       :items="items_modal"
       :value.sync="value_model"
       :menu-name.sync="menuName_modal"
+      :portion-units = "myAppWatcher.dataSet.portionUnit"
       @modalOk="addSupply"
     />
     <dri-select-modal

@@ -66,13 +66,21 @@ export const state = () => ({
        */
       regionId: 'eth_region',
       /**
+       * portionUnitのid
+       */
+      portionUnitId: 'portionUnit1',
+      /**
        * fctのデータ
        */
       fct: [],
       /**
        * driのデータ
        */
-      dri: []
+      dri: [],
+      /**
+       * portionUnitのデータ
+       */
+      portionUnit:[],
     },
     /**
      * シナリオの数（各シナリオに10の食事パターンが存在）
@@ -179,6 +187,14 @@ export const mutations = {
     state.myApp.dataSet.regionId = payload
   },
   /**
+   * portionUnitIdを更新
+   * @param state
+   * @param payload
+   */
+  updatePortionUnitId: function(state, payload){
+    state.myApp.dataSet.portionUnitId = payload
+  },
+  /**
    * ユーザーデータ（myApp）が読み込まれたらTrueにセット
    * @param state
    */
@@ -202,6 +218,7 @@ export const mutations = {
     state.myApp.user.uid = ''
     state.myApp.dataSet.fct = []
     state.myApp.dataSet.dri = []
+    state.myApp.dataSet.portionUnit = []
     state.myApp.menuCases = []
     state.myApp.feasibilityCases = []
     state.myApp.saveDate = {}
@@ -285,6 +302,14 @@ export const mutations = {
     state.myApp.dataSet.dri = JSON.parse(JSON.stringify(payload))
   },
   /**
+   * portionUnitを更新
+   * @param state
+   * @param payload 更新する値（JSON）
+   */
+  updatePortionUnit: function (state, payload) {
+    state.myApp.dataSet.portionUnit = JSON.parse(JSON.stringify(payload))
+  },
+  /**
    * menuCasesを更新
    * @param state
    * @param payload
@@ -348,6 +373,14 @@ export const actions = {
    */
   updateDriId({commit}, payload){
     commit('updateDriId', payload)
+  },
+  /**
+   * PortionUnitIdを更新
+   * @param commit
+   * @param payload
+   */
+  updatePortionUnitId({commit}, payload){
+    commit('updatePortionUnitId', payload)
   },
   /**
    * ユーザーデータ（myApp）が読み込まれたらTrueにセット
@@ -488,8 +521,6 @@ export const actions = {
       });
     const user = res.user
     commit('initUser', user)
-    //commit('updateUserUid', user.uid)
-    //commit('updateUserName', user.displayName)
     commit('updateIsLoggedIn', true)
     console.log('login success')
 
@@ -535,8 +566,6 @@ export const actions = {
     });
 
     commit('initUser', user)
-    //commit('updateUserUid', user.uid)
-    //commit('updateUserName', user.displayName)
     commit('updateIsLoggedIn', true)
     console.log('login success')
     /**
@@ -610,7 +639,6 @@ export const actions = {
    * @returns {Promise<void>}
    */
   async initFct({commit, dispatch, state}) {
-    console.log(state.myApp.dataSet.fctId)
     const fct = await fireGetDoc('dataset', state.myApp.dataSet.fctId)
     if (fct) {
       const fctArray = await dispatch('formatFct', fct)
@@ -628,13 +656,32 @@ export const actions = {
    * @returns {Promise<void>}
    */
   async initDri({commit, dispatch, state}) {
-    console.log(state.myApp.dataSet)
     const dri = await fireGetDoc('dataset', state.myApp.dataSet.driId)
     if (dri) {
       const driArray = await dispatch('formatDri', dri)
       commit('updateDri', driArray)
     } else {
       throw new Error('initDri fail: no data')
+    }
+  },
+  /**
+   * PortionUnitのデータをfireStoreから取得して返す
+   * @param state
+   * @param commit
+   * @param dispatch
+   * @returns {Promise<void>}
+   */
+  async initPortionUnit({state, commit, dispatch}) {
+    console.log(state.myApp.dataSet)
+    console.log(state.myApp.dataSet.portionUnitId)
+    const portionUnit = await fireGetDoc('dataset', state.myApp.dataSet.portionUnitId).catch((err)=>{
+      throw Error(err)
+    })
+    if (portionUnit) {
+      const portionUnitArray = await dispatch('formatPortionUnit', portionUnit)
+      commit('updatePortionUnit', portionUnitArray)
+    } else {
+      throw new Error('initPortionUnit fail: no data')
     }
   },
   /**
@@ -711,6 +758,23 @@ export const actions = {
     return res
   },
   /**
+   * JSON -→ array of objectに変換
+   * @param dat (JSON形式)
+   * @returns {{}[]}
+   */
+  formatPortionUnit({}, dat) {
+    let res = []
+    for (let key of Object.keys(dat)) {
+      let resObj = {}
+      resObj.id = dat[key].id
+      resObj.FCT_id = dat[key].FCT_id
+      resObj.count_method = dat[key].count_method
+      resObj.unit_weight = dat[key].unit_weight
+      res.push(resObj)
+    }
+    return res
+  },
+  /**
    * menuCasesを初期化（空白ArrayをsetCountの数だけ作成）
    * @param payload driのセット(array of object)
    * @param state
@@ -760,11 +824,10 @@ export const actions = {
       throw new Error('Error: initAll → no registered user-info')
     }
     try {
-      console.log('state.myApp')
-      console.log(state.myApp)
-        await commit('initUser', payload)
+      await commit('initUser', payload)
       await dispatch('initFct')
       await dispatch('initDri')
+      await dispatch('initPortionUnit')
       await dispatch('initMenu', state.myApp.dataSet.dri)
       await dispatch('initFeasibility', state.myApp.dataSet.dri)
       await dispatch('fireSaveAppdata')
