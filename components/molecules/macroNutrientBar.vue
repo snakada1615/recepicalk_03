@@ -47,6 +47,7 @@ export default {
      * @returns {[{color, x1: number, x2: number},{color, x1: number, x2: number},{color, x1: number, x2: number}]}
      */
     chartDataSet() {
+      console.log(this.chartValues)
       const sum = this.chartValues[0].val + this.chartValues[1].val + this.chartValues[2].val
       const val1 = Math.round(this.chartValues[0].val * 100 / sum)
       const val2 = Math.round((this.chartValues[0].val + this.chartValues[1].val) * 100 / sum)

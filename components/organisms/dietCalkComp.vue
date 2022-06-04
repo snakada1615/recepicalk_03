@@ -15,6 +15,16 @@
               class="mx-1 my-1">update
             </b-button>
           </div>
+          <b-button
+            @click="showDriSelect = !showDriSelect"
+            variant="info"
+          >set family
+          </b-button>
+          <b-button
+            @click="showFct = !showFct"
+            variant="info"
+          >add crop
+          </b-button>
           <b-card title="dietary diversity" class="my-2">
             <div
               v-for="(grp, index) in foodGroup"
@@ -26,6 +36,28 @@
             >
               {{ grp }}
             </div>
+          </b-card>
+          <b-card title="Key Nutrients Balance" class="my-2">
+            <b-row>
+              <b-col cols="4">
+                <div>PFC recommendation</div>
+              </b-col>
+              <b-col cols="7">
+                <macro-nutrient-bar
+                  :chart-values = "pfcBalanceStandard"
+                ></macro-nutrient-bar>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col cols="4">
+                <div>Current PFC balance</div>
+              </b-col>
+              <b-col cols="7">
+                <macro-nutrient-bar
+                  :chart-values = "pfcBalanceCurrent[pageIdComputed]"
+                ></macro-nutrient-bar>
+              </b-col>
+            </b-row>
           </b-card>
           <b-card title="Key Nutrients Sufficiency" class="my-2">
             <b-row>
@@ -48,29 +80,14 @@
     </b-row>
     <b-row class="my-2">
       <b-col>
-        <b-card
-          bg-variant="light"
-        >
+        <b-card bg-variant="light">
           <recepi-table
             :items.sync="myAppWatcher.menuCases[pageIdComputed].menu"
             @itemDeleted="deleteSupply"
             @rowClick="onRecepiClicked"
+            @totalChanged="updatePfc"
           ></recepi-table>
         </b-card>
-      </b-col>
-    </b-row>
-    <b-row>
-      <b-col>
-        <b-button
-          @click="showDriSelect = !showDriSelect"
-          variant="info"
-        >set target
-        </b-button>
-        <b-button
-          @click="showFct = !showFct"
-          variant="info"
-        >add crop
-        </b-button>
       </b-col>
     </b-row>
     <FctTableModal
@@ -109,6 +126,7 @@ import driSelectModal from "@/components/organisms/driSelectModal";
 import foodModal from "@/components/molecules/foodModal"
 import recepiTable from "@/components/molecules/recepiTable"
 import nutritionBar from "@/components/molecules/nutritionBar"
+import macroNutrientBar from "@/components/molecules/macroNutrientBar";
 import {validateMyApp} from "@/plugins/helper";
 
 /**
@@ -132,7 +150,8 @@ export default {
     recepiTable,
     foodModal,
     nutritionBar,
-    driSelectModal
+    driSelectModal,
+    macroNutrientBar
   },
   data() {
     return {
@@ -200,6 +219,69 @@ export default {
        * 各ページの捕捉情報
        */
       pageMemo: '',
+      /**
+       * PFCバランスの推奨値
+       */
+      pfcBalanceStandard: [
+        {val: 55, color: 'red'},
+        {val: 35, color: 'green'},
+        {val: 10, color: 'yellow'},
+      ],
+      /**
+       * PFCバランスの現状
+       */
+      pfcBalanceCurrent:[
+        [
+          {val: 55, color: 'red'},
+          {val: 35, color: 'green'},
+          {val: 10, color: 'yellow'},
+        ],
+        [
+          {val: 55, color: 'red'},
+          {val: 35, color: 'green'},
+          {val: 10, color: 'yellow'},
+        ],
+        [
+          {val: 55, color: 'red'},
+          {val: 35, color: 'green'},
+          {val: 10, color: 'yellow'},
+        ],
+        [
+          {val: 55, color: 'red'},
+          {val: 35, color: 'green'},
+          {val: 10, color: 'yellow'},
+        ],
+        [
+          {val: 55, color: 'red'},
+          {val: 35, color: 'green'},
+          {val: 10, color: 'yellow'},
+        ],
+        [
+          {val: 55, color: 'red'},
+          {val: 35, color: 'green'},
+          {val: 10, color: 'yellow'},
+        ],
+        [
+          {val: 55, color: 'red'},
+          {val: 35, color: 'green'},
+          {val: 10, color: 'yellow'},
+        ],
+        [
+          {val: 55, color: 'red'},
+          {val: 35, color: 'green'},
+          {val: 10, color: 'yellow'},
+        ],
+        [
+          {val: 55, color: 'red'},
+          {val: 35, color: 'green'},
+          {val: 10, color: 'yellow'},
+        ],
+        [
+          {val: 55, color: 'red'},
+          {val: 35, color: 'green'},
+          {val: 10, color: 'yellow'},
+        ],
+      ]
     }
   },
   props: {
@@ -264,6 +346,10 @@ export default {
       }
       return res
     },
+    /**
+     * FCTからfood Groupを抽出
+     * @returns {*}
+     */
     foodGroup() {
       return this.myApp.dataSet.fct.reduce((accumulator, dat) => {
         if (accumulator.indexOf(dat.Group) < 0) {
@@ -272,6 +358,10 @@ export default {
         return accumulator
       }, [])
     },
+    /**
+     * menuCasesに含まれるfood Groupから、何種類の食品群が含まれるか判定
+     * @returns {*[]}
+     */
     diversityStatus() {
       const vm = this
       return this.myApp.menuCases.map((foodsTemp) => {
@@ -286,7 +376,7 @@ export default {
         })
         return res
       })
-    }
+    },
   },
   watch: {
     /**
@@ -358,15 +448,33 @@ export default {
       return vm.myApp.menuCases.map((datArray) => {
         if (datArray.menu.length > 0) {
           return datArray.menu.reduce((accumulator, item) => {
-            accumulator.En = (accumulator.En || 0) + Number(item.En)
-            accumulator.Pr = (accumulator.Pr || 0) + Number(item.Pr)
-            accumulator.Va = (accumulator.Va || 0) + Number(item.Va)
-            accumulator.Fe = (accumulator.Fe || 0) + Number(item.Fe)
-            accumulator.Wt = (accumulator.Wt || 0) + Number(item.Wt)
+            accumulator.En += Number(item.En)
+            accumulator.Pr += Number(item.Pr)
+            accumulator.Va += Number(item.Va)
+            accumulator.Fe += Number(item.Fe)
+            accumulator.Wt += Number(item.Wt)
+            accumulator.Carbohydrate += Number(item.Carbohydrate)
+            accumulator.Fat += Number(item.Fat)
             return accumulator
-          }, {})
+          }, {
+            'En': 0,
+            'Pr': 0,
+            'Va': 0,
+            'Fe': 0,
+            'Wt': 0,
+            'Carbohydrate': 0,
+            'Fat':0
+          })
         } else {
-          return {'En': 0, 'Pr': 0, 'Va': 0, 'Fe': 0, 'Wt': 0}
+          return {
+            'En': 0,
+            'Pr': 0,
+            'Va': 0,
+            'Fe': 0,
+            'Wt': 0,
+            'Carbohydrate': 0,
+            'Fat':0
+          }
         }
       })
     },
@@ -438,6 +546,8 @@ export default {
         'Pr': val.Pr,
         'Va': val.Va,
         'Fe': val.Fe,
+        'Carbohydrate': val.Carbohydrate,
+        'Fat': val.Fat,
       })
       this.value_model = 0
       this.showModal = true
@@ -487,6 +597,26 @@ export default {
     toggleFctDri() {
       console.log('test')
     },
+    /**
+     * recepiTableが更新される旅に、pfcBalanceCurrent
+     *    の値を更新
+     *    conversion factor
+     *    -Carbohydrate: 4Kcal/gram
+     *    -Protein: 4Kcal/gram
+     *    -Fat: 9Kcal/gram
+     */
+    updatePfc(){
+      this.pfcBalanceCurrent = this.nutritionSupplyWatcher.map((dat)=>{
+        return [
+          {val: Math.round(dat.Carbohydrate * 4), color: 'red'},
+          {val: Math.round(dat.Pr * 4), color: 'green'},
+          {val: Math.round(dat.Fat * 9), color: 'yellow'},
+        ]
+
+      })
+      console.log(this.nutritionSupplyWatcher)
+      console.log(this.pfcBalanceCurrent)
+    }
   }
 }
 </script>
