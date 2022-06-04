@@ -46,6 +46,7 @@
         :filter-included-fields="filterOn"
         @filtered="onFiltered"
         @row-clicked="rowClick"
+        @row-dblclicked="rowDblClick"
         @input="onInput"
         v-bind="$attrs">
       </b-table>
@@ -196,6 +197,13 @@ export default {
      */
     rowClick(record) {
       this.$emit('fctClick', record)
+    },
+    /**
+     * テーブルの行をダブルクリックした際にその行の情報をemit
+     * @param record
+     */
+    rowDblClick(record) {
+      this.$emit('fctDblClick', record)
     }
   },
 }

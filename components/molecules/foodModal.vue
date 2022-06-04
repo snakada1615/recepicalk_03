@@ -3,16 +3,20 @@
     v-model="showModalComputed"
     :id="myName"
     :title="myModalHeader"
+    :ok-disabled = "!menuNameState"
     @ok="clickOk"
     @cancel="clickCancel"
     hide-header
     static
   >
-    <b-input
-      :value="menuName"
-      @input="$emit('update:menuName', $event)"
-      placeholder="name of the dish"
-    />
+    <b-input-group prepend="name of dish" size="sm">
+      <b-input
+        :value="menuName"
+        @input="$emit('update:menuName', $event)"
+        :state="menuNameState"
+        placeholder="name of the dish"
+      />
+    </b-input-group>
     <b-table
       small
       striped
@@ -155,6 +159,9 @@ export default {
     },
     inputState() {
       return (this.value > 0 && this.value <= this.maxWeight)
+    },
+    menuNameState() {
+      return (this.menuName.length > 3)
     },
     showModalComputed: {
       get() {

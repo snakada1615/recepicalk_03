@@ -13,6 +13,7 @@
       head-row-variant="success"
       table-variant="light"
       @fctClick="onFctClick"
+      @fctDblClick="onFctDblClick"
     ></fct-table>
   </b-modal>
 </template>
@@ -85,13 +86,23 @@
     },
     methods: {
       /**
-       * 行をクリックされた場合にその内容をemitして
-       * 食品の摂取量の設定用の別のmodal（foodModal）を開く
+       * 行をクリックされた場合にその内容をemitする
        * @param rec
        */
       onFctClick(rec){
         this.selectedItem = rec
         this.$emit('click', rec)
+      },
+      /**
+       * 行をクリックされた場合にその内容をemitして
+       * 食品の摂取量の設定用の別のmodal（foodModal）を開く
+       * @param rec
+       */
+      onFctDblClick(rec){
+        this.selectedItem = rec
+        this.$emit('click', rec)
+        this.clickOk()
+        this.$emit('update:showModal', false)
       },
       /**
        * 選択されたfood item（onFctClick）と摂取量(foodModal)の両方をemitする
