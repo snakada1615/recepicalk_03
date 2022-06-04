@@ -1,7 +1,7 @@
 <template>
   <b-container>
     <b-row class="my-2">
-      <b-col>
+      <b-col cols="12" lg="6">
         <b-card bg-variant="light" class="my-2">
           <b-form-select v-model="pageIdComputed" :options="pageOptions"></b-form-select>
           <div class="d-flex flex-row">
@@ -25,56 +25,62 @@
             variant="info"
           >add crop
           </b-button>
-          <b-card title="dietary diversity" class="my-2">
-            <div
-              v-for="(grp, index) in foodGroup"
-              class="border my-1 px-1"
-              :class="{
+        </b-card>
+      </b-col>
+      <b-col cols="12" lg="6">
+        <b-card title="dietary diversity" class="my-2">
+          <div
+            v-for="(grp, index) in foodGroup"
+            class="border my-1 px-1"
+            :class="{
                 'bg-warning': !diversityStatus[pageIdComputed][index][grp],
                 'bg-success': diversityStatus[pageIdComputed][index][grp]
               }"
-            >
-              {{ grp }}
-            </div>
-          </b-card>
-          <b-card title="Key Nutrients Balance" class="my-2">
-            <b-row>
-              <b-col cols="4">
-                <div>PFC recommendation</div>
-              </b-col>
-              <b-col cols="7">
-                <macro-nutrient-bar
-                  :chart-values = "pfcBalanceStandard"
-                ></macro-nutrient-bar>
-              </b-col>
-            </b-row>
-            <b-row>
-              <b-col cols="4">
-                <div>Current PFC balance</div>
-              </b-col>
-              <b-col cols="7">
-                <macro-nutrient-bar
-                  :chart-values = "pfcBalanceCurrent[pageIdComputed]"
-                ></macro-nutrient-bar>
-              </b-col>
-            </b-row>
-          </b-card>
-          <b-card title="Key Nutrients Sufficiency" class="my-2">
-            <b-row>
-              <b-col cols="2" class="d-flex justify-content-center">Target</b-col>
-              <b-col cols="2" class="d-flex justify-content-center">Supply</b-col>
-              <b-col class="d-flex justify-content-right">sufficiency rate</b-col>
-            </b-row>
-            <nutrition-bar
-              v-for="index in 4" :key="index"
-              :col-width-first=2
-              :col-width-second=2
-              :label="nutritionLabel[index-1]"
-              :max-rating="maxRating"
-              :rating="rating[pageIdComputed][nutritionLabel[index-1]]"
-              :maxRatingAbsolute="nutritionSupplyWatcher[pageIdComputed][nutritionLabel[index-1]]"
-            />
-          </b-card>
+          >
+            {{ grp }}
+          </div>
+        </b-card>
+      </b-col>
+      <b-col cols="12" lg="6">
+        <b-card title="Key Nutrients Sufficiency" class="my-2">
+          <b-row>
+            <b-col cols="2" class="d-flex justify-content-center">Target</b-col>
+            <b-col cols="2" class="d-flex justify-content-center">Supply</b-col>
+            <b-col class="d-flex justify-content-right">sufficiency rate</b-col>
+          </b-row>
+          <nutrition-bar
+            v-for="index in 4" :key="index"
+            :col-width-first=2
+            :col-width-second=2
+            :label="nutritionLabel[index-1]"
+            :max-rating="maxRating"
+            :rating="rating[pageIdComputed][nutritionLabel[index-1]]"
+            :maxRatingAbsolute="nutritionSupplyWatcher[pageIdComputed][nutritionLabel[index-1]]"
+          />
+        </b-card>
+      </b-col>
+      <b-col cols="12" lg="6">
+        <b-card title="Key Nutrients Balance" class="my-2">
+          <b-row>
+            <b-col cols="4">
+              <div>PFC recommendation</div>
+            </b-col>
+            <b-col cols="7">
+              <macro-nutrient-bar
+                :chart-values="pfcBalanceStandard"
+              ></macro-nutrient-bar>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col cols="4">
+              <div>Current PFC balance</div>
+            </b-col>
+            <b-col cols="7">
+              <macro-nutrient-bar
+                :chart-values="pfcBalanceCurrent[pageIdComputed]"
+              ></macro-nutrient-bar>
+            </b-col>
+          </b-row>
         </b-card>
       </b-col>
     </b-row>
@@ -230,7 +236,7 @@ export default {
       /**
        * PFCバランスの現状
        */
-      pfcBalanceCurrent:[
+      pfcBalanceCurrent: [
         [
           {val: 55, color: 'red'},
           {val: 35, color: 'green'},
@@ -463,7 +469,7 @@ export default {
             'Fe': 0,
             'Wt': 0,
             'Carbohydrate': 0,
-            'Fat':0
+            'Fat': 0
           })
         } else {
           return {
@@ -473,7 +479,7 @@ export default {
             'Fe': 0,
             'Wt': 0,
             'Carbohydrate': 0,
-            'Fat':0
+            'Fat': 0
           }
         }
       })
@@ -605,8 +611,8 @@ export default {
      *    -Protein: 4Kcal/gram
      *    -Fat: 9Kcal/gram
      */
-    updatePfc(){
-      this.pfcBalanceCurrent = this.nutritionSupplyWatcher.map((dat)=>{
+    updatePfc() {
+      this.pfcBalanceCurrent = this.nutritionSupplyWatcher.map((dat) => {
         return [
           {val: Math.round(dat.Carbohydrate * 4), color: 'red'},
           {val: Math.round(dat.Pr * 4), color: 'green'},
