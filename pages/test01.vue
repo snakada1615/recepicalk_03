@@ -1,78 +1,26 @@
 <template>
   <b-container>
-    <b-card>
-      {{testApp}}
-      <div>validation:{{
-          myValidator
-        }}</div>
-    </b-card>
+    <macro-nutrient-bar
+      :chart-values="chartValues"
+    ></macro-nutrient-bar>
   </b-container>
 </template>
 
 <script>
-import dietCalkComp from "@/components/organisms/dietCalkComp";
-import {validateMyApp} from "@/plugins/helper";
+import macroNutrientBar from "@/components/molecules/macroNutrientBar";
 
 export default {
   components: {
-    dietCalkComp,
+    macroNutrientBar,
   },
-  data: function () {
+  data() {
     return {
-      pageId: 2,
-      sceneCount: 0,
-      myCount: [],
-      target: {},
-      testApp:{
-        user:{
-          title:'',
-          email:'',
-          uid:'',
-          country:'',
-          displayName:'',
-          organization:'',
-          phoneNumber:'',
-          subnational1:'',
-          subnational2:'',
-          subnational3:'',
-        },
-        dataSet:{
-          dri:[],
-          fct:[],
-          driId:[],
-          fctId:[]
-        },
-        feasibilityCases:[],
-        menuCases:[],
-        saveDate:'',
-        sceneCount:'',
-        scene:'',
-      },
-      myValidator: true
+      chartValues: [
+        {val: 24, color: 'red'},
+        {val: 32, color: 'green'},
+        {val: 66, color: 'yellow'},
+      ],
     }
   },
-  created() {
-    /**
-     * 初回ロード時にstoreからmyAppを読み込む
-     * @type {any}
-     */
-    this.myValidator = validateMyApp(this.testApp)
-  },
-  computed: {
-    myApp:function(){
-      return this.$store.state.fire.myApp
-    }
-  },
-  methods: {
-    changeTab() {
-      console.log('tabChange:' + this.pageId)
-    },
-    updateMyApp(val) {
-      this.$store.dispatch('fire/updateMyApp', val)
-    },
-    formatter(val) {
-      return Number(val)
-    }
-  }
-}
+};
 </script>

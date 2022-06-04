@@ -220,6 +220,26 @@ export function validatePortionUnit(dat){
   return isObject(dat) && res
 }
 
+export function validateMacroNutrient(dat){
+  const check1 = (dat.length === 3)
+  let check2 = false
+  const typeName = [
+    'val',
+    'color'
+  ]
+  if (check1){
+    check2 = true
+    dat.forEach((item)=>{
+      const myError = validateObject(item, typeName)
+      if (myError.length > 0){
+        console.log(myError)
+        check2 = false
+      }
+    })
+  }
+  return check2
+}
+
 /**
  * ターゲットグループの構成とdri一蘭から栄養需要を計算する
  * @param target ターゲット構成[id, count]
