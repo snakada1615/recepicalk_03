@@ -91,7 +91,8 @@ export default {
         'FormRadioPlugin',
         'FormTextareaPlugin',
         'ListGroupPlugin',
-        'DropdownPlugin'
+        'DropdownPlugin',
+        'ImagePlugin',
       ],
     }],
     // https://go.nuxtjs.dev/axios

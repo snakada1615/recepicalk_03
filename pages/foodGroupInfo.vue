@@ -109,12 +109,12 @@ export default {
       return this.allCrops[this.selectedFoodGroup].foodList
     },
     foodGroupList() {
-     return this.allCrops.map((item, index)=>{
-       return {
-         value: index,
-         text: item.groupName
-       }
-     })
+      return this.allCrops.map((item, index)=>{
+        return {
+          value: index,
+          text: item.groupName
+        }
+      })
     }
   }
 }
