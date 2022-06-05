@@ -83,10 +83,8 @@
           </b-row>
         </b-card>
       </b-col>
-    </b-row>
-    <b-row class="my-2">
-      <b-col>
-        <b-card bg-variant="light">
+      <b-col cols="12" lg="6">
+        <b-card bg-variant="light" title="Record of Diet" class="my-2">
           <recepi-table
             :items.sync="myAppWatcher.menuCases[pageIdComputed].menu"
             @itemDeleted="deleteSupply"
