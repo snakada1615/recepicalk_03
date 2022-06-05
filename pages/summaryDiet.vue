@@ -1,9 +1,14 @@
 <template>
   <b-container>
     <b-row>
-      <b-col cols="12" lg="6">
+      <b-col cols="12" lg="6" class="my-1">
         <b-card title="Comparison of Diet assessment">
-
+          <b-card>
+            Note for each case
+            <div v-for="pageId in sceneCount" :key="pageId" v-if="myApp" class="border bg-light">
+              Case {{pageId}}: {{myApp.menuCases[pageId-1].note}}
+            </div>
+          </b-card>
         </b-card>
       </b-col>
       <b-col cols="12" lg="6">
@@ -17,10 +22,10 @@
           </b-table>
         </b-card>
       </b-col>
-      <b-col cols="12" lg="12">
+      <b-col cols="12" lg="12" class="my-1">
         <b-card title="Key nutrient sufficiency">
           <b-row>
-            <b-col cols="6" v-for="pageId in sceneCount" :key="pageId">
+            <b-col cols="6" v-for="pageId in sceneCount" :key="pageId" class="my-1">
               <b-card>
                 Case{{ pageId }}
                 <nutrition-bar
@@ -36,9 +41,36 @@
           </b-row>
         </b-card>
       </b-col>
-      <b-col cols="12" lg="12">
-        <b-card title="Key Nutrient Balance">
-
+      <b-col cols="12" lg="12" class="my-1">
+        <b-card title="PFC balance">
+          <b-row>
+            <b-col cols="6" v-for="pageId in sceneCount" :key="pageId" class="my-1">
+              <b-card>
+                Case{{ pageId }}
+                <b-row>
+                  <b-col cols="3">
+                    <div style="font-size: 1vw">Recommend</div>
+                  </b-col>
+                  <b-col cols="9">
+                    <macro-nutrient-bar
+                      :chart-values="pfcBalanceStandard"
+                    ></macro-nutrient-bar>
+                  </b-col>
+                </b-row>
+                <b-row>
+                  <b-col cols="3">
+                    <div style="font-size: 1vw">Current</div>
+                  </b-col>
+                  <b-col cols="9">
+                    <macro-nutrient-bar
+                      v-if="pfcBalanceCurrent[pageId]"
+                      :chart-values="pfcBalanceCurrent[pageId]"
+                    ></macro-nutrient-bar>
+                  </b-col>
+                </b-row>
+              </b-card>
+            </b-col>
+          </b-row>
         </b-card>
       </b-col>
     </b-row>
@@ -46,16 +78,18 @@
 </template>
 <script>
 import nutritionBar from "@/components/molecules/nutritionBar";
+import macroNutrientBar from "@/components/molecules/macroNutrientBar";
 
 export default {
   components: {
-    nutritionBar
+    nutritionBar,
+    macroNutrientBar
   },
   computed: {
-    myApp:function(){
+    myApp: function () {
       return this.$store.state.fire.myApp
     },
-    sceneCount:function(){
+    sceneCount: function () {
       return this.$store.state.fire.myApp.sceneCount
     },
     /**
@@ -79,9 +113,9 @@ export default {
       return this.myApp.menuCases.map((foodsTemp, index) => {
         let res = {}
         let colorVariant = {}
-        res['case']= 'Case' + (index + 1)
+        res['case'] = 'Case' + (index + 1)
         colorVariant['case'] = 'primary'
-        vm.foodGroup.forEach((foodItem)=>{
+        vm.foodGroup.forEach((foodItem) => {
           res[foodItem] = ''
           colorVariant[foodItem] = 'danger'
         })
@@ -180,22 +214,35 @@ export default {
       }
       return res
     },
+    /**
+     *
+     * @returns {[{val: number, color: string},{val: number, color: string},{val: number, color: string}][]}
+     */
+    pfcBalanceCurrent() {
+      return this.nutritionSupplyGetter.map((dat) => {
+        return [
+          {val: Math.round(dat.Carbohydrate * 4), color: 'red'},
+          {val: Math.round(dat.Pr * 4), color: 'green'},
+          {val: Math.round(dat.Fat * 9), color: 'yellow'},
+        ]
+      })
+    }
   },
   data() {
     return {
       /**
        * Dietary Diversityのフィールド定義
        */
-      fieldsDiversity:[
-        {key:'case', label:'Case'},
-        {key:'Grains@ roots and tubers ', label:'F1'},
-        {key:'Vitamin A rich fruits and Vegetable ', label:'F2'},
-        {key:'Legumes and nuts ', label:'F3'},
-        {key:'Other fruits and vegetables ', label:'F4'},
-        {key:'Flesh foods ', label:'F5'},
-        {key:'Eggs ', label:'F6'},
-        {key:'Dairy products ', label:'F7'},
-        {key:'non-category', label:'F8'},
+      fieldsDiversity: [
+        {key: 'case', label: 'Case'},
+        {key: 'Grains@ roots and tubers ', label: 'F1'},
+        {key: 'Vitamin A rich fruits and Vegetable ', label: 'F2'},
+        {key: 'Legumes and nuts ', label: 'F3'},
+        {key: 'Other fruits and vegetables ', label: 'F4'},
+        {key: 'Flesh foods ', label: 'F5'},
+        {key: 'Eggs ', label: 'F6'},
+        {key: 'Dairy products ', label: 'F7'},
+        {key: 'non-category', label: 'F8'},
       ],
       /**
        * nutritionBar用のproperty：栄養素表示用のlabel
@@ -212,6 +259,14 @@ export default {
        * @returns {number}
        */
       driRange: 1,
+      /**
+       * PFCバランスの推奨値
+       */
+      pfcBalanceStandard: [
+        {val: 55, color: 'red'},
+        {val: 35, color: 'green'},
+        {val: 10, color: 'yellow'},
+      ],
     }
   },
 }

@@ -60,10 +60,10 @@
         </b-card>
       </b-col>
       <b-col cols="12" lg="6">
-        <b-card title="Key Nutrients Balance" class="my-2">
+        <b-card title="PFC Balance" class="my-2">
           <b-row>
             <b-col cols="4">
-              <div>PFC recommendation</div>
+              <div>PFC recommend</div>
             </b-col>
             <b-col cols="7">
               <macro-nutrient-bar
@@ -73,7 +73,7 @@
           </b-row>
           <b-row>
             <b-col cols="4">
-              <div>Current PFC balance</div>
+              <div>Current PFC</div>
             </b-col>
             <b-col cols="7">
               <macro-nutrient-bar
@@ -616,10 +616,7 @@ export default {
           {val: Math.round(dat.Pr * 4), color: 'green'},
           {val: Math.round(dat.Fat * 9), color: 'yellow'},
         ]
-
       })
-      console.log(this.nutritionSupplyWatcher)
-      console.log(this.pfcBalanceCurrent)
     }
   }
 }
