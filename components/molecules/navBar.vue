@@ -25,6 +25,7 @@
           >crop feasibility
           </b-dropdown-item>
           <b-dropdown-item to="/summaryDiet">diet Summary</b-dropdown-item>
+          <b-dropdown-item to="/summaryfeasibility">feasibility Summary</b-dropdown-item>
           <b-dropdown-item to="/foodGroupInfo">about FoodGroup</b-dropdown-item>
           <b-dropdown-item to="/documents">documents</b-dropdown-item>
           <b-dropdown-item to="/firtest/importFct">update FCT</b-dropdown-item>

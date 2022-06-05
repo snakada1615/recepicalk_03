@@ -8,10 +8,11 @@
     hide-header
   >
     <dri-select-all
-      :targetSwitch.sync="targetSwitch"
+      :targetSwitch="targetSwitch"
       :max="max"
       :driPopulations="driPopulations"
       :driItems="driItems"
+      @update:targetSwitch="$emit('update:targetSwitch', $event)"
       @update:target="$emit('update:target', $event)"
       @changeNutritionValue="$emit('changeNutritionValue', $event)"
     ></dri-select-all>

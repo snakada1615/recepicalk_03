@@ -577,7 +577,6 @@ export default {
       if (!existing) {
         newMenu.push(val)
       }
-      console.log(newMenu)
       //作業用のmyAppコピー作成
       let dat = JSON.parse(JSON.stringify(vm.myAppWatcher))
       //更新されたmenuを入れ替える
