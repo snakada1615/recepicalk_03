@@ -37,8 +37,8 @@ export default {
 
       file.text().then((csv) => {
         const array = csv.split(/\r\n|\n/);
-        const header = array[0].split(",");
-        const body = array.slice(1).map((arr) => arr.split(","));
+        const header = array[0].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+        const body = array.slice(1).map((arr) => arr.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
 
         this.data = body.map((b) => {
           let result = {};
