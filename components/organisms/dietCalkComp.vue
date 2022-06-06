@@ -2,12 +2,20 @@
   <b-container>
     <b-row class="my-2">
       <b-col cols="12" lg="6">
-        <b-card bg-variant="light" class="my-2">
+        <b-card
+          header-bg-variant="success"
+          border-variant="success"
+          bg-variant="light"
+          class="my-2">
+          <template #header>
+            <div class="font-weight-bold">Case information</div>
+          </template>
           <b-form-select v-model="pageIdComputed" :options="pageOptions"></b-form-select>
           <div class="d-flex flex-row">
             <b-form-input
               v-model="pageMemo[pageIdComputed]"
               placeholder="note for this family"
+              :state="noteInputState"
               class="my-1"></b-form-input>
             <b-button
               @click="updatePageMemo(pageMemo[pageIdComputed])"
@@ -28,7 +36,14 @@
         </b-card>
       </b-col>
       <b-col cols="12" lg="6">
-        <b-card title="dietary diversity" class="my-2">
+        <b-card
+          header-bg-variant="success"
+          border-variant="success"
+          bg-variant="light"
+          class="my-2">
+          <template #header>
+            <div class="font-weight-bold">Dietary diversity</div>
+          </template>
           <div
             v-for="(grp, index) in foodGroup"
             class="border my-1 px-1"
@@ -42,7 +57,14 @@
         </b-card>
       </b-col>
       <b-col cols="12" lg="6">
-        <b-card title="Key Nutrients Sufficiency" class="my-2">
+        <b-card
+          header-bg-variant="success"
+          border-variant="success"
+          bg-variant="light"
+          class="my-2">
+          <template #header>
+            <div class="font-weight-bold">Key Nutrients Sufficiency</div>
+          </template>
           <b-row>
             <b-col cols="2" class="d-flex justify-content-center">Target</b-col>
             <b-col cols="2" class="d-flex justify-content-center">Supply</b-col>
@@ -60,7 +82,14 @@
         </b-card>
       </b-col>
       <b-col cols="12" lg="6">
-        <b-card title="PFC Balance" class="my-2">
+        <b-card
+          header-bg-variant="success"
+          border-variant="success"
+          bg-variant="light"
+          class="my-2">
+          <template #header>
+            <div class="font-weight-bold">PFC Balance</div>
+          </template>
           <b-row>
             <b-col cols="4">
               <div>PFC recommend</div>
@@ -84,7 +113,14 @@
         </b-card>
       </b-col>
       <b-col cols="12" lg="6">
-        <b-card bg-variant="light" title="Record of Diet" class="my-2">
+        <b-card
+          header-bg-variant="success"
+          border-variant="success"
+          bg-variant="light"
+          class="my-2">
+          <template #header>
+            <div class="font-weight-bold">Record of Diet</div>
+          </template>
           <recepi-table
             :items.sync="myAppWatcher.menuCases[pageIdComputed].menu"
             @itemDeleted="deleteSupply"
@@ -381,6 +417,13 @@ export default {
         return res
       })
     },
+    /**
+     * noteの記入状態
+     * @returns {boolean}
+     */
+    noteInputState(){
+      return (this.pageMemo[this.pageIdComputed].length > 3)
+    }
   },
   watch: {
     /**

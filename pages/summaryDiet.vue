@@ -2,17 +2,31 @@
   <b-container>
     <b-row>
       <b-col cols="12" lg="6" class="my-1">
-        <b-card title="Comparison of Diet assessment">
+        <b-card
+          header-bg-variant="success"
+          border-variant="success"
+          bg-variant="light"
+        >
+          <template #header>
+            <div class="font-weight-bold">Comparison of Diet assessment</div>
+          </template>
           <b-card>
             Note for each case
             <div v-for="pageId in sceneCount" :key="pageId" v-if="myApp" class="border bg-light">
-              Case {{pageId}}: {{myApp.menuCases[pageId-1].note}}
+              Case {{ pageId }}: {{ myApp.menuCases[pageId - 1].note }}
             </div>
           </b-card>
         </b-card>
       </b-col>
       <b-col cols="12" lg="6">
-        <b-card title="Dietary diversity">
+        <b-card
+          header-bg-variant="success"
+          border-variant="success"
+          bg-variant="light"
+        >
+          <template #header>
+            <div class="font-weight-bold">Dietary diversity</div>
+          </template>
           <b-table
             bordered
             small
@@ -23,7 +37,14 @@
         </b-card>
       </b-col>
       <b-col cols="12" lg="12" class="my-1">
-        <b-card title="Key nutrient sufficiency">
+        <b-card
+          header-bg-variant="success"
+          border-variant="success"
+          bg-variant="light"
+        >
+          <template #header>
+            <div class="font-weight-bold">Key nutrient sufficiency</div>
+          </template>
           <b-row>
             <b-col cols="6" v-for="pageId in sceneCount" :key="pageId" class="my-1">
               <b-card>
@@ -42,7 +63,14 @@
         </b-card>
       </b-col>
       <b-col cols="12" lg="12" class="my-1">
-        <b-card title="PFC balance">
+        <b-card
+          header-bg-variant="success"
+          border-variant="success"
+          bg-variant="light"
+        >
+          <template #header>
+            <div class="font-weight-bold">PFC balance</div>
+          </template>
           <b-row>
             <b-col cols="6" v-for="pageId in sceneCount" :key="pageId" class="my-1">
               <b-card>

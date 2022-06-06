@@ -9,6 +9,7 @@
           <b-form-input
             v-model="pageMemo[pageIdComputed]"
             placeholder="memo for this page"
+            :state="noteInputState"
             class="my-1"></b-form-input>
           <b-button
             @click="updatePageMemo(pageMemo[pageIdComputed])"
@@ -457,6 +458,13 @@ export default {
       }
       return res
     },
+    /**
+     * noteの記入状態
+     * @returns {boolean}
+     */
+    noteInputState(){
+      return (this.pageMemo[this.pageIdComputed].length > 3)
+    }
   },
   data() {
     return {
