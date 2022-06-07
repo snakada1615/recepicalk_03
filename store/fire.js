@@ -105,6 +105,10 @@ export const state = () => ({
       jsDate:0,
       date:''
     },
+    /**
+     * 食材の解説用データベース名
+     */
+    foodDictionaryId:'foodDictionary_eth',
   },
   /**
    * ログイン状態のフラグ
