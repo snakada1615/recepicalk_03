@@ -1,14 +1,14 @@
 <template>
   <div>
-    <nav-bar/>
+    <nav-bar-sub-menu/>
     <Nuxt />
   </div>
 </template>
 <script>
-import navBar from "@/components/molecules/navBar.vue"
+import navBarSubMenu from '@/components/molecules/navBarSubMenu.vue'
 export default {
   components: {
-    navBar
+    navBarSubMenu
   },
 }
 </script>
