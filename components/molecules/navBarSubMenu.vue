@@ -9,7 +9,7 @@
 
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto" :small=true>
-        <b-nav-item-dropdown text="Menu" right>
+        <b-nav-item-dropdown text="Menu" right ref="rootMenu">
           <b-dropdown-item to="/">top</b-dropdown-item>
 
           <!-- メニューグループ1　導入 -->
@@ -168,6 +168,10 @@ export default {
         removeEventListener("beforeunload", this.beforeUnloadListener, {capture: true});
       }
     },
+    $route(){
+      //ページ移動前にメニューを折りたたむ
+      this.$refs.rootMenu.hide();
+    }
   },
   data() {
     return {

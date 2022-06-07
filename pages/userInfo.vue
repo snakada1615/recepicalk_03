@@ -34,7 +34,6 @@
             placeholder="Enter your role in the organization"/>
         </b-col>
       </b-row>
-      <b-button class="my-1" @click="updateUserInfo">update</b-button>
     </b-card>
   </b-container>
 </template>
@@ -69,21 +68,30 @@ export default {
         subnational3:'',
       },
       /**
-       * csvファイルから読み込んだデータ本体
+       * 初回読み込みかどうかチェック
        */
-      dataCsv: '',
+      isInitialLoad: '',
     }
   },
   created() {
     this.user = JSON.parse(JSON.stringify(this.$store.state.fire.myApp.user))
+    this.isInitialLoad = true
   },
-  methods: {
-    async updateUserInfo(){
-      //storeのアップデート
-      await this.$store.dispatch('fire/updateUser', this.user)
-      //fireStoreへの保存
-      await this.$store.dispatch('fire/fireSaveAppdata')
+  watch:{
+    user:{
+      deep: true,
+      async handler() {
+        //初回読み込み時は何もしない（フラグを変更するのみ）
+        if (this.isInitialLoad){
+          this.isInitialLoad = false
+          return
+        }
+        //storeのアップデート
+        await this.$store.dispatch('fire/updateUser', this.user)
+        //userの変更時は、常に setHasDocumentChanged=true をセット
+        await this.$store.dispatch('fire/setHasDocumentChanged', true)
+      }
     }
-  }
+  },
 }
 </script>
