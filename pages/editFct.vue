@@ -2,8 +2,8 @@
   <b-container >
     <b-row>
       <fct-table-editor
-        :items = fctData
-        @changeFct="updateFct"
+        :items.sync = fctData
+        @update:items="updateFct"
       ></fct-table-editor>
     </b-row>
   </b-container>

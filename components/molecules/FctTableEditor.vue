@@ -1,6 +1,15 @@
 <template>
   <b-container class="my-0">
-    {{FoodGrp}}
+    <b-row align-h="end">
+      <b-col cols="3" class="my-1">
+        <b-button
+          size="sm"
+          variant="warning"
+          @click="addNewItem"
+          class="float-right"
+        >+Add new item</b-button>
+      </b-col>
+    </b-row>
     <!--  food list絞り込みのためのフィルター  -->
     <b-input-group>
       <b-form-input
@@ -193,6 +202,11 @@ export default {
       }
       return result
     },
+    foodIdMax() {
+      return this.items.reduce(function (a, b) {
+        return Math.min(a, Number(b.id));
+      }, 0)
+    },
     stateGroup: function () {
       return (/^[a-zA-Z0-9][a-zA-Z0-9+\-_\\., ]{3,59}$/).test(this.fctItem.Group)
         && (typeof this.fctItem.Group !== 'undefined')
@@ -271,13 +285,33 @@ export default {
       this.fctItem.food_grp_id = val.food_grp_id
       this.$bvModal.show('foodModal')
     },
+    /**
+     * 新規追加する際の初期値
+     */
+    addNewItem() {
+      this.fctItem.id = this.foodIdMax + 1
+      this.fctItem.Group = ''
+      this.fctItem.Name = ''
+      this.fctItem.En = ''
+      this.fctItem.Pr = ''
+      this.fctItem.Va = ''
+      this.fctItem.Fe = ''
+      this.fctItem.food_grp_id = ''
+      this.$bvModal.show('foodModal')
+    },
     clickOk(val) {
+      // 追加か修正か判断するフラグ
+      let isNewRecord = true
       const vm = this
-      const groupIdTemp =  Object.values(vm.FoodGrp).filter((item) => {
+
+      //food_group_idはFoodGrpの値に基づいて、手動で変更する必要がある
+      val.food_grp_id = Object.values(vm.FoodGrp).filter((item) => {
         return item.name === val.Group
       })[0].food_grp_id
-      const res = vm.items.map(function (doc) {
+
+      let res = vm.items.map(function (doc) {
         if (doc.id === val.id) {
+          isNewRecord = false
           doc.Group = val.Group
           doc.Name = val.Name
           doc.En = val.En
@@ -285,11 +319,14 @@ export default {
           doc.Va = val.Va
           doc.Fe = val.Fe
           doc.id = val.id
-          doc.food_grp_id = groupIdTemp
+          doc.food_grp_id = val.food_grp_id
         }
         return doc
       })
-      this.$emit('changeFct', res)
+      if (isNewRecord) {
+        res.push(val)
+      }
+      this.$emit('update:items', res)
       this.$bvModal.hide('foodModal')
     },
     clickCancel() {
