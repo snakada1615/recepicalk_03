@@ -37,8 +37,14 @@ export default {
 
       file.text().then((csv) => {
         const array = csv.split(/\r\n|\n/);
-        const header = array[0].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-        const body = array.slice(1).map((arr) => arr.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
+        const header = array[0].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map((item)=>{
+          return item.replaceAll(/"/g, ''); // 二重引用符を削除する
+        });
+        const body = array.slice(1).map((arr) => arr.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)).map((item)=>{
+          return item.map((item2)=>{
+            return item2.replaceAll(/"/g, '');// 二重引用符を削除する
+          })
+        });
 
         this.data = body.map((b) => {
           let result = {};
