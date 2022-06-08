@@ -42,6 +42,7 @@
 
           <!-- メニューグループ4　その他 -->
           <b-dropdown size="sm" id="subMenu-3" text="Other function" class="m-md-2" variant="outline-danger">
+            <b-dropdown-item to="/editFct">edit current FCT</b-dropdown-item>
             <b-dropdown-item to="/firetest/importFct">replace FCT</b-dropdown-item>
             <b-dropdown-item-button
               @click="resetData"

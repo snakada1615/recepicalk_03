@@ -1,5 +1,6 @@
 <template>
   <b-container class="my-0">
+    {{FoodGrp}}
     <!--  food list絞り込みのためのフィルター  -->
     <b-input-group>
       <b-form-input
@@ -90,9 +91,10 @@
             Group
           </b-col>
           <b-col cols="9">
-            <b-form-input
+            <b-form-select
               size="sm"
               :state="stateGroup"
+              :options="FoodGrp.map((item)=>item.name)"
               v-model="fctItem.Group"
             />
           </b-col>
@@ -183,7 +185,8 @@ export default {
           if (uniqueGroup.indexOf(elem.Group) === -1) {
             uniqueGroup.push(elem.Group)
             result.push({
-              name: elem.Group
+              name: elem.Group,
+              food_grp_id: elem.food_grp_id
             })
           }
         })
@@ -217,6 +220,7 @@ export default {
   },
   data() {
     return {
+      temp: '',
       fields: [
         {key: 'id', sortable: false, tdClass: 'd-none', thClass: 'd-none'},
         {key: 'Group', sortable: true, tdClass: 'd-none', thClass: 'd-none'},
@@ -242,6 +246,7 @@ export default {
         Pr: '',
         Va: '',
         Fe: '',
+        food_grp_id: ''
       },
     }
   },
@@ -250,7 +255,6 @@ export default {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length
       this.currentPage = 1
-      console.log('filtered!!')
     },
     onInput() {
       // Set the initial number of items
@@ -264,10 +268,15 @@ export default {
       this.fctItem.Pr = val.Pr
       this.fctItem.Va = val.Va
       this.fctItem.Fe = val.Fe
+      this.fctItem.food_grp_id = val.food_grp_id
       this.$bvModal.show('foodModal')
     },
     clickOk(val) {
-      const res = this.items.map(function (doc) {
+      const vm = this
+      const groupIdTemp =  Object.values(vm.FoodGrp).filter((item) => {
+        return item.name === val.Group
+      })[0].food_grp_id
+      const res = vm.items.map(function (doc) {
         if (doc.id === val.id) {
           doc.Group = val.Group
           doc.Name = val.Name
@@ -276,6 +285,7 @@ export default {
           doc.Va = val.Va
           doc.Fe = val.Fe
           doc.id = val.id
+          doc.food_grp_id = groupIdTemp
         }
         return doc
       })
