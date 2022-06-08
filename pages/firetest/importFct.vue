@@ -2,7 +2,7 @@
   <b-container>
     <!--   現在firestoreに含まれるドキュメントを抽出     -->
     <b-card
-      header="Load data from firebase"
+      header="check existing dataset on server and replace with current data"
       header-bg-variant="success"
       header-text-variant="light"
       class="my-2"
@@ -33,7 +33,7 @@
 
     <!--  csvを読み込んでfireStoreに登録  -->
     <b-card
-      header="Load data from CSV and import to firebase"
+      header="import data from EXCEL/CSV and upload to server"
       header-bg-variant="success"
       header-text-variant="light"
       class="my-2"
@@ -68,7 +68,7 @@
 
     <!--  指定したコレクション内に含まれるドキュメントの一覧  -->
     <b-card
-      header="get fileList from firebase"
+      header="confirm fct/dri database currently registered on server"
       header-bg-variant="success"
       header-text-variant="light"
       class="my-2"

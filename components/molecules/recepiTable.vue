@@ -51,7 +51,7 @@
 
         <!-- A custom formatted cell for field 'name' -->
         <template #cell(Name)="data">
-          <span class="text-info" style="font-size: small">{{ data.value }}</span>
+          <span class="text-info pointer" style="font-size: small">{{ data.value }}</span>
           <b-button class="px-0 py-0 mx-0 my-0" variant="light" @click="delClick(data.index)">
             <b-badge variant="gray-400" class="px-0 py-0">
               <b-icon icon="X"></b-icon>
@@ -220,3 +220,9 @@ export default {
     }
   }
 </script>
+
+<style>
+.pointer {
+  cursor: pointer;
+}
+</style>

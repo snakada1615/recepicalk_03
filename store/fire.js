@@ -395,6 +395,14 @@ export const actions = {
     commit('updateFctId', payload)
   },
   /**
+   * fctを更新
+   * @param state
+   * @param payload 更新する値（JSON）
+   */
+  updateFct({commit}, payload){
+    commit('updateFct', payload)
+  },
+  /**
    * DriIdを更新
    * @param commit
    * @param payload
