@@ -170,7 +170,7 @@ export default {
             res = String(Math.round(item / 1000000)) + units[unitKey]["3"]
             break;
           default:
-            console.error('parameter not valid:setDigit')
+            console.error('parameter not valid:setDigit:' + item)
             res = ''
             break;
         }

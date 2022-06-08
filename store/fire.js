@@ -52,7 +52,7 @@ export const state = () => ({
       /**
        * fctのid
        */
-      fctId: 'fct02',
+      fctId: 'fct_eth',
       /**
        * driのid
        */
@@ -348,6 +348,30 @@ export const mutations = {
 }
 export const actions = {
   /**
+   * ユーザー登録時に基本データセット（FCT,DRI）をユーザースペースmyAppに
+   *     コピーする
+   */
+  async copyOriginalDataSet2UserDataOnRegistration({state, commit}, payload){
+    //fctのオリジナルデータをコピーしてmyApp/dataSetに保存
+    const fct = await fireGetDoc('dataset', payload.dataSet.fctId)
+    const newFctId = 'fct_' + payload.user.displayName
+    const ref = doc(firestoreDb, 'dataset', newFctId)
+    setDoc(ref, fct).catch((err) => {
+      throw new Error('Error in fireSaveAppdata:' + err)
+    })
+    //driのオリジナルデータをコピーしてmyApp/dataSetに保存
+    const dri = await fireGetDoc('dataset', payload.dataSet.driId)
+    const newDriId = 'dri_' + payload.user.displayName
+    const ref2 = doc(firestoreDb, 'dataset', newDriId)
+    setDoc(ref2, dri).catch((err) => {
+      throw new Error('Error in fireSaveAppdata:' + err)
+    })
+    //storeの中のfctデータベース名を変更
+    commit('updateFctId', newFctId)
+    //storeの中のdriデータベース名を変更
+    commit('updateDriId', newDriId)
+  },
+  /**
    * ユーザー情報をpayloadで与えられた内容で更新する
    * @param commit
    * @param payload
@@ -546,11 +570,14 @@ export const actions = {
   },
   /**
    * name/passwordでアカウント作成(signInWithEmailAndPasswordを流用)
+   *     アカウント作成後に、基本DBをユーザー用に複製(fct, dri)
    * @param commit
+   * @param state
+   * @param dispatch
    * @param payload
    * @returns {Promise<void>}
    */
-  async registerEmail({commit}, payload) {
+  async registerEmail({commit, state, dispatch}, payload) {
     const auth = getAuth();
     const email = payload.name + '@ifna.app'
     const res = await createUserWithEmailAndPassword(auth, email, payload.password)
@@ -587,6 +614,9 @@ export const actions = {
         console.log('keeping state error: ', errorCode, errorMessage)
         throw error
       })
+    // fct. driのオリジナルをfirebaseからコピーしてユーザースペースmyAppに貼り付ける
+    console.log('copy original database to user space')
+    dispatch('copyOriginalDataSet2UserDataOnRegistration', state.myApp)
   },
   /**
    * ページ遷移・リロードの度にログイン状態を確認(middleware:login.js)、
@@ -645,6 +675,7 @@ export const actions = {
   async initFct({commit, dispatch, state}) {
     const fct = await fireGetDoc('dataset', state.myApp.dataSet.fctId)
     if (fct) {
+      //ObjectをArrayに変換
       const fctArray = await dispatch('formatFct', fct)
       commit('updateFct', fctArray)
     } else {
