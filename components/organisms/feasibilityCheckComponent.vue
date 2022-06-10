@@ -10,12 +10,9 @@
             v-model="pageMemo[pageIdComputed]"
             placeholder="memo for this page"
             :state="noteInputState"
-            class="my-1"></b-form-input>
-          <b-button
-            @click="updatePageMemo(pageMemo[pageIdComputed])"
-            size="sm"
-            class="mx-1 my-1">update
-          </b-button>
+            @input="updatePageMemo(pageMemo[pageIdComputed])"
+            class="my-1">
+          </b-form-input>
         </div>
       </b-col>
     </b-row>
@@ -179,6 +176,9 @@ export default {
     driSelectSingle,
   },
   methods: {
+    onNoteChange(val){
+      console.log(val)
+    },
     /**
      * ansListをmyAppから読み込んでwatch
      * @returns {any[]}
@@ -312,7 +312,7 @@ export default {
       //更新されたmenuを入れ替える
       dat.feasibilityCases[this.pageIdComputed].note = newVal
       //更新されたmyAppをemit
-      this.$emit('update:pageMemo', dat)
+      this.$emit('update:myApp', dat)
     },
     /**
      * targetGroupの更新をmyAppに組み込んでemitで通知
@@ -321,7 +321,7 @@ export default {
     onTargetGroupChanged(val) {
       //作業用のmyAppコピー作成
       let dat = JSON.parse(JSON.stringify(this.myAppWatcher))
-      //更新されたmenuを入れ替える
+      //更新されたfeasibilityCasesを入れ替える
       dat.feasibilityCases[this.pageIdComputed].target = val
       //更新されたmyAppをemit
       this.$emit('update:myApp', dat)
@@ -539,10 +539,10 @@ export default {
               questionText: 'Is required amount for nutrition target feasible?',
               answerList: [
                 {value: -99, text: 'please select', disabled: true},
-                {value: 3, text: 'yes'},
-                {value: 2, text: 'maybe yes'},
-                {value: 1, text: 'maybe no'},
-                {value: 0, text: 'no'},
+                {value: 3, text: 'It can cover >50% daily requirement'},
+                {value: 2, text: 'It can cover >30% daily requirement'},
+                {value: 1, text: 'It can cover <30% daily requirement'},
+                {value: 0, text: 'It can cover <10% daily requirement'},
               ]
             },
           ]
@@ -553,46 +553,46 @@ export default {
           itemsQA: [
             {
               id: 2,
-              questionText: 'Is there any social barrier to consume this commodity in general?',
+              questionText: 'Is there any restriction to consume this commodity?',
               answerList: [
                 {value: -99, text: 'please select', disabled: true},
-                {value: 3, text: 'no'},
-                {value: 2, text: 'maybe no'},
-                {value: 1, text: 'maybe yes'},
-                {value: 0, text: 'yes'},
+                {value: 3, text: 'not at all'},
+                {value: 2, text: 'yes for limited occasion, or limited person'},
+                {value: 1, text: 'yes, frequently'},
+                {value: 0, text: 'this food is not recommended to consume'},
               ]
             },
             {
               id: 3,
-              questionText: 'Is there any social barrier to consume this commodity for women?',
+              questionText: 'does people like to consume this commodity?',
               answerList: [
                 {value: -99, text: 'please select', disabled: true},
-                {value: 3, text: 'no'},
-                {value: 2, text: 'maybe no'},
-                {value: 1, text: 'maybe yes'},
-                {value: 0, text: 'yes'},
+                {value: 3, text: 'yes, most people like it'},
+                {value: 2, text: 'yes, but some people does not like it'},
+                {value: 1, text: 'some people like it'},
+                {value: 0, text: 'no one eat it'},
               ]
             },
             {
               id: 4,
-              questionText: 'Is there any social barrier to consume this commodity for child?',
+              questionText: 'Is this food equally shared among HH member?',
               answerList: [
                 {value: -99, text: 'please select', disabled: true},
-                {value: 3, text: 'no'},
-                {value: 2, text: 'maybe no'},
-                {value: 1, text: 'maybe yes'},
-                {value: 0, text: 'yes'},
+                {value: 3, text: 'Yes always'},
+                {value: 2, text: 'serving size is not equal, sometimes'},
+                {value: 1, text: 'serving size is not equal, usually'},
+                {value: 0, text: 'some HH member cannot eat'},
               ]
             },
             {
               id: 5,
-              questionText: 'Is this commodity affordable in the market for ordinary population?',
+              questionText: 'Is this commodity affordable in the market for this community?',
               answerList: [
                 {value: -99, text: 'please select', disabled: true},
-                {value: 3, text: 'no'},
-                {value: 2, text: 'maybe no'},
-                {value: 1, text: 'maybe yes'},
-                {value: 0, text: 'yes'},
+                {value: 3, text: 'yes for everyone'},
+                {value: 2, text: 'yes for most family'},
+                {value: 1, text: 'yes for wealthy family'},
+                {value: 0, text: 'this is too expensive'},
               ]
             },
           ]
@@ -606,10 +606,10 @@ export default {
               questionText: 'do target beneficiary have enough skill to grow this commodity?',
               answerList: [
                 {value: -99, text: 'please select', disabled: true},
-                {value: 3, text: 'yes'},
-                {value: 2, text: 'maybe yes'},
-                {value: 1, text: 'maybe no'},
-                {value: 0, text: 'no'},
+                {value: 3, text: 'yes, people have good experience for this commodity'},
+                {value: 2, text: 'people have technical difficulty only sometimes'},
+                {value: 1, text: 'there are technical challenges to grow this'},
+                {value: 0, text: 'people have no experience for this commodity'},
               ]
             },
             {
@@ -617,21 +617,21 @@ export default {
               questionText: 'Does this commodity imply incremental workload for women?',
               answerList: [
                 {value: -99, text: 'please select', disabled: true},
-                {value: 3, text: 'no'},
-                {value: 2, text: 'maybe no'},
-                {value: 1, text: 'maybe yes'},
-                {value: 0, text: 'yes'},
+                {value: 3, text: 'no extra burden expected'},
+                {value: 2, text: 'additional light daily work required'},
+                {value: 1, text: 'additional work required, seasonally'},
+                {value: 0, text: 'additional intensive daily work required'},
               ]
             },
             {
               id: 8,
-              questionText: 'Is technical service available for this commodity?',
+              questionText: 'Is technical service available for this commodity, if needed?',
               answerList: [
                 {value: -99, text: 'please select', disabled: true},
                 {value: 3, text: 'yes / there is no need for it since beneficiaries already have enough skill'},
-                {value: 2, text: 'maybe yes'},
-                {value: 1, text: 'maybe no'},
-                {value: 0, text: 'no'},
+                {value: 2, text: 'available upon request'},
+                {value: 1, text: 'available once/twice in a season'},
+                {value: 0, text: 'not available'},
               ]
             },
           ]
@@ -645,10 +645,10 @@ export default {
               questionText: 'Is there need for specific infrastructure (irrigation / post harvest, etc.)?',
               answerList: [
                 {value: -99, text: 'please select', disabled: true},
-                {value: 3, text: 'no'},
-                {value: 2, text: 'maybe no'},
-                {value: 1, text: 'maybe yes'},
-                {value: 0, text: 'yes'},
+                {value: 3, text: 'no investment required for infrastructure'},
+                {value: 2, text: 'not essential, but infrastructure can enhance productivity/profitability'},
+                {value: 1, text: 'small investment on infrastructure required (e.g. hand-made fence, small cage)'},
+                {value: 0, text: 'certain investment on infrastructure required (e.g. irrigation, processing equipment)'},
               ]
             },
             {
@@ -684,10 +684,10 @@ export default {
               questionText: 'Are there any feasible storage method available for this commodity?',
               answerList: [
                 {value: -99, text: 'please select', disabled: true},
-                {value: 3, text: 'yes'},
-                {value: 2, text: 'maybe yes'},
-                {value: 1, text: 'maybe no'},
-                {value: 0, text: 'no'},
+                {value: 3, text: 'Conventional storage/processing method works well'},
+                {value: 2, text: 'Conventional method is available, but needs improvement'},
+                {value: 1, text: 'Storage/processing method is available, but investment required'},
+                {value: 0, text: 'no technology is available yet'},
               ]
             },
           ]

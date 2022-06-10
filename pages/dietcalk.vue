@@ -21,7 +21,7 @@ export default {
   },
   data: function () {
     return {
-      pageId: 2,
+      pageId: 0,
       myCount: [],
     }
   },

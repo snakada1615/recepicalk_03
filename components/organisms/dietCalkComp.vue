@@ -16,12 +16,9 @@
               v-model="pageMemo[pageIdComputed]"
               placeholder="note for this family"
               :state="noteInputState"
-              class="my-1"></b-form-input>
-            <b-button
-              @click="updatePageMemo(pageMemo[pageIdComputed])"
-              size="sm"
-              class="mx-1 my-1">update
-            </b-button>
+              @update="updatePageMemo(pageMemo[pageIdComputed])"
+              class="my-1">
+            </b-form-input>
           </div>
           <b-button
             @click="showDriSelect = !showDriSelect"
@@ -421,7 +418,7 @@ export default {
      * noteの記入状態
      * @returns {boolean}
      */
-    noteInputState(){
+    noteInputState() {
       return (this.pageMemo[this.pageIdComputed].length > 3)
     }
   },
@@ -465,7 +462,7 @@ export default {
       //更新されたmenuを入れ替える
       dat.menuCases[this.pageIdComputed].note = newVal
       //更新されたmyAppをemit
-      this.$emit('update:pageMemo', dat)
+      this.$emit('update:myApp', dat)
     },
     /**
      * myApp.menuCases.targetの値を集計してnutritionDemandWatcherに代入するための関数
@@ -492,13 +489,14 @@ export default {
      */
     nutritionSupplyGetter() {
       const vm = this
+      console.log(vm.myApp.menuCases[vm.pageIdComputed].menu[0])
       return vm.myApp.menuCases.map((datArray) => {
         if (datArray.menu.length > 0) {
           return datArray.menu.reduce((accumulator, item) => {
-            accumulator.En += Number(item.En)
-            accumulator.Pr += Number(item.Pr)
-            accumulator.Va += Number(item.Va)
-            accumulator.Fe += Number(item.Fe)
+            accumulator.En += Number(item.En) * Number(item.Wt)
+            accumulator.Pr += Number(item.Pr) * Number(item.Wt)
+            accumulator.Va += Number(item.Va) * Number(item.Wt)
+            accumulator.Fe += Number(item.Fe) * Number(item.Wt)
             accumulator.Wt += Number(item.Wt)
             accumulator.Carbohydrate += Number(item.Carbohydrate)
             accumulator.Fat += Number(item.Fat)
