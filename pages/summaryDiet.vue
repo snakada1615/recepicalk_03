@@ -2,6 +2,9 @@
   <b-container>
     <b-row>
       <b-col cols="12" lg="6" class="my-1">
+        <div>supply:{{nutritionSupplyGetter[0]}}</div>
+        <div>demand:{{nutritionDemandGetter[0]}}</div>
+        <div>rating:{{ratingGetter[0]}}</div>
         <b-card
           header-bg-variant="success"
           border-variant="success"
@@ -190,13 +193,13 @@ export default {
       return vm.myApp.menuCases.map((datArray) => {
         if (datArray.menu.length > 0) {
           return datArray.menu.reduce((accumulator, item) => {
-            accumulator.En += Number(item.En)
-            accumulator.Pr += Number(item.Pr)
-            accumulator.Va += Number(item.Va)
-            accumulator.Fe += Number(item.Fe)
+            accumulator.En += Number(item.En) * Number(item.Wt) / 100
+            accumulator.Pr += Number(item.Pr) * Number(item.Wt) / 100
+            accumulator.Va += Number(item.Va) * Number(item.Wt) / 100
+            accumulator.Fe += Number(item.Fe) * Number(item.Wt) / 100
+            accumulator.Carbohydrate += Number(item.Carbohydrate) * Number(item.Wt) / 100
+            accumulator.Fat += Number(item.Fat) * Number(item.Wt) / 100
             accumulator.Wt += Number(item.Wt)
-            accumulator.Carbohydrate += Number(item.Carbohydrate)
-            accumulator.Fat += Number(item.Fat)
             return accumulator
           }, {
             'En': 0,

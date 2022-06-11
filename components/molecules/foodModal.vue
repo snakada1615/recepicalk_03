@@ -34,7 +34,7 @@
         :disabled="!selected"
       ></b-form-input>
       <template #append>
-        <!-- portionList配列からcount_methodを抽出して軽量方法を選択 -->
+        <!-- portionList配列からcount_methodを抽出して計量方法を選択 -->
         <b-form-select
           v-model="selected"
           :options="portionList.map((item)=>{return item.count_method})"
@@ -130,22 +130,50 @@ export default {
     portionList() {
       const vm = this
       if (vm.items.length === 0) {
-        return [{
-          'FCT_id': '0',
-          'id': '0',
-          'count_method': 'gram',
-          'unit_weight': 1,
-        }]
+        return [
+          {
+            'FCT_id': '0',
+            'id': '0',
+            'count_method': 'ton',
+            'unit_weight': 1000000,
+          },
+          {
+            'FCT_id': '0',
+            'id': '0',
+            'count_method': 'Kg',
+            'unit_weight': 1000,
+          },
+          {
+            'FCT_id': '0',
+            'id': '0',
+            'count_method': 'gram',
+            'unit_weight': 1,
+          }
+        ]
       }
       const res = this.portionUnits.filter((dat) => {
         return dat.FCT_id === vm.items[0].id
       })
-      res.push({
-        'FCT_id': '0',
-        'id': '0',
-        'count_method': 'gram',
-        'unit_weight': 1,
-      })
+      res.push(
+        {
+          'FCT_id': '0',
+          'id': '0',
+          'count_method': 'ton',
+          'unit_weight': 1000000,
+        },
+        {
+          'FCT_id': '0',
+          'id': '0',
+          'count_method': 'Kg',
+          'unit_weight': 1000,
+        },
+        {
+          'FCT_id': '0',
+          'id': '0',
+          'count_method': 'gram',
+          'unit_weight': 1,
+        }
+      )
       return res
     },
     portionSelected() {

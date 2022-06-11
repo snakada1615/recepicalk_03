@@ -489,17 +489,16 @@ export default {
      */
     nutritionSupplyGetter() {
       const vm = this
-      console.log(vm.myApp.menuCases[vm.pageIdComputed].menu[0])
       return vm.myApp.menuCases.map((datArray) => {
         if (datArray.menu.length > 0) {
           return datArray.menu.reduce((accumulator, item) => {
-            accumulator.En += Number(item.En) * Number(item.Wt)
-            accumulator.Pr += Number(item.Pr) * Number(item.Wt)
-            accumulator.Va += Number(item.Va) * Number(item.Wt)
-            accumulator.Fe += Number(item.Fe) * Number(item.Wt)
+            accumulator.En += Number(item.En) * Number(item.Wt) / 100
+            accumulator.Pr += Number(item.Pr) * Number(item.Wt) / 100
+            accumulator.Va += Number(item.Va) * Number(item.Wt) / 100
+            accumulator.Fe += Number(item.Fe) * Number(item.Wt) / 100
+            accumulator.Carbohydrate += Number(item.Carbohydrate) * Number(item.Wt) / 100
+            accumulator.Fat += Number(item.Fat) * Number(item.Wt) / 100
             accumulator.Wt += Number(item.Wt)
-            accumulator.Carbohydrate += Number(item.Carbohydrate)
-            accumulator.Fat += Number(item.Fat)
             return accumulator
           }, {
             'En': 0,

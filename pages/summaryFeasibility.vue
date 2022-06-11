@@ -12,7 +12,6 @@
         </b-card>
       </b-col>
       <b-col cols="12" lg="6" class="my-1" v-for="pageId in sceneCount" :key="pageId" v-if="myApp" >
-
         <!--   スコアの総括票     -->
         <b-card
           style="min-width: 530px;"
@@ -74,6 +73,16 @@ export default {
         res.push(vm.summarizeQA(vm.ansId, val.ansList))
       })
       return res
+    },
+    /**
+     * QAリストのカテゴリ数
+     * @returns {*}
+     */
+    qaCategoryCount: function () {
+      if (this.ansId.length === 0) {
+        return 0
+      }
+      return this.ansId.reduce((a, b) => a.categoryID < b.categoryID ? a.categoryID : b.categoryID)
     },
     /**
      * QAのカテゴリとIDをセットにしてArrayに追加（カテゴリ事の集計に用いる）
