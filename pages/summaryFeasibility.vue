@@ -28,7 +28,9 @@
           </b-row>
           <b-row>
             <b-col cols="6" class="text-center">total score:</b-col>
-            <b-col cols="6" class="text-center">{{ qaScore[pageId-1][qaScore[pageId-1].length - 1].value }} / 50</b-col>
+            <b-col cols="6">{{ qaScore[pageId-1][qaScore[pageId-1].length - 1].value }} /
+              {{ 10 * qaList.length }}
+            </b-col>
           </b-row>
           <b-row v-for="(qa, index) in qaScore[pageId-1]" :key="index">
             <nutrition-bar
@@ -275,6 +277,45 @@ export default {
                 {value: 2, text: 'maybe yes'},
                 {value: 1, text: 'maybe no'},
                 {value: 0, text: 'no'},
+              ]
+            },
+          ]
+        },
+        {
+          categoryID: 6,
+          categoryText: 'Market opportunity',
+          itemsQA: [
+            {
+              id: 13,
+              questionText: 'Do you find this commodity at local market?',
+              answerList: [
+                {value: -99, text: 'please select', disabled: true},
+                {value: 3, text: 'yes, it is quite common'},
+                {value: 2, text: 'yes, but limited period or limited seller'},
+                {value: 1, text: 'Not here, but I saw it in a big market'},
+                {value: 0, text: 'i have never seen this in the market'},
+              ]
+            },
+            {
+              id: 14,
+              questionText: 'When you sell your products, how it is delivered?',
+              answerList: [
+                {value: -99, text: 'please select', disabled: true},
+                {value: 3, text: 'There is a trader/middleman (going to big city)'},
+                {value: 2, text: 'There is a trader/middleman (going to local market)'},
+                {value: 1, text: 'I bring products to the market'},
+                {value: 0, text: 'I cannot bring products to the market'},
+              ]
+            },
+            {
+              id: 15,
+              questionText: 'How is your experience marketing your products?',
+              answerList: [
+                {value: -99, text: 'please select', disabled: true},
+                {value: 3, text: 'I usually sell staples and other cash crop'},
+                {value: 2, text: 'I usually sell mostly staples'},
+                {value: 1, text: 'I sell staples when there are surplus'},
+                {value: 0, text: 'I do not sell my products'},
               ]
             },
           ]
