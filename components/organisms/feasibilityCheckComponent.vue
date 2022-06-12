@@ -60,7 +60,9 @@
           </b-row>
           <b-row>
             <b-col cols="6" class="text-center">total score:</b-col>
-            <b-col cols="6">{{ qaScore[pageIdComputed][qaScore[pageIdComputed].length - 1].value }} / 50</b-col>
+            <b-col cols="6">{{ qaScore[pageIdComputed][qaScore[pageIdComputed].length - 1].value }} /
+              {{ 10 * qaList.length }}
+            </b-col>
           </b-row>
           <b-row v-for="(qa, index) in qaScore[pageIdComputed]" :key="index">
             <nutrition-bar
@@ -176,7 +178,7 @@ export default {
     driSelectSingle,
   },
   methods: {
-    onNoteChange(val){
+    onNoteChange(val) {
       console.log(val)
     },
     /**
@@ -462,7 +464,7 @@ export default {
      * noteの記入状態
      * @returns {boolean}
      */
-    noteInputState(){
+    noteInputState() {
       return (this.pageMemo[this.pageIdComputed].length > 3)
     }
   },
@@ -648,7 +650,10 @@ export default {
                 {value: 3, text: 'no investment required for infrastructure'},
                 {value: 2, text: 'not essential, but infrastructure can enhance productivity/profitability'},
                 {value: 1, text: 'small investment on infrastructure required (e.g. hand-made fence, small cage)'},
-                {value: 0, text: 'certain investment on infrastructure required (e.g. irrigation, processing equipment)'},
+                {
+                  value: 0,
+                  text: 'certain investment on infrastructure required (e.g. irrigation, processing equipment)'
+                },
               ]
             },
             {
@@ -688,6 +693,45 @@ export default {
                 {value: 2, text: 'Conventional method is available, but needs improvement'},
                 {value: 1, text: 'Storage/processing method is available, but investment required'},
                 {value: 0, text: 'no technology is available yet'},
+              ]
+            },
+          ]
+        },
+        {
+          categoryID: 6,
+          categoryText: 'Market opportunity',
+          itemsQA: [
+            {
+              id: 13,
+              questionText: 'Do you find this commodity at local market?',
+              answerList: [
+                {value: -99, text: 'please select', disabled: true},
+                {value: 3, text: 'yes, it is quite common'},
+                {value: 2, text: 'yes, but limited period or limited seller'},
+                {value: 1, text: 'Not here, but I saw it in a big market'},
+                {value: 0, text: 'i have never seen this in the market'},
+              ]
+            },
+            {
+              id: 14,
+              questionText: 'When you sell your products, how it is delivered?',
+              answerList: [
+                {value: -99, text: 'please select', disabled: true},
+                {value: 3, text: 'There is a trader/middleman (going to big city)'},
+                {value: 2, text: 'There is a trader/middleman (going to local market)'},
+                {value: 1, text: 'I bring products to the market'},
+                {value: 0, text: 'I cannot bring products to the market'},
+              ]
+            },
+            {
+              id: 15,
+              questionText: 'How is your experience marketing your products?',
+              answerList: [
+                {value: -99, text: 'please select', disabled: true},
+                {value: 3, text: 'I usually sell staples and other cash crop'},
+                {value: 2, text: 'I usually sell mostly staples'},
+                {value: 1, text: 'I sell staples when there are surplus'},
+                {value: 0, text: 'I do not sell my products'},
               ]
             },
           ]
