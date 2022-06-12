@@ -128,6 +128,18 @@
                 ></nutrition-bar>
               </b-row>
             </b-card>
+            <b-row align-h="end" class="mt-2">
+              <b-col cols="6">
+                <b-input-group size="sm" prepend="intake" append="g per day">
+                  <b-form-input
+                    v-model="portionSize"
+                    type="number"
+                    class="text-right"
+                    @update="onPortionSizeChanged"
+                  ></b-form-input>
+                </b-input-group>
+              </b-col>
+            </b-row>
           </div>
           <ul class="pl-2 my-0">
             <li
@@ -277,30 +289,30 @@ export default {
         {
           name: 'Energy',
           target: nutritionDemand.En ? Number(nutritionDemand.En) : 0,
-          supply: nutritionSupply.En ? nutritionSupply.En : 0,
+          supply: nutritionSupply.En ? Number(nutritionSupply.En * nutritionSupply.Wt / 100) : 0,
           rating: nutritionDemand.En ?
-            Math.round(nutritionSupply.En / nutritionDemand.En * 10) : 0
+            Math.round((nutritionSupply.En * nutritionSupply.Wt / 100) / nutritionDemand.En * 10) : 0
         },
         {
           name: 'Protein',
           target: nutritionDemand.Pr ? Number(nutritionDemand.Pr) : 0,
-          supply: nutritionSupply.Pr ? nutritionSupply.Pr : 0,
+          supply: nutritionSupply.Pr ? Number(nutritionSupply.Pr * nutritionSupply.Wt / 100) : 0,
           rating: nutritionDemand.Pr ?
-            Math.round(nutritionSupply.Pr / nutritionDemand.Pr * 10) : 0
+            Math.round((nutritionSupply.Pr * nutritionSupply.Wt / 100) / nutritionDemand.Pr * 10) : 0
         },
         {
           name: 'VitA',
           target: nutritionDemand.Va ? Number(nutritionDemand.Va) : 0,
-          supply: nutritionSupply.Va ? nutritionSupply.Va : 0,
+          supply: nutritionSupply.Va ? Number(nutritionSupply.Va * nutritionSupply.Wt / 100) : 0,
           rating: nutritionDemand.Va ?
-            Math.round(nutritionSupply.Va / nutritionDemand.Va * 10) : 0
+            Math.round((nutritionSupply.Va * nutritionSupply.Wt / 100) / nutritionDemand.Va * 10) : 0
         },
         {
           name: 'Fe',
           target: nutritionDemand.Fe ? Number(nutritionDemand.Fe) : 0,
-          supply: nutritionSupply.Fe ? nutritionSupply.Fe : 0,
+          supply: nutritionSupply.Fe ? Number(nutritionSupply.Fe * nutritionSupply.Wt / 100) : 0,
           rating: nutritionDemand.Fe ?
-            Math.round(nutritionSupply.Fe / nutritionDemand.Fe * 10) : 0
+            Math.round((nutritionSupply.Fe * nutritionSupply.Wt / 100) / nutritionDemand.Fe * 10) : 0
         },
       ]
     },
@@ -329,6 +341,18 @@ export default {
       this.$emit('update:myApp', dat)
     },
     /**
+     * portionSizeの更新をmyAppに組み込んでemitで通知
+     * @param val
+     */
+    onPortionSizeChanged(val) {
+      //作業用のmyAppコピー作成
+      let dat = JSON.parse(JSON.stringify(this.myAppWatcher))
+      //更新されたfeasibilityCasesを入れ替える
+      dat.feasibilityCases[this.pageIdComputed].selectedCrop[0].Wt = val
+      //更新されたmyAppをemit
+      this.$emit('update:myApp', dat)
+    },
+    /**
      * cropの選択の変更をmyAppに組み込んでemitで通知
      * @param value
      */
@@ -340,7 +364,7 @@ export default {
       res.Pr = Number(value.Pr) || 0
       res.Va = Number(value.Va) || 0
       res.Fe = Number(value.Fe) || 0
-      res.Wt = 100
+      res.Wt = this.portionSize
 
       //作業用のmyAppコピー作成
       let dat = JSON.parse(JSON.stringify(this.myAppWatcher))
@@ -528,6 +552,10 @@ export default {
        * fctTableModal表示用のフラグ
        */
       showFct: false,
+      /**
+       * 選択された食品の重量（portion size)
+       */
+      portionSize: 100,
       /**
        * 質問と回答一覧
        */
