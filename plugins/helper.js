@@ -15,6 +15,12 @@ export async function objectSort(objects, key) {
   return objects
 }
 
+/**
+ * 数字の桁数を３桁に自動調整し、単位を追記して返す
+ * @param val
+ * @param unitKey
+ * @returns {string}
+ */
 export function setDigit(val, unitKey) {
   let res
   const units = [

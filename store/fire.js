@@ -99,6 +99,10 @@ export const state = () => ({
      */
     feasibilityCases: [],
     /**
+     * 各シナリオに対応したデータ(prodTarget)
+     */
+    prodTargetCases: [],
+    /**
      * 最後に保存した日時
      */
     saveDate: {
@@ -224,6 +228,7 @@ export const mutations = {
     state.myApp.dataSet.dri = []
     state.myApp.dataSet.portionUnit = []
     state.myApp.menuCases = []
+    state.myApp.prodTargetCases = []
     state.myApp.feasibilityCases = []
     state.myApp.saveDate = {}
     state.hasMyAppLoaded = false
@@ -320,6 +325,14 @@ export const mutations = {
    */
   updateMenuCases: function (state, payload) {
     state.myApp.menuCases = JSON.parse(JSON.stringify(payload))
+  },
+  /**
+   * prodTargetCasesを更新
+   * @param state
+   * @param payload
+   */
+  updateProdTargetCases: function (state, payload) {
+    state.myApp.prodTargetCases = JSON.parse(JSON.stringify(payload))
   },
   /**
    * feasibilityCasesを更新
@@ -837,6 +850,25 @@ export const actions = {
     commit('updateMenuCases', arr)
   },
   /**
+   * prodTargetCasesを初期化（空白ArrayをsetCountの数だけ作成）
+   * @param payload driのセット(array of object)
+   * @param state
+   * @param commit
+   */
+  initProdTarget({state, commit}, payload) {
+    const arr = []
+    for (let i = 0; i < state.myApp.sceneCount; i++) {
+      const isTargetSingle = false
+      const note = ''
+      const prodTarget = []
+      const target = payload.map(function (dat) {
+        return {id: dat.id, count: 0}
+      })
+      arr.push({target: target, prodTarget: prodTarget, note: note, isTargetSingle: isTargetSingle})
+    }
+    commit('updateProdTargetCases', arr)
+  },
+  /**
    * feasibilityCasesを初期化（空白ArrayをsetCountの数だけ作成）
    * @param state
    * @param commit
@@ -872,6 +904,7 @@ export const actions = {
       await dispatch('initDri')
       await dispatch('initPortionUnit')
       await dispatch('initMenu', state.myApp.dataSet.dri)
+      await dispatch('initProdTarget', state.myApp.dataSet.dri)
       await dispatch('initFeasibility', state.myApp.dataSet.dri)
       await dispatch('fireSaveAppdata')
       console.log('initAll: all done')

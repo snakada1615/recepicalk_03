@@ -28,6 +28,7 @@
             >dietCalk
             </b-dropdown-item>
             <b-dropdown-item to="/summaryDiet">diet Summary</b-dropdown-item>
+            <b-dropdown-item to="/setSupplyTarget">estimate Supply Target</b-dropdown-item>
           </b-dropdown>
 
           <!-- メニューグループ3　品目特定 -->
