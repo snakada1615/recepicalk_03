@@ -14,10 +14,11 @@
           <b-form-select v-model="pageIdComputed" :options="pageOptions"></b-form-select>
           <div class="d-flex flex-row">
             <b-form-input
+
               v-model="pageMemo[pageIdComputed]"
               placeholder="note for this family"
               :state="noteInputState"
-              @update="updatePageMemo(pageMemo[pageIdComputed])"
+              @update="updatePageMemo"
               class="my-1">
             </b-form-input>
           </div>
@@ -62,15 +63,51 @@
             Target commodity: <span
             class="text-danger">{{ myAppWatcher.prodTargetCases[pageIdComputed].prodTarget[0].Name }}</span>
           </div>
-          <div class="font-weight-bold mb-2" v-if="myAppWatcher.prodTargetCases[pageIdComputed].prodTarget.length">
-            Target volume:
-            <span class="text-danger">{{setDigit(Math.round(myAppWatcher.prodTargetCases[pageIdComputed].prodTarget[0].Wt * 365), 2) }}</span>
-            (annually)
+          <div class="font-weight-bold" v-if="myAppWatcher.prodTargetCases[pageIdComputed].prodTarget.length">
+            Daily Target:
+            <span v-if="nutrientTarget" class="text-danger">
+                {{
+                setDigit(myAppWatcher.prodTargetCases[pageIdComputed].prodTarget[0].Wt, 2)
+              }}
+              </span>
           </div>
+          <div class="font-weight-bold mb-2" v-if="myAppWatcher.prodTargetCases[pageIdComputed].prodTarget.length">
+            Annual Target:
+            <span v-if="nutrientTarget" class="text-danger">
+                {{
+                setDigit(myAppWatcher.prodTargetCases[pageIdComputed].prodTarget[0].Wt365, 2)
+              }}
+              </span>
+          </div>
+          <b-row class="my-2">
+            <b-col class="font-weight-bold mx-0">
+              <b-input-group prepend="target nutrient" size="sm">
+                <b-form-select
+                  class="font-weight-bold"
+                  v-model="nutrientTarget"
+                  :options="Object.keys(rating[pageIdComputed])"
+                  @change="updateNutrientTarget"
+                >
+                </b-form-select>
+              </b-input-group>
+            </b-col>
+            <b-col>
+              <b-input-group
+                prepend="sufficiency rate"
+                append="%"
+                size="sm">
+                <b-form-input
+                  v-model="targetSufficicncy"
+                  type="number"
+                  size="sm"
+                  @update="updateShare"
+                ></b-form-input>
+              </b-input-group>
+            </b-col>
+          </b-row>
           <recepi-table
             :items.sync="myAppWatcher.prodTargetCases[pageIdComputed].prodTarget"
             @itemDeleted="deleteSupply"
-            @rowClick="onRecepiClicked"
           ></recepi-table>
         </b-card>
       </b-col>
@@ -107,16 +144,6 @@
       :items="myAppWatcher.dataSet.fct"
       @modalOk="onFctClick"
     ></FctTableModal>
-    <food-modal
-      :show-modal.sync="showModal"
-      :max-weight=500
-      my-name="myFoodModal"
-      :items="items_modal"
-      :value.sync="value_model"
-      :menu-name.sync="prodTargetName_modal"
-      :portion-units="myAppWatcher.dataSet.portionUnit"
-      @modalOk="addSupply"
-    />
     <dri-select-modal
       my-modal-header="nutrition target"
       my-name="driModal"
@@ -140,7 +167,7 @@ import macroNutrientBar from "@/components/molecules/macroNutrientBar";
 import {validateMyApp} from "@/plugins/helper";
 
 /**
- * @desc 6つのコンポーネントを組み合わせて食事評価
+ * @desc 6つのコンポーネントを組み合わせて必要な作物の量を計算する
  * 1. driSelectModa\
  *    対象グループの選択→栄養必要量の決定
  * 2. FctTableModal\
@@ -165,6 +192,15 @@ export default {
   },
   data() {
     return {
+      /**
+       * 栄養素充足率のターゲット
+       */
+      targetSufficicncy: 100,
+      /**
+       /**
+       * リストボックスで選択された重要な栄養素
+       */
+      nutrientTarget: '',
       /**
        * 使用する全変数のobject
        * myAppから読み込んでこのページで利用。更新された時にemitを返す
@@ -309,24 +345,12 @@ export default {
       return res
     },
     /**
-     * FCTからfood Groupを抽出
-     * @returns {*}
-     */
-    foodGroup() {
-      return this.myApp.dataSet.fct.reduce((accumulator, dat) => {
-        if (accumulator.indexOf(dat.Group) < 0) {
-          accumulator.push(dat.Group)
-        }
-        return accumulator
-      }, [])
-    },
-    /**
      * noteの記入状態
      * @returns {boolean}
      */
     noteInputState() {
       return (this.pageMemo[this.pageIdComputed].length > 3)
-    }
+    },
   },
   watch: {
     /**
@@ -342,6 +366,10 @@ export default {
         this.pageMemo = this.myAppWatcher.prodTargetCases.map(function (item) {
           return item.note
         })
+        this.targetSufficicncy = this.myAppWatcher.prodTargetCases[0] ?
+          this.myAppWatcher.prodTargetCases[0].prodTarget[0].share : 100
+        this.nutrientTarget = this.myAppWatcher.prodTargetCases[0] ?
+          this.myAppWatcher.prodTargetCases[0].prodTarget[0].nutrientTarget : 'Pr'
       }
     },
   },
@@ -356,6 +384,10 @@ export default {
     this.pageMemo = this.myAppWatcher.prodTargetCases.map(function (item) {
       return item.note
     })
+    this.targetSufficicncy = this.myAppWatcher.prodTargetCases[0] ?
+      this.myAppWatcher.prodTargetCases[0].prodTarget[0].share : 100
+    this.nutrientTarget = this.myAppWatcher.prodTargetCases[0] ?
+      this.myAppWatcher.prodTargetCases[0].prodTarget[0].nutrientTarget : 'Pr'
   },
   methods: {
     /**
@@ -367,6 +399,58 @@ export default {
       let dat = JSON.parse(JSON.stringify(this.myAppWatcher))
       //更新されたprodTargetを入れ替える
       dat.prodTargetCases[this.pageIdComputed].note = newVal
+      //更新されたmyAppをemit
+      this.$emit('update:myApp', dat)
+    },
+    /**
+     * nutrientTargetの更新：
+     * @param newVal
+     */
+    updateNutrientTarget(newVal) {
+      console.log('updateNutrientTarget')
+      //作業用のmyAppコピー作成
+      let dat = JSON.parse(JSON.stringify(this.myAppWatcher))
+
+      //nutrientTargetを更新して入れ替える
+      const share = dat.prodTargetCases[this.pageIdComputed].prodTarget[0].share
+      const vm = this
+      const Wt = vm.setQuantity(
+        vm.nutritionDemandWatcher[vm.pageIdComputed],
+        vm.myAppWatcher.prodTargetCases[vm.pageIdComputed].prodTarget[0],
+        newVal,
+        share
+      )
+
+      dat.prodTargetCases[vm.pageIdComputed].prodTarget[0].nutrientTarget = newVal
+      dat.prodTargetCases[vm.pageIdComputed].prodTarget[0].Wt = Wt
+      dat.prodTargetCases[vm.pageIdComputed].prodTarget[0].Wt365 = Wt * 365
+
+      //更新されたmyAppをemit
+      this.$emit('update:myApp', dat)
+    },
+    /**
+     * 栄養素充足目標の更新：
+     * @param newVal
+     */
+    updateShare(newVal) {
+      console.log('updateNutrientTarget')
+      //作業用のmyAppコピー作成
+      let dat = JSON.parse(JSON.stringify(this.myAppWatcher))
+
+      //nutrientTargetを更新して入れ替える
+      const nutrientTarget = dat.prodTargetCases[this.pageIdComputed].prodTarget[0].nutrientTarget
+      const vm = this
+      const Wt = vm.setQuantity(
+        vm.nutritionDemandWatcher[vm.pageIdComputed],
+        vm.myAppWatcher.prodTargetCases[vm.pageIdComputed].prodTarget[0],
+        nutrientTarget,
+        newVal
+      )
+
+      dat.prodTargetCases[vm.pageIdComputed].prodTarget[0].share = newVal
+      dat.prodTargetCases[vm.pageIdComputed].prodTarget[0].Wt = Wt
+      dat.prodTargetCases[vm.pageIdComputed].prodTarget[0].Wt365 = Wt * 365
+
       //更新されたmyAppをemit
       this.$emit('update:myApp', dat)
     },
@@ -451,6 +535,19 @@ export default {
       return res
     },
     /**
+     * 栄養必要量、栄養供給量から必要な作物位の生産量を計算する
+     * @param nutrientsDemand
+     * @param nutrientsSupply
+     * @param keyNutrient
+     * @param share
+     * @returns {number|number}
+     */
+    setQuantity(nutrientsDemand, nutrientsSupply, keyNutrient, share) {
+      const rep1 = nutrientsDemand[keyNutrient] ? nutrientsDemand[keyNutrient] : 0
+      const rep2 = nutrientsSupply ? nutrientsSupply[keyNutrient] : 0
+      return rep2 ? Math.round((rep1 * 100 / rep2) * share / 100) : 0
+    },
+    /**
      * ユーザーによりtergetが変更された際に、栄養素必要量合計を再計算してemit
      * @param val 更新されたグループ構成
      */
@@ -464,32 +561,23 @@ export default {
       this.$emit('update:myApp', dat)
     },
     /**
-     * ユーザーによりrecepiTableがクリックされた際に、行の内容を組み込んでfoodModalを開く
-     * @param val
-     */
-    onRecepiClicked(val) {
-      console.log(val)
-      this.items_modal.length = 0
-      this.items_modal.push({
-        'id': val.id,
-        'Name': val.Name,
-        'Group': val.Group,
-        'En': val.En,
-        'Pr': val.Pr,
-        'Va': val.Va,
-        'Fe': val.Fe,
-      })
-      this.prodTargetName_modal = val.menuName
-      this.value_model = val.Wt
-      this.showModal = true
-    },
-    /**
-     * ユーザーによりfctTableがクリックされた時に行の内容を組み込んでfoodModalを開く
+     * ユーザーによりfctTableがクリックされた時に行の内容を組み込んで
+     *     newProdTargetを更新してemit
      * @param val
      */
     onFctClick(val) {
-      this.items_modal.length = 0
-      this.items_modal.push({
+      const vm = this
+      let newProdTarget = []
+      const nut = 'Pr'
+      const share = 100
+      const Wt = vm.setQuantity(
+        vm.nutritionDemandWatcher[vm.pageIdComputed],
+        vm.myAppWatcher.prodTargetCases[vm.pageIdComputed].prodTarget[0],
+        nut,
+        share
+      )
+
+      newProdTarget.push({
         'id': val.id,
         'Name': val.Name,
         'Group': val.Group,
@@ -499,31 +587,16 @@ export default {
         'Fe': val.Fe,
         'Carbohydrate': val.Carbohydrate,
         'Fat': val.Fat,
+        // 当該作物が目標とする栄養素の種類
+        'nutrientTarget': nut,
+        // 当該作物が必要栄養量の何％を満たすか表す
+        'share': share,
+        'menuName': 'target',
+        //1日に必要な生産・消費目標
+        'Wt': Wt,
+        //1年間に必要な生産・消費目標
+        'Wt365': Wt * 365,
       })
-      this.value_model = 0
-      this.showModal = true
-    },
-    /**
-     * prodTargetが変更・追加された際に、栄養素供給量合計を再計算してemit
-     * 新規なら追加、変更なら更新
-     * @param val 更新されたprodTarget
-     */
-    addSupply(val) {
-      const vm = this
-      //prodTargetを更新する
-      let existing = false
-      let newProdTarget = []
-      newProdTarget = vm.myAppWatcher.prodTargetCases[vm.pageIdComputed].prodTarget.map((item) => {
-        if (item.id === val.id && item.prodTargetName === val.prodTargetName) {
-          existing = true
-          return JSON.parse(JSON.stringify(val))
-        } else {
-          return item
-        }
-      })
-      if (!existing) {
-        newProdTarget.push(val)
-      }
       //作業用のmyAppコピー作成
       let dat = JSON.parse(JSON.stringify(vm.myAppWatcher))
       //更新されたprodTargetを入れ替える

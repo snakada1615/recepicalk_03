@@ -2,9 +2,6 @@
   <b-container>
     <b-row>
       <b-col cols="12" lg="6" class="my-1">
-        <div>supply:{{nutritionSupplyGetter[0]}}</div>
-        <div>demand:{{nutritionDemandGetter[0]}}</div>
-        <div>rating:{{ratingGetter[0]}}</div>
         <b-card
           header-bg-variant="success"
           border-variant="success"
@@ -34,7 +31,7 @@
             bordered
             small
             :items="diversityStatus"
-            :fields="fieldsDiversity"
+            :fields="fieldsFoodGroup"
           >
           </b-table>
         </b-card>
@@ -134,6 +131,16 @@ export default {
         }
         return accumulator
       }, [])
+    },
+    fieldsFoodGroup() {
+      const vm = this
+      let res = [{key: 'case', label: 'Case'}]
+      vm.foodGroup.forEach((grp, index)=>{
+        res.push(
+          {key: grp, label: 'F' + (index + 1)}
+        )
+      })
+      return res
     },
     /**
      * menuCasesに含まれるfood Groupから、何種類の食品群が含まれるか判定
@@ -261,20 +268,6 @@ export default {
   },
   data() {
     return {
-      /**
-       * Dietary Diversityのフィールド定義
-       */
-      fieldsDiversity: [
-        {key: 'case', label: 'Case'},
-        {key: 'Grains@ roots and tubers ', label: 'F1'},
-        {key: 'Vitamin A rich fruits and Vegetable ', label: 'F2'},
-        {key: 'Legumes and nuts ', label: 'F3'},
-        {key: 'Other fruits and vegetables ', label: 'F4'},
-        {key: 'Flesh foods ', label: 'F5'},
-        {key: 'Eggs ', label: 'F6'},
-        {key: 'Dairy products ', label: 'F7'},
-        {key: 'non-category', label: 'F8'},
-      ],
       /**
        * nutritionBar用のproperty：栄養素表示用のlabel
        */
