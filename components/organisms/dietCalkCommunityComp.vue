@@ -160,23 +160,19 @@
 <script>
 import FctTableModal from "@/components/organisms/FctTableModal.vue";
 import driSelectModal from "@/components/organisms/driSelectModal";
-import foodModal from "@/components/molecules/foodModal"
 import recepiTable from "@/components/molecules/recepiTable"
 import nutritionBar from "@/components/molecules/nutritionBar"
-import macroNutrientBar from "@/components/molecules/macroNutrientBar";
 import {validateMyApp} from "@/plugins/helper";
 
 /**
- * @desc 6つのコンポーネントを組み合わせて必要な作物の量を計算する
+ * @desc 4つのコンポーネントを組み合わせて必要な作物の量を計算する
  * 1. driSelectModa\
  *    対象グループの選択→栄養必要量の決定
  * 2. FctTableModal\
  *    利用する品目の選択→栄養供給量の決定
- * 3. foodModal\
- *    利用する品目の摂取量決定→栄養供給量の決定
- * 4. recepiTable\
+ * 3. recepiTable\
  *    選択された品目一覧を示す
- * 5. nutritionBar\
+ * 4. nutritionBar\
  *    栄養素の充足状況をバーチャートで示す
  *
  */
@@ -185,10 +181,8 @@ export default {
   components: {
     FctTableModal,
     recepiTable,
-    foodModal,
     nutritionBar,
     driSelectModal,
-    macroNutrientBar
   },
   data() {
     return {
@@ -232,23 +226,7 @@ export default {
       /**
        * ターゲットの1グループあたり設定人数の最大値
        */
-      maxPopulation: 10000,
-      /**
-       * nutritionBarで評価するprodTargetを１日分で評価するか、一食分で評価するか判定
-       */
-      driSwitch: true,
-      /**
-       * 作物情報を表すobject：作物摂取量の設定ダイアログに渡すproperty
-       */
-      items_modal: [],
-      /**
-       * 作物摂取量を表す値：作物摂取量の設定ダイアログに渡すproperty
-       */
-      value_model: 0,
-      /**
-       * 当該作物がどのメニュに含まれるかを示す変数
-       */
-      prodTargetName_modal: '',
+      maxPopulation: 1000000,
       /**
        * driSelectAll表示用のフラグ
        */
@@ -257,10 +235,6 @@ export default {
        * fctTableModal表示用のフラグ
        */
       showFct: false,
-      /**
-       * modal表示用のフラグ
-       */
-      showModal: false,
       /**
        * 各ページの捕捉情報
        */
@@ -308,19 +282,6 @@ export default {
      */
     driItem: function () {
       return this.myApp.dataSet.dri
-    },
-    /**
-     * ratingを計算するにあたって、同一メニューを一日3回食べると仮定した場合の評価、
-     *     (recepiTableの値×3)、または1回分が一日の栄養素に与える影響の評価を
-     *     切り替える
-     * @returns {number}
-     */
-    driRange: function () {
-      let res = 3
-      if (this.driSwitch) {
-        res = 1
-      }
-      return res
     },
     /**
      * 現在のページ番号
@@ -403,7 +364,7 @@ export default {
       this.$emit('update:myApp', dat)
     },
     /**
-     * nutrientTargetの更新：
+     * 栄養目標（nutrientTarget）の更新：
      * @param newVal
      */
     updateNutrientTarget(newVal) {
@@ -429,7 +390,7 @@ export default {
       this.$emit('update:myApp', dat)
     },
     /**
-     * 栄養素充足目標の更新：
+     * 栄養素充足目標（share）の更新：
      * @param newVal
      */
     updateShare(newVal) {
@@ -523,13 +484,13 @@ export default {
         const demand = this.nutritionDemandWatcher[i]
         res.push({
           En: demand.En ?
-            Math.round(100 * supply.En * this.driRange / demand.En) / 10 : 0,
+            Math.round(100 * supply.En / demand.En) / 10 : 0,
           Pr: demand.Pr ?
-            Math.round(100 * supply.Pr * this.driRange / demand.Pr) / 10 : 0,
+            Math.round(100 * supply.Pr / demand.Pr) / 10 : 0,
           Va: demand.Va ?
-            Math.round(100 * supply.Va * this.driRange / demand.Va) / 10 : 0,
+            Math.round(100 * supply.Va / demand.Va) / 10 : 0,
           Fe: demand.Fe ?
-            Math.round(100 * supply.Fe * this.driRange / demand.Fe) / 10 : 0
+            Math.round(100 * supply.Fe / demand.Fe) / 10 : 0
         })
       }
       return res
@@ -570,6 +531,7 @@ export default {
       let newProdTarget = []
       const nut = 'Pr'
       const share = 100
+      //shareとnutからWtを決定
       const Wt = vm.setQuantity(
         vm.nutritionDemandWatcher[vm.pageIdComputed],
         vm.myAppWatcher.prodTargetCases[vm.pageIdComputed].prodTarget[0],
