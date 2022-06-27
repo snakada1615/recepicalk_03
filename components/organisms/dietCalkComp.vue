@@ -120,30 +120,20 @@
           </template>
           <recepi-table
             :items.sync="myAppWatcher.menuCases[pageIdComputed].menu"
-            @itemDeleted="deleteSupply"
-            @rowClick="onRecepiClicked"
-            @totalChanged="updatePfc"
+            @itemDeleted="notifiRecepiEdit"
+            @rowClick="notifiRecepiEdit"
           ></recepi-table>
         </b-card>
       </b-col>
     </b-row>
-    <FctTableModal
-      my-name="fctModal"
-      my-modal-header="Food Composition Table"
+    <fctTableModal2
+      my-name="fctModal2"
       :show-modal.sync="showFct"
       :items="myAppWatcher.dataSet.fct"
-      @modalOk="onFctClick"
-    ></FctTableModal>
-    <food-modal
-      :show-modal.sync="showModal"
-      :max-weight=500
-      my-name="myFoodModal"
-      :items="items_modal"
-      :value.sync="value_model"
-      :menu-name.sync="menuName_modal"
+      :menu-cases.sync="myAppWatcher.menuCases[pageIdComputed].menu"
       :portion-units="myAppWatcher.dataSet.portionUnit"
-      @modalOk="addSupply"
-    />
+      @update:menuCases="updateSupply"
+    ></fctTableModal2>
     <dri-select-modal
       my-modal-header="nutrition target"
       my-name="driModal"
@@ -158,13 +148,12 @@
 </template>
 
 <script>
-import FctTableModal from "@/components/organisms/FctTableModal.vue";
 import driSelectModal from "@/components/organisms/driSelectModal";
-import foodModal from "@/components/molecules/foodModal"
 import recepiTable from "@/components/molecules/recepiTable"
 import nutritionBar from "@/components/molecules/nutritionBar"
 import macroNutrientBar from "@/components/molecules/macroNutrientBar";
 import {validateMyApp} from "@/plugins/helper";
+import fctTableModal2 from "@/components/organisms/FctTableModal2";
 
 /**
  * @desc 6つのコンポーネントを組み合わせて食事評価
@@ -183,12 +172,11 @@ import {validateMyApp} from "@/plugins/helper";
 
 export default {
   components: {
-    FctTableModal,
     recepiTable,
-    foodModal,
     nutritionBar,
     driSelectModal,
-    macroNutrientBar
+    macroNutrientBar,
+    fctTableModal2
   },
   data() {
     return {
@@ -436,6 +424,7 @@ export default {
         this.pageMemo = this.myAppWatcher.menuCases.map(function (item) {
           return item.note
         })
+        this.updatePfc()
       }
     },
   },
@@ -450,6 +439,7 @@ export default {
     this.pageMemo = this.myAppWatcher.menuCases.map(function (item) {
       return item.note
     })
+    this.updatePfc()
   },
   methods: {
     /**
@@ -543,6 +533,19 @@ export default {
         })
       }
       return res
+    },
+    /**
+     * ユーザーによりmenuCasesが変更された際に、myApp全体を更新してemit
+     * @param val
+     */
+    updateSupply(val){
+      const vm = this
+      //作業用のmyAppコピー作成
+      let dat = JSON.parse(JSON.stringify(vm.myAppWatcher))
+      //更新されたmenuを入れ替える
+      dat.menuCases[vm.pageIdComputed].menu = JSON.parse(JSON.stringify(val))
+      //更新されたmyAppをemit
+      this.$emit('update:myApp', dat)
     },
     /**
      * ユーザーによりtergetが変更された際に、栄養素必要量合計を再計算してemit
@@ -656,6 +659,9 @@ export default {
           {val: Math.round(dat.Fat * 9), color: 'yellow'},
         ]
       })
+    },
+    notifiRecepiEdit(){
+      alert('you can edit diet record by clicking [add crop] button')
     }
   }
 }

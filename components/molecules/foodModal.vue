@@ -72,6 +72,9 @@ export default {
       type: Array,
       required: true,
     },
+    /**
+     * portion換算用の変換表
+     */
     portionUnits: {
       type: Array,
       required: true,
@@ -133,19 +136,19 @@ export default {
         return [
           {
             'FCT_id': '0',
-            'id': '0',
+            'id': '999',
             'count_method': 'ton',
             'unit_weight': 1000000,
           },
           {
             'FCT_id': '0',
-            'id': '0',
+            'id': '998',
             'count_method': 'Kg',
             'unit_weight': 1000,
           },
           {
             'FCT_id': '0',
-            'id': '0',
+            'id': '997',
             'count_method': 'gram',
             'unit_weight': 1,
           }
@@ -157,19 +160,19 @@ export default {
       res.push(
         {
           'FCT_id': '0',
-          'id': '0',
+          'id': '999',
           'count_method': 'ton',
           'unit_weight': 1000000,
         },
         {
           'FCT_id': '0',
-          'id': '0',
+          'id': '998',
           'count_method': 'Kg',
           'unit_weight': 1000,
         },
         {
           'FCT_id': '0',
-          'id': '0',
+          'id': '997',
           'count_method': 'gram',
           'unit_weight': 1,
         }
