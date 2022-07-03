@@ -13,10 +13,14 @@
         class="mb-2"
         border-variant="success"
       >
-        <b-row class="mb-3">
-          <!--    ここからFCTテーブル      -->
+        <!--    ここからFCTテーブル      -->
+        <b-row class="mb-0">
           <div class="font-weight-bold ml-3 text-primary">food composition table</div>
-          <span class="small ml-3 text-muted">(1) select food item from the list below</span>
+        </b-row>
+        <b-row class="my-0">
+          <div class="small ml-3 text-muted">(1) select food item from the list below</div>
+        </b-row>
+        <b-row class="my-0">
           <fct-table
             :items="items"
             head-row-variant="success"
@@ -25,20 +29,32 @@
             class="mb-0"
           ></fct-table>
         </b-row>
-
+      </b-card>
+      <b-card
+        class="mb-2"
+        border-variant="success"
+      >
         <!--   ここから選択されたfood itemの表示     -->
-        <span class="font-weight-bold text-primary">add new ingredients</span>
-        <b-button
-          class="px-0 py-0 mx-0 my-0"
-          variant="light"
-          @click="showModalInput = !showModalInput"
-          :disabled="!stateSelectedItem"
-        >
-          <b-badge variant="danger" class="px-1 py-1">
-            +
-          </b-badge>
-        </b-button>
-        <span class="small ml-3 text-muted">(2) add food item by clicking +</span>
+        <b-row>
+          <div class="font-weight-bold ml-3 text-primary">
+            add new ingredients
+          </div>
+            <b-button
+              class="px-0 py-0 mx-0 my-0"
+              variant="light"
+              @click="showModalInput = !showModalInput"
+              :disabled="!stateSelectedItem"
+            >
+              <b-badge variant="danger" class="px-1 py-1">
+                +
+              </b-badge>
+            </b-button>
+        </b-row>
+
+        <b-row>
+          <div class="small ml-3 text-muted">(2) add food item by clicking +</div>
+        </b-row>
+
         <b-table
           :items="selectedItemArray"
           :fields="fieldsSelected"
@@ -178,7 +194,7 @@
         </b-input-group>
         <b-row class="mt-2">
           <b-col>
-            portionSize:{{portionSize}}
+            portionSize:{{ portionSize }}
             <b-form-group
               description="select measurement unit and put number"
             >
@@ -288,7 +304,7 @@ export default {
     /**
      * 食材の重さの入力値
      */
-    foodVolume(){
+    foodVolume() {
       return this.portionCount * this.portionSize
     },
     /**
