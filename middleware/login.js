@@ -17,6 +17,11 @@ export default async function ({store, redirect, route}) {
     console.log('not login')
     return redirect('/')
   } else {
+    if (store.state.fire.isLoggedIn){
+      // 初期化されていない変数があった場合、firebaseからオリジナル変数をダウンロードして際読み込む
+      // （下位互換のための例外措置）
+      await store.dispatch('fire/initFirebaseNewVariable')
+    }
     console.log('autologin complete:')
   }
 }

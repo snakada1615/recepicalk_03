@@ -1,105 +1,77 @@
 <template>
   <b-container>
-    <fct-table-modal2
-      :show-modal="modalFlag"
-      :items="items"
-      :menu-cases.sync="myMenu"
-      :portion-units="portionList"
-      my-name="shunModal"
-    />
-    <b-button
-      @click="modalFlag =!modalFlag"
-    >halo</b-button>
+    <b-button variant="success" @click="save2fire('dataset', 'questions01', qaList3)">push me</b-button>
+    <div>select question</div>
+    <b-form-select
+      v-model="qaId"
+      :options="qaOption"
+      class="mb-2"
+    ></b-form-select>
+
+    <div>edit question</div>
+    <feasibility-qa-editor
+      v-if="qaList2"
+      :qa=qaList2[qaId]
+    ></feasibility-qa-editor>
   </b-container>
 </template>
 
 <script>
-import FctTableModal2 from "@/components/organisms/FctTableModal2";
+import feasibilityQaEditor from "@/components/atoms/feasibilityQAEditor.vue"
+import {doc, setDoc} from "firebase/firestore";
+import {firestoreDb} from "@/plugins/firebasePlugin";
 
 export default {
   components: {
-    FctTableModal2,
+    feasibilityQaEditor
   },
-  data: function () {
+  async created() {
+    if (!this.$store.state.fire.myApp.dataSet.questionsId){
+      alert('questions are not initialized. data will be loaded from original copy')
+      await this.$store.dispatch('fire/updateQuestionsId', 'questions01')
+      await this.$store.dispatch('fire/initQuestions')
+      alert(this.$store.state.fire.myApp.dataSet.questionsId)
+      await this.$store.dispatch('fire/fireSaveAppdata')
+      //location.reload()
+      this.$router.push('/test01')
+    }
+  },
+  computed: {
+    qaList3(){
+      const vm = this
+      let res = {}
+      vm.$store.state.fire.myApp.dataSet.questions.forEach((item, index)=>{
+        res[index] = item
+      })
+      return res
+    },
+    qaList2(){
+      return this.$store.state.fire.myApp.dataSet.questions
+    },
+    qaOption() {
+      if (!this.qaList2) {return {}}
+      return this.qaList2.map((item, index) => {
+        return {
+          text: item.questionText,
+          value: index
+        }
+      })
+    }
+  },
+  methods: {
+    save2fire(path, docName, content){
+      const ref = doc(firestoreDb, path, docName)
+      setDoc(ref, content).catch((err) => {
+        throw new Error('Error in fireSaveAppdata:' + err)
+      })
+    }
+  },
+  data() {
     return {
-      items : [
-        {
-          Carbohydrate: "67.9",
-          En: "315",
-          Fe: "1.9",
-          Fat: "0.4",
-          Food_grp: "Starchy roots, tubers and their products",
-          Name: "Yam tuber, flour",
-          Pr: "3.4",
-          Va: "",
-          Group: "Grains, roots and tubers",
-          food_grp_id: "2",
-          id: "110",
-        },
-        {
-          Carbohydrate: "58.9",
-          En: "380",
-          Fe: "3.3",
-          Fat: "5.9",
-          Food_grp: "Legumes and their products",
-          Name: "Bambara groundnut, dried ",
-          Pr: "20.1",
-          Va: "2",
-          Group: "Legumes and nuts ",
-          food_grp_id: "3",
-          id: "111",
-        },
-        {
-          Carbohydrate: "20.3",
-          En: "562",
-          Fe: "3.7",
-          Fat: "43.2",
-          Food_grp: "Nuts, seeds and their products",
-          Name: "Groundnut, rose",
-          Pr: "20.4",
-          Va: "0",
-          Group: "Legumes and nuts ",
-          food_grp_id: "6",
-          id: "273",
-        }
-      ],
-      myMenu : [
-        {
-          Carbohydrate: "99.9",
-          En: "99",
-          Fe: "9.9",
-          Fat: "0.9",
-          Name: "YamYam",
-          Pr: "3.9",
-          Va: "",
-          Group: "Grains, roots and tubers",
-          food_grp_id: "2",
-          id: "106",
-          Wt: 128,
-          menuName: "breakfast"
-        },
-      ],
-      modalFlag: false,
-      portionList: [
-        {
-          'FCT_id': '1043',
-          'id': '1',
-          'count_method': 'small cup',
-          'unit_weight': 50,
-        },
-        {
-          'FCT_id': '4156',
-          'id': '2',
-          'count_method': 'small',
-          'unit_weight': 20,
-        },
-        {
-          'FCT_id': '4156',
-          'id': '3',
-          'count_method': 'medium',
-          'unit_weight': 50,
-        }
-      ],
+      /**
+       * 現在選択中のQAのID
+       */
+      qaId: 0,
     }
   },
 }

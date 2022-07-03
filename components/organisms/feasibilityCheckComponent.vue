@@ -421,8 +421,6 @@ export default {
       return res2
     },
   },
-  created() {
-  },
   watch: {
     myApp: {
       deep: true,
@@ -450,6 +448,25 @@ export default {
         })
       }
     }
+  },
+  created() {
+    //表示用にmyApp.questionsの構造を変形
+    const vm = this
+    let res = JSON.parse(JSON.stringify(vm.qaListDataFrame))
+    vm.myApp.dataSet.questions.forEach((item)=>{
+      const index = res.findIndex(item2 => item2.categoryText === item.categoryText)
+      if (index >= 0){
+        const itemsQATemp = {
+          id: item.id,
+          questionText: item.questionText,
+          answerList: JSON.parse(JSON.stringify(
+            item.answerList
+          ))
+        }
+        res[index].itemsQA.push(itemsQATemp)
+      }
+    })
+    vm.qaList = res
   },
   computed: {
     /**
@@ -557,214 +574,44 @@ export default {
        */
       portionSize: 100,
       /**
-       * 質問と回答一覧
+       * qaListのデータ構造
        */
-      qaList: [
+      qaListDataFrame: [
         {
           categoryID: 1,
           categoryText: 'Nutrient balance',
-          itemsQA: [
-            {
-              id: 1,
-              questionText: 'Is required amount for nutrition target feasible?',
-              answerList: [
-                {value: -99, text: 'please select', disabled: true},
-                {value: 3, text: 'It can cover >50% daily requirement'},
-                {value: 2, text: 'It can cover >30% daily requirement'},
-                {value: 1, text: 'It can cover <30% daily requirement'},
-                {value: 0, text: 'It can cover <10% daily requirement'},
-              ]
-            },
-          ]
+          itemsQA: []
         },
         {
           categoryID: 2,
           categoryText: 'Socioeconomic feasibility',
-          itemsQA: [
-            {
-              id: 2,
-              questionText: 'Is there any restriction to consume this commodity?',
-              answerList: [
-                {value: -99, text: 'please select', disabled: true},
-                {value: 3, text: 'not at all'},
-                {value: 2, text: 'yes for limited occasion, or limited person'},
-                {value: 1, text: 'yes, frequently'},
-                {value: 0, text: 'this food is not recommended to consume'},
-              ]
-            },
-            {
-              id: 3,
-              questionText: 'does people like to consume this commodity?',
-              answerList: [
-                {value: -99, text: 'please select', disabled: true},
-                {value: 3, text: 'yes, most people like it'},
-                {value: 2, text: 'yes, but some people does not like it'},
-                {value: 1, text: 'some people like it'},
-                {value: 0, text: 'no one eat it'},
-              ]
-            },
-            {
-              id: 4,
-              questionText: 'Is this food equally shared among HH member?',
-              answerList: [
-                {value: -99, text: 'please select', disabled: true},
-                {value: 3, text: 'Yes always'},
-                {value: 2, text: 'serving size is not equal, sometimes'},
-                {value: 1, text: 'serving size is not equal, usually'},
-                {value: 0, text: 'some HH member cannot eat'},
-              ]
-            },
-            {
-              id: 5,
-              questionText: 'Is this commodity affordable in the market for this community?',
-              answerList: [
-                {value: -99, text: 'please select', disabled: true},
-                {value: 3, text: 'yes for everyone'},
-                {value: 2, text: 'yes for most family'},
-                {value: 1, text: 'yes for wealthy family'},
-                {value: 0, text: 'this is too expensive'},
-              ]
-            },
-          ]
+          itemsQA: []
         },
         {
           categoryID: 3,
           categoryText: 'Technical feasibility',
-          itemsQA: [
-            {
-              id: 6,
-              questionText: 'do target beneficiary have enough skill to grow this commodity?',
-              answerList: [
-                {value: -99, text: 'please select', disabled: true},
-                {value: 3, text: 'yes, people have good experience for this commodity'},
-                {value: 2, text: 'people have technical difficulty only sometimes'},
-                {value: 1, text: 'there are technical challenges to grow this'},
-                {value: 0, text: 'people have no experience for this commodity'},
-              ]
-            },
-            {
-              id: 7,
-              questionText: 'Does this commodity imply incremental workload for women?',
-              answerList: [
-                {value: -99, text: 'please select', disabled: true},
-                {value: 3, text: 'no extra burden expected'},
-                {value: 2, text: 'additional light daily work required'},
-                {value: 1, text: 'additional work required, seasonally'},
-                {value: 0, text: 'additional intensive daily work required'},
-              ]
-            },
-            {
-              id: 8,
-              questionText: 'Is technical service available for this commodity, if needed?',
-              answerList: [
-                {value: -99, text: 'please select', disabled: true},
-                {value: 3, text: 'yes / there is no need for it since beneficiaries already have enough skill'},
-                {value: 2, text: 'available upon request'},
-                {value: 1, text: 'available once/twice in a season'},
-                {value: 0, text: 'not available'},
-              ]
-            },
-          ]
+          itemsQA: []
         },
         {
           categoryID: 4,
           categoryText: 'Investment',
-          itemsQA: [
-            {
-              id: 9,
-              questionText: 'Is there need for specific infrastructure (irrigation / post harvest, etc.)?',
-              answerList: [
-                {value: -99, text: 'please select', disabled: true},
-                {value: 3, text: 'no investment required for infrastructure'},
-                {value: 2, text: 'not essential, but infrastructure can enhance productivity/profitability'},
-                {value: 1, text: 'small investment on infrastructure required (e.g. hand-made fence, small cage)'},
-                {
-                  value: 0,
-                  text: 'certain investment on infrastructure required (e.g. irrigation, processing equipment)'
-                },
-              ]
-            },
-            {
-              id: 10,
-              questionText: 'Is production input (fertilizer, seed, feed) become financial burden for small farmer?',
-              answerList: [
-                {value: -99, text: 'please select', disabled: true},
-                {value: 3, text: 'no'},
-                {value: 2, text: 'maybe no'},
-                {value: 1, text: 'maybe yes'},
-                {value: 0, text: 'yes'},
-              ]
-            },
-          ]
+          itemsQA: []
         },
         {
           categoryID: 5,
           categoryText: 'Stability',
-          itemsQA: [
-            {
-              id: 11,
-              questionText: 'How many month can you harvest this commodity in a year?',
-              answerList: [
-                {value: -99, text: 'please select', disabled: true},
-                {value: 3, text: '10-12 mon'},
-                {value: 2, text: '7-9 mon'},
-                {value: 1, text: '4-6 mon'},
-                {value: 0, text: '0-3 mon'},
-              ]
-            },
-            {
-              id: 12,
-              questionText: 'Are there any feasible storage method available for this commodity?',
-              answerList: [
-                {value: -99, text: 'please select', disabled: true},
-                {value: 3, text: 'Conventional storage/processing method works well'},
-                {value: 2, text: 'Conventional method is available, but needs improvement'},
-                {value: 1, text: 'Storage/processing method is available, but investment required'},
-                {value: 0, text: 'no technology is available yet'},
-              ]
-            },
-          ]
+          itemsQA: []
         },
         {
           categoryID: 6,
           categoryText: 'Market opportunity',
-          itemsQA: [
-            {
-              id: 13,
-              questionText: 'Do you find this commodity at local market?',
-              answerList: [
-                {value: -99, text: 'please select', disabled: true},
-                {value: 3, text: 'yes, it is quite common'},
-                {value: 2, text: 'yes, but limited period or limited seller'},
-                {value: 1, text: 'Not here, but I saw it in a big market'},
-                {value: 0, text: 'i have never seen this in the market'},
-              ]
-            },
-            {
-              id: 14,
-              questionText: 'When you sell your products, how it is delivered?',
-              answerList: [
-                {value: -99, text: 'please select', disabled: true},
-                {value: 3, text: 'There is a trader/middleman (going to big city)'},
-                {value: 2, text: 'There is a trader/middleman (going to local market)'},
-                {value: 1, text: 'I bring products to the market'},
-                {value: 0, text: 'I cannot bring products to the market'},
-              ]
-            },
-            {
-              id: 15,
-              questionText: 'How is your experience marketing your products?',
-              answerList: [
-                {value: -99, text: 'please select', disabled: true},
-                {value: 3, text: 'I usually sell staples and other cash crop'},
-                {value: 2, text: 'I usually sell mostly staples'},
-                {value: 1, text: 'I sell staples when there are surplus'},
-                {value: 0, text: 'I do not sell my products'},
-              ]
-            },
-          ]
+          itemsQA: []
         },
-      ]
+      ],
+      /**
+       * 質問と回答一覧
+       */
+      qaList: []
     }
   },
   props: {

@@ -70,6 +70,10 @@ export const state = () => ({
        */
       portionUnitId: 'portionUnit1',
       /**
+       * questionのid
+       */
+      questionsId: 'questions01',
+      /**
        * fctのデータ
        */
       fct: [],
@@ -80,7 +84,11 @@ export const state = () => ({
       /**
        * portionUnitのデータ
        */
-      portionUnit:[],
+      portionUnit: [],
+      /**
+       * feasibility Questionのデータ
+       */
+      questions: [],
     },
     /**
      * シナリオの数（各シナリオに10の食事パターンが存在）
@@ -106,13 +114,13 @@ export const state = () => ({
      * 最後に保存した日時
      */
     saveDate: {
-      jsDate:0,
-      date:''
+      jsDate: 0,
+      date: ''
     },
     /**
      * 食材の解説用データベース名
      */
-    foodDictionaryId:'foodDictionary_eth',
+    foodDictionaryId: 'foodDictionary_eth',
   },
   /**
    * ログイン状態のフラグ
@@ -145,8 +153,8 @@ export const getters = {
       }, {})
     })
   },
-  nutritionSupplyGetter(state){
-    return state.myApp.menuCases.map((datArray)=>{
+  nutritionSupplyGetter(state) {
+    return state.myApp.menuCases.map((datArray) => {
       return datArray.menu.reduce((accumulator, item) => {
         accumulator.En = (accumulator.En || 0) + Number(item.En)
         accumulator.Pr = (accumulator.Pr || 0) + Number(item.Pr)
@@ -165,7 +173,7 @@ export const mutations = {
    * 保存した日付を記録
    * @param state
    */
-  updateSaveDate: function(state){
+  updateSaveDate: function (state) {
     let time = Date.now()
     state.myApp.saveDate.jsDate = time
     state.myApp.saveDate.date = Date(time)
@@ -175,7 +183,7 @@ export const mutations = {
    * @param state
    * @param payload
    */
-  updateFctId: function(state, payload){
+  updateFctId: function (state, payload) {
     state.myApp.dataSet.fctId = payload
   },
   /**
@@ -183,7 +191,7 @@ export const mutations = {
    * @param state
    * @param payload
    */
-  updateDriId: function(state, payload){
+  updateDriId: function (state, payload) {
     state.myApp.dataSet.driId = payload
   },
   /**
@@ -191,7 +199,7 @@ export const mutations = {
    * @param state
    * @param payload
    */
-  updateRegionId: function(state, payload){
+  updateRegionId: function (state, payload) {
     state.myApp.dataSet.regionId = payload
   },
   /**
@@ -199,8 +207,17 @@ export const mutations = {
    * @param state
    * @param payload
    */
-  updatePortionUnitId: function(state, payload){
+  updatePortionUnitId: function (state, payload) {
     state.myApp.dataSet.portionUnitId = payload
+  },
+  /**
+   * questionsIdを更新
+   * @param state
+   * @param payload
+   */
+  updateQuestionsId: function (state, payload) {
+    console.log(payload)
+    state.myApp.dataSet.questionsId = payload
   },
   /**
    * ユーザーデータ（myApp）が読み込まれたらTrueにセット
@@ -227,6 +244,7 @@ export const mutations = {
     state.myApp.dataSet.fct = []
     state.myApp.dataSet.dri = []
     state.myApp.dataSet.portionUnit = []
+    state.myApp.dataSet.questions = []
     state.myApp.menuCases = []
     state.myApp.prodTargetCases = []
     state.myApp.feasibilityCases = []
@@ -313,10 +331,18 @@ export const mutations = {
   /**
    * portionUnitを更新
    * @param state
-   * @param payload 更新する値（JSON）
+   * @param payload 更新する値（Array of Objects）
    */
   updatePortionUnit: function (state, payload) {
     state.myApp.dataSet.portionUnit = JSON.parse(JSON.stringify(payload))
+  },
+  /**
+   * questionsを更新
+   * @param state
+   * @param payload 更新する値（Array of Objects）
+   */
+  updateQuestions: function (state, payload) {
+    state.myApp.dataSet.questions = JSON.parse(JSON.stringify(payload))
   },
   /**
    * menuCasesを更新
@@ -347,7 +373,7 @@ export const mutations = {
    * @param state
    * @param payload
    */
-  updateFeasibilityMemo: function (state, payload){
+  updateFeasibilityMemo: function (state, payload) {
     state.myApp.feasibilityCases[payload.pageId].pageMemo = payload.pageMemo
   },
   /**
@@ -364,7 +390,7 @@ export const actions = {
    * ユーザー登録時に基本データセット（FCT,DRI）をユーザースペースmyAppに
    *     コピーする
    */
-  async copyOriginalDataSet2UserDataOnRegistration({state, commit}, payload){
+  async copyOriginalDataSet2UserDataOnRegistration({state, commit}, payload) {
     //fctのオリジナルデータをコピーしてmyApp/dataSetに保存
     const fct = await fireGetDoc('dataset', payload.dataSet.fctId)
     const newFctId = 'fct_' + payload.user.displayName
@@ -379,10 +405,28 @@ export const actions = {
     setDoc(ref2, dri).catch((err) => {
       throw new Error('Error in fireSaveAppdata:' + err)
     })
+    //portionのオリジナルデータをコピーしてmyApp/dataSetに保存
+    const portion = await fireGetDoc('dataset', payload.dataSet.portionUnitId)
+    const newPortionId = 'portion_' + payload.user.displayName
+    const ref3 = doc(firestoreDb, 'dataset', newPortionId)
+    setDoc(ref3, portion).catch((err) => {
+      throw new Error('Error in fireSaveAppdata:' + err)
+    })
+    //questionのオリジナルデータをコピーしてmyApp/dataSetに保存
+    const questions = await fireGetDoc('dataset', payload.dataSet.questionsId)
+    const newQuestionsId = 'question_' + payload.user.displayName
+    const ref4 = doc(firestoreDb, 'dataset', newQuestionsId)
+    setDoc(ref4, questions).catch((err) => {
+      throw new Error('Error in fireSaveAppdata:' + err)
+    })
     //storeの中のfctデータベース名を変更
     commit('updateFctId', newFctId)
     //storeの中のdriデータベース名を変更
     commit('updateDriId', newDriId)
+    //storeの中のportionUnitデータベース名を変更
+    commit('updatePortionUnitId', newPortionId)
+    //storeの中のdriデータベース名を変更
+    commit('updateQuestionsId', newQuestionsId)
   },
   /**
    * ユーザー情報をpayloadで与えられた内容で更新する
@@ -396,7 +440,7 @@ export const actions = {
    * 保存した日付を記録
    * @param state
    */
-  updateSaveDate({commit}){
+  updateSaveDate({commit}) {
     commit('updateSaveDate')
   },
   /**
@@ -404,7 +448,7 @@ export const actions = {
    * @param commit
    * @param payload
    */
-  updateFctId({commit}, payload){
+  updateFctId({commit}, payload) {
     commit('updateFctId', payload)
   },
   /**
@@ -412,7 +456,7 @@ export const actions = {
    * @param state
    * @param payload 更新する値（JSON）
    */
-  updateFct({commit}, payload){
+  updateFct({commit}, payload) {
     commit('updateFct', payload)
   },
   /**
@@ -420,7 +464,7 @@ export const actions = {
    * @param commit
    * @param payload
    */
-  updateDriId({commit}, payload){
+  updateDriId({commit}, payload) {
     commit('updateDriId', payload)
   },
   /**
@@ -428,8 +472,24 @@ export const actions = {
    * @param commit
    * @param payload
    */
-  updatePortionUnitId({commit}, payload){
+  updatePortionUnitId({commit}, payload) {
     commit('updatePortionUnitId', payload)
+  },
+  /**
+   * questionsIdを更新
+   * @param commit
+   * @param payload
+   */
+  updateQuestionsId({commit}, payload) {
+    commit('updateQuestionsId', payload)
+  },
+  /**
+   * questionsを更新
+   * @param commit
+   * @param payload
+   */
+  updateQuestions({commit}, payload) {
+    commit('updateQuestions', payload)
   },
   /**
    * ユーザーデータ（myApp）が読み込まれたらTrueにセット
@@ -635,9 +695,49 @@ export const actions = {
         console.log('keeping state error: ', errorCode, errorMessage)
         throw error
       })
-    // fct. driのオリジナルをfirebaseからコピーしてユーザースペースmyAppに貼り付ける
+    // fct. dri, portionUnit, questionsのオリジナルをfirebaseからコピーしてユーザースペースmyAppに貼り付ける
     console.log('copy original database to user space')
     dispatch('copyOriginalDataSet2UserDataOnRegistration', state.myApp)
+  },
+  //アプリを更新して、Storeに新たな変数が追加された場合、旧バージョンを使っている人向けにこれら新変数の追加更新(例外措置)
+  async initFirebaseNewVariable({dispatch, state}) {
+    let needInitialization = false
+    //questionsが読み込まれていない場合に強制的にfirestoreからコピー（過去バージョン使用者への例外措置）
+    if ((!state.myApp.dataSet.questionsId) || (state.myApp.dataSet.questionsId.indexOf('question_') < 0)) {
+      alert('feasibility questions are not initialized. data will be loaded from original copy')
+      //questionのオリジナルデータをコピーしてfireStoreに保存
+      const questions = await fireGetDoc('dataset', 'questions01')
+      const newQuestionsId = 'question_' + state.myApp.user.displayName
+      const ref = await doc(firestoreDb, 'dataset', newQuestionsId)
+      await setDoc(ref, questions).catch((err) => {
+        throw new Error('Error in fireSaveAppdata:' + err)
+      })
+      //fireStoreからquestionsのデータを読み込んでstoreに保存
+      await dispatch('updateQuestionsId', newQuestionsId)
+      await dispatch('initQuestions')
+      needInitialization = true
+    }
+
+    //portionが読み込まれていない場合に強制的にfirestoreからコピー（過去バージョン使用者への例外措置）
+    if ((!state.myApp.dataSet.portionUnitId) || (state.myApp.dataSet.portionUnitId.indexOf('portion_') < 0)) {
+      alert('portion Size is not initialized. data will be loaded from original copy')
+      //portionのオリジナルデータをコピーしてfireStoreに保存
+      const portion = await fireGetDoc('dataset', 'portionUnit1')
+      const newPortionId = 'portion_' + state.myApp.user.displayName
+      const ref = await doc(firestoreDb, 'dataset', newPortionId)
+      await setDoc(ref, portion).catch((err) => {
+        throw new Error('Error in fireSaveAppdata:' + err)
+      })
+      //fireStoreからportionのデータを読み込んでstoreに保存
+      await dispatch('updatePortionUnitId', newPortionId)
+      await dispatch('initPortionUnit')
+      needInitialization = true
+    }
+
+    if (needInitialization) {
+      await dispatch('fireSaveAppdata')
+      await this.$router.push('/')
+    }
   },
   /**
    * ページ遷移・リロードの度にログイン状態を確認(middleware:login.js)、
@@ -655,6 +755,8 @@ export const actions = {
         if (user) {
           commit('updateIsLoggedIn', true)
           //ログイン成功したら、ユーザーデータ(myApp)がすでに読み込まれているかチェック
+          console.log('welcome to my home')
+          console.log(state.myApp.dataSet.questionsId)
           if (!state.hasMyAppLoaded) {
             //ユーザーデータ(myApp)が読み込まれていない場合、fireStoreからfetch
             await dispatch('loadMyApp', user.uid).catch(async () => {
@@ -728,11 +830,12 @@ export const actions = {
    * @returns {Promise<void>}
    */
   async initPortionUnit({state, commit, dispatch}) {
-    console.log(state.myApp.dataSet)
-    console.log(state.myApp.dataSet.portionUnitId)
-    const portionUnit = await fireGetDoc('dataset', state.myApp.dataSet.portionUnitId).catch((err)=>{
+    // portionUnitをfireStoreからfetch (portionUnitIdを使う)
+    const portionUnit = await fireGetDoc('dataset', state.myApp.dataSet.portionUnitId).catch((err) => {
       throw Error(err)
     })
+
+    // portionUnitをstoreに保存
     if (portionUnit) {
       const portionUnitArray = await dispatch('formatPortionUnit', portionUnit)
       commit('updatePortionUnit', portionUnitArray)
@@ -741,12 +844,34 @@ export const actions = {
     }
   },
   /**
+   * questionsのデータをfireStoreから取得して返す
+   * @param state
+   * @param commit
+   * @param dispatch
+   * @returns {Promise<void>}
+   */
+  async initQuestions({state, commit, dispatch}) {
+    console.log(state.myApp.dataSet.questionsId)
+    // questionsをfireStoreからfetch (questionsIdを使う)
+    const questions = await fireGetDoc('dataset', state.myApp.dataSet.questionsId).catch((err) => {
+      throw Error(err)
+    })
+
+    // questionsをstoreに保存
+    if (questions) {
+      const questionsArray = await dispatch('formatQuestions', questions)
+      commit('updateQuestions', questionsArray)
+    } else {
+      throw new Error('initQuestions fail: no data')
+    }
+  },
+  /**
    * CountryNamesのデータをfireStoreから取得して返す
    * @param state
    * @returns {Promise<*>}
    */
   async initCountryNames({state}) {
-    const countries = await fireGetDoc('dataset', state.myApp.dataSet.CountryNamesId).catch((err)=>{
+    const countries = await fireGetDoc('dataset', state.myApp.dataSet.CountryNamesId).catch((err) => {
       throw Error(err)
     })
     if (countries) {
@@ -761,7 +886,7 @@ export const actions = {
    * @returns {Promise<*>}
    */
   async initRegion({state}) {
-    const region = await fireGetDoc('dataset', state.myApp.dataSet.regionId).catch((err)=>{
+    const region = await fireGetDoc('dataset', state.myApp.dataSet.regionId).catch((err) => {
       throw Error(err)
     })
     if (region) {
@@ -826,6 +951,23 @@ export const actions = {
       resObj.FCT_id = dat[key].FCT_id
       resObj.count_method = dat[key].count_method
       resObj.unit_weight = dat[key].unit_weight
+      res.push(resObj)
+    }
+    return res
+  },
+  /**
+   * JSON -→ array of objectに変換
+   * @param dat (JSON形式)
+   * @returns {{}[]}
+   */
+  formatQuestions({}, dat) {
+    let res = []
+    for (let key of Object.keys(dat)) {
+      let resObj = {}
+      resObj.id = dat[key].id
+      resObj.categoryText = dat[key].categoryText
+      resObj.questionText = dat[key].questionText
+      resObj.answerList = JSON.parse(JSON.stringify(dat[key].answerList))
       res.push(resObj)
     }
     return res
@@ -903,6 +1045,7 @@ export const actions = {
       await dispatch('initFct')
       await dispatch('initDri')
       await dispatch('initPortionUnit')
+      await dispatch('initQuestions')
       await dispatch('initMenu', state.myApp.dataSet.dri)
       await dispatch('initProdTarget', state.myApp.dataSet.dri)
       await dispatch('initFeasibility', state.myApp.dataSet.dri)
@@ -940,7 +1083,7 @@ export const actions = {
    * @param commit
    * @param payload
    */
-  updateFeasibilityMemo({dispatch}, payload){
+  updateFeasibilityMemo({dispatch}, payload) {
     dispatch('updateFeasibilityMemo', payload)
   },
   /**
