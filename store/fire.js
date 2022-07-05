@@ -755,8 +755,6 @@ export const actions = {
         if (user) {
           commit('updateIsLoggedIn', true)
           //ログイン成功したら、ユーザーデータ(myApp)がすでに読み込まれているかチェック
-          console.log('welcome to my home')
-          console.log(state.myApp.dataSet.questionsId)
           if (!state.hasMyAppLoaded) {
             //ユーザーデータ(myApp)が読み込まれていない場合、fireStoreからfetch
             await dispatch('loadMyApp', user.uid).catch(async () => {
@@ -1073,6 +1071,12 @@ export const actions = {
       throw new Error('loadMyApp fail: no data on fireStore')
     }
   },
+  /**
+   * myAppをStoreに保存したうえで、更新フラグをオン（setHasDocumentChanged）
+   * @param commit
+   * @param dispatch
+   * @param payload
+   */
   updateMyApp({commit, dispatch}, payload) {
     commit('updateMyApp', payload)
     //myAppの変更時は、常に setHasDocumentChanged=true をセット

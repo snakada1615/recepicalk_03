@@ -13,7 +13,7 @@
           <b-dropdown-item to="/">top</b-dropdown-item>
 
           <!-- メニューグループ1　導入 -->
-          <b-dropdown size="sm" id="subMenu-0" text="Introduction" class="m-md-2" variant="outline-danger">
+          <b-dropdown size="sm" id="subMenu-0" text="Introduction" class="m-md-2" variant="light">
             <b-dropdown-item to="/whatsNfa">what's NFA</b-dropdown-item>
             <b-dropdown-item to="/login">login/register</b-dropdown-item>
             <b-dropdown-item to="/userinfo">user info</b-dropdown-item>
@@ -21,7 +21,7 @@
           </b-dropdown>
 
           <!-- メニューグループ2　食事評価 -->
-          <b-dropdown size="sm" id="subMenu-1" text="Diet Assessment" class="m-md-2" variant="outline-danger">
+          <b-dropdown size="sm" id="subMenu-1" text="Diet Assessment" class="m-md-2" variant="light">
             <b-dropdown-item
               to="/dietcalk"
               :disabled="!isLoggedIn"
@@ -32,7 +32,7 @@
           </b-dropdown>
 
           <!-- メニューグループ3　品目特定 -->
-          <b-dropdown size="sm" id="subMenu-2" text="Identify Commodity" class="m-md-2" variant="outline-danger">
+          <b-dropdown size="sm" id="subMenu-2" text="Identify Commodity" class="m-md-2" variant="light">
             <b-dropdown-item
               to="/feasibilityCheck"
               :disabled="!isLoggedIn"
@@ -42,9 +42,10 @@
           </b-dropdown>
 
           <!-- メニューグループ4　その他 -->
-          <b-dropdown size="sm" id="subMenu-3" text="Other function" class="m-md-2" variant="outline-danger">
+          <b-dropdown size="sm" id="subMenu-3" text="Other function" class="m-md-2" variant="light">
             <b-dropdown-item to="/editFct">edit current FCT</b-dropdown-item>
             <b-dropdown-item to="/firetest/importFct">replace FCT</b-dropdown-item>
+            <b-dropdown-item to="/editQuestions">edit feasibility question</b-dropdown-item>
             <b-dropdown-item-button
               @click="resetData"
               :disabled="!isLoggedIn"
