@@ -15,14 +15,31 @@
       variant="warning"
       :disabled="logOutValidate"
     >logout</b-button>
+    <b-card class="my-2" bg-variant="light" text-variant="dark" border-variant="warning">
+      <div>
+        Please register your id and password first to use full function of the application
+      </div>
+    </b-card>
     <b-row class="my-2">
       <b-col cols="11">
-        <b-form-input v-model="user" placeholder="Enter username" :state="stateName"/>
+        <b-input-group prepend="name">
+          <b-form-input v-model="user" placeholder="Enter username" :state="stateName"/>
+        </b-input-group>
+        <div
+          v-if="!stateName"
+          class="small text-danger"
+        >Enter at least 4 characters, using alphanumeric characters, and underscore </div>
       </b-col>
     </b-row>
     <b-row class="my-2">
       <b-col cols="11">
-        <b-form-input v-model="pass" :type="typePass" placeholder="Enter password" :state="statePass"/>
+        <b-input-group prepend="password">
+          <b-form-input v-model="pass" :type="typePass" placeholder="Enter password" :state="statePass"/>
+        </b-input-group>
+        <div
+          v-if="!statePass"
+          class="small text-danger"
+        >password should be between 6 to 20 characters length</div>
       </b-col>
       <b-col cols="1" class="py-1 px-0">
         <p class="h5">

@@ -13,7 +13,7 @@
           <b-dropdown-item to="/">top</b-dropdown-item>
 
           <!-- メニューグループ1　導入 -->
-          <b-dropdown size="sm" id="subMenu-0" text="Introduction" class="m-md-2" variant="light">
+          <b-dropdown size="sm" id="subMenu-0" text="Introduction" class="m-md-2 menuGroup" variant="light">
             <b-dropdown-item to="/whatsNfa">what's NFA</b-dropdown-item>
             <b-dropdown-item to="/login">login/register</b-dropdown-item>
             <b-dropdown-item to="/userinfo">user info</b-dropdown-item>
@@ -171,7 +171,7 @@ export default {
         removeEventListener("beforeunload", this.beforeUnloadListener, {capture: true});
       }
     },
-    $route(){
+    $route() {
       //ページ移動前にメニューを折りたたむ
       this.$refs.rootMenu.hide();
     }
@@ -202,3 +202,10 @@ export default {
   }
 }
 </script>
+<style>
+.menuGroup {
+  margin: 3px;
+  color: hotpink !important;
+}
+
+</style>
