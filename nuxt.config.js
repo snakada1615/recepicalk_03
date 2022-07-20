@@ -40,7 +40,6 @@ export default {
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
-    'nuxt-purgecss',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -110,26 +109,6 @@ export default {
     manifest: {
       lang: 'en'
     }
-  },
-
-  // purgeCSS
-  purgeCSS: {
-    mode: 'webpack',
-    enabled: ({isDev, isClient}) => (!isDev && isClient), // or `false` when in dev/debug mode
-    paths: [
-      'components/**/*.vue',
-      'layouts/**/*.vue',
-      'pages/**/*.vue',
-      'plugins/**/*.js'
-    ],
-    styleExtensions: ['.css'],
-    whitelist: ['body', 'html', 'nuxt-progress'],
-    extractors: [
-      {
-        extractor: content => content.match(/[A-z0-9-:\\/]+/g) || [],
-        extensions: ['html', 'vue', 'js']
-      }
-    ]
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
