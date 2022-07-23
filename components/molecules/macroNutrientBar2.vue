@@ -1,6 +1,6 @@
 <template>
   <b-container>
-    <my-canvas style="width: 100%; height: 20px;" className="my-0">
+    <my-canvas style="width: 100%; height: 20px;" class="my-0">
       <my-box
         v-for="(obj, index) of chartDataSet(chartValues)" :key="index"
         :x1="obj.x1"
@@ -47,13 +47,13 @@ export default {
      * @returns {[{color, x1: number, x2: number},{color, x1: number, x2: number},{color, x1: number, x2: number}]}
      */
     chartDataSet(dat) {
-      const sum = dat.reduce((accum, curr) => {
+      const sum = dat.reduce((accum, curr)=>{
         return accum + curr.val
-      }, 0)
+      },0)
 
       let x1 = 0
       let x2 = 0
-      return dat.map((item) => {
+      return dat.map((item)=>{
         x1 = x2
         x2 += Math.round(item.val * 100 / sum)
         return {
