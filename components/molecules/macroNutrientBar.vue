@@ -8,7 +8,7 @@
         :y1="100"
         :y2="0"
         :color="obj.color"
-        :value="obj.x2-obj.x1"
+        :value="obj.xLabel"
       />
     </my-canvas>
   </b-container>
@@ -59,7 +59,8 @@ export default {
         return {
           'x1': x1,
           'x2': x2,
-          color: item.color
+          'xLabel': Number(item.val),
+          'color': item.color
         }
       })
     }

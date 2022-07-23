@@ -85,7 +85,7 @@
           bg-variant="light"
           class="my-2">
           <template #header>
-            <div class="font-weight-bold">PFC Balance</div>
+            <div class="font-weight-bold">Dietary energy supply from PFC(Protein, Fat, Carbohydrate)</div>
           </template>
           <b-row>
             <b-col cols="4">
@@ -93,7 +93,7 @@
             </b-col>
             <b-col cols="7">
               <macro-nutrient-bar
-                :chart-values="pfcBalanceStandard"
+                :chart-values="pfcBalanceStandard[pageIdComputed]"
               ></macro-nutrient-bar>
             </b-col>
           </b-row>
@@ -107,6 +107,16 @@
               ></macro-nutrient-bar>
             </b-col>
           </b-row>
+<!--
+          <b-row class="mt-2 small" align-h="end">
+            <b-col class="border-primary small" cols="6" style="background-color: silver">
+              PFC =>
+              <span style="color: Red">Carbohydrate</span>
+              <span style="color: Green">Fat</span>
+              <span style="color: Yellow">Protein</span>
+            </b-col>
+          </b-row>
+-->
         </b-card>
       </b-col>
       <b-col cols="12" lg="6">
@@ -538,7 +548,7 @@ export default {
      * ユーザーによりmenuCasesが変更された際に、myApp全体を更新してemit
      * @param val
      */
-    updateSupply(val){
+    updateSupply(val) {
       const vm = this
       //作業用のmyAppコピー作成
       let dat = JSON.parse(JSON.stringify(vm.myAppWatcher))
@@ -644,7 +654,7 @@ export default {
       console.log('test')
     },
     /**
-     * recepiTableが更新される旅に、pfcBalanceCurrent
+     * recepiTableが更新される度に、pfcBalanceCurrent
      *    の値を更新
      *    conversion factor
      *    -Carbohydrate: 4Kcal/gram
@@ -652,15 +662,26 @@ export default {
      *    -Fat: 9Kcal/gram
      */
     updatePfc() {
-      this.pfcBalanceCurrent = this.nutritionSupplyWatcher.map((dat) => {
+      this.pfcBalanceCurrent = this.nutritionSupplyWatcher.map((dat, index) => {
         return [
-          {val: Math.round(dat.Carbohydrate * 4), color: 'red'},
           {val: Math.round(dat.Pr * 4), color: 'green'},
           {val: Math.round(dat.Fat * 9), color: 'yellow'},
+          {val: Math.round(dat.Carbohydrate * 4), color: 'red'},
+          {
+            val: Math.round(this.nutritionDemandWatcher[index].En
+              - dat.Carbohydrate * 4 - dat.Pr * 4 - dat.Fat * 9), color: 'silver'
+          },
+        ]
+      })
+      this.pfcBalanceStandard = this.nutritionDemandWatcher.map((dat) => {
+        return [
+          {val: Math.round(dat.En * 10 / 100), color: 'green'},
+          {val: Math.round(dat.En * 35 / 100), color: 'yellow'},
+          {val: Math.round(dat.En * 55 / 100), color: 'red'},
         ]
       })
     },
-    notifiRecepiEdit(){
+    notifiRecepiEdit() {
       alert('you can edit diet record by clicking [add crop] button')
     }
   }
