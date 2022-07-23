@@ -91,8 +91,8 @@
                   </b-col>
                   <b-col cols="9">
                     <macro-nutrient-bar
-                      v-if="pfcBalanceCurrent[pageId]"
-                      :chart-values="pfcBalanceCurrent[pageId]"
+                      v-if="pfcBalanceCurrent[pageId-1]"
+                      :chart-values="pfcBalanceCurrent[pageId-1]"
                     ></macro-nutrient-bar>
                   </b-col>
                 </b-row>
@@ -257,11 +257,17 @@ export default {
      * @returns {[{val: number, color: string},{val: number, color: string},{val: number, color: string}][]}
      */
     pfcBalanceCurrent() {
-      return this.nutritionSupplyGetter.map((dat) => {
+      return this.nutritionSupplyGetter.map((dat, index) => {
         return [
-          {val: Math.round(dat.Carbohydrate * 4), color: 'red'},
-          {val: Math.round(dat.Pr * 4), color: 'green'},
-          {val: Math.round(dat.Fat * 9), color: 'yellow'},
+          {val: Math.round(dat.Pr * 4), color: 'green', label: '%'},
+          {val: Math.round(dat.Fat * 9), color: 'yellow', label: '%'},
+          {val: Math.round(dat.Carbohydrate * 4), color: 'red', label: '%'},
+          {
+            val: Math.round(this.nutritionDemandGetter[index].En
+              - dat.Carbohydrate * 4 - dat.Pr * 4 - dat.Fat * 9),
+            color: 'silver',
+            label: '$',
+          },
         ]
       })
     }
@@ -287,9 +293,9 @@ export default {
        * PFCバランスの推奨値
        */
       pfcBalanceStandard: [
-        {val: 55, color: 'red'},
-        {val: 35, color: 'green'},
-        {val: 10, color: 'yellow'},
+        {val: 35, color: 'green', label: '%'},
+        {val: 10, color: 'yellow', label: '%'},
+        {val: 55, color: 'red', label: '%'},
       ],
     }
   },

@@ -60,7 +60,7 @@ export default {
         //labelの値に応じて表示用のテキストを設定
         let myLabel = item.label
         switch (item.label) {
-          case '%': myLabel = String(x2) + '%'
+          case '%': myLabel = String(Math.round(item.val * 100 / sum)) + '%'
             break;
           case '$': myLabel = String(Math.round(item.val))
             break;
