@@ -8,7 +8,7 @@
         :y1="100"
         :y2="0"
         :color="obj.color"
-        :value="obj.xLabel"
+        :value="String(obj.label)"
       />
     </my-canvas>
   </b-container>
@@ -56,10 +56,20 @@ export default {
       return dat.map((item) => {
         x1 = x2
         x2 += Math.round(item.val * 100 / sum)
+
+        //labelの値に応じて表示用のテキストを設定
+        let myLabel = item.label
+        switch (item.label) {
+          case '%': myLabel = String(x2) + '%'
+            break;
+          case '$': myLabel = String(Math.round(item.val))
+            break;
+        }
+
         return {
           'x1': x1,
           'x2': x2,
-          'xLabel': Number(item.val),
+          'label': myLabel,
           'color': item.color
         }
       })

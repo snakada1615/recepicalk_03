@@ -25,8 +25,7 @@ export default {
       default: 0,
     },
     value: {
-      type: Number,
-      default: 0,
+      type: String,
     },
     color: {
       type: String,
@@ -83,7 +82,7 @@ export default {
     ctx.font = '12px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(
-      Math.floor(this.value),
+      this.value,
       newBox.x + newBox.w / 2,
       newBox.y - 5
     );

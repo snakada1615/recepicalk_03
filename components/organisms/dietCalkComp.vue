@@ -107,16 +107,16 @@
               ></macro-nutrient-bar>
             </b-col>
           </b-row>
-<!--
-          <b-row class="mt-2 small" align-h="end">
-            <b-col class="border-primary small" cols="6" style="background-color: silver">
-              PFC =>
-              <span style="color: Red">Carbohydrate</span>
-              <span style="color: Green">Fat</span>
-              <span style="color: Yellow">Protein</span>
-            </b-col>
-          </b-row>
--->
+          <!--
+                    <b-row class="mt-2 small" align-h="end">
+                      <b-col class="border-primary small" cols="6" style="background-color: silver">
+                        PFC =>
+                        <span style="color: Red">Carbohydrate</span>
+                        <span style="color: Green">Fat</span>
+                        <span style="color: Yellow">Protein</span>
+                      </b-col>
+                    </b-row>
+          -->
         </b-card>
       </b-col>
       <b-col cols="12" lg="6">
@@ -258,9 +258,56 @@ export default {
        * PFCバランスの推奨値
        */
       pfcBalanceStandard: [
-        {val: 55, color: 'red'},
-        {val: 35, color: 'green'},
-        {val: 10, color: 'yellow'},
+        [
+          {val: 35, color: 'green', label: '35%'},
+          {val: 10, color: 'yellow', label: '10%'},
+          {val: 55, color: 'red', label: '55%'},
+        ],
+        [
+          {val: 35, color: 'green', label: '35%'},
+          {val: 10, color: 'yellow', label: '10%'},
+          {val: 55, color: 'red', label: '55%'},
+        ],
+        [
+          {val: 35, color: 'green', label: '35%'},
+          {val: 10, color: 'yellow', label: '10%'},
+          {val: 55, color: 'red', label: '55%'},
+        ],
+        [
+          {val: 35, color: 'green', label: '35%'},
+          {val: 10, color: 'yellow', label: '10%'},
+          {val: 55, color: 'red', label: '55%'},
+        ],
+        [
+          {val: 35, color: 'green', label: '35%'},
+          {val: 10, color: 'yellow', label: '10%'},
+          {val: 55, color: 'red', label: '55%'},
+        ],
+        [
+          {val: 35, color: 'green', label: '35%'},
+          {val: 10, color: 'yellow', label: '10%'},
+          {val: 55, color: 'red', label: '55%'},
+        ],
+        [
+          {val: 35, color: 'green', label: '35%'},
+          {val: 10, color: 'yellow', label: '10%'},
+          {val: 55, color: 'red', label: '55%'},
+        ],
+        [
+          {val: 35, color: 'green', label: '35%'},
+          {val: 10, color: 'yellow', label: '10%'},
+          {val: 55, color: 'red', label: '55%'},
+        ],
+        [
+          {val: 35, color: 'green', label: '35%'},
+          {val: 10, color: 'yellow', label: '10%'},
+          {val: 55, color: 'red', label: '55%'},
+        ],
+        [
+          {val: 35, color: 'green', label: '35%'},
+          {val: 10, color: 'yellow', label: '10%'},
+          {val: 55, color: 'red', label: '55%'},
+        ],
       ],
       /**
        * PFCバランスの現状
@@ -660,24 +707,22 @@ export default {
      *    -Carbohydrate: 4Kcal/gram
      *    -Protein: 4Kcal/gram
      *    -Fat: 9Kcal/gram
+     *
+     * labelに指定した値が表示用に使われる。空白の場合はvalの値が表示される
+     *
      */
     updatePfc() {
       this.pfcBalanceCurrent = this.nutritionSupplyWatcher.map((dat, index) => {
         return [
-          {val: Math.round(dat.Pr * 4), color: 'green'},
-          {val: Math.round(dat.Fat * 9), color: 'yellow'},
-          {val: Math.round(dat.Carbohydrate * 4), color: 'red'},
+          {val: Math.round(dat.Pr * 4), color: 'green', label: '%'},
+          {val: Math.round(dat.Fat * 9), color: 'yellow', label: '%'},
+          {val: Math.round(dat.Carbohydrate * 4), color: 'red', label: '%'},
           {
             val: Math.round(this.nutritionDemandWatcher[index].En
-              - dat.Carbohydrate * 4 - dat.Pr * 4 - dat.Fat * 9), color: 'silver'
+              - dat.Carbohydrate * 4 - dat.Pr * 4 - dat.Fat * 9),
+            color: 'silver',
+            label: '$',
           },
-        ]
-      })
-      this.pfcBalanceStandard = this.nutritionDemandWatcher.map((dat) => {
-        return [
-          {val: Math.round(dat.En * 10 / 100), color: 'green'},
-          {val: Math.round(dat.En * 35 / 100), color: 'yellow'},
-          {val: Math.round(dat.En * 55 / 100), color: 'red'},
         ]
       })
     },

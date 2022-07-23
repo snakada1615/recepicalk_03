@@ -143,26 +143,27 @@ export default {
   data() {
     return {
       myicon: '', // declare the icon
-      /**
-       * ratingの値に応じて色を変化させる
-       */
-      myTextColor: ''
     }
   },
   computed: {
     maxRatingAbsoluteComputed() {
       return this.orgRound(this.maxRatingAbsolute, this.digitMaxRatingAbsolute)
     },
+    /**
+     * ratingの値に応じて色を変化させる
+     */
+    myTextColor(){
+      if (Number(this.rating) >= 7) {
+        return 'text-success'
+      } else if (Number(this.rating) >= 5) {
+        return 'text-warning'
+      } else {
+        return 'text-danger'
+      }
+    }
   },
   created() {
     this.myicon = stop
-    if (Number(this.rating) >= 7) {
-      this.myTextColor = 'text-success'
-    } else if (Number(this.rating) >= 5) {
-      this.myTextColor = 'text-warning'
-    } else {
-      this.myTextColor = 'text-danger'
-    }
   },
   methods: {
     /**

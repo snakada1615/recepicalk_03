@@ -1,7 +1,6 @@
 <template>
   <b-container class="my-0 px-0">
     <div>
-      <div>{{ nutritionSum }}</div>
       <b-table
         striped
         bordered

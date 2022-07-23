@@ -227,7 +227,7 @@ export function validatePortionUnit(dat){
 }
 
 export function validateMacroNutrient(dat){
-  const check1 = (dat.length === 3)
+  const check1 = (dat.length === 3 || dat.length === 4)
   let check2 = false
   const typeName = [
     'val',
