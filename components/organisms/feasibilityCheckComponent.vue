@@ -439,23 +439,23 @@ export default {
       immediate: true,
       handler() {
         const vm = this
-        this.myAppWatcher = JSON.parse(JSON.stringify(this.myApp))
-        this.ansListWatcher = this.updateAnsList()
-        this.ansId = this.updateAnsId()
-        this.items = JSON.parse(JSON.stringify(this.myApp.dataSet.fct))
-        this.itemsDRI = JSON.parse(JSON.stringify(this.myApp.dataSet.dri))
-        this.targetCrop = this.updateTargetCrop()
-        this.targetGroup = this.updateTargetGroup()
-        this.nutritionDemand = this.updateNutritionDemand(this.targetGroup, this.itemsDRI)
-        this.nutritionSum = this.updateNutritionSupply(this.targetCrop)
-        this.cropName = this.targetCrop.map(function (item) {
+        vm.myAppWatcher = JSON.parse(JSON.stringify(vm.myApp))
+        vm.ansListWatcher = vm.updateAnsList()
+        vm.ansId = vm.updateAnsId()
+        vm.items = JSON.parse(JSON.stringify(vm.myApp.dataSet.fct))
+        vm.itemsDRI = JSON.parse(JSON.stringify(vm.myApp.dataSet.dri))
+        vm.targetCrop = vm.updateTargetCrop()
+        vm.targetGroup = vm.updateTargetGroup()
+        vm.nutritionDemand = vm.updateNutritionDemand(vm.targetGroup, vm.itemsDRI)
+        vm.nutritionSum = vm.updateNutritionSupply(vm.targetCrop)
+        vm.cropName = vm.targetCrop.map(function (item) {
           return item.length > 0 ? item[0].Name : ''
         })
-        this.nutritionRatingSet = vm.nutritionDemand.map(function (demand, index) {
+        vm.nutritionRatingSet = vm.nutritionDemand.map(function (demand, index) {
           return vm.updateNutritionRating(demand, vm.nutritionSum[index])
         })
-        this.qaScore = this.updateScore()
-        this.pageMemo = this.myApp.feasibilityCases.map(function (item) {
+        vm.qaScore = vm.updateScore()
+        vm.pageMemo = vm.myApp.feasibilityCases.map(function (item) {
           return item.note
         })
       }
@@ -479,6 +479,28 @@ export default {
       }
     })
     vm.qaList = res
+
+    //各種変数の初期化
+    vm.myAppWatcher = JSON.parse(JSON.stringify(vm.myApp))
+    vm.ansListWatcher = vm.updateAnsList()
+    vm.ansId = vm.updateAnsId()
+    vm.items = JSON.parse(JSON.stringify(vm.myApp.dataSet.fct))
+    vm.itemsDRI = JSON.parse(JSON.stringify(vm.myApp.dataSet.dri))
+    vm.targetCrop = vm.updateTargetCrop()
+    vm.targetGroup = vm.updateTargetGroup()
+    vm.nutritionDemand = vm.updateNutritionDemand(vm.targetGroup, vm.itemsDRI)
+    vm.nutritionSum = vm.updateNutritionSupply(vm.targetCrop)
+    vm.cropName = vm.targetCrop.map(function (item) {
+      return item.length > 0 ? item[0].Name : ''
+    })
+    vm.nutritionRatingSet = vm.nutritionDemand.map(function (demand, index) {
+      return vm.updateNutritionRating(demand, vm.nutritionSum[index])
+    })
+    vm.qaScore = vm.updateScore()
+    vm.pageMemo = vm.myApp.feasibilityCases.map(function (item) {
+      return item.note
+    })
+
   },
   computed: {
     /**
