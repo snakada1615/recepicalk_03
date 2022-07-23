@@ -65,7 +65,7 @@
           <b-row>
             <b-col cols="2" class="d-flex justify-content-center">Target</b-col>
             <b-col cols="2" class="d-flex justify-content-center">Supply</b-col>
-            <b-col class="d-flex justify-content-right">sufficiency rate</b-col>
+            <b-col class="d-flex justify-content-start pl-5">sufficiency rate</b-col>
           </b-row>
           <nutrition-bar
             v-for="index in 4" :key="index"
