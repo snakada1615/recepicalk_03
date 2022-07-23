@@ -105,15 +105,20 @@
           <template #header>
             <div>{{ qaGroup.categoryText }}</div>
           </template>
+
           <!--    質問番号が0の場合に以下の項目を表示      -->
           <div v-show="index===0" class="mb-2">
-            <dri-select-single
-              :driItems="itemsDRI"
-              :target="targetGroup[pageIdComputed]"
-              @update:target="onTargetGroupChanged"
-              @changeNutritionValue="updateNutrition"
-            >
-            </dri-select-single>
+            <b-card class="px-0 mx-0 mb-2">
+              <b-row class="mt-0 bg-success mb-3">
+                <b-col class="text-center mr-2 font-weight-bold">Family structure</b-col>
+              </b-row>
+              <dri-select-multi
+                :driItems="itemsDRI"
+                :target="targetGroup[pageIdComputed]"
+                @update:target="onTargetGroupChanged"
+                @changeNutritionValue="updateNutrition"
+              ></dri-select-multi>
+            </b-card>
             <b-card class="px-0 mx-0">
               <b-row class="mt-0 bg-success mb-3">
                 <b-col cols="3" class="text-center mr-2 font-weight-bold">Nutrition</b-col>
@@ -173,7 +178,7 @@
 <script>
 import FctTableModal from "@/components/organisms/FctTableModal.vue";
 import nutritionBar from "@/components/molecules/nutritionBar";
-import driSelectSingle from "@/components/molecules/driSelectSingle";
+import driSelectMulti from "@/components/molecules/driSelectMulti";
 import {getNutritionDemand, getNutritionSupply, validateMyApp} from "@/plugins/helper";
 
 /**
@@ -187,7 +192,7 @@ export default {
   components: {
     FctTableModal,
     nutritionBar,
-    driSelectSingle,
+    driSelectMulti
   },
   methods: {
     onNoteChange(val) {
