@@ -1,6 +1,7 @@
 <template>
   <b-container class="my-0 px-0">
     <div>
+      <div>{{ nutritionSum }}</div>
       <b-table
         striped
         bordered
@@ -207,10 +208,10 @@ export default {
           Group: val.Group,
           menuName: val.menuName,
           Name: val.Name,
-          En: val.En * val.Wt,
-          Pr: val.Pr * val.Wt,
-          Va: val.Va * val.Wt,
-          Fe: val.Fe * val.Wt,
+          En: val.En * val.Wt / 100,
+          Pr: val.Pr * val.Wt / 100,
+          Va: val.Va * val.Wt / 100,
+          Fe: val.Fe * val.Wt / 100,
           Wt: val.Wt
         }
       })
