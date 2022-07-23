@@ -118,7 +118,6 @@ export default {
           }
         } else {
           this.itemWeighted = this.updateItemWeight(value)
-          console.log(this.itemWeighted)
           this.nutritionSum = {...this.updateSum(this.itemWeighted)}
         }
       }

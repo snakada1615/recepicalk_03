@@ -67,7 +67,7 @@
             <b-col cols="2" class="d-flex justify-content-center">Supply</b-col>
             <b-col class="d-flex justify-content-start pl-5">sufficiency rate</b-col>
           </b-row>
-          <nutrition-bar
+          <nutrition-bar2
             v-for="index in 4" :key="index"
             :col-width-first=2
             :col-width-second=2
@@ -150,7 +150,7 @@
 <script>
 import driSelectModal from "@/components/organisms/driSelectModal";
 import recepiTable from "@/components/molecules/recepiTable"
-import nutritionBar from "@/components/molecules/nutritionBar"
+import nutritionBar2 from "@/components/molecules/nutritionBar2"
 import macroNutrientBar from "@/components/molecules/macroNutrientBar";
 import {validateMyApp} from "@/plugins/helper";
 import fctTableModal2 from "@/components/organisms/FctTableModal2";
@@ -173,7 +173,7 @@ import fctTableModal2 from "@/components/organisms/FctTableModal2";
 export default {
   components: {
     recepiTable,
-    nutritionBar,
+    nutritionBar2,
     driSelectModal,
     macroNutrientBar,
     fctTableModal2
