@@ -44,6 +44,24 @@
           </b-row>
         </b-card>
 
+        <!--   家族構成の設定     -->
+        <b-card
+          style="min-width: 530px;"
+          header-bg-variant="success"
+          bg-variant="light"
+          border-variant="success"
+          class="mx-1 px-0 my-2">
+          <template #header>
+            <div>Family structure</div>
+          </template>
+          <dri-select-multi
+            :driItems="itemsDRI"
+            :target="targetGroup[pageIdComputed]"
+            @update:target="onTargetGroupChanged"
+            @changeNutritionValue="updateNutrition"
+          ></dri-select-multi>
+        </b-card>
+
         <!--   スコアの総括票     -->
         <b-card
           style="min-width: 530px;"
@@ -108,17 +126,6 @@
 
           <!--    質問番号が0の場合に以下の項目を表示      -->
           <div v-show="index===0" class="mb-2">
-            <b-card class="px-0 mx-0 mb-2">
-              <b-row class="mt-0 bg-success mb-3">
-                <b-col class="text-center mr-2 font-weight-bold">Family structure</b-col>
-              </b-row>
-              <dri-select-multi
-                :driItems="itemsDRI"
-                :target="targetGroup[pageIdComputed]"
-                @update:target="onTargetGroupChanged"
-                @changeNutritionValue="updateNutrition"
-              ></dri-select-multi>
-            </b-card>
             <b-card class="px-0 mx-0">
               <b-row class="mt-0 bg-success mb-3">
                 <b-col cols="3" class="text-center mr-2 font-weight-bold">Nutrition</b-col>
@@ -458,9 +465,9 @@ export default {
     //表示用にmyApp.questionsの構造を変形
     const vm = this
     let res = JSON.parse(JSON.stringify(vm.qaListDataFrame))
-    vm.myApp.dataSet.questions.forEach((item)=>{
+    vm.myApp.dataSet.questions.forEach((item) => {
       const index = res.findIndex(item2 => item2.categoryText === item.categoryText)
-      if (index >= 0){
+      if (index >= 0) {
         const itemsQATemp = {
           id: item.id,
           questionText: item.questionText,
