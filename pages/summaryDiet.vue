@@ -49,7 +49,7 @@
             <b-col cols="6" v-for="pageId in sceneCount" :key="pageId" class="my-1">
               <b-card>
                 Case{{ pageId }}
-                <nutrition-bar
+                <nutrition-bar2
                   v-for="index in 4" :key="index"
                   :col-width-first=2
                   :col-width-second=2
@@ -105,12 +105,12 @@
   </b-container>
 </template>
 <script>
-import nutritionBar from "@/components/molecules/nutritionBar";
+import nutritionBar2 from "@/components/molecules/nutritionBar2";
 import macroNutrientBar from "@/components/molecules/macroNutrientBar";
 
 export default {
   components: {
-    nutritionBar,
+    nutritionBar2,
     macroNutrientBar
   },
   computed: {
