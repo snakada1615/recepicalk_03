@@ -734,6 +734,22 @@ export const actions = {
       needInitialization = true
     }
 
+    //ETH研修向け暫定措置：fctデータベースを強制的にfct_ethに変更してデータ更新
+    //2022年10月30日までの限定機能
+    //**********暫定措置、要削除***********
+    //**********暫定措置、要削除***********
+    //**********暫定措置、要削除***********
+    //**********暫定措置、要削除***********
+    const current = new Date()
+    const limit = new Date(2022, 10,30)
+    if ((state.myApp.dataSet.fctId !== 'fct_eth0723') && (current < limit)) {
+      //fctNameをstoreに保存
+      await dispatch('updateFctId', 'fct_eth0723')
+      //fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
+      await dispatch('initFct')
+      needInitialization = true
+    }
+
     if (needInitialization) {
       await dispatch('fireSaveAppdata')
       await this.$router.push('/')
