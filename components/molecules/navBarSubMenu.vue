@@ -46,6 +46,7 @@
             <b-dropdown-item to="/editFct">edit current FCT</b-dropdown-item>
             <b-dropdown-item to="/importFct2">change FCT</b-dropdown-item>
             <b-dropdown-item to="/editQuestions">edit feasibility question</b-dropdown-item>
+            <b-dropdown-item to="/copyAndPaste">copy & paste</b-dropdown-item>
             <b-dropdown-item-button
               @click="resetData"
               :disabled="!isLoggedIn"

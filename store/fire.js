@@ -741,7 +741,7 @@ export const actions = {
     //**********暫定措置、要削除***********
     //**********暫定措置、要削除***********
     const current = new Date()
-    const limit = new Date(2022, 10,30)
+    const limit = new Date(2022, 10, 30)
     if ((state.myApp.dataSet.fctId !== 'fct_eth0723') && (current < limit)) {
       //fctNameをstoreに保存
       await dispatch('updateFctId', 'fct_eth0723')
@@ -1148,5 +1148,83 @@ export const actions = {
       throw err
     })
     console.log('fireResetAppdata: complete')
+  },
+  /**
+   * 各ページ間でデータをコピー＆貼り付け
+   * @param commit
+   * @param dispatch
+   * @param state
+   * @param payload
+   */
+  copyAndPasteMyApp({commit, dispatch, state}, payload) {
+    //payloadがfromId, toIdを含まない場合は停止
+    if (!payload.fromId) {
+      return
+    }
+    if (!payload.toId) {
+      return
+    }
+    //fromId, toIdが所定の範囲内から外れる場合は停止
+    if (
+      !(
+        (payload.fromId >= 100) && (payload.fromId < 100 + state.myApp.sceneCount) ||
+        (payload.fromId >= 200) && (payload.fromId < 200 + state.myApp.sceneCount)
+      ) && (
+        (payload.toId >= 100) && (payload.toId < 100 + state.myApp.sceneCount) ||
+        (payload.toId >= 200) && (payload.toId < 200 + state.myApp.sceneCount)
+      )
+    ) {
+      return
+    }
+
+    let myAppWatcher = JSON.parse(JSON.stringify(state.myApp))
+    // copyPattern = 0:家族構成＋食品構成をコピー ,1: 家族構成のみコピー
+    let copyPattern = 1
+
+    //range = 0: dietCalk, 1:feasibilityCheckに所属
+    let fromRange = 0
+    let toRange = 0
+    if ((payload.fromId >= 200) && (payload.fromId < 200 + myAppWatcher.sceneCount)){
+      fromRange = 1
+    }
+    if ((payload.toId >= 200) && (payload.toId < 200 + myAppWatcher.sceneCount)){
+      toRange = 1
+    }
+    if ((fromRange === 0) && (toRange === 0)) {
+      copyPattern = 0
+    }
+    //内部変数の初期化
+    let fromFamily = ''
+    let fromFoodList =''
+    let isTargetSingle = ''
+    let note = ''
+
+    //dietCalkの内容をコピー
+    if (fromRange === 0) {
+      fromFamily = JSON.stringify(myAppWatcher.menuCases[payload.fromId - 100 * (fromRange + 1)].target)
+      fromFoodList = JSON.stringify(myAppWatcher.menuCases[payload.fromId - 100 * (fromRange + 1)].menu)
+      isTargetSingle = myAppWatcher.menuCases[payload.fromId - 100 * (fromRange + 1)].isTargetSingle
+      note = myAppWatcher.menuCases[payload.fromId - 100 * (fromRange + 1)].note
+    } else {
+      //feasibilityCasedの内容をコピー
+      fromFamily = JSON.stringify(myAppWatcher.feasibilityCases[payload.fromId - 100 * (fromRange + 1)].target)
+      note = myAppWatcher.feasibilityCases[payload.fromId - 100 * (fromRange + 1)].note
+      isTargetSingle = false
+    }
+    if (toRange === 0) {
+      //dietCalkにペースト
+      myAppWatcher.menuCases[payload.toId - 100 * (toRange + 1)].target = JSON.parse(fromFamily)
+      myAppWatcher.menuCases[payload.toId - 100 * (toRange + 1)].isTargetSingle = isTargetSingle
+      myAppWatcher.menuCases[payload.toId - 100 * (toRange + 1)].note = note
+      if (copyPattern === 0){
+        //品目リストもあればペースト
+        myAppWatcher.menuCases[payload.toId - 100 * (toRange + 1)].menu = JSON.parse(fromFoodList)
+      }
+    } else {
+      //feasibilityCasedにペースト
+      myAppWatcher.feasibilityCases[payload.toId - 100 * (toRange + 1)].target = JSON.parse(fromFamily)
+      myAppWatcher.feasibilityCases[payload.toId - 100 * (toRange + 1)].note = note
+    }
+    dispatch('updateMyApp', myAppWatcher)
   }
 }
