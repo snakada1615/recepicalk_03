@@ -36,8 +36,10 @@
             <b-col>
               <nutrition-bar2
                 v-if="qa.id > 0"
-                :colWidthFirst=2
-                :colwidthSecond="2"
+                :colWidthFirst="3"
+                :colwidthSecond="0"
+                :colwidthThird="0"
+                :colwidthFourth="2"
                 :show-max-number="false"
                 :max="10"
                 :nutritionTarget="0"
