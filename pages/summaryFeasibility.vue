@@ -33,17 +33,19 @@
             </b-col>
           </b-row>
           <b-row v-for="(qa, index) in qaScore[pageId-1]" :key="index">
-            <nutrition-bar
-              v-if="qa.id > 0"
-              :colWidthFirst=6
-              :colwidthSecond="0"
-              :show-max-number="false"
-              :max="10"
-              :nutritionTarget="0"
-              :cropName="qa.text"
-              :rating="qa.value || 0"
-              :label="qa.text"
-            ></nutrition-bar>
+            <b-col>
+              <nutrition-bar2
+                v-if="qa.id > 0"
+                :colWidthFirst=2
+                :colwidthSecond="2"
+                :show-max-number="false"
+                :max="10"
+                :nutritionTarget="0"
+                :cropName="qa.text"
+                :rating="qa.value || 0"
+                :label="qa.text"
+              ></nutrition-bar2>
+            </b-col>
           </b-row>
         </b-card>
       </b-col>
@@ -51,11 +53,11 @@
   </b-container>
 </template>
 <script>
-import nutritionBar from "@/components/molecules/nutritionBar";
+import nutritionBar2 from "@/components/molecules/nutritionBar2";
 
 export default {
   components: {
-    nutritionBar
+    nutritionBar2
   },
   computed: {
     myApp: function () {
