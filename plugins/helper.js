@@ -5,7 +5,7 @@
  * @returns {Promise<*>}
  */
 export async function objectSort(objects, key) {
-  objects.sort(function(a, b) {
+  objects.sort(function (a, b) {
     if (a[key] > b[key]) {
       return 1;
     } else {
@@ -29,7 +29,7 @@ export function setDigit(val, unitKey) {
     {1: ' µg', 2: ' mg', 3: ' g'},    // for vit-A
     {1: ' mg', 2: ' g', 3: ' kt'},    // for iron
   ]
-  const item = Number(val)
+  const item = Number(val ? val : 0)
   switch (true) {
     case (item < 1000):
       res = String(Math.round(item)) + units[unitKey - 1]["1"]
@@ -84,7 +84,7 @@ export function isObjectDeepEqual(object1, object2) {
  * @param key チェックするkey(String表記)
  * @returns {boolean}
  */
-export function isKeyContained(myObject, key){
+export function isKeyContained(myObject, key) {
   const keys = Object.keys(myObject)
   return (keys.indexOf(key) >= 0)
 }
@@ -95,7 +95,7 @@ export function isKeyContained(myObject, key){
  * @param item 検査対象の変数
  * @returns {boolean}
  */
-export function isArray (item) {
+export function isArray(item) {
   return Object.prototype.toString.call(item) === '[object Array]';
 }
 
@@ -105,7 +105,7 @@ export function isArray (item) {
  * @param item 検査対象の変数
  * @returns {boolean}
  */
-export function isObject (item) {
+export function isObject(item) {
   return typeof item === 'object' && item !== null && !isArray(item);
 }
 
@@ -127,7 +127,7 @@ export function isObject (item) {
  *     ）
  * @returns {*[]} dataに存在しないkeyを抽出
  */
-export function validateObject(data, types){
+export function validateObject(data, types) {
   let errors = [];
   types.forEach(type => {
     const keys = type.split('.');
@@ -155,7 +155,7 @@ export function validateObject(data, types){
  * @param dat 検証するmyApp
  * @returns {false|boolean}
  */
-export function validateMyApp(dat){
+export function validateMyApp(dat) {
   //myAppの型設計
   const typeName = [
     'user', 'dataSet', 'sceneCount', 'scene', 'menuCases',
@@ -168,19 +168,20 @@ export function validateMyApp(dat){
   ]
   let res = true
   const myError = validateObject(dat, typeName)
-  if (myError.length > 0){
+  if (myError.length > 0) {
     console.log(myError)
     res = false
   }
 
   return isObject(dat) && res
 }
+
 /**
  * FCTのバリデーション
  * @param dat 検証するFCT
  * @returns {false|boolean}
  */
-export function validateFct(dat){
+export function validateFct(dat) {
   //FCTの型設計
   const typeName = [
     'Carbohydrate',
@@ -196,19 +197,20 @@ export function validateFct(dat){
   ]
   let res = true
   const myError = validateObject(dat, typeName)
-  if (myError.length > 0){
+  if (myError.length > 0) {
     console.log(myError)
     res = false
   }
 
   return isObject(dat) && res
 }
+
 /**
  * portionUnitのバリデーション
  * @param dat 検証するportionUnit
  * @returns {false|boolean}
  */
-export function validatePortionUnit(dat){
+export function validatePortionUnit(dat) {
   //portionUnitの型設計
   const typeName = [
     'id',
@@ -218,7 +220,7 @@ export function validatePortionUnit(dat){
   ]
   let res = true
   const myError = validateObject(dat, typeName)
-  if (myError.length > 0){
+  if (myError.length > 0) {
     console.log(myError)
     res = false
   }
@@ -226,18 +228,18 @@ export function validatePortionUnit(dat){
   return isObject(dat) && res
 }
 
-export function validateMacroNutrient(dat){
+export function validateMacroNutrient(dat) {
   const check1 = (dat.length === 3 || dat.length === 4)
   let check2 = false
   const typeName = [
     'val',
     'color'
   ]
-  if (check1){
+  if (check1) {
     check2 = true
-    dat.forEach((item)=>{
+    dat.forEach((item) => {
       const myError = validateObject(item, typeName)
-      if (myError.length > 0){
+      if (myError.length > 0) {
         console.log(myError)
         check2 = false
       }
@@ -257,14 +259,14 @@ export function validateMacroNutrient(dat){
  * @returns {*}
  */
 export function getNutritionDemand(target, dri) {
-    return target.reduce((accumulator, item, index) => {
-      const count = item.count
-      accumulator.En += Number(count) * Number(dri[index].En)
-      accumulator.Pr += Number(count) * Number(dri[index].Pr)
-      accumulator.Va += Number(count) * Number(dri[index].Va)
-      accumulator.Fe += Number(count) * Number(dri[index].Fe)
-      return accumulator
-    }, {'En':0, 'Pr':0, 'Va':0, 'Fe':0})
+  return target.reduce((accumulator, item, index) => {
+    const count = item.count
+    accumulator.En += Number(count) * Number(dri[index].En)
+    accumulator.Pr += Number(count) * Number(dri[index].Pr)
+    accumulator.Va += Number(count) * Number(dri[index].Va)
+    accumulator.Fe += Number(count) * Number(dri[index].Fe)
+    return accumulator
+  }, {'En': 0, 'Pr': 0, 'Va': 0, 'Fe': 0})
 }
 
 /**
@@ -272,7 +274,7 @@ export function getNutritionDemand(target, dri) {
  * @param datArray [En, Pr, Va, Fe, Wt]
  * @returns {T}
  */
-export function getNutritionSupply(datArray){
+export function getNutritionSupply(datArray) {
   return datArray.reduce((accumulator, item) => {
     accumulator.En = (accumulator.En || 0) + Number(item.En)
     accumulator.Pr = (accumulator.Pr || 0) + Number(item.Pr)

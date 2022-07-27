@@ -39,16 +39,16 @@
           <div class="font-weight-bold ml-3 text-primary">
             add new ingredients
           </div>
-            <b-button
-              class="px-0 py-0 mx-0 my-0"
-              variant="light"
-              @click="showModalInput = !showModalInput"
-              :disabled="!stateSelectedItem"
-            >
-              <b-badge variant="danger" class="px-1 py-1">
-                +
-              </b-badge>
-            </b-button>
+          <b-button
+            class="px-0 py-0 mx-0 my-0"
+            variant="light"
+            @click="showModalInput = !showModalInput"
+            :disabled="!stateSelectedItem"
+          >
+            <b-badge variant="danger" class="px-1 py-1">
+              +
+            </b-badge>
+          </b-button>
         </b-row>
 
         <b-row>
@@ -465,18 +465,19 @@ export default {
         {1: ' mg', 2: ' g', 3: ' kt'},
         {1: ' KC', 2: ' MC', 3: ' GC'},
       ]
+      const itemConv = item ? item : 0
       switch (true) {
-        case (item < 1000):
-          res = String(Math.round(item)) + units[unitKey]["1"]
+        case (itemConv < 1000):
+          res = String(Math.round(itemConv)) + units[unitKey]["1"]
           break;
-        case (item >= 1000 && item < 1000000):
-          res = String(Math.round(item / 1000)) + units[unitKey]["2"]
+        case (itemConv >= 1000 && itemConv < 1000000):
+          res = String(Math.round(itemConv / 1000)) + units[unitKey]["2"]
           break;
-        case (item >= 1000000):
-          res = String(Math.round(item / 1000000)) + units[unitKey]["3"]
+        case (itemConv >= 1000000):
+          res = String(Math.round(itemConv / 1000000)) + units[unitKey]["3"]
           break;
         default:
-          console.error('parameter not valid:setDigit:' + item)
+          console.error('parameter not valid:setDigit:' + itemConv)
           res = ''
           break;
       }

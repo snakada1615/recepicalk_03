@@ -164,18 +164,19 @@ export default {
         {1: ' mg', 2: ' g', 3: ' kt'},
         {1: ' KC', 2: ' MC', 3: ' GC'},
       ]
+      const itemConv = item ? item : 0
       switch (true) {
-        case (item < 1000):
-          res = String(Math.round(item)) + units[unitKey]["1"]
+        case (itemConv < 1000):
+          res = String(Math.round(itemConv)) + units[unitKey]["1"]
           break;
-        case (item >= 1000 && item < 1000000):
-          res = String(Math.round(item / 1000)) + units[unitKey]["2"]
+        case (itemConv >= 1000 && itemConv < 1000000):
+          res = String(Math.round(itemConv / 1000)) + units[unitKey]["2"]
           break;
-        case (item >= 1000000):
-          res = String(Math.round(item / 1000000)) + units[unitKey]["3"]
+        case (itemConv >= 1000000):
+          res = String(Math.round(itemConv / 1000000)) + units[unitKey]["3"]
           break;
         default:
-          console.error('parameter not valid:setDigit:' + item)
+          console.error('parameter not valid:setDigit:' + itemConv)
           res = ''
           break;
       }
@@ -188,11 +189,11 @@ export default {
      */
     updateSum(array) {
       return array.reduce((accumulator, item) => {
-        accumulator.En = (accumulator.En || 0) + Number(item.En)
-        accumulator.Pr = (accumulator.Pr || 0) + Number(item.Pr)
-        accumulator.Va = (accumulator.Va || 0) + Number(item.Va)
-        accumulator.Fe = (accumulator.Fe || 0) + Number(item.Fe)
-        accumulator.Wt = (accumulator.Wt || 0) + Number(item.Wt)
+        accumulator.En = (accumulator.En || 0) + Number(item.En ? item.En : 0)
+        accumulator.Pr = (accumulator.Pr || 0) + Number(item.Pr ? item.Pr : 0)
+        accumulator.Va = (accumulator.Va || 0) + Number(item.Va ? item.Va : 0)
+        accumulator.Fe = (accumulator.Fe || 0) + Number(item.Fe ? item.Fe : 0)
+        accumulator.Wt = (accumulator.Wt || 0) + Number(item.Wt ? item.Wt : 0)
         return accumulator
       }, {})
     },

@@ -482,6 +482,7 @@ export default {
           return item.note
         })
         this.updatePfc()
+        console.log(this.nutritionSupplyGetter())
       }
     },
   },
@@ -539,13 +540,16 @@ export default {
       return vm.myApp.menuCases.map((datArray) => {
         if (datArray.menu.length > 0) {
           return datArray.menu.reduce((accumulator, item) => {
-            accumulator.En += Number(item.En) * Number(item.Wt) / 100
-            accumulator.Pr += Number(item.Pr) * Number(item.Wt) / 100
-            accumulator.Va += Number(item.Va) * Number(item.Wt) / 100
-            accumulator.Fe += Number(item.Fe) * Number(item.Wt) / 100
-            accumulator.Carbohydrate += Number(item.Carbohydrate) * Number(item.Wt) / 100
-            accumulator.Fat += Number(item.Fat) * Number(item.Wt) / 100
+            accumulator.En += Number(item.En ? item.En : 0) * Number(item.Wt) / 100
+            accumulator.Pr += Number(item.Pr ? item.Pr : 0) * Number(item.Wt) / 100
+            accumulator.Va += Number(item.Va ? item.Va : 0) * Number(item.Wt) / 100
+            accumulator.Fe += Number(item.Fe ? item.Fe : 0) * Number(item.Wt) / 100
+            accumulator.Carbohydrate += Number(item.Carbohydrate ? item.Carbohydrate : 0) * Number(item.Wt) / 100
+            accumulator.Fat += Number(item.Fat ? item.Fat : 0) * Number(item.Wt) / 100
             accumulator.Wt += Number(item.Wt)
+            if (!accumulator.Pr){
+              console.log(item)
+            }
             return accumulator
           }, {
             'En': 0,

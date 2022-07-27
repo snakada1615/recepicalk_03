@@ -1,3 +1,5 @@
+
+
 <template>
   <b-container>
     <b-row>
@@ -9,53 +11,47 @@
               Case {{pageId}}: {{myApp.feasibilityCases[pageId-1].note}}
             </div>
           </b-card>
-          <b-form-select v-model="selectedCaseId" :options="noteList" v-if="myApp"></b-form-select>
         </b-card>
       </b-col>
       <b-col cols="12" lg="6" class="my-1" v-for="pageId in sceneCount" :key="pageId" v-if="myApp" >
-        <div v-if="selectedCase.includes(pageId-1)">
-          <!--   スコアの総括票     -->
-          <b-card
-            style="min-width: 530px;"
-            header-bg-variant="success"
-            bg-variant="light"
-            border-variant="success"
-            class="mx-1 px-0 my-2">
-            <template #header>
-              <div class="font-weight-bolder text-white">
-                {{myApp.feasibilityCases[pageId-1].note}}:
-                {{ cropName[pageId-1] || 'not selected'}}
-              </div>
-            </template>
-            <b-row>
-              <b-col class="text-center">Crop name:</b-col>
-              <b-col class="text-info text-center">{{ cropName[pageId-1] }}</b-col>
-            </b-row>
-            <b-row>
-              <b-col cols="6" class="text-center">total score:</b-col>
-              <b-col cols="6">{{ qaScore[pageId-1][qaScore[pageId-1].length - 1].value }} /
-                {{ 10 * qaList.length }}
-              </b-col>
-            </b-row>
-            <b-row v-for="(qa, index) in qaScore[pageId-1]" :key="index">
-              <b-col>
-                <nutrition-bar2
-                  v-if="qa.id > 0"
-                  :colWidthFirst="3"
-                  :colwidthSecond="0"
-                  :colwidthThird="0"
-                  :colwidthFourth="2"
-                  :show-max-number="false"
-                  :max="10"
-                  :nutritionTarget="0"
-                  :cropName="qa.text"
-                  :rating="qa.value || 0"
-                  :label="qa.text"
-                ></nutrition-bar2>
-              </b-col>
-            </b-row>
-          </b-card>
-        </div>
+        <!--   スコアの総括票     -->
+        <b-card
+          style="min-width: 530px;"
+          header-bg-variant="success"
+          bg-variant="light"
+          border-variant="success"
+          class="mx-1 px-0 my-2">
+          <template #header>
+            <div class="font-weight-bolder text-white">{{ cropName[pageId-1] || 'not selected'}}</div>
+          </template>
+          <b-row>
+            <b-col class="text-center">Crop name:</b-col>
+            <b-col class="text-info text-center">{{ cropName[pageId-1] }}</b-col>
+          </b-row>
+          <b-row>
+            <b-col cols="6" class="text-center">total score:</b-col>
+            <b-col cols="6">{{ qaScore[pageId-1][qaScore[pageId-1].length - 1].value }} /
+              {{ 10 * qaList.length }}
+            </b-col>
+          </b-row>
+          <b-row v-for="(qa, index) in qaScore[pageId-1]" :key="index">
+            <b-col>
+              <nutrition-bar2
+                v-if="qa.id > 0"
+                :colWidthFirst="3"
+                :colwidthSecond="0"
+                :colwidthThird="0"
+                :colwidthFourth="2"
+                :show-max-number="false"
+                :max="10"
+                :nutritionTarget="0"
+                :cropName="qa.text"
+                :rating="qa.value || 0"
+                :label="qa.text"
+              ></nutrition-bar2>
+            </b-col>
+          </b-row>
+        </b-card>
       </b-col>
     </b-row>
   </b-container>
@@ -68,39 +64,6 @@ export default {
     nutritionBar2
   },
   computed: {
-    /**
-     * 同一グループのidリスト
-     * @returns {*[]}
-     */
-    selectedCase(){
-      if (this.selectedCaseId === -1){
-        return []
-      }
-      const selectedItem = this.noteList.find((dat)=>dat.value === this.selectedCaseId).key
-      return this.noteList.filter((val)=>{
-        return val.key === selectedItem
-      }).map((val2)=>{
-        return val2.value
-      })
-    },
-    /**
-     * 表示するfeasibilityCaseを選択するためのリスト
-     * @returns {*[]}
-     */
-    noteList(){
-      let res = []
-      for (let index =1; index<= this.sceneCount; index++ ){
-        const myNote = this.myApp.feasibilityCases[index-1].note
-        if (myNote){
-          res.push({
-            'text': 'Case' + index + ':' + myNote,
-            'value': index-1,
-            'key': myNote
-          })
-        }
-      }
-      return res
-    },
     myApp: function () {
       return this.$store.state.fire.myApp
     },
@@ -158,10 +121,6 @@ export default {
   },
   data() {
     return {
-      /**
-       * 選択されたfeasibilityCase
-       */
-      selectedCaseId:-1,
       /**
        * 質問と回答一覧
        */
