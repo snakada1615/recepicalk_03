@@ -1,3 +1,5 @@
+
+
 <template>
   <b-container>
     <b-row>
@@ -16,7 +18,6 @@
               Case {{ pageId }}: {{ myApp.menuCases[pageId - 1].note }}
             </div>
           </b-card>
-          <b-form-select v-model="selectedCaseId" :options="noteList" v-if="myApp"></b-form-select>
         </b-card>
       </b-col>
       <b-col cols="12" lg="6">
@@ -31,9 +32,8 @@
           <b-table
             bordered
             small
-            :items="diversityStatusFiltered"
+            :items="diversityStatus"
             :fields="fieldsFoodGroup"
-            :row-class="(row) => row.id === 1 ? 'is-hidden' : ''"
           >
           </b-table>
         </b-card>
@@ -49,22 +49,20 @@
           </template>
           <b-row>
             <b-col cols="6" v-for="pageId in sceneCount" :key="pageId" class="my-1">
-              <div v-if="selectedCase.includes(pageId-1)">
-                <b-card>
-                  Case{{ pageId }}
-                  <nutrition-bar2
-                    v-for="index in 4" :key="index"
-                    :colWidthFirst="3"
-                    :colwidthSecond="0"
-                    :colwidthThird="0"
-                    :colwidthFourth="2"
-                    :show-max-number="false"
-                    :label="nutritionLabel[index-1]"
-                    :max-rating="maxRating"
-                    :rating="ratingGetter[pageId-1][nutritionLabel[index-1]]"
-                  />
-                </b-card>
-              </div>
+              <b-card>
+                Case{{ pageId }}
+                <nutrition-bar2
+                  v-for="index in 4" :key="index"
+                  :colWidthFirst="3"
+                  :colwidthSecond="0"
+                  :colwidthThird="0"
+                  :colwidthFourth="2"
+                  :show-max-number="false"
+                  :label="nutritionLabel[index-1]"
+                  :max-rating="maxRating"
+                  :rating="ratingGetter[pageId-1][nutritionLabel[index-1]]"
+                />
+              </b-card>
             </b-col>
           </b-row>
         </b-card>
@@ -80,32 +78,30 @@
           </template>
           <b-row>
             <b-col cols="6" v-for="pageId in sceneCount" :key="pageId" class="my-1">
-              <div v-if="selectedCase.includes(pageId-1)">
-                <b-card>
-                  Case{{ pageId }}
-                  <b-row>
-                    <b-col cols="3">
-                      <div style="font-size: 1vw">Recommend</div>
-                    </b-col>
-                    <b-col cols="9">
-                      <macro-nutrient-bar
-                        :chart-values="pfcBalanceStandard"
-                      ></macro-nutrient-bar>
-                    </b-col>
-                  </b-row>
-                  <b-row>
-                    <b-col cols="3">
-                      <div style="font-size: 1vw">Current</div>
-                    </b-col>
-                    <b-col cols="9">
-                      <macro-nutrient-bar
-                        v-if="pfcBalanceCurrent[pageId-1]"
-                        :chart-values="pfcBalanceCurrent[pageId-1]"
-                      ></macro-nutrient-bar>
-                    </b-col>
-                  </b-row>
-                </b-card>
-              </div>
+              <b-card>
+                Case{{ pageId }}
+                <b-row>
+                  <b-col cols="3">
+                    <div style="font-size: 1vw">Recommend</div>
+                  </b-col>
+                  <b-col cols="9">
+                    <macro-nutrient-bar
+                      :chart-values="pfcBalanceStandard"
+                    ></macro-nutrient-bar>
+                  </b-col>
+                </b-row>
+                <b-row>
+                  <b-col cols="3">
+                    <div style="font-size: 1vw">Current</div>
+                  </b-col>
+                  <b-col cols="9">
+                    <macro-nutrient-bar
+                      v-if="pfcBalanceCurrent[pageId-1]"
+                      :chart-values="pfcBalanceCurrent[pageId-1]"
+                    ></macro-nutrient-bar>
+                  </b-col>
+                </b-row>
+              </b-card>
             </b-col>
           </b-row>
         </b-card>
@@ -123,39 +119,6 @@ export default {
     macroNutrientBar
   },
   computed: {
-    /**
-     * 同一グループのidリスト
-     * @returns {*[]}
-     */
-    selectedCase(){
-      if (this.selectedCaseId === -1){
-        return []
-      }
-      const selectedItem = this.noteList.find((dat)=>dat.value === this.selectedCaseId).key
-      return this.noteList.filter((val)=>{
-        return val.key === selectedItem
-      }).map((val2)=>{
-        return val2.value
-      })
-    },
-    /**
-     * 表示するfeasibilityCaseを選択するためのリスト
-     * @returns {*[]}
-     */
-    noteList(){
-      let res = []
-      for (let index =1; index<= this.sceneCount; index++ ){
-        const myNote = this.myApp.menuCases[index-1].note
-        if (myNote){
-          res.push({
-            'text': 'Case' + index + ':' + myNote,
-            'value': index-1,
-            'key': myNote
-          })
-        }
-      }
-      return res
-    },
     myApp: function () {
       return this.$store.state.fire.myApp
     },
@@ -183,11 +146,6 @@ export default {
         )
       })
       return res
-    },
-    diversityStatusFiltered(){
-      return this.diversityStatus.filter((val,index)=>{
-        return this.selectedCase.includes(index)
-      })
     },
     /**
      * menuCasesに含まれるfood Groupから、何種類の食品群が含まれるか判定
@@ -321,10 +279,6 @@ export default {
   },
   data() {
     return {
-      /**
-       * 選択されたfeasibilityCase
-       */
-      selectedCaseId:-1,
       /**
        * nutritionBar用のproperty：栄養素表示用のlabel
        */
