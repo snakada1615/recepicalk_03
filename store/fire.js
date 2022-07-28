@@ -111,6 +111,10 @@ export const state = () => ({
      */
     prodTargetCases: [],
     /**
+     * 各シナリオに対応したデータ(family -> Eth向け)
+     */
+    familyCases: [],
+    /**
      * 最後に保存した日時
      */
     saveDate: {
@@ -369,6 +373,14 @@ export const mutations = {
     state.myApp.feasibilityCases = JSON.parse(JSON.stringify(payload))
   },
   /**
+   * FamilyCasesを更新
+   * @param state
+   * @param payload
+   */
+  updateFamilyCases: function (state, payload) {
+    state.myApp.familyCases = JSON.parse(JSON.stringify(payload))
+  },
+  /**
    * feasibilityCaseのメモを更新
    * @param state
    * @param payload
@@ -386,6 +398,14 @@ export const mutations = {
   }
 }
 export const actions = {
+  /**
+   * FamilyCasesを更新
+   * @param dispatch
+   * @param payload
+   */
+  updateFamilyCases({dispatch}, payload){
+    dispatch('updateFamilyCases', payload)
+  },
   /**
    * ユーザー登録時に基本データセット（FCT,DRI）をユーザースペースmyAppに
    *     コピーする
@@ -750,7 +770,12 @@ export const actions = {
       needInitialization = true
     }
 
-    if (needInitialization) {
+    if (!state.myApp.familyCases){
+      await dispatch('updateFamilyCases', [])
+      needInitialization = true
+    }
+
+      if (needInitialization) {
       await dispatch('fireSaveAppdata')
       await this.$router.push('/')
     }

@@ -97,6 +97,8 @@ export default {
   methods: {
     clickOk() {
       console.log('done')
+      console.log(this.driPopulations)
+      this.$emit('driSelectOk', this.driPopulations)
     },
   }
 }
