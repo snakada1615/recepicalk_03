@@ -245,6 +245,7 @@ export function validateMacroNutrient(dat) {
       }
       if (!(item.val >= 0)) {
         console.log('Param Error: validateMacroNutrient')
+        console.log(item)
         check2 = false
       }
     })

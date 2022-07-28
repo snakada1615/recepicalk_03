@@ -87,14 +87,14 @@ export default {
      */
     label2: {
       type: String,
-      default: 'Woreda'
+      default: 'Zone'
     },
     /**
      * region3のラベル
      */
     label3: {
       type: String,
-      default: 'Kebere'
+      default: 'Woreda'
     },
   },
   data() {

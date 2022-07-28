@@ -76,6 +76,13 @@
             :rating="rating[pageIdComputed][nutritionLabel[index-1]]"
             :maxRatingAbsolute="nutritionSupplyWatcher[pageIdComputed][nutritionLabel[index-1]]"
           />
+          <b-row>
+            <b-col>
+              <div class="small">
+                * the amount of protein and fe from staple is excluded from total
+              </div>
+            </b-col>
+          </b-row>
         </b-card>
       </b-col>
       <b-col cols="12" lg="6">
@@ -476,13 +483,12 @@ export default {
       handler(newVal) {
         this.myAppWatcher = JSON.parse(JSON.stringify(newVal))
         this.nutritionDemandWatcher = JSON.parse(JSON.stringify(this.nutritionDemandGetter()))
-        this.nutritionSupplyWatcher = JSON.parse(JSON.stringify(this.nutritionSupplyGetter()))
+        this.nutritionSupplyWatcher = JSON.parse(JSON.stringify(this.nutritionSupplyGetter2()))
         this.rating = JSON.parse(JSON.stringify(this.ratingGetter()))
         this.pageMemo = this.myAppWatcher.menuCases.map(function (item) {
           return item.note
         })
         this.updatePfc()
-        console.log(this.nutritionSupplyGetter())
       }
     },
   },
@@ -492,7 +498,7 @@ export default {
   created() {
     this.myAppWatcher = JSON.parse(JSON.stringify(this.myApp))
     this.nutritionDemandWatcher = JSON.parse(JSON.stringify(this.nutritionDemandGetter()))
-    this.nutritionSupplyWatcher = JSON.parse(JSON.stringify(this.nutritionSupplyGetter()))
+    this.nutritionSupplyWatcher = JSON.parse(JSON.stringify(this.nutritionSupplyGetter2()))
     this.rating = JSON.parse(JSON.stringify(this.ratingGetter()))
     this.pageMemo = this.myAppWatcher.menuCases.map(function (item) {
       return item.note
@@ -547,9 +553,56 @@ export default {
             accumulator.Carbohydrate += Number(item.Carbohydrate ? item.Carbohydrate : 0) * Number(item.Wt) / 100
             accumulator.Fat += Number(item.Fat ? item.Fat : 0) * Number(item.Wt) / 100
             accumulator.Wt += Number(item.Wt)
-            if (!accumulator.Pr){
-              console.log(item)
+            return accumulator
+          }, {
+            'En': 0,
+            'Pr': 0,
+            'Va': 0,
+            'Fe': 0,
+            'Wt': 0,
+            'Carbohydrate': 0,
+            'Fat': 0
+          })
+        } else {
+          return {
+            'En': 0,
+            'Pr': 0,
+            'Va': 0,
+            'Fe': 0,
+            'Wt': 0,
+            'Carbohydrate': 0,
+            'Fat': 0
+          }
+        }
+      })
+    },
+    /**
+     * myApp.menuCases.menuの値を集計してnutritionSupplyWatcherに代入するための関数
+     * ただしfood_grp_idがStapleの場合、PrとFeを無視する
+     * @returns {*[]} 栄養素供給量の合計値
+     */
+    nutritionSupplyGetter2() {
+      const vm = this
+      return vm.myApp.menuCases.map((datArray) => {
+        if (datArray.menu.length > 0) {
+          return datArray.menu.reduce((accumulator, item) => {
+            let myPr = item.Pr ? item.Pr : 0
+            let myFe = item.Fe ? item.Fe : 0
+
+            // 食品群がstapleであった場合、Pr、Fe の値を無視
+            if (Number(item.food_grp_id) === 1) {
+              myPr = 0
+              myFe = 0
             }
+            console.log('menuCase: protein = ' + myPr)
+
+            accumulator.En += Number(item.En ? item.En : 0) * Number(item.Wt) / 100
+            accumulator.Pr += Number(myPr) * Number(item.Wt) / 100
+            accumulator.Va += Number(item.Va ? item.Va : 0) * Number(item.Wt) / 100
+            accumulator.Fe += Number(myFe) * Number(item.Wt) / 100
+            accumulator.Carbohydrate += Number(item.Carbohydrate ? item.Carbohydrate : 0) * Number(item.Wt) / 100
+            accumulator.Fat += Number(item.Fat ? item.Fat : 0) * Number(item.Wt) / 100
+            accumulator.Wt += Number(item.Wt)
             return accumulator
           }, {
             'En': 0,
