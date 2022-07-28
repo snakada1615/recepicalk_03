@@ -742,9 +742,9 @@ export const actions = {
     //**********暫定措置、要削除***********
     const current = new Date()
     const limit = new Date(2022, 10, 30)
-    if ((state.myApp.dataSet.fctId !== 'fct_eth0727') && (current < limit)) {
+    if ((state.myApp.dataSet.fctId !== 'fct_eth0729') && (current < limit)) {
       //fctNameをstoreに保存
-      await dispatch('updateFctId', 'fct_eth0727')
+      await dispatch('updateFctId', 'fct_eth0729')
       //fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
       await dispatch('initFct')
       needInitialization = true

@@ -594,7 +594,6 @@ export default {
               myPr = 0
               myFe = 0
             }
-            console.log('menuCase: protein = ' + myPr)
 
             accumulator.En += Number(item.En ? item.En : 0) * Number(item.Wt) / 100
             accumulator.Pr += Number(myPr) * Number(item.Wt) / 100
