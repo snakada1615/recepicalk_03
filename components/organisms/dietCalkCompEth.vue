@@ -388,6 +388,10 @@ export default {
     maxPage: {
       type: Number,
       required: true
+    },
+    disabledOption:{
+      type: Array,
+      default: []
     }
   },
   computed: {
@@ -422,7 +426,11 @@ export default {
     pageOptions() {
       let res = []
       for (let i = 0; i < this.maxPage; i++) {
-        res.push({value: i, text: 'page' + i + ': ' + this.pageMemo[i]})
+        res.push({
+          value: i,
+          text: 'page' + i + ': ' + this.pageMemo[i],
+          disabled: this.disabledOption.includes(i)
+        })
       }
       return res
     },
@@ -763,7 +771,6 @@ export default {
      */
     updatePfc() {
       this.pfcBalanceCurrent = this.nutritionSupplyWatcher.map((dat, index) => {
-        console.log(dat)
         return [
           {val: Math.round(dat.Pr * 4), color: 'green', label: '%'},
           {val: Math.round(dat.Fat * 9), color: 'yellow', label: '%'},

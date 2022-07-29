@@ -2,35 +2,6 @@
   <b-container>
     <b-card :header="'current family: ' + familyName">
       <b-tabs card>
-        <b-tab title="select family" v-if="familyList.length > 0">
-          <b-row class="justify-content-center border-primary">
-            <b-col cols="8">
-              <b-input-group size="sm" class="mb-2">
-                <template #prepend>
-                  <b-input-group-text >
-                    select family
-                  </b-input-group-text>
-                  <b-button
-                    @click="removeFamily(familyName)"
-                  >
-                    <b-icon icon="trash" />
-                  </b-button>
-                </template>
-                <b-form-select
-                  v-model="familyName"
-                  :options="familyList"
-                ></b-form-select>
-              </b-input-group>
-              <dri-select-multi
-                :driItems="dri"
-                :target="currentTarget"
-                :max="maxPopulation"
-                @update:target="updateFamily(familyName, $event)"
-                class="multi"
-              ></dri-select-multi>
-            </b-col>
-          </b-row>
-        </b-tab>
         <b-tab title="add family">
           <b-row class="justify-content-center">
             <b-col cols="8">
@@ -46,6 +17,7 @@
                 <template #append>
                   <b-button
                     :disabled="!stateFamilyName"
+                    :class="{'btn-info':stateFamilyName}"
                     @click="addNewFamily(newFamilyName, newTarget)"
                   >add new family
                   </b-button>
@@ -63,23 +35,74 @@
             </b-col>
           </b-row>
         </b-tab>
-        <b-tab title="current diet">
-
+        <b-tab title="select family" :disabled="familyList.length === 0">
+          <b-row class="justify-content-center border-primary">
+            <b-col cols="8">
+              <b-input-group size="sm" class="mb-2">
+                <template #prepend>
+                  <b-input-group-text >
+                    select family
+                  </b-input-group-text>
+                </template>
+                <b-form-select
+                  v-model="familyName"
+                  :options="familyList"
+                ></b-form-select>
+                <template #append>
+                  <b-button
+                    @click="removeFamily(familyName)"
+                  >
+                    <b-icon icon="trash" />
+                  </b-button>
+                </template>
+              </b-input-group>
+              <dri-select-multi
+                :driItems="dri"
+                :target="currentTarget"
+                :max="maxPopulation"
+                @update:target="updateFamily(familyName, $event)"
+                class="multi"
+              ></dri-select-multi>
+            </b-col>
+          </b-row>
         </b-tab>
-        <b-tab title="improved option">
+        <b-tab title="current diet" :disabled="familyList.length === 0">
+          <b-card no-body>
+            <diet-calk-comp-eth
+              :my-app="myApp"
+              :page-id=0
+              :max-page=10
+              :current-family="familyName"
+              :disabled-option="[1,2,3,4,5,6,7,8,9]"
+              @update:myApp="updateMyApp"
+              @update:pageMemo="updatePageMemo"
+            />
+          </b-card>
+        </b-tab>
+        <b-tab title="improved option" :disabled="familyList.length === 0">
           <b-card no-body>
             <diet-calk-comp-eth
               :my-app="myApp"
               :page-id.sync="pageId"
               :max-page=10
               :current-family="familyName"
+              :disabled-option="[0]"
               @update:myApp="updateMyApp"
               @update:pageMemo="updatePageMemo"
             />
           </b-card>
         </b-tab>
-        <b-tab title="crop feasibility">
-
+        <b-tab title="crop feasibility" :disabled="familyList.length === 0">
+          <b-row>
+            <feasibility-check-component-eth
+              :my-app="$store.state.fire.myApp"
+              :page-id.sync="pageId"
+              :max-page=10
+              :current-family = "familyName"
+              @update:myApp="updateMyApp"
+              @update:pageMemo="updatePageMemo"
+            />
+          </b-row>
         </b-tab>
       </b-tabs>
     </b-card>
@@ -88,11 +111,13 @@
 <script>
 import driSelectMulti from "../components/molecules/driSelectMulti";
 import dietCalkCompEth from "../components/organisms/dietCalkCompEth";
+import feasibilityCheckComponentEth from "../components/organisms/feasibilityCheckComponentEth";
 
 export default {
   components: {
     driSelectMulti,
-    dietCalkCompEth
+    dietCalkCompEth,
+    feasibilityCheckComponentEth
   },
   data() {
     return {
@@ -174,6 +199,10 @@ export default {
       this.$store.dispatch('fire/updateCurrentFamilyName', name)
     },
     removeFamily(val){
+      if (this.familyList.length === 1){
+        alert('you cannot delete last item')
+        return
+      }
       this.$store.dispatch('fire/removeFamily', val)
       const newVal = this.familyList[0]
       this.$store.dispatch('fire/updateCurrentFamilyName', newVal)
