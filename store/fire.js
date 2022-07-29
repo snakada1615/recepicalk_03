@@ -115,6 +115,10 @@ export const state = () => ({
      */
     familyCases: [],
     /**
+     * 現在対象になっている家族名
+     */
+    currentFamily: '',
+    /**
      * 最後に保存した日時
      */
     saveDate: {
@@ -381,6 +385,14 @@ export const mutations = {
     state.myApp.familyCases = JSON.parse(JSON.stringify(payload))
   },
   /**
+   * 現在対象になっている家族名の更新
+   * @param state
+   * @param payload
+   */
+  updateCurrentFamilyName: function (state, payload) {
+    state.myApp.currentFamily = JSON.parse(JSON.stringify(payload))
+  },
+  /**
    * feasibilityCaseのメモを更新
    * @param state
    * @param payload
@@ -403,8 +415,66 @@ export const actions = {
    * @param dispatch
    * @param payload
    */
-  updateFamilyCases({dispatch}, payload){
-    dispatch('updateFamilyCases', payload)
+  updateFamilyCases({commit}, payload) {
+    commit('updateFamilyCases', payload)
+  },
+  updateFamilyCase({dispatch, state}, payload) {
+    let familyCaseTemp = JSON.parse(JSON.stringify(state.myApp.familyCases))
+    familyCaseTemp = familyCaseTemp.map((item) => {
+      if (item.name === payload.name) {
+        item.member = payload.member
+      }
+      return item
+    })
+    dispatch('updateFamilyCases', familyCaseTemp)
+    dispatch('setHasDocumentChanged', true)
+  },
+  /**
+   * 現在対象になっている家族の更新
+   * @param commit
+   * @param dispatch
+   * @param payload
+   */
+  updateCurrentFamilyName({commit, dispatch}, payload) {
+    commit('updateCurrentFamilyName', payload)
+    dispatch('setHasDocumentChanged', true)
+  },
+  /**
+   * 新しい家族構成の追加、併せて初期化
+   * @param state
+   * @param dispatch
+   * @param payload
+   */
+  addNewFamily({state, dispatch}, payload) {
+    let currentFamily = JSON.parse(JSON.stringify(state.myApp.familyCases))
+    let arr = []
+    for (let i = 0; i < state.myApp.sceneCount; i++) {
+      const note = ''
+      const menu = []
+      arr.push({menu: menu, note: note})
+    }
+    let arr2 = []
+    for (let i = 0; i < state.myApp.sceneCount; i++) {
+      const selectedCrop = []
+      const note = ''
+      const ansList = [-99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99]
+      arr2.push({selectedCrop: selectedCrop, note: note, ansList: ansList})
+    }
+    currentFamily.push({
+      'name': payload.name,
+      'member': payload.member,
+      'menuCases': arr,
+      'feasibilityCases': arr2
+    })
+    dispatch('updateFamilyCases', currentFamily)
+    dispatch('setHasDocumentChanged', true)
+    //await dispatch('fireSaveAppdata')
+  },
+  removeFamily({state, dispatch}, payload) {
+    let currentFamily = JSON.parse(JSON.stringify(state.myApp.familyCases))
+    currentFamily = currentFamily.filter((item) => item.name !== payload)
+    dispatch('updateFamilyCases', currentFamily)
+    dispatch('setHasDocumentChanged', true)
   },
   /**
    * ユーザー登録時に基本データセット（FCT,DRI）をユーザースペースmyAppに
@@ -770,12 +840,19 @@ export const actions = {
       needInitialization = true
     }
 
-    if (!state.myApp.familyCases){
-      await dispatch('updateFamilyCases', [])
+    //familyCasesの新規追加
+    if (!state.myApp.familyCases) {
+      dispatch('updateFamilyCases', [])
       needInitialization = true
     }
 
-      if (needInitialization) {
+    //currentFamilyの新規追加
+    if (state.myApp.currentFamily === null) {
+      dispatch('updateCurrentFamilyName', '')
+      needInitialization = true
+    }
+
+    if (needInitialization) {
       await dispatch('fireSaveAppdata')
       await this.$router.push('/')
     }
@@ -1209,10 +1286,10 @@ export const actions = {
     //range = 0: dietCalk, 1:feasibilityCheckに所属
     let fromRange = 0
     let toRange = 0
-    if ((payload.fromId >= 200) && (payload.fromId < 200 + myAppWatcher.sceneCount)){
+    if ((payload.fromId >= 200) && (payload.fromId < 200 + myAppWatcher.sceneCount)) {
       fromRange = 1
     }
-    if ((payload.toId >= 200) && (payload.toId < 200 + myAppWatcher.sceneCount)){
+    if ((payload.toId >= 200) && (payload.toId < 200 + myAppWatcher.sceneCount)) {
       toRange = 1
     }
     if ((fromRange === 0) && (toRange === 0)) {
@@ -1220,7 +1297,7 @@ export const actions = {
     }
     //内部変数の初期化
     let fromFamily = ''
-    let fromFoodList =''
+    let fromFoodList = ''
     let isTargetSingle = ''
     let note = ''
 
@@ -1241,7 +1318,7 @@ export const actions = {
       myAppWatcher.menuCases[payload.toId - 100 * (toRange + 1)].target = JSON.parse(fromFamily)
       myAppWatcher.menuCases[payload.toId - 100 * (toRange + 1)].isTargetSingle = isTargetSingle
       myAppWatcher.menuCases[payload.toId - 100 * (toRange + 1)].note = note
-      if (copyPattern === 0){
+      if (copyPattern === 0) {
         //品目リストもあればペースト
         myAppWatcher.menuCases[payload.toId - 100 * (toRange + 1)].menu = JSON.parse(fromFoodList)
       }

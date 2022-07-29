@@ -68,6 +68,7 @@ export default {
         'BIconBookmarkCheck',
         'BIconEye',
         'BIconEyeSlash',
+        'BIconTrash'
       ],
       componentPlugins: [
         'NavbarPlugin',
