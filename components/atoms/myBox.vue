@@ -67,12 +67,12 @@ export default {
     if (!this.provider.context) return;
 
     const ctx = this.provider.context;
-    const oldBox = this.oldBox;
+    //const oldBox = this.oldBox;
     const newBox = this.calculatedBox;
 
     ctx.beginPath();
-    ctx.clearRect(oldBox.x, oldBox.y, oldBox.w, oldBox.h);
-    ctx.clearRect(newBox.x, newBox.y - 42, newBox.w, 100);
+    //ctx.clearRect(oldBox.x, oldBox.y, oldBox.w, oldBox.h);
+    //ctx.clearRect(newBox.x, newBox.y - 42, newBox.w, 100);
 
     ctx.rect(newBox.x, newBox.y, newBox.w, newBox.h);
     ctx.fillStyle = this.color;

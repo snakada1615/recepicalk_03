@@ -135,7 +135,7 @@ export default {
     },
     familyName: {
       get() {
-        return this.$store.state.fire.myApp.currentFamily
+        return this.$store.state.fire.myApp.currentFamily ? this.$store.state.fire.myApp.currentFamily: ''
       },
       set(newVal) {
         this.$store.dispatch('fire/updateCurrentFamilyName', newVal)
