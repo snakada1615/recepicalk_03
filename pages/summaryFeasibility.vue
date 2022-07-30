@@ -5,13 +5,20 @@
         <b-card title="Comparison of Feasibility assessment">
           <b-card>
             Note for each case
-            <div v-for="pageId in sceneCount" :key="pageId" v-if="myApp" class="border bg-light">
-              Case {{ pageId }}: {{ myApp.feasibilityCases[pageId - 1].note }}
-            </div>
+            <b-list-group>
+              <b-list-group-item
+                v-for="pageId in sceneCount" :key="pageId" v-if="myApp"
+                button
+                @click="clickCaseName(pageId)"
+                :variant="cellColor[pageId - 1]"
+              >
+                Case {{ pageId }}: {{ myApp.feasibilityCases[pageId - 1].note }}
+              </b-list-group-item>
+            </b-list-group>
           </b-card>
         </b-card>
       </b-col>
-      <b-col cols="12" lg="6" class="my-1" v-for="pageId in sceneCount" :key="pageId" v-if="myApp">
+      <b-col cols="12" lg="6" class="my-1" v-for="pageId in sceneCount" :key="pageId" v-if="showScore[pageId-1]">
         <!--   スコアの総括票     -->
         <b-card
           style="min-width: 530px;"
@@ -65,6 +72,33 @@ export default {
     nutritionBar2
   },
   computed: {
+    /**
+     * noteの選択状態に応じてリスト上のセルの値を変化
+     * @returns {unknown[]}
+     */
+    cellColor() {
+      return this.showScore.map((item) => {
+        if (item) {
+          return "info"
+        } else {
+          return 'light'
+        }
+      })
+    },
+    /**
+     * それぞれのCaseを表示するかどうかの判定フラグ
+     * @returns {unknown[]}
+     */
+    showScore() {
+      let vm = this
+      return this.myApp.feasibilityCases.map((val) => {
+        if (vm.selectedNote === '') {
+          return true
+        } else {
+          return val.note === vm.selectedNote
+        }
+      })
+    },
     /**
      * 同一グループのidリスト
      * @returns {*[]}
@@ -155,6 +189,10 @@ export default {
   },
   data() {
     return {
+      /**
+       * リストから選択されたnoteの値
+       */
+      selectedNote: '',
       /**
        * 選択されたfeasibilityCase
        */
@@ -368,6 +406,14 @@ export default {
     }
   },
   methods: {
+    /**
+     * Caseのリストをクリックした際に含まれるnoteを代入
+     * @param val
+     */
+    clickCaseName(val) {
+      this.selectedNote = this.myApp.feasibilityCases[val - 1].note
+      console.log(this.selectedNote)
+    },
     /**
      * カテゴリ毎のスコアを集計して戻す
      * @param keys カテゴリとQA_idのペア

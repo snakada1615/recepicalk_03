@@ -12,9 +12,16 @@
           </template>
           <b-card>
             Note for each case
-            <div v-for="pageId in sceneCount" :key="pageId" v-if="myApp" class="border bg-light">
-              Case {{ pageId }}: {{ myApp.menuCases[pageId - 1].note }}
-            </div>
+            <b-list-group>
+              <b-list-group-item
+                v-for="pageId in sceneCount" :key="pageId" v-if="myApp"
+                button
+                @click="clickCaseName(pageId)"
+                :variant="cellColor[pageId - 1]"
+              >
+                Case {{ pageId }}: {{ myApp.menuCases[pageId - 1].note }}
+              </b-list-group-item>
+            </b-list-group>
           </b-card>
         </b-card>
       </b-col>
@@ -30,7 +37,7 @@
           <b-table
             bordered
             small
-            :items="diversityStatus"
+            :items="diversityStatusFiltered"
             :fields="fieldsFoodGroup"
             :row-class="(row) => row.id === 1 ? 'is-hidden' : ''"
           >
@@ -47,7 +54,7 @@
             <div class="font-weight-bold">Key nutrient sufficiency</div>
           </template>
           <b-row>
-            <b-col cols="6" v-for="pageId in sceneCount" :key="pageId" class="my-1">
+            <b-col cols="6" v-for="pageId in sceneCount" :key="pageId" class="my-1" v-if="showScore[pageId-1]">
               <b-card>
                 Case{{ pageId }}
                 <nutrition-bar2
@@ -76,7 +83,7 @@
             <div class="font-weight-bold">PFC balance</div>
           </template>
           <b-row>
-            <b-col cols="6" v-for="pageId in sceneCount" :key="pageId" class="my-1">
+            <b-col cols="6" v-for="pageId in sceneCount" :key="pageId" class="my-1" v-if="showScore[pageId-1]">
               <b-card>
                 Case{{ pageId }}
                 <b-row>
@@ -118,6 +125,38 @@ export default {
     macroNutrientBar
   },
   computed: {
+    diversityStatusFiltered(){
+      return this.diversityStatus.filter((val,index)=>{
+        return this.showScore[index]
+      })
+    },
+    /**
+     * noteの選択状態に応じてリスト上のセルの値を変化
+     * @returns {unknown[]}
+     */
+    cellColor() {
+      return this.showScore.map((item) => {
+        if (item) {
+          return "info"
+        } else {
+          return 'light'
+        }
+      })
+    },
+    /**
+     * それぞれのCaseを表示するかどうかの判定フラグ
+     * @returns {unknown[]}
+     */
+    showScore() {
+      let vm = this
+      return this.myApp.menuCases.map((val) => {
+        if (vm.selectedNote === '') {
+          return true
+        } else {
+          return val.note === vm.selectedNote
+        }
+      })
+    },
     /**
      * 同一グループのidリスト
      * @returns {*[]}
@@ -178,11 +217,6 @@ export default {
         )
       })
       return res
-    },
-    diversityStatusFiltered() {
-      return this.diversityStatus.filter((val, index) => {
-        return this.selectedCase.includes(index)
-      })
     },
     /**
      * menuCasesに含まれるfood Groupから、何種類の食品群が含まれるか判定
@@ -317,6 +351,10 @@ export default {
   data() {
     return {
       /**
+       * リストから選択されたnoteの値
+       */
+      selectedNote: '',
+      /**
        * 選択されたfeasibilityCase
        */
       selectedCaseId: -1,
@@ -345,5 +383,15 @@ export default {
       ],
     }
   },
+  methods: {
+    /**
+     * Caseのリストをクリックした際に含まれるnoteを代入
+     * @param val
+     */
+    clickCaseName(val) {
+      this.selectedNote = this.myApp.menuCases[val - 1].note
+      console.log(this.selectedNote)
+    },
+  }
 }
 </script>

@@ -49,7 +49,7 @@
 -->
             <b-dropdown-item to="/editQuestions">edit feasibility question</b-dropdown-item>
 <!--
-            <b-dropdown-item to="/copyAndPaste">copy & paste</b-dropdown-item>
+            <b-dropdown-item to="/copp0;0p0;pyAndPaste">copy & paste</b-dropdown-item>
             <b-dropdown-item-button
               @click="resetData"
               :disabled="!isLoggedIn"
