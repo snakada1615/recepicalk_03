@@ -30,6 +30,12 @@
             variant="info"
           >add crop
           </b-button>
+          <b-button
+            @click="refreshCurrentPage(pageIdComputed)"
+            variant="secondary"
+          >
+            reset page
+          </b-button>
         </b-card>
       </b-col>
       <b-col cols="12" lg="6">
@@ -517,6 +523,41 @@ export default {
       dat.menuCases[this.pageIdComputed].note = newVal
       //更新されたmyAppをemit
       this.$emit('update:myApp', dat)
+    },
+    refreshCurrentPage(index) {
+      let result = window.confirm('this will reset data of this page only. do you proceed?')
+      if (!result) {
+        return
+      }
+      //作業用のmyAppコピー作成
+      let dat = JSON.parse(JSON.stringify(this.myAppWatcher))
+      //更新されたmenuを入れ替える
+      dat.menuCases[index].note = ''
+      dat.menuCases[index].menu.length = 0
+      dat.menuCases[index].isTargetSingle = false
+      dat.menuCases[index].target = [
+        {count: 0, id: "0"},
+        {count: 0, id: "1"},
+        {count: 0, id: "2"},
+        {count: 0, id: "3"},
+        {count: 0, id: "4"},
+        {count: 0, id: "5"},
+        {count: 0, id: "6"},
+        {count: 0, id: "7"},
+        {count: 0, id: "8"},
+        {count: 0, id: "9"},
+        {count: 0, id: "10"},
+        {count: 0, id: "11"},
+        {count: 0, id: "12"}
+      ]
+      //更新されたmyAppをemit
+      //ここがうまくいかないので修正
+      //this.$emit('update:myApp', dat)
+
+      //一時的な措置
+      this.$store.dispatch('fire/updateMyApp', dat)
+      this.$store.dispatch('fire/fireSaveAppdata')
+      this.$router.push('/')
     },
     /**
      * myApp.menuCases.targetの値を集計してnutritionDemandWatcherに代入するための関数

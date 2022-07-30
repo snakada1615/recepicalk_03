@@ -53,6 +53,25 @@
           <template #header>
             <div class="font-weight-bold">Key nutrient sufficiency</div>
           </template>
+          <b-row class="mb-2">
+            <b-col cols="6">
+              <b-card
+                header="Overall Average"
+                border-variant="success">
+                <nutrition-bar2
+                  v-for="index in 4" :key="index"
+                  :colWidthFirst="3"
+                  :colwidthSecond="0"
+                  :colwidthThird="0"
+                  :colwidthFourth="2"
+                  :show-max-number="false"
+                  :label="nutritionLabel[index-1]"
+                  :max-rating="maxRating"
+                  :rating="averageRatingGetter[nutritionLabel[index-1]]"
+                />
+              </b-card>
+            </b-col>
+          </b-row>
           <b-row>
             <b-col cols="6" v-for="pageId in sceneCount" :key="pageId" class="my-1" v-if="showScore[pageId-1]">
               <b-card>
@@ -83,6 +102,33 @@
             <div class="font-weight-bold">PFC balance</div>
           </template>
           <b-row>
+            <b-col>
+              <b-card
+                header="Overall Average"
+                border-variant="success">
+                <b-row>
+                  <b-col cols="3">
+                    <div style="font-size: 1vw">Recommend</div>
+                  </b-col>
+                  <b-col cols="9">
+                    <macro-nutrient-bar
+                      :chart-values="pfcBalanceStandard"
+                    ></macro-nutrient-bar>
+                  </b-col>
+                </b-row>
+                <b-row>
+                  <b-col cols="3">
+                    <div style="font-size: 1vw">Current</div>
+                  </b-col>
+                  <b-col cols="9">
+                    <macro-nutrient-bar
+                      v-if="averagePfcBalance"
+                      :chart-values="averagePfcBalance"
+                    ></macro-nutrient-bar>
+                  </b-col>
+                </b-row>
+              </b-card>
+            </b-col>
             <b-col cols="6" v-for="pageId in sceneCount" :key="pageId" class="my-1" v-if="showScore[pageId-1]">
               <b-card>
                 Case{{ pageId }}
@@ -125,8 +171,23 @@ export default {
     macroNutrientBar
   },
   computed: {
-    diversityStatusFiltered(){
-      return this.diversityStatus.filter((val,index)=>{
+    averagePfcBalance() {
+      const supply = this.averageNutritionSupplyGetter
+      const demand = this.averageNutritionDemandGetter
+      return [
+        {val: Math.round(supply.Pr * 4), color: 'green', label: '%'},
+        {val: Math.round(supply.Fat * 9), color: 'yellow', label: '%'},
+        {val: Math.round(supply.Carbohydrate * 4), color: 'red', label: '%'},
+        {
+          val: Math.round(demand.En
+            - supply.Carbohydrate * 4 - supply.Pr * 4 - supply.Fat * 9),
+          color: 'silver',
+          label: '$',
+        },
+      ]
+    },
+    diversityStatusFiltered() {
+      return this.diversityStatus.filter((val, index) => {
         return this.showScore[index]
       })
     },
@@ -306,6 +367,89 @@ export default {
         }
       })
     },
+    /**
+     * nutritionSupplyの平均値
+     * @returns {{Pr: number, Fat: number, En: number, Carbohydrate: number, Va: number, Wt: number, Fe: number}}
+     */
+    averageNutritionSupplyGetter() {
+      let count = 0
+      const supplySum = this.nutritionSupplyGetter.reduce((accumulator, item) => {
+        if (item.Wt > 0) {
+          count += 1
+          accumulator.En += Number(item.En)
+          accumulator.Pr += Number(item.Pr)
+          accumulator.Va += Number(item.Va)
+          accumulator.Fe += Number(item.Fe)
+          accumulator.Carbohydrate += Number(item.Carbohydrate)
+          accumulator.Fat += Number(item.Fat)
+          accumulator.Wt += Number(item.Wt)
+        }
+        return accumulator
+      }, {
+        'En': 0,
+        'Pr': 0,
+        'Va': 0,
+        'Fe': 0,
+        'Wt': 0,
+        'Carbohydrate': 0,
+        'Fat': 0
+      })
+      return {
+        'En': supplySum.En / count,
+        'Pr': supplySum.Pr / count,
+        'Va': supplySum.Va / count,
+        'Fe': supplySum.Fe / count,
+        'Wt': supplySum.Wt / count,
+        'Carbohydrate': supplySum.Carbohydrate / count,
+        'Fat': supplySum.Fat / count,
+      }
+    },
+    /**
+     * nutritionDemandGetterの平均値
+     * @returns {{Pr: number, En: number, Va: number, Wt: number, Fe: number}}
+     */
+    averageNutritionDemandGetter() {
+      let count = 0
+      const demandSum = this.nutritionDemandGetter.reduce((accumulator, item) => {
+        if (item.En > 0) {
+          count += 1
+          accumulator.En += Number(item.En ? item.En : 0)
+          accumulator.Pr += Number(item.Pr ? item.Pr : 0)
+          accumulator.Va += Number(item.Va ? item.Va : 0)
+          accumulator.Fe += Number(item.Fe ? item.Fe : 0)
+          accumulator.Wt += Number(item.Wt ? item.Wt : 0)
+        }
+        return accumulator
+      }, {
+        'En': 0,
+        'Pr': 0,
+        'Va': 0,
+        'Fe': 0,
+        'Wt': 0,
+      })
+      return {
+        'En': demandSum.En / count,
+        'Pr': demandSum.Pr / count,
+        'Va': demandSum.Va / count,
+        'Fe': demandSum.Fe / count,
+        'Wt': demandSum.Wt / count,
+      }
+    },
+    averageRatingGetter() {
+      const supply = this.averageNutritionSupplyGetter
+      const demand = this.averageNutritionDemandGetter
+      return {
+        En: demand.En ?
+          Math.round(100 * supply.En * this.driRange / demand.En) / 10 : 0,
+        Pr: demand.Pr ?
+          Math.round(100 * supply.Pr * this.driRange / demand.Pr) / 10 : 0,
+        Va: demand.Va ?
+          Math.round(100 * supply.Va * this.driRange / demand.Va) / 10 : 0,
+        Fe: demand.Fe ?
+          Math.round(100 * supply.Fe * this.driRange / demand.Fe) / 10 : 0
+      }
+    },
+
     /**
      * nutritionSupplyとnutritionDemandの値に基づいて栄養素の充足率を算出
      * @returns {*[]} 栄養素ごとの充足率
