@@ -68,46 +68,45 @@
         </b-tab>
         <b-tab title="current diet" :disabled="!myFamily">
           <b-card no-body>
-            <diet-calk-comp-eth2 v-if="myFamily.name"
+            <diet-calk-comp-eth2
+              v-if="myFamily.name"
               :my-family="myFamily"
               :my-dri="myApp.dataSet.dri"
               :my-fct="myApp.dataSet.fct"
               :my-portion="myApp.dataSet.portionUnit"
-              :page-id=0
+              :page-id="pageId1"
               :max-page=10
               :disabled-option="[1,2,3,4,5,6,7,8,9]"
-              @update:myFamily="updateMyApp"
-              @update:pageMemo="updatePageMemo"
+              @update:myFamily="updateMyFamily"
             />
           </b-card>
         </b-tab>
         <b-tab title="improved option" :disabled="!myFamily">
           <b-card no-body>
-            <diet-calk-comp-eth2 v-if="myFamily.name"
+            <diet-calk-comp-eth2
+              v-if="myFamily.name"
               :my-family="myFamily"
               :my-dri="myApp.dataSet.dri"
               :my-fct="myApp.dataSet.fct"
               :my-portion="myApp.dataSet.portionUnit"
-              :page-id.sync="pageId"
+              :page-id.sync="pageId2"
               :max-page=10
               :disabled-option="[0]"
-              @update:myFamily="updateMyApp"
-              @update:pageMemo="updatePageMemo"
+              @update:myFamily="updateMyFamily"
             />
           </b-card>
         </b-tab>
         <b-tab title="crop feasibility" :disabled="familyList.length === 0">
           <b-row>
-            <!--
-                        <feasibility-check-component-eth
-                          :my-app="$store.state.fire.myApp"
-                          :page-id.sync="pageId"
-                          :max-page=10
-                          :current-family = "familyName"
-                          @update:myApp="updateMyApp"
-                          @update:pageMemo="updatePageMemo"
-                        />
-            -->
+            <feasibility-check-component-eth
+              v-if="myFamily.name"
+              :my-app="$store.state.fire.myApp"
+              :page-id.sync="pageId3"
+              :max-page=10
+              :current-family="familyName"
+              @update:myApp="updateMyApp"
+              @update:pageMemo="updatePageMemo"
+            />
           </b-row>
         </b-tab>
       </b-tabs>
@@ -132,7 +131,9 @@ export default {
       maxPopulation: 10000,
       newTarget: [],
       newFamilyName: '',
-      pageId: 0,
+      pageId1: 0,
+      pageId2: 1,
+      pageId3: 0,
       /**
        * workFlowの何ページ目まで読み込めるかのフラグ
        */
@@ -143,8 +144,8 @@ export default {
     myApp: function () {
       return this.$store.state.fire.myApp
     },
-    myFamily(){
-      let res = this.myApp.familyCases.find((item)=> item.name === this.familyName)
+    myFamily() {
+      let res = this.myApp.familyCases.find((item) => item.name === this.familyName)
       return res ? res : {}
     },
     familyName: {
@@ -180,6 +181,7 @@ export default {
         familySize > 0
     },
     familyList() {
+      console.log(this.$store.state.fire.myApp.familyCases)
       const temp = this.$store.state.fire.myApp.familyCases
       if (!temp) {
         return []
@@ -190,11 +192,19 @@ export default {
     },
   },
   methods: {
-    updateMyApp(val) {
-      this.$store.dispatch('fire/updateMyApp', val)
+    updateMyFamily(val) {
+      let res = JSON.parse(JSON.stringify(this.$store.state.fire.myApp.familyCases))
+      res = res.map((item) => {
+        let res2 = item
+        if (item.name === val.name) {
+          res2 = val
+        }
+        return res2
+      })
+      this.$store.dispatch('fire/updateMyFamily', res)
     },
     updatePageMemo(val) {
-      this.$store.dispatch('fire/updateMyApp', val)
+      this.$store.dispatch('fire/updateMyFamily', val)
       this.$store.dispatch('fire/fireSaveAppdata')
     },
     updateFamily(name, member) {
@@ -204,14 +214,12 @@ export default {
       this.newTarget = JSON.parse(JSON.stringify(val))
     },
     addNewFamily(name, member) {
-      console.log(name)
       this.$store.dispatch('fire/addNewFamily', {
         'name': name,
         'member': member,
       })
       //現在の家族名の更新
       this.$store.dispatch('fire/updateCurrentFamilyName', name)
-      console.log(this.$store.state.fire.myApp)
 
       //変数のクリア
       this.newFamilyName = ''

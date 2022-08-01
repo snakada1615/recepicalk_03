@@ -111,6 +111,7 @@ export default {
   watch: {
     items: {
       immediate: true,
+      deep: true,
       handler(value) {
         if (value.length === 0) {
           this.nutritionSum = {

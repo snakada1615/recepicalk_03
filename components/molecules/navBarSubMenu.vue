@@ -147,6 +147,7 @@ export default {
       return this.$store.state.fire.isLoggedIn
     },
     userInfo() {
+      console.log(this.$store.state.fire)
       return Object.entries(this.$store.state.fire.myApp.user).filter(([key]) => {
         return (
           ['displayName', 'country',

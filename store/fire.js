@@ -268,6 +268,16 @@ export const mutations = {
     state.myApp = JSON.parse(JSON.stringify(payload))
   },
   /**
+   * familyCasesを更新
+   * @param state
+   * @param payload
+   */
+  updateMyFamily: function (state, payload) {
+    //const index = state.myApp.familyCases.findIndex((item)=> item.name === payload.name)
+    //state.myApp.familyCases.splice(index, state.myApp.familyCases.length, JSON.parse(JSON.stringify(payload)))
+    state.myApp.familyCases = JSON.parse(JSON.stringify(payload))
+  },
+  /**
    * ユーザー情報をpayloadで与えられた内容で更新する
    * @param state
    * @param payload
@@ -1201,6 +1211,17 @@ export const actions = {
    */
   updateMyApp({commit, dispatch}, payload) {
     commit('updateMyApp', payload)
+    //myAppの変更時は、常に setHasDocumentChanged=true をセット
+    dispatch('setHasDocumentChanged', true)
+  },
+  /**
+   * familyCasesを更新
+   * @param commit
+   * @param dispatch
+   * @param payload
+   */
+  updateMyFamily: function ({commit, dispatch}, payload) {
+    commit('updateMyFamily', payload)
     //myAppの変更時は、常に setHasDocumentChanged=true をセット
     dispatch('setHasDocumentChanged', true)
   },

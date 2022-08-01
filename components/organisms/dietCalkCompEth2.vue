@@ -40,8 +40,8 @@
             v-for="(grp, index) in foodGroup"
             class="border my-1 px-1"
             :class="{
-                'bg-warning': !diversityStatus[index][grp],
-                'bg-success': diversityStatus[index][grp]
+                'bg-warning': !diversityStatus[pageIdComputed][index][grp],
+                'bg-success': diversityStatus[pageIdComputed][index][grp]
               }"
           >
             {{ grp }}
@@ -133,7 +133,7 @@
             <div class="font-weight-bold">Record of Diet</div>
           </template>
           <recepi-table
-            :items.sync="myFamilyWatcher.menuCases[pageIdComputed].menu"
+            :items="myFamilyWatcher.menuCases[pageIdComputed].menu"
             @itemDeleted="notifiRecepiEdit"
             @rowClick="notifiRecepiEdit"
           ></recepi-table>
@@ -146,7 +146,7 @@
       :items="myFct"
       :menu-cases.sync="myFamilyWatcher.menuCases[pageIdComputed].menu"
       :portion-units="myPortion"
-      @update:menuCases="updateSupply"
+      @update:menuCases="updateSupply($event, pageIdComputed)"
     ></fctTableModal2>
   </b-container>
 </template>
@@ -460,11 +460,11 @@ export default {
      */
     diversityStatus() {
       const vm = this
-      let res = vm.foodGroup.map((groupTemp) => {
-        return {[groupTemp]: false}
-      })
       if (vm.myFamilyWatcher.menuCases !== []) {
         return vm.myFamilyWatcher.menuCases.map((foodsTemp) => {
+          let res = vm.foodGroup.map((groupTemp) => {
+            return {[groupTemp]: false}
+          })
           foodsTemp.menu.forEach((dat1) => {
             const indexTemp = vm.foodGroup.indexOf(dat1.Group)
             if (indexTemp >= 0) {
@@ -598,18 +598,20 @@ export default {
       return menu.reduce((accumulator, item) => {
         let myPr = item.Pr ? item.Pr : 0
         let myFe = item.Fe ? item.Fe : 0
+        let myFat = item.Fat ? item.Fat : 0
 
         // 食品群がstapleであった場合、Pr、Fe の値を無視
         if (Number(item.food_grp_id) === 1) {
           myPr = 0
           myFe = 0
+          myFat = 0
         }
         accumulator.En += Number(item.En ? item.En : 0) * Number(item.Wt) / 100
         accumulator.Pr += Number(myPr) * Number(item.Wt) / 100
         accumulator.Va += Number(item.Va ? item.Va : 0) * Number(item.Wt) / 100
         accumulator.Fe += Number(myFe) * Number(item.Wt) / 100
         accumulator.Carbohydrate += Number(item.Carbohydrate ? item.Carbohydrate : 0) * Number(item.Wt) / 100
-        accumulator.Fat += Number(item.Fat ? item.Fat : 0) * Number(item.Wt) / 100
+        accumulator.Fat += Number(myFat) * Number(item.Wt) / 100
         accumulator.Wt += Number(item.Wt)
         return accumulator
       }, initObj)
@@ -666,18 +668,16 @@ export default {
         })
       }
       return res
-    }
-    ,
-    /**
-     * ユーザーによりmenuCasesが変更された際に、myApp全体を更新してemit
+    },
+     /** ユーザーによりmenuCasesが変更された際に、myApp全体を更新してemit
      * @param val
+     * @param index
      */
-    updateSupply(val) {
-      const vm = this
+    updateSupply(val, index) {
       //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(vm.myFamilyWatcher))
+      let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
       //更新されたmenuを入れ替える
-      dat.menuCases[vm.pageIdComputed].menu = JSON.parse(JSON.stringify(val))
+      dat.menuCases[index].menu = val
       //更新されたmyAppをemit
       this.$emit('update:myFamily', dat)
     },
