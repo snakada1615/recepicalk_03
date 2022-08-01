@@ -176,6 +176,21 @@ export function validateMyApp(dat) {
   return isObject(dat) && res
 }
 
+export function validateMyFamily(dat) {
+  //myFamilyの型設計
+  const typeName = [
+    'name', 'member', 'menuCases', 'feasibilityCases',
+  ]
+  let res = true
+  const myError = validateObject(dat, typeName)
+  if (myError.length > 0) {
+    console.log(myError)
+    res = false
+  }
+
+  return isObject(dat) && res
+}
+
 /**
  * FCTのバリデーション
  * @param dat 検証するFCT

@@ -133,7 +133,7 @@
             <div class="font-weight-bold">Record of Diet</div>
           </template>
           <recepi-table
-            :items.sync="currentMenu"
+            :items.sync="myFamilyWatcher.menuCases[pageIdComputed].menu"
             @itemDeleted="notifiRecepiEdit"
             @rowClick="notifiRecepiEdit"
           ></recepi-table>
@@ -143,9 +143,9 @@
     <fctTableModal2
       my-name="fctModal2"
       :show-modal.sync="showFct"
-      :items="myAppWatcher.dataSet.fct"
-      :menu-cases.sync="currentMenu"
-      :portion-units="myAppWatcher.dataSet.portionUnit"
+      :items="myFct"
+      :menu-cases.sync="myFamilyWatcher.menuCases[pageIdComputed].menu"
+      :portion-units="myPortion"
       @update:menuCases="updateSupply"
     ></fctTableModal2>
   </b-container>
@@ -156,8 +156,8 @@ import driSelectModal from "@/components/organisms/driSelectModal";
 import recepiTable from "@/components/molecules/recepiTable"
 import nutritionBar2 from "@/components/molecules/nutritionBar2"
 import macroNutrientBar from "@/components/molecules/macroNutrientBar";
-import {validateMyApp} from "@/plugins/helper";
 import fctTableModal2 from "@/components/organisms/FctTableModal2";
+import {validateMyFamily} from "../../plugins/helper";
 
 /**
  * @desc 6つのコンポーネントを組み合わせて食事評価
@@ -186,13 +186,9 @@ export default {
     return {
       /**
        * 使用する全変数のobject
-       * myAppから読み込んでこのページで利用。更新された時にemitを返す
+       * myFamilyから読み込んでこのページで利用。更新された時にemitを返す
        */
-      myAppWatcher: {},
-      /**
-       * 現在のcurrentFamilyに対応したmenuCases
-       */
-      currentMenu: [],
+      myFamilyWatcher: {},
       /**
        * menuテーブルから計算される栄養供給量の合計値
        * menuCases[].menuから読み込んでこのページで利用。参照専用
@@ -365,19 +361,24 @@ export default {
     }
   },
   props: {
-    /**
-     * データ本体。myAppWatcherで読み込んでページ内で利用
-     */
-    myApp: {
+    myFamily: {
       type: Object,
+      required: true,
       validator: function (value) {
-        return validateMyApp(value)
+        return validateMyFamily(value)
       },
-      required: true,
     },
-    currentFamily: {
-      type: String,
-      required: true,
+    myDri: {
+      type: Array,
+      required: true
+    },
+    myFct: {
+      type: Array,
+      required: true
+    },
+    myPortion: {
+      type: Array,
+      required: true
     },
     /**
      * 複数インスタンスを作成する場合のindex
@@ -446,7 +447,7 @@ export default {
      * @returns {*}
      */
     foodGroup() {
-      return this.myApp.dataSet.fct.reduce((accumulator, dat) => {
+      return this.myFct.reduce((accumulator, dat) => {
         if (accumulator.indexOf(dat.Group) < 0) {
           accumulator.push(dat.Group)
         }
@@ -459,16 +460,11 @@ export default {
      */
     diversityStatus() {
       const vm = this
-      const familyCase = vm.myAppWatcher.familyCases.find((item) => item.name === vm.currentFamily)
-      if (!familyCase || (familyCase.menuCases === [])) {
-        return vm.foodGroup.map((groupTemp) => {
-          return {[groupTemp]: false}
-        })
-      } else {
-        return familyCase.menuCases.map((foodsTemp) => {
-          let res = vm.foodGroup.map((groupTemp) => {
-            return {[groupTemp]: false}
-          })
+      let res = vm.foodGroup.map((groupTemp) => {
+        return {[groupTemp]: false}
+      })
+      if (vm.myFamilyWatcher.menuCases !== []) {
+        return vm.myFamilyWatcher.menuCases.map((foodsTemp) => {
           foodsTemp.menu.forEach((dat1) => {
             const indexTemp = vm.foodGroup.indexOf(dat1.Group)
             if (indexTemp >= 0) {
@@ -477,6 +473,8 @@ export default {
           })
           return res
         })
+      } else {
+        return res
       }
     },
     /**
@@ -484,7 +482,6 @@ export default {
      * @returns {boolean}
      */
     noteInputState() {
-      console.log('noteinput:' + this.pageMemo + typeof this.pageMemo)
       if (this.pageMemo.length === 0) {
         return false
       }
@@ -495,30 +492,24 @@ export default {
     /**
      * myApp Property(オブジェクト)の変更を検知してコンポーネントに反映させる
      */
-    myApp: {
+    myFamily: {
       deep: true,
       handler(newVal) {
         const vm = this
-        this.myAppWatcher = JSON.parse(JSON.stringify(newVal))
-        const family = vm.myAppWatcher.familyCases.find((item) => item.name === vm.currentFamily)
-        this.nutritionDemandWatcher = JSON.parse(JSON.stringify(this.nutritionDemandGetter(
-          family.member,
-          this.myApp.dataSet.dri,
-          this.maxPage
+        vm.myFamilyWatcher = JSON.parse(JSON.stringify(newVal))
+        this.nutritionDemandWatcher = JSON.parse(JSON.stringify(vm.nutritionDemandGetter(
+          vm.myFamily.member,
+          vm.myDri,
+          vm.maxPage
         )))
-        this.nutritionSupplyWatcher = JSON.parse(JSON.stringify(this.nutritionSupplyGetter(
-          family ? family.menuCases : [])))
-        this.rating = JSON.parse(JSON.stringify(this.ratingGetter(
-          this.nutritionSupplyWatcher, this.nutritionDemandWatcher)))
-        this.currentMenu = JSON.parse(JSON.stringify(vm.getMenu(vm.currentFamily)))
-        if (family) {
-          this.pageMemo = family.map((item2) => {
-            return item2.note
-          })
-        } else {
-          this.pageMemo = []
-        }
-        this.updatePfc()
+        vm.nutritionSupplyWatcher = JSON.parse(JSON.stringify(vm.nutritionSupplyGetter(
+          vm.myFamily.menuCases)))
+        vm.rating = JSON.parse(JSON.stringify(vm.ratingGetter(
+          vm.nutritionSupplyWatcher, vm.nutritionDemandWatcher)))
+        vm.pageMemo = vm.myFamily.menuCases.map((item2) => {
+          return item2.note
+        })
+        vm.updatePfc()
       }
     },
   },
@@ -527,44 +518,33 @@ export default {
    */
   created() {
     const vm = this
-    this.myAppWatcher = JSON.parse(JSON.stringify(this.myApp))
-    const family = vm.myAppWatcher.familyCases.find((item) => item.name === vm.currentFamily)
-    this.nutritionDemandWatcher = JSON.parse(JSON.stringify(this.nutritionDemandGetter(
-      family ? family.member : [],
-      this.myApp.dataSet.dri,
-      this.maxPage
+    vm.myFamilyWatcher = JSON.parse(JSON.stringify(vm.myFamily))
+    this.nutritionDemandWatcher = JSON.parse(JSON.stringify(vm.nutritionDemandGetter(
+      vm.myFamily.member,
+      vm.myDri,
+      vm.maxPage
     )))
-    this.nutritionSupplyWatcher = JSON.parse(JSON.stringify(this.nutritionSupplyGetter(
-      family ? family.menuCases : [])))
-    this.rating = JSON.parse(JSON.stringify(this.ratingGetter(
-      this.nutritionSupplyWatcher, this.nutritionDemandWatcher)))
-    this.currentMenu = JSON.parse(JSON.stringify(vm.getMenu(vm.currentFamily)))
-    if (family) {
-      this.pageMemo = family.map((item2) => {
-        return item2.note
-      })
-    } else {
-      this.pageMemo = []
-    }
-
-    this.updatePfc()
+    vm.nutritionSupplyWatcher = JSON.parse(JSON.stringify(vm.nutritionSupplyGetter(
+      vm.myFamily.menuCases)))
+    vm.rating = JSON.parse(JSON.stringify(vm.ratingGetter(
+      vm.nutritionSupplyWatcher, vm.nutritionDemandWatcher)))
+    vm.pageMemo = vm.myFamily.menuCases.map((item2) => {
+      return item2.note
+    })
+    vm.updatePfc()
   },
   methods: {
-    getMenu(currentFamily) {
-      const family = this.myAppWatcher.familyCases.find((item) => item.name === currentFamily)
-      return family ? family.menuCases : []
-    },
     /**
      * ページメモの更新：
      * @param newVal
      */
     updatePageMemo(newVal) {
       //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(this.myAppWatcher))
+      let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
       //更新されたmenuを入れ替える
       dat.menuCases[this.pageIdComputed].note = newVal
       //更新されたmyAppをemit
-      this.$emit('update:myApp', dat)
+      this.$emit('update:myFamily', dat)
     },
     /**
      * 年齢グループごとの構成員数と各グループの栄養需要から合計を計算
@@ -695,11 +675,11 @@ export default {
     updateSupply(val) {
       const vm = this
       //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(vm.myAppWatcher))
+      let dat = JSON.parse(JSON.stringify(vm.myFamilyWatcher))
       //更新されたmenuを入れ替える
       dat.menuCases[vm.pageIdComputed].menu = JSON.parse(JSON.stringify(val))
       //更新されたmyAppをemit
-      this.$emit('update:myApp', dat)
+      this.$emit('update:myFamily', dat)
     },
     /**
      * ユーザーによりtergetが変更された際に、栄養素必要量合計を再計算してemit
@@ -708,11 +688,11 @@ export default {
     updateDemand(val) {
       const vm = this
       //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(vm.myAppWatcher))
+      let dat = JSON.parse(JSON.stringify(vm.myFamilyWatcher))
       //更新されたtargetを入れ替える
-      dat.menuCases[vm.pageIdComputed].target = JSON.parse(JSON.stringify(val))
+      dat.member = JSON.parse(JSON.stringify(val))
       //更新されたmyAppをemit
-      this.$emit('update:myApp', dat)
+      this.$emit('update:myFamily', dat)
     }
     ,
     /**
@@ -766,7 +746,7 @@ export default {
       //menuを更新する
       let existing = false
       let newMenu = []
-      newMenu = vm.myAppWatcher.menuCases[vm.pageIdComputed].menu.map((item) => {
+      newMenu = vm.myFamilyWatcher.menuCases[vm.pageIdComputed].menu.map((item) => {
         if (item.id === val.id && item.menuName === val.menuName) {
           existing = true
           return JSON.parse(JSON.stringify(val))
@@ -778,11 +758,11 @@ export default {
         newMenu.push(val)
       }
       //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(vm.myAppWatcher))
+      let dat = JSON.parse(JSON.stringify(vm.myFamilyWatcher))
       //更新されたmenuを入れ替える
       dat.menuCases[vm.pageIdComputed].menu = newMenu
       //更新されたmyAppをemit
-      this.$emit('update:myApp', dat)
+      this.$emit('update:myFamily', dat)
     }
     ,
     /**
@@ -791,11 +771,11 @@ export default {
      */
     deleteSupply(val) {
       //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(this.myAppWatcher))
+      let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
       //更新されたmenuを入れ替える
       dat.menuCases[this.pageIdComputed].menu = val
       //更新されたmyAppをemit
-      this.$emit('update:myApp', dat)
+      this.$emit('update:myFamily', dat)
     }
     ,
     //fctとdriの表示調整

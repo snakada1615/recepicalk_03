@@ -390,7 +390,7 @@ export const mutations = {
    * @param payload
    */
   updateCurrentFamilyName: function (state, payload) {
-    state.myApp.currentFamily = JSON.parse(JSON.stringify(payload))
+    state.myApp.currentFamily = payload
   },
   /**
    * feasibilityCaseのメモを更新
@@ -447,12 +447,15 @@ export const actions = {
    */
   addNewFamily({state, dispatch}, payload) {
     let currentFamily = JSON.parse(JSON.stringify(state.myApp.familyCases))
+    //食事リストの初期値設定
     let arr = []
     for (let i = 0; i < state.myApp.sceneCount; i++) {
       const note = ''
       const menu = []
       arr.push({menu: menu, note: note})
     }
+
+    //feasibilityリストの初期値設定
     let arr2 = []
     for (let i = 0; i < state.myApp.sceneCount; i++) {
       const selectedCrop = []
@@ -467,6 +470,7 @@ export const actions = {
       'feasibilityCases': arr2
     })
     dispatch('updateFamilyCases', currentFamily)
+    dispatch('updateCurrentFamilyName', currentFamily.name)
     dispatch('setHasDocumentChanged', true)
     //await dispatch('fireSaveAppdata')
   },

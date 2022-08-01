@@ -40,7 +40,7 @@
             <b-col cols="8">
               <b-input-group size="sm" class="mb-2">
                 <template #prepend>
-                  <b-input-group-text >
+                  <b-input-group-text>
                     select family
                   </b-input-group-text>
                 </template>
@@ -52,7 +52,7 @@
                   <b-button
                     @click="removeFamily(familyName)"
                   >
-                    <b-icon icon="trash" />
+                    <b-icon icon="trash"/>
                   </b-button>
                 </template>
               </b-input-group>
@@ -66,42 +66,48 @@
             </b-col>
           </b-row>
         </b-tab>
-        <b-tab title="current diet" :disabled="familyList.length === 0">
+        <b-tab title="current diet" :disabled="!myFamily">
           <b-card no-body>
-            <diet-calk-comp-eth
-              :my-app="myApp"
+            <diet-calk-comp-eth2 v-if="myFamily.name"
+              :my-family="myFamily"
+              :my-dri="myApp.dataSet.dri"
+              :my-fct="myApp.dataSet.fct"
+              :my-portion="myApp.dataSet.portionUnit"
               :page-id=0
               :max-page=10
-              :current-family="familyName"
               :disabled-option="[1,2,3,4,5,6,7,8,9]"
-              @update:myApp="updateMyApp"
+              @update:myFamily="updateMyApp"
               @update:pageMemo="updatePageMemo"
             />
           </b-card>
         </b-tab>
-        <b-tab title="improved option" :disabled="familyList.length === 0">
+        <b-tab title="improved option" :disabled="!myFamily">
           <b-card no-body>
-            <diet-calk-comp-eth
-              :my-app="myApp"
+            <diet-calk-comp-eth2 v-if="myFamily.name"
+              :my-family="myFamily"
+              :my-dri="myApp.dataSet.dri"
+              :my-fct="myApp.dataSet.fct"
+              :my-portion="myApp.dataSet.portionUnit"
               :page-id.sync="pageId"
               :max-page=10
-              :current-family="familyName"
               :disabled-option="[0]"
-              @update:myApp="updateMyApp"
+              @update:myFamily="updateMyApp"
               @update:pageMemo="updatePageMemo"
             />
           </b-card>
         </b-tab>
         <b-tab title="crop feasibility" :disabled="familyList.length === 0">
           <b-row>
-            <feasibility-check-component-eth
-              :my-app="$store.state.fire.myApp"
-              :page-id.sync="pageId"
-              :max-page=10
-              :current-family = "familyName"
-              @update:myApp="updateMyApp"
-              @update:pageMemo="updatePageMemo"
-            />
+            <!--
+                        <feasibility-check-component-eth
+                          :my-app="$store.state.fire.myApp"
+                          :page-id.sync="pageId"
+                          :max-page=10
+                          :current-family = "familyName"
+                          @update:myApp="updateMyApp"
+                          @update:pageMemo="updatePageMemo"
+                        />
+            -->
           </b-row>
         </b-tab>
       </b-tabs>
@@ -110,13 +116,13 @@
 </template>
 <script>
 import driSelectMulti from "../components/molecules/driSelectMulti";
-import dietCalkCompEth from "../components/organisms/dietCalkCompEth";
+import dietCalkCompEth2 from "../components/organisms/dietCalkCompEth2";
 import feasibilityCheckComponentEth from "../components/organisms/feasibilityCheckComponentEth";
 
 export default {
   components: {
     driSelectMulti,
-    dietCalkCompEth,
+    dietCalkCompEth2,
     feasibilityCheckComponentEth
   },
   data() {
@@ -127,15 +133,23 @@ export default {
       newTarget: [],
       newFamilyName: '',
       pageId: 0,
+      /**
+       * workFlowの何ページ目まで読み込めるかのフラグ
+       */
+      workFlowStatus: 0,
     }
   },
   computed: {
-    myApp:function(){
+    myApp: function () {
       return this.$store.state.fire.myApp
+    },
+    myFamily(){
+      let res = this.myApp.familyCases.find((item)=> item.name === this.familyName)
+      return res ? res : {}
     },
     familyName: {
       get() {
-        return this.$store.state.fire.myApp.currentFamily ? this.$store.state.fire.myApp.currentFamily: ''
+        return this.$store.state.fire.myApp.currentFamily ? this.$store.state.fire.myApp.currentFamily : ''
       },
       set(newVal) {
         this.$store.dispatch('fire/updateCurrentFamilyName', newVal)
@@ -183,23 +197,28 @@ export default {
       this.$store.dispatch('fire/updateMyApp', val)
       this.$store.dispatch('fire/fireSaveAppdata')
     },
-    updateFamily(name, structure) {
-      this.$store.dispatch('fire/updateFamilyCase', {name: name, member: structure})
+    updateFamily(name, member) {
+      this.$store.dispatch('fire/updateFamilyCase', {name: name, member: member})
     },
     updateNewFamily(val) {
       this.newTarget = JSON.parse(JSON.stringify(val))
     },
     addNewFamily(name, member) {
+      console.log(name)
       this.$store.dispatch('fire/addNewFamily', {
         'name': name,
         'member': member,
       })
+      //現在の家族名の更新
+      this.$store.dispatch('fire/updateCurrentFamilyName', name)
+      console.log(this.$store.state.fire.myApp)
+
+      //変数のクリア
       this.newFamilyName = ''
       this.newTarget = []
-      this.$store.dispatch('fire/updateCurrentFamilyName', name)
     },
-    removeFamily(val){
-      if (this.familyList.length === 1){
+    removeFamily(val) {
+      if (this.familyList.length === 1) {
         alert('you cannot delete last item')
         return
       }

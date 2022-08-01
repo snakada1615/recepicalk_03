@@ -219,7 +219,7 @@ export default {
       const querySnapshot = await getDocs(collection(firestoreDb, myCollection));
       this.myList.length = 0
       querySnapshot.forEach((doc) => {
-        this.myList.push(doc.id)
+        this.myList.push(doc.id + ': ' + doc.data().user.displayName)
       });
     }
   }
