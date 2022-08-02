@@ -56,7 +56,7 @@
           </template>
           <b-row>
             <b-col class="text-center">Crop name:</b-col>
-            <b-col class="text-info">{{ cropName[pageIdComputed] }}</b-col>
+            <b-col class="text-info">{{ currentCrop }}</b-col>
           </b-row>
           <b-row>
             <b-col cols="6" class="text-center">total score:</b-col>
@@ -108,6 +108,30 @@
 
           <!--    質問番号が0の場合に以下の項目を表示      -->
           <div v-show="index===0" class="mb-2">
+            <div class="font-weight-bold">
+              Target commodity: <span
+              class="text-danger">{{ currentCrop }}</span>
+            </div>
+            <div class="font-weight-bold">
+              Target nutrient: <span
+              class="text-danger">{{ keyNutrient }}</span>
+            </div>
+            <div class="font-weight-bold">
+              Daily Target:
+              <span class="text-danger">
+                {{
+                  setDigit(myFamilyWatcher.feasibilityCases[pageIdComputed].selectedCrop[0].Wt, 2)
+                }}
+              </span>
+            </div>
+            <div class="font-weight-bold mb-2">
+              Annual Target:
+              <span class="text-danger">
+                {{
+                  setDigit(myFamilyWatcher.feasibilityCases[pageIdComputed].selectedCrop[0].Wt * 365, 2)
+                }}
+              </span>
+            </div>
             <b-card class="px-0 mx-0">
               <b-row class="mt-0 bg-success mb-3">
                 <b-col cols="3" class="text-center mr-2 font-weight-bold">Nutrition</b-col>
@@ -124,13 +148,15 @@
             </b-card>
             <b-row align-h="end" class="mt-2">
               <b-col cols="6">
-                <b-input-group size="sm" prepend="intake" append="g per day">
+                <b-input-group
+                  prepend="sufficiency rate"
+                  append="%"
+                  size="sm">
                   <b-form-input
-                    :disabled="!cropName[pageIdComputed]"
-                    v-model="portionSize"
+                    v-model="share"
                     type="number"
-                    class="text-right"
-                    @update="onPortionSizeChanged"
+                    size="sm"
+                    @update="updateShare"
                   ></b-form-input>
                 </b-input-group>
               </b-col>
@@ -187,6 +213,51 @@ export default {
   },
   methods: {
     /**
+     * 栄養必要量、栄養供給量から必要な作物位の生産量を計算する
+     * @param nutrientsDemand
+     * @param nutrientsSupply
+     * @param keyNutrient
+     * @param share
+     * @returns {number|number}
+     */
+    setQuantity(nutrientsDemand, nutrientsSupply, keyNutrient, share) {
+      const rep1 = nutrientsDemand[keyNutrient] ? nutrientsDemand[keyNutrient] : 0
+      const rep2 = nutrientsSupply ? nutrientsSupply[keyNutrient] : 0
+      return rep2 ? Math.round((rep1 * 100 / rep2) * share / 100) : 0
+    },
+    /**
+     * 数字の桁数を３桁に自動調整し、単位を追記して返す
+     * @param val
+     * @param unitKey
+     * @returns {string}
+     */
+    setDigit(val, unitKey) {
+      let res
+      const units = [
+        {1: ' KC', 2: ' MC', 3: ' GC'},   // for dietary energy
+        {1: ' g', 2: ' kg', 3: ' t'},    // for protein
+        {1: ' µg', 2: ' mg', 3: ' g'},    // for vit-A
+        {1: ' mg', 2: ' g', 3: ' kt'},    // for iron
+      ]
+      const item = Number(val)
+      switch (true) {
+        case (item < 1000):
+          res = String(Math.round(item)) + units[unitKey - 1]["1"]
+          break;
+        case (item >= 1000 && item < 1000000):
+          res = String(Math.round(item / 1000)) + units[unitKey - 1]["2"]
+          break;
+        case (item >= 1000000):
+          res = String(Math.round(item / 1000000)) + units[unitKey - 1]["3"]
+          break;
+        default:
+          console.log('parameter not valid:setDigit')
+          res = ''
+          break;
+      }
+      return res
+    },
+    /**
      * ansListをmyFamilyから読み込んでwatch
      * @returns {any[]}
      */
@@ -199,8 +270,8 @@ export default {
      * targetCropをmyFamilyから読み込んでwatch
      * @returns {any[]}
      */
-    updateTargetCrop() {
-      return this.myFamilyWatcher.feasibilityCases.map(function (item) {
+    updateTargetCrop(myFamily) {
+      return myFamily.feasibilityCases.map(function (item) {
         return JSON.parse(JSON.stringify(item.selectedCrop))
       })
     },
@@ -208,9 +279,9 @@ export default {
      * targetGroupをmyFamilyから読み込んでwatch
      * @returns {any[]}
      */
-    updateTargetGroup() {
-      const res = JSON.parse(JSON.stringify(this.myFamilyWatcher.member))
-      return [...Array(this.maxPage)].map(() => res)
+    updateTargetGroup(member, maxPage) {
+      const res = JSON.parse(JSON.stringify(member))
+      return [...Array(maxPage)].map(() => res)
     },
     /**
      * targetGroupの更新に伴い栄養摂取目標を更新
@@ -321,10 +392,10 @@ export default {
       this.$emit('update:myFamily', dat)
     },
     /**
-     * portionSizeの更新をmyFamilyに組み込んでemitで通知
+     * shareの更新をmyFamilyに組み込んでemitで通知
      * @param val
      */
-    onPortionSizeChanged(val) {
+    onshareChanged(val) {
       //作業用のmyFamilyコピー作成w
       let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
       //更新されたfeasibilityCasesを入れ替える
@@ -332,6 +403,32 @@ export default {
       dat.feasibilityCases[this.pageIdComputed].selectedCrop[0].Wt = val
       //更新されたmyFamilyをemit
       this.$emit('update:myFamily', dat)
+    },
+    /**
+     * 栄養素充足目標（share）の更新：
+     * @param newVal
+     */
+    updateShare(newVal) {
+      console.log('updateNutrientTarget')
+      //作業用のmyFamilyコピー作成w
+      let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
+
+      //nutrientTargetを更新して入れ替える
+      const nutrientTarget = dat.keyNutrient
+      const vm = this
+      const Wt = vm.setQuantity(
+        vm.nutritionDemand[vm.pageIdComputed],
+        vm.myAppWatcher.prodTargetCases[vm.pageIdComputed].prodTarget[0],
+        nutrientTarget,
+        newVal
+      )
+
+      dat.prodTargetCases[vm.pageIdComputed].prodTarget[0].share = newVal
+      dat.prodTargetCases[vm.pageIdComputed].prodTarget[0].Wt = Wt
+      dat.prodTargetCases[vm.pageIdComputed].prodTarget[0].Wt365 = Wt * 365
+
+      //更新されたmyAppをemit
+      this.$emit('update:myApp', dat)
     },
     /**
      * cropの選択の変更をmyFamilyに組み込んでemitで通知
@@ -345,7 +442,7 @@ export default {
       res.Pr = Number(value.Pr) || 0
       res.Va = Number(value.Va) || 0
       res.Fe = Number(value.Fe) || 0
-      res.Wt = this.portionSize
+      res.Wt = this.share
 
       //作業用のmyFamilyコピー作成
       let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
@@ -366,6 +463,9 @@ export default {
       //更新されたmyFamilyをemit
       this.$emit('update:myFamily', res)
     },
+    /**
+     * fctダイアログのトリガー
+     */
     showDialogue() {
       this.showFct = !this.showFct
     },
@@ -413,8 +513,8 @@ export default {
         vm.ansId = vm.updateAnsId()
         vm.items = JSON.parse(JSON.stringify(vm.myFct))
         vm.itemsDRI = JSON.parse(JSON.stringify(vm.myDri))
-        vm.targetCrop = vm.updateTargetCrop()
-        vm.targetGroup = vm.updateTargetGroup()
+        vm.targetCrop = vm.updateTargetCrop(vm.myFamilyWatcher)
+        vm.targetGroup = vm.updateTargetGroup(vm.myFamilyWatcher.member, vm.maxPage)
         vm.nutritionDemand = vm.updateNutritionDemand(vm.targetGroup, vm.itemsDRI)
         vm.nutritionSum = vm.updateNutritionSupply(vm.targetCrop)
         vm.cropName = vm.targetCrop.map(function (item) {
@@ -455,8 +555,8 @@ export default {
     vm.ansId = vm.updateAnsId()
     vm.items = JSON.parse(JSON.stringify(vm.myFct))
     vm.itemsDRI = JSON.parse(JSON.stringify(vm.myDri))
-    vm.targetCrop = vm.updateTargetCrop()
-    vm.targetGroup = vm.updateTargetGroup()
+    vm.targetCrop = vm.updateTargetCrop(vm.myFamilyWatcher)
+    vm.targetGroup = vm.updateTargetGroup(vm.myFamilyWatcher.member, vm.maxPage)
     vm.nutritionDemand = vm.updateNutritionDemand(vm.targetGroup, vm.itemsDRI)
     vm.nutritionSum = vm.updateNutritionSupply(vm.targetCrop)
     vm.cropName = vm.targetCrop.map(function (item) {
@@ -471,6 +571,9 @@ export default {
     })
   },
   computed: {
+    currentCrop(){
+      return this.cropName[this.pageIdComputed]
+    },
     /**
      * QAリストのカテゴリ数
      * @returns {*}
@@ -572,9 +675,9 @@ export default {
        */
       showFct: false,
       /**
-       * 選択された食品の重量（portion size)
+       * 選択された栄養素の充足率（share)
        */
-      portionSize: 100,
+      share: 100,
       /**
        * qaListのデータ構造
        */
@@ -657,6 +760,10 @@ export default {
      * 現在の家族名
      */
     currentFamily: {
+      type: String,
+      required: true
+    },
+    keyNutrient: {
       type: String,
       required: true
     }

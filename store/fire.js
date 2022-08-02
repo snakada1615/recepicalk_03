@@ -471,11 +471,13 @@ export const actions = {
       const selectedCrop = []
       const note = ''
       const ansList = [-99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99]
-      arr2.push({selectedCrop: selectedCrop, note: note, ansList: ansList})
+      const prodTarget = {'share': 100, 'Wt': 0, 'Wt365': 0}
+      arr2.push({selectedCrop: selectedCrop, note: note, ansList: ansList, prodTarget: prodTarget})
     }
     currentFamily.push({
       'name': payload.name,
       'member': payload.member,
+      'keyNutrient': '',
       'menuCases': arr,
       'feasibilityCases': arr2
     })

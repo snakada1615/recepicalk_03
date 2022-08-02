@@ -81,6 +81,32 @@
             />
           </b-card>
         </b-tab>
+
+        <b-tab title="priority commodity" :disabled="!myFamily">
+          <b-card no-body>
+            <b-form-group
+              label="Select key nutrient for your target family/HH"
+              v-if="myFamily.name"
+              class="ml-2"
+            >
+              <b-form-radio-group
+                v-model="selectedNutrient"
+                :options="keyNutrients"
+                button-variant="outline-primary"
+                buttons
+                stacked
+                class="ml-4"
+              ></b-form-radio-group>
+            </b-form-group>
+          </b-card>
+          <b-card
+            no-body
+            class="my-2"
+          >
+            test
+          </b-card>
+        </b-tab>
+
         <b-tab title="improved option" :disabled="!myFamily">
           <b-card no-body>
             <diet-calk-comp-eth
@@ -97,9 +123,17 @@
           </b-card>
         </b-tab>
         <b-tab title="crop feasibility" :disabled="familyList.length === 0">
+          <div class=" mb-2">
+            identified nutrient gap:
+            <span
+              class="text-danger font-weight-bold"
+            >
+              {{selectedNutrient}}
+            </span>
+          </div>
           <b-row>
             <feasibility-check-component-eth
-              v-if="myFamily.name"
+              v-if="myFamily.name && selectedNutrient"
               :my-family="myFamily"
               :my-dri="myApp.dataSet.dri"
               :my-fct="myApp.dataSet.fct"
@@ -107,6 +141,7 @@
               :page-id.sync="pageId3"
               :max-page=10
               :current-family="familyName"
+              :key-nutrient="selectedNutrient"
               @update:myFamily="updateMyFamily"
               @update:pageMemo="updatePageMemo"
             />
@@ -141,9 +176,26 @@ export default {
        * workFlowの何ページ目まで読み込めるかのフラグ
        */
       workFlowStatus: 0,
+      keyNutrients: [
+        'Energy',
+        'Protein',
+        'Vitamin A',
+        'Iron'
+      ],
     }
   },
   computed: {
+    selectedNutrient:{
+      get(){
+        return this.myFamily.keyNutrient
+      },
+      set(val){
+        const vm = this
+        let res = JSON.parse(JSON.stringify(vm.myFamily))
+        res.keyNutrient = val
+        vm.updateMyFamily(res)
+      }
+    },
     myApp: function () {
       return this.$store.state.fire.myApp
     },
@@ -184,7 +236,6 @@ export default {
         familySize > 0
     },
     familyList() {
-      console.log(this.$store.state.fire.myApp.familyCases)
       const temp = this.$store.state.fire.myApp.familyCases
       if (!temp) {
         return []
