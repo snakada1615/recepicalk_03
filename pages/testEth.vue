@@ -68,7 +68,7 @@
         </b-tab>
         <b-tab title="current diet" :disabled="!myFamily">
           <b-card no-body>
-            <diet-calk-comp-eth2
+            <diet-calk-comp-eth
               v-if="myFamily.name"
               :my-family="myFamily"
               :my-dri="myApp.dataSet.dri"
@@ -83,7 +83,7 @@
         </b-tab>
         <b-tab title="improved option" :disabled="!myFamily">
           <b-card no-body>
-            <diet-calk-comp-eth2
+            <diet-calk-comp-eth
               v-if="myFamily.name"
               :my-family="myFamily"
               :my-dri="myApp.dataSet.dri"
@@ -118,13 +118,13 @@
 </template>
 <script>
 import driSelectMulti from "../components/molecules/driSelectMulti";
-import dietCalkCompEth2 from "../components/organisms/dietCalkCompEth";
+import dietCalkCompEth from "../components/organisms/dietCalkCompEth";
 import feasibilityCheckComponentEth from "../components/organisms/feasibilityCheckComponentEth";
 
 export default {
   components: {
     driSelectMulti,
-    dietCalkCompEth2,
+    dietCalkCompEth,
     feasibilityCheckComponentEth
   },
   data() {

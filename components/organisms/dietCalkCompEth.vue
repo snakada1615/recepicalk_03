@@ -97,7 +97,11 @@
             </b-col>
             <b-col cols="7">
               <macro-nutrient-bar
-                :chart-values="pfcBalanceStandard[pageIdComputed]"
+                :chart-values="[
+                  {val: 35, color: 'green', label: '%'},
+                  {val: 10, color: 'yellow', label: '%'},
+                  {val: 55, color: 'red', label: '%'},
+                ]"
               ></macro-nutrient-bar>
             </b-col>
           </b-row>
@@ -133,7 +137,7 @@
             <div class="font-weight-bold">Record of Diet</div>
           </template>
           <recepi-table
-            :items="myFamilyWatcher.menuCases[pageIdComputed].menu"
+            :items="currentMenu"
             @itemDeleted="notifiRecepiEdit"
             @rowClick="notifiRecepiEdit"
           ></recepi-table>
@@ -144,7 +148,7 @@
       my-name="fctModal2"
       :show-modal.sync="showFct"
       :items="myFct"
-      :menu-cases.sync="myFamilyWatcher.menuCases[pageIdComputed].menu"
+      :menu-cases.sync="currentMenu"
       :portion-units="myPortion"
       @update:menuCases="updateSupply($event, pageIdComputed)"
     ></fctTableModal2>
@@ -413,6 +417,9 @@ export default {
     }
   },
   computed: {
+    currentMenu(){
+      return this.myFamilyWatcher.menuCases[this.pageIdComputed].menu
+    },
     /**
      * ratingを計算するにあたって、同一メニューを一日3回食べると仮定した場合の評価、
      *     (recepiTableの値×3)、または1回分が一日の栄養素に与える影響の評価を
@@ -500,7 +507,7 @@ export default {
   },
   watch: {
     /**
-     * myApp Property(オブジェクト)の変更を検知してコンポーネントに反映させる
+     * myFamily Property(オブジェクト)の変更を検知してコンポーネントに反映させる
      */
     myFamily: {
       deep: true,
@@ -520,7 +527,6 @@ export default {
           return item2.note
         })
         vm.updatePfc()
-        console.log(vm.pfcBalanceCurrent[0])
       }
     },
   },

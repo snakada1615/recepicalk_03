@@ -121,6 +121,7 @@ export default {
             Fe: 0,
             Wt: 0,
           }
+          this.itemWeighted.splice(0, this.itemWeighted.length)
         } else {
           this.itemWeighted = this.updateItemWeight(value)
           this.nutritionSum = {...this.updateSum(this.itemWeighted)}
