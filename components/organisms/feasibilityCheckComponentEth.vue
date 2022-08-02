@@ -126,6 +126,7 @@
               <b-col cols="6">
                 <b-input-group size="sm" prepend="intake" append="g per day">
                   <b-form-input
+                    :disabled="!cropName[pageIdComputed]"
                     v-model="portionSize"
                     type="number"
                     class="text-right"
@@ -327,6 +328,7 @@ export default {
       //作業用のmyFamilyコピー作成w
       let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
       //更新されたfeasibilityCasesを入れ替える
+      console.log(dat.feasibilityCases[this.pageIdComputed])
       dat.feasibilityCases[this.pageIdComputed].selectedCrop[0].Wt = val
       //更新されたmyFamilyをemit
       this.$emit('update:myFamily', dat)
@@ -497,7 +499,7 @@ export default {
     pageOptions() {
       let res = []
       for (let i = 0; i < this.maxPage; i++) {
-        res.push({value: i, text: 'page:' + i})
+        res.push({value: i, text: 'page:' + i + ': ' + this.pageMemo[i]})
       }
       return res
     },
@@ -633,7 +635,7 @@ export default {
       type: Array,
       required: true
     },
-    myQuestions:{
+    myQuestions: {
       type: Array,
       required: true
     },
@@ -654,7 +656,7 @@ export default {
     /**
      * 現在の家族名
      */
-    currentFamily:{
+    currentFamily: {
       type: String,
       required: true
     }
