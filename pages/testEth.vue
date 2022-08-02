@@ -100,11 +100,14 @@
           <b-row>
             <feasibility-check-component-eth
               v-if="myFamily.name"
-              :my-app="$store.state.fire.myApp"
+              :my-family="myFamily"
+              :my-dri="myApp.dataSet.dri"
+              :my-fct="myApp.dataSet.fct"
+              :my-questions="myApp.dataSet.questions"
               :page-id.sync="pageId3"
               :max-page=10
               :current-family="familyName"
-              @update:myApp="updateMyApp"
+              @update:myFamily="updateMyFamily"
               @update:pageMemo="updatePageMemo"
             />
           </b-row>
@@ -115,7 +118,7 @@
 </template>
 <script>
 import driSelectMulti from "../components/molecules/driSelectMulti";
-import dietCalkCompEth2 from "../components/organisms/dietCalkCompEth2";
+import dietCalkCompEth2 from "../components/organisms/dietCalkCompEth";
 import feasibilityCheckComponentEth from "../components/organisms/feasibilityCheckComponentEth";
 
 export default {

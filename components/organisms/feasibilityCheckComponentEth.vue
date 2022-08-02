@@ -168,7 +168,8 @@
 import FctTableModal from "@/components/organisms/FctTableModal.vue";
 import nutritionBar from "@/components/molecules/nutritionBar";
 import driSelectMulti from "@/components/molecules/driSelectMulti";
-import {getNutritionDemand, getNutritionSupply, validateMyApp} from "@/plugins/helper";
+import {getNutritionDemand, getNutritionSupply} from "@/plugins/helper";
+import {validateMyFamily} from "../../plugins/helper";
 
 /**
  * @desc 3つのコンポーネントを組み合わせて特定の品目のfeasibility scoreを算出する
@@ -184,39 +185,30 @@ export default {
     driSelectMulti
   },
   methods: {
-    myFeasibilityCases(val){
-      return this.myApp.familyCases.find((item)=> item.name === val).feasibilityCases
-    },
-    myTargetGroup(val){
-      return this.myApp.familyCases.find((item)=> item.name === val).member
-    },
-    onNoteChange(val) {
-      console.log(val)
-    },
     /**
-     * ansListをmyAppから読み込んでwatch
+     * ansListをmyFamilyから読み込んでwatch
      * @returns {any[]}
      */
     updateAnsList() {
-      return this.myFeasibilityCases(this.currentFamily).map(function (item) {
+      return this.myFamilyWatcher.feasibilityCases.map(function (item) {
         return JSON.parse(JSON.stringify(item.ansList))
       })
     },
     /**
-     * targetCropをmyAppから読み込んでwatch
+     * targetCropをmyFamilyから読み込んでwatch
      * @returns {any[]}
      */
     updateTargetCrop() {
-      return this.myFeasibilityCases(this.currentFamily).map(function (item) {
+      return this.myFamilyWatcher.feasibilityCases.map(function (item) {
         return JSON.parse(JSON.stringify(item.selectedCrop))
       })
     },
     /**
-     * targetGroupをmyAppから読み込んでwatch
+     * targetGroupをmyFamilyから読み込んでwatch
      * @returns {any[]}
      */
     updateTargetGroup() {
-      const res = JSON.parse(JSON.stringify(this.myTargetGroup(this.currentFamily)))
+      const res = JSON.parse(JSON.stringify(this.myFamilyWatcher.member))
       return [...Array(this.maxPage)].map(() => res)
     },
     /**
@@ -229,13 +221,13 @@ export default {
       //this.$emit('changeNutrition', res)
     },
     /**
-     * ansListをmyAppから読み込んでscoreに変換
+     * ansListをmyFamilyから読み込んでscoreに変換
      * @returns {*[]}
      */
     updateScore() {
       let res = []
       const vm = this
-      vm.myFeasibilityCases(vm.currentFamily).forEach(function (val) {
+      vm.myFamily.feasibilityCases.forEach(function (val) {
         res.push(vm.summarizeQA(vm.ansId, val.ansList))
       })
       return res
@@ -320,27 +312,27 @@ export default {
      * @param newVal
      */
     updatePageMemo(newVal) {
-      //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(this.myAppWatcher))
+      //作業用のmyFamilyコピー作成
+      let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
       //更新されたmenuを入れ替える
-      dat.familyCases().find((item)=> item.name === val).feasibilityCases[this.pageIdComputed].note = newVal
-      //更新されたmyAppをemit
-      this.$emit('update:myApp', dat)
+      dat.feasibilityCases[this.pageIdComputed].note = newVal
+      //更新されたmyFamilyをemit
+      this.$emit('update:myFamily', dat)
     },
     /**
-     * portionSizeの更新をmyAppに組み込んでemitで通知
+     * portionSizeの更新をmyFamilyに組み込んでemitで通知
      * @param val
      */
     onPortionSizeChanged(val) {
-      //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(this.myAppWatcher))
+      //作業用のmyFamilyコピー作成w
+      let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
       //更新されたfeasibilityCasesを入れ替える
-      dat.familyCases().find((item)=> item.name === val).feasibilityCases[this.pageIdComputed].selectedCrop[0].Wt = val
-      //更新されたmyAppをemit
-      this.$emit('update:myApp', dat)
+      dat.feasibilityCases[this.pageIdComputed].selectedCrop[0].Wt = val
+      //更新されたmyFamilyをemit
+      this.$emit('update:myFamily', dat)
     },
     /**
-     * cropの選択の変更をmyAppに組み込んでemitで通知
+     * cropの選択の変更をmyFamilyに組み込んでemitで通知
      * @param value
      */
     onItemSelected(value) {
@@ -353,24 +345,24 @@ export default {
       res.Fe = Number(value.Fe) || 0
       res.Wt = this.portionSize
 
-      //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(this.myAppWatcher))
+      //作業用のmyFamilyコピー作成
+      let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
       //更新されたmenuを入れ替える
-      dat.familyCases().find((item)=> item.name === val).feasibilityCases[this.pageIdComputed].selectedCrop[0] = res
-      //更新されたmyAppをemit
-      this.$emit('update:myApp', dat)
+      dat.feasibilityCases[this.pageIdComputed].selectedCrop[0] = res
+      //更新されたmmyFamilyをemit
+      this.$emit('update:myFamily', dat)
     },
     /**
-     * Ansの更新をmyAppに組み込んでemitで通知
+     * Ansの更新をmyFamilyに組み込んでemitで通知
      * @param dat
      */
     onAnsChanged(dat) {
-      //作業用のmyAppコピー作成
-      let res = JSON.parse(JSON.stringify(this.myAppWatcher))
+      //作業用のmyFamilyコピー作成
+      let res = JSON.parse(JSON.stringify(this.myFamilyWatcher))
       //更新されたmenuを入れ替える
-      res.familyCases().find((item)=> item.name === val).feasibilityCases[this.pageIdComputed].ansList.splice(dat.id - 1, 1, dat.val)
-      //更新されたmyAppをemit
-      this.$emit('update:myApp', res)
+      res.feasibilityCases[this.pageIdComputed].ansList.splice(dat.id - 1, 1, dat.val)
+      //更新されたmyFamilyをemit
+      this.$emit('update:myFamily', res)
     },
     showDialogue() {
       this.showFct = !this.showFct
@@ -409,16 +401,16 @@ export default {
     },
   },
   watch: {
-    myApp: {
+    myFamily: {
       deep: true,
       immediate: true,
-      handler() {
+      handler(newVal) {
         const vm = this
-        vm.myAppWatcher = JSON.parse(JSON.stringify(vm.myApp))
+        vm.myFamilyWatcher = JSON.parse(JSON.stringify(newVal))
         vm.ansListWatcher = vm.updateAnsList()
         vm.ansId = vm.updateAnsId()
-        vm.items = JSON.parse(JSON.stringify(vm.myApp.dataSet.fct))
-        vm.itemsDRI = JSON.parse(JSON.stringify(vm.myApp.dataSet.dri))
+        vm.items = JSON.parse(JSON.stringify(vm.myFct))
+        vm.itemsDRI = JSON.parse(JSON.stringify(vm.myDri))
         vm.targetCrop = vm.updateTargetCrop()
         vm.targetGroup = vm.updateTargetGroup()
         vm.nutritionDemand = vm.updateNutritionDemand(vm.targetGroup, vm.itemsDRI)
@@ -430,17 +422,17 @@ export default {
           return vm.updateNutritionRating(demand, vm.nutritionSum[index])
         })
         vm.qaScore = vm.updateScore()
-        this.pageMemo = vm.myFeasibilityCases(vm.currentFamily).map((item2) => {
+        this.pageMemo = vm.myFamily.feasibilityCases.map((item2) => {
           return item2.note
         })
       }
     }
   },
   created() {
-    //表示用にmyApp.questionsの構造を変形
+    //表示用にmyFamily.questionsの構造を変形
     const vm = this
     let res = JSON.parse(JSON.stringify(vm.qaListDataFrame))
-    vm.myApp.dataSet.questions.forEach((item) => {
+    vm.myQuestions.forEach((item) => {
       const index = res.findIndex(item2 => item2.categoryText === item.categoryText)
       if (index >= 0) {
         const itemsQATemp = {
@@ -456,11 +448,11 @@ export default {
     vm.qaList = res
 
     //各種変数の初期化
-    vm.myAppWatcher = JSON.parse(JSON.stringify(vm.myApp))
+    vm.myFamilyWatcher = JSON.parse(JSON.stringify(vm.myFamily))
     vm.ansListWatcher = vm.updateAnsList()
     vm.ansId = vm.updateAnsId()
-    vm.items = JSON.parse(JSON.stringify(vm.myApp.dataSet.fct))
-    vm.itemsDRI = JSON.parse(JSON.stringify(vm.myApp.dataSet.dri))
+    vm.items = JSON.parse(JSON.stringify(vm.myFct))
+    vm.itemsDRI = JSON.parse(JSON.stringify(vm.myDri))
     vm.targetCrop = vm.updateTargetCrop()
     vm.targetGroup = vm.updateTargetGroup()
     vm.nutritionDemand = vm.updateNutritionDemand(vm.targetGroup, vm.itemsDRI)
@@ -472,7 +464,7 @@ export default {
       return vm.updateNutritionRating(demand, vm.nutritionSum[index])
     })
     vm.qaScore = vm.updateScore()
-    this.pageMemo = vm.myFeasibilityCases(vm.currentFamily).map((item2) => {
+    this.pageMemo = vm.myFamilyWatcher.feasibilityCases.map((item2) => {
       return item2.note
     })
   },
@@ -521,9 +513,9 @@ export default {
     return {
       /**
        * 使用する全変数のobject
-       * myAppから読み込んでこのページで利用。更新された時にemitを返す
+       * myFamilyから読み込んでこのページで利用。更新された時にemitを返す
        */
-      myAppWatcher: {},
+      myFamilyWatcher: {},
       /**
        * (カテゴリ、質問ID)の一蘭
        * @returns {*[]}
@@ -624,14 +616,26 @@ export default {
   },
   props: {
     /**
-     * データ本体。myAppWatcherで読み込んでページ内で利用
+     * データ本体。myFamilyWatcherで読み込んでページ内で利用
      */
-    myApp: {
+    myFamily: {
       type: Object,
       validator: function (value) {
-        return validateMyApp(value)
+        return validateMyFamily(value)
       },
       required: true,
+    },
+    myDri: {
+      type: Array,
+      required: true
+    },
+    myFct: {
+      type: Array,
+      required: true
+    },
+    myQuestions:{
+      type: Array,
+      required: true
     },
     /**
      * 現在のページ番号
