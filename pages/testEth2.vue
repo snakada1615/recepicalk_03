@@ -25,7 +25,6 @@
               </b-input-group>
               <div class="small text-muted mb-2">you have to give unique family name</div>
               <hr>
-              {{$store.state.fire.myApp.currentFamily}}
               <dri-select-multi
                 :driItems="dri"
                 :target="newTarget"
@@ -48,7 +47,6 @@
                 <b-form-select
                   v-model="familyName"
                   :options="familyList"
-                  @change="changeFamily"
                 ></b-form-select>
                 <template #append>
                   <b-button
@@ -68,7 +66,7 @@
             </b-col>
           </b-row>
         </b-tab>
-        <b-tab title="current diet" :disabled="!stateDiet">
+        <b-tab title="current diet" :disabled="!myFamily">
           <b-card no-body>
             <diet-calk-comp-eth
               v-if="myFamily.name"
@@ -84,7 +82,7 @@
           </b-card>
         </b-tab>
 
-        <b-tab title="priority commodity" :disabled="!statePriotiry">
+        <b-tab title="priority commodity" :disabled="!myFamily || (myFamily.menuCases[0].menu.length === 0)">
           <b-card
             style="min-width: 530px;"
             header-bg-variant="success"
@@ -143,7 +141,7 @@
             <span
               class="text-danger font-weight-bold"
             >
-              {{ selectedNutrient }}
+              {{selectedNutrient}}
             </span>
           </div>
           <div class=" mb-2 ml-3">
@@ -151,7 +149,7 @@
             <span
               class="text-danger font-weight-bold"
             >
-              {{ selectedCropList[pageId3]}}
+              {{selectedCropList[pageId3]}}
             </span>
           </div>
           <b-row>
@@ -197,12 +195,12 @@
                   </div>
                 </template>
                 <b-row>
-                  <b-col cols="6">Crop name:</b-col>
+                  <b-col cols="6" >Crop name:</b-col>
                   <b-col cols="6" class="text-info">{{ selectedCropList[pageId - 1] }}</b-col>
                 </b-row>
                 <b-row>
                   <b-col cols="6">total score:</b-col>
-                  <b-col cols="6">
+                  <b-col cols="6" >
                     {{ qaScore[pageId - 1][qaScore[pageId - 1].length - 1].value }} /
                     {{ 10 * qaList.length }}
                   </b-col>
@@ -272,7 +270,6 @@ export default {
        * workFlowの何ページ目まで読み込めるかのフラグ
        */
       workFlowStatus: 0,
-      familyName: '',
       keyNutrients: [
         {text: 'Energy', value: 'En'},
         {text: 'Protein', value: 'Pr'},
@@ -532,40 +529,16 @@ export default {
       })
       return res
     },
-    stateDiet(){
-      const vm = this
-      console.log(vm.familyName)
-      if (!vm.familyName){
-        return false
-      }
-      return (vm.familyName.length > 3)
-    },
-    statePriotiry() {
-      const vm = this
-      let res = false
-      if (vm.myFamily) {
-        if (vm.myFamily.menuCases){
-          if (vm.myFamily.menuCases.length > 0) {
-            if (vm.myFamily.menuCases[0].menu.length > 0) {
-              res = true
-            }
-          }
-        }
-      }
-      return res
-    },
-    stateSummary() {
+    stateSummary(){
 
     },
-    stateFeasibilityCheck() {
+    stateFeasibilityCheck(){
       let res = false
-      if (this.myFamily.feasibilityCases){
-        this.myFamily.feasibilityCases.forEach((item) => {
-          if (item.selectedCrop.length > 0) {
-            res = true
-          }
-        })
-      }
+      this.myFamily.feasibilityCases.forEach((item)=>{
+        if (item.selectedCrop.length > 0) {
+          res = true
+        }
+      })
       if (this.familyList.length === 0) {
         res = false
       }
@@ -574,11 +547,11 @@ export default {
       }
       return res
     },
-    selectedNutrient: {
-      get() {
+    selectedNutrient:{
+      get(){
         return this.myFamily.keyNutrient
       },
-      set(val) {
+      set(val){
         const vm = this
         let res = JSON.parse(JSON.stringify(vm.myFamily))
         res.keyNutrient = val
@@ -589,31 +562,22 @@ export default {
       return this.$store.state.fire.myApp
     },
     myFamily() {
-      const vm = this
-      let res = vm.myApp.familyCases.find((item) => item.name === vm.myApp.currentFamily)
+      let res = this.myApp.familyCases.find((item) => item.name === this.familyName)
       return res ? res : {}
     },
-    selectedCropList() {
-      console.log(this.myFamily)
-      console.log(this.myFamily.feasibilityCases)
-      if (!this.myFamily.feasibilityCases){
-        return []
-      }
-      return this.myFamily.feasibilityCases.map((item) => {
-        return item.selectedCrop[0] ? item.selectedCrop[0].Name : ''
+    selectedCropList(){
+      return this.myFamily.feasibilityCases.map((item)=> {
+        return item.selectedCrop[0] ? item.selectedCrop[0].Name: ''
       })
     },
-/*
     familyName: {
       get() {
-        console.log(this.$store.state.fire.myApp.currentFamily)
-        return this.myApp.currentFamily ? this.myApp.currentFamily : ''
+        return this.$store.state.fire.myApp.currentFamily ? this.$store.state.fire.myApp.currentFamily : ''
       },
       set(newVal) {
         this.$store.dispatch('fire/updateCurrentFamilyName', newVal)
       }
     },
-*/
     currentTarget() {
       const temp = this.$store.state.fire.myApp.familyCases
       if (!temp) {
@@ -651,9 +615,6 @@ export default {
       })
     },
   },
-  created() {
-    this.familyName = this.$store.state.fire.myApp.currentFamily
-  },
   methods: {
     /**
      * cropの選択の変更をmyFamilyに組み込んでemitで通知
@@ -675,20 +636,20 @@ export default {
       let dat = JSON.parse(JSON.stringify(this.myFamily))
 
       //selectedCropを更新
-      dat.feasibilityCases[index - 1].selectedCrop[0] = res
+      dat.feasibilityCases[index-1].selectedCrop[0] = res
 
       //生産目標を計算
       const demand = getNutritionDemand(dat.member, this.dri)
-      const supply = getNutritionSupply(dat.feasibilityCases[index - 1].selectedCrop)
+      const supply = getNutritionSupply(dat.feasibilityCases[index-1].selectedCrop)
       const Wt = getProductionTarget(demand, supply, dat.keyNutrient, 100)
 
       //prodTargetを更新
-      dat.feasibilityCases[index - 1].prodTarget.share = 100
-      dat.feasibilityCases[index - 1].prodTarget.Wt = Wt
-      dat.feasibilityCases[index - 1].prodTarget.Wt365 = Wt * 365
+      dat.feasibilityCases[index-1].prodTarget.share = 100
+      dat.feasibilityCases[index-1].prodTarget.Wt = Wt
+      dat.feasibilityCases[index-1].prodTarget.Wt365 = Wt * 365
 
       //selectedCrop[0]を更新
-      dat.feasibilityCases[index - 1].selectedCrop[0].Wt = Wt
+      dat.feasibilityCases[index-1].selectedCrop[0].Wt = Wt
 
       //myFamilyを更新
       await this.updateMyFamily(dat)
@@ -721,16 +682,13 @@ export default {
     updateNewFamily(val) {
       this.newTarget = JSON.parse(JSON.stringify(val))
     },
-    async addNewFamily(name, member) {
-      console.log(' start')
-      await this.$store.dispatch('fire/addNewFamily', {
+    addNewFamily(name, member) {
+      this.$store.dispatch('fire/addNewFamily', {
         'name': name,
         'member': member,
       })
-
-      this.familyName = name
       //現在の家族名の更新
-      await this.$store.dispatch('fire/updateCurrentFamilyName', name)
+      this.$store.dispatch('fire/updateCurrentFamilyName', name)
 
       //変数のクリア
       this.newFamilyName = ''
@@ -777,9 +735,6 @@ export default {
       })
       return res2
     },
-    changeFamily(val){
-      this.$store.dispatch('fire/updateCurrentFamilyName', val)
-    }
   }
 }
 </script>

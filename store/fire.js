@@ -392,7 +392,9 @@ export const mutations = {
    * @param payload
    */
   updateFamilyCases: function (state, payload) {
+    console.log('updateFamilyCases')
     state.myApp.familyCases = JSON.parse(JSON.stringify(payload))
+    console.log(state.myApp.familyCases)
   },
   /**
    * 現在対象になっている家族名の更新
@@ -400,6 +402,7 @@ export const mutations = {
    * @param payload
    */
   updateCurrentFamilyName: function (state, payload) {
+    console.log('updateCurrentFamilyName')
     state.myApp.currentFamily = payload
   },
   /**
@@ -455,8 +458,10 @@ export const actions = {
    * @param dispatch
    * @param payload
    */
-  addNewFamily({state, dispatch}, payload) {
+  async addNewFamily({state, dispatch}, payload) {
+    console.log('addNewFamily')
     let currentFamily = JSON.parse(JSON.stringify(state.myApp.familyCases))
+
     //食事リストの初期値設定
     let arr = []
     for (let i = 0; i < state.myApp.sceneCount; i++) {
@@ -474,7 +479,6 @@ export const actions = {
       const prodTarget = {'share': 100, 'Wt': 0, 'Wt365': 0}
       arr2.push({selectedCrop: selectedCrop, note: note, ansList: ansList, prodTarget: prodTarget})
     }
-    console.log(arr2)
     currentFamily.push({
       'name': payload.name,
       'member': payload.member,
@@ -482,9 +486,10 @@ export const actions = {
       'menuCases': arr,
       'feasibilityCases': arr2
     })
-    dispatch('updateFamilyCases', currentFamily)
-    dispatch('updateCurrentFamilyName', currentFamily.name)
-    dispatch('setHasDocumentChanged', true)
+    console.log(currentFamily)
+    await dispatch('updateCurrentFamilyName', currentFamily[0].name)
+    await dispatch('updateFamilyCases', currentFamily)
+    await dispatch('setHasDocumentChanged', true)
     //await dispatch('fireSaveAppdata')
   },
   removeFamily({state, dispatch}, payload) {
