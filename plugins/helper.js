@@ -300,3 +300,40 @@ export function getNutritionSupply(datArray) {
     return accumulator
   }, {})
 }
+
+/**
+ * 栄養必要量、栄養供給量, 目標充足率から必要な作物位の生産量を計算する
+ * @param nutrientsDemand
+ * @param nutrientsSupply
+ * @param keyNutrient
+ * @param share
+ * @returns {number|number}
+ */
+export function getProductionTarget(nutrientsDemand, nutrientsSupply, keyNutrient, share) {
+  const rep1 = nutrientsDemand[keyNutrient] ? nutrientsDemand[keyNutrient] : 0
+  const rep2 = nutrientsSupply ? nutrientsSupply[keyNutrient] : 0
+  return rep2 ? Math.round((rep1 * 100 / rep2) * share / 100) : 0
+}
+
+/**
+ * targetグループから栄養摂取目標を計算
+ * @param targetGroup
+ * @param dri
+ * @returns {*}
+ */
+export function getNutritionDemandList(targetGroup, dri) {
+  return targetGroup.map(function (target) {
+    return getNutritionDemand(target, dri)
+  })
+}
+
+/**
+ * 選択された作物から栄養供給量を計算
+ * @param crops
+ * @returns {*}
+ */
+export function getNutritionSupplyList(crops) {
+  return crops.map((cropList) => {
+    return getNutritionSupply(cropList)
+  })
+}

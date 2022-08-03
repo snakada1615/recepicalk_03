@@ -474,6 +474,7 @@ export const actions = {
       const prodTarget = {'share': 100, 'Wt': 0, 'Wt365': 0}
       arr2.push({selectedCrop: selectedCrop, note: note, ansList: ansList, prodTarget: prodTarget})
     }
+    console.log(arr2)
     currentFamily.push({
       'name': payload.name,
       'member': payload.member,

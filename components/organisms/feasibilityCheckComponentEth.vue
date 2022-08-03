@@ -20,7 +20,9 @@
     <!--  作物の選択パネル -->
     <b-row>
       <b-col class="px-0 mx-0">
+        <!--    このパネルは表示しない（一応残してるだけ）      -->
         <b-card
+          v-if="false"
           style="min-width: 530px;"
           header-bg-variant="success"
           bg-variant="light"
@@ -35,8 +37,8 @@
             </b-col>
             <b-col
               cols="7" class="border"
-              :class="{'border-dark':cropName[pageIdComputed], 'border-danger':!cropName[pageIdComputed]}">
-              <div class="font-weight-bold text-info">{{ cropName[pageIdComputed] }}</div>
+              :class="{'border-dark':currentCrop, 'border-danger':!currentCrop}">
+              <div class="font-weight-bold text-info">{{ currentCrop }}</div>
             </b-col>
             <b-col cols="3">
               <b-button @click="showDialogue" size="sm" variant="info">select crop</b-button>
@@ -120,7 +122,7 @@
               Daily Target:
               <span class="text-danger">
                 {{
-                  setDigit(myFamilyWatcher.feasibilityCases[pageIdComputed].selectedCrop[0].Wt, 2)
+                  setDigit(currentFeasibility.prodTarget.Wt, 2)
                 }}
               </span>
             </div>
@@ -128,7 +130,7 @@
               Annual Target:
               <span class="text-danger">
                 {{
-                  setDigit(myFamilyWatcher.feasibilityCases[pageIdComputed].selectedCrop[0].Wt * 365, 2)
+                  setDigit(currentFeasibility.prodTarget.Wt365, 2)
                 }}
               </span>
             </div>
@@ -153,10 +155,11 @@
                   append="%"
                   size="sm">
                   <b-form-input
+                    :disabled="!currentCrop"
                     v-model="share"
                     type="number"
                     size="sm"
-                    @update="updateShare"
+                    @update="updateShare($event, pageIdComputed)"
                   ></b-form-input>
                 </b-input-group>
               </b-col>
@@ -195,8 +198,8 @@
 import FctTableModal from "@/components/organisms/FctTableModal.vue";
 import nutritionBar from "@/components/molecules/nutritionBar";
 import driSelectMulti from "@/components/molecules/driSelectMulti";
-import {getNutritionDemand, getNutritionSupply} from "@/plugins/helper";
-import {validateMyFamily} from "../../plugins/helper";
+import {getNutritionDemandList, getNutritionSupplyList, getProductionTarget} from "@/plugins/helper";
+import {validateMyFamily} from "@/plugins/helper";
 
 /**
  * @desc 3つのコンポーネントを組み合わせて特定の品目のfeasibility scoreを算出する
@@ -212,19 +215,6 @@ export default {
     driSelectMulti
   },
   methods: {
-    /**
-     * 栄養必要量、栄養供給量から必要な作物位の生産量を計算する
-     * @param nutrientsDemand
-     * @param nutrientsSupply
-     * @param keyNutrient
-     * @param share
-     * @returns {number|number}
-     */
-    setQuantity(nutrientsDemand, nutrientsSupply, keyNutrient, share) {
-      const rep1 = nutrientsDemand[keyNutrient] ? nutrientsDemand[keyNutrient] : 0
-      const rep2 = nutrientsSupply ? nutrientsSupply[keyNutrient] : 0
-      return rep2 ? Math.round((rep1 * 100 / rep2) * share / 100) : 0
-    },
     /**
      * 数字の桁数を３桁に自動調整し、単位を追記して返す
      * @param val
@@ -284,15 +274,6 @@ export default {
       return [...Array(maxPage)].map(() => res)
     },
     /**
-     * targetGroupの更新に伴い栄養摂取目標を更新
-     * @param val
-     */
-    updateNutrition(val) {
-      this.nutritionDemand = JSON.parse(JSON.stringify(val.total))
-      //this.$emit('changeNutritionValue', this.nutritionDemand)
-      //this.$emit('changeNutrition', res)
-    },
-    /**
      * ansListをmyFamilyから読み込んでscoreに変換
      * @returns {*[]}
      */
@@ -320,27 +301,6 @@ export default {
         })
       })
       return res
-    },
-    /**
-     * 選択された作物から栄養供給量を計算
-     * @param crops
-     * @returns {*}
-     */
-    updateNutritionSupply(crops) {
-      return crops.map((cropList) => {
-        return getNutritionSupply(cropList)
-      })
-    },
-    /**
-     * targetグループから栄養摂取目標を計算
-     * @param targetGroup
-     * @param dri
-     * @returns {*}
-     */
-    updateNutritionDemand(targetGroup, dri) {
-      return targetGroup.map(function (target) {
-        return getNutritionDemand(target, dri)
-      })
     },
     /**
      * 栄養摂取目標と栄養供給量から栄養スコアを計算
@@ -393,48 +353,46 @@ export default {
     },
     /**
      * shareの更新をmyFamilyに組み込んでemitで通知
-     * @param val
-     */
-    onshareChanged(val) {
-      //作業用のmyFamilyコピー作成w
-      let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
-      //更新されたfeasibilityCasesを入れ替える
-      console.log(dat.feasibilityCases[this.pageIdComputed])
-      dat.feasibilityCases[this.pageIdComputed].selectedCrop[0].Wt = val
-      //更新されたmyFamilyをemit
-      this.$emit('update:myFamily', dat)
-    },
-    /**
      * 栄養素充足目標（share）の更新：
      * @param newVal
+     * @param index
      */
-    updateShare(newVal) {
+    updateShare(newVal, index) {
       console.log('updateNutrientTarget')
       //作業用のmyFamilyコピー作成w
       let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
 
+      //作物が未選択の場合、何もしない
+      if (dat.feasibilityCases[index].selectedCrop.length === 0){
+        return
+      }
+
       //nutrientTargetを更新して入れ替える
       const nutrientTarget = dat.keyNutrient
       const vm = this
-      const Wt = vm.setQuantity(
-        vm.nutritionDemand[vm.pageIdComputed],
-        vm.myAppWatcher.prodTargetCases[vm.pageIdComputed].prodTarget[0],
+      const Wt = getProductionTarget(
+        vm.nutritionDemand[index],
+        vm.nutritionSupply[index],
         nutrientTarget,
         newVal
       )
 
-      dat.prodTargetCases[vm.pageIdComputed].prodTarget[0].share = newVal
-      dat.prodTargetCases[vm.pageIdComputed].prodTarget[0].Wt = Wt
-      dat.prodTargetCases[vm.pageIdComputed].prodTarget[0].Wt365 = Wt * 365
+      //prodTargetを更新
+      dat.feasibilityCases[index].prodTarget.share = newVal
+      dat.feasibilityCases[index].prodTarget.Wt = Wt
+      dat.feasibilityCases[index].prodTarget.Wt365 = Wt * 365
+
+      //selectedCrop[0]を更新
+      dat.feasibilityCases[index].selectedCrop[0].Wt = Wt
 
       //更新されたmyAppをemit
-      this.$emit('update:myApp', dat)
+      this.$emit('update:myFamily', dat)
     },
     /**
      * cropの選択の変更をmyFamilyに組み込んでemitで通知
      * @param value
      */
-    onItemSelected(value) {
+    async onItemSelected(value) {
       let res = {}
       res.Name = value.Name || 0
       res.id = value.id || 0
@@ -442,14 +400,18 @@ export default {
       res.Pr = Number(value.Pr) || 0
       res.Va = Number(value.Va) || 0
       res.Fe = Number(value.Fe) || 0
-      res.Wt = this.share
+      //暫定的に100gにセット
+      res.Wt = 100
 
       //作業用のmyFamilyコピー作成
       let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
-      //更新されたmenuを入れ替える
+      //更新されたfeasibilityCasesを入れ替える
       dat.feasibilityCases[this.pageIdComputed].selectedCrop[0] = res
       //更新されたmmyFamilyをemit
-      this.$emit('update:myFamily', dat)
+      await this.$emit('update:myFamily', dat)
+      //更新されたfeasibilityCaseに基づいて充足率100%で必要合計料を更新
+      this.share = 100
+      this.updateShare(this.share, this.pageIdComputed)
     },
     /**
      * Ansの更新をmyFamilyに組み込んでemitで通知
@@ -515,18 +477,19 @@ export default {
         vm.itemsDRI = JSON.parse(JSON.stringify(vm.myDri))
         vm.targetCrop = vm.updateTargetCrop(vm.myFamilyWatcher)
         vm.targetGroup = vm.updateTargetGroup(vm.myFamilyWatcher.member, vm.maxPage)
-        vm.nutritionDemand = vm.updateNutritionDemand(vm.targetGroup, vm.itemsDRI)
-        vm.nutritionSum = vm.updateNutritionSupply(vm.targetCrop)
+        vm.nutritionDemand = getNutritionDemandList(vm.targetGroup, vm.itemsDRI)
+        vm.nutritionSupply = getNutritionSupplyList(vm.targetCrop)
         vm.cropName = vm.targetCrop.map(function (item) {
           return item.length > 0 ? item[0].Name : ''
         })
         vm.nutritionRatingSet = vm.nutritionDemand.map(function (demand, index) {
-          return vm.updateNutritionRating(demand, vm.nutritionSum[index])
+          return vm.updateNutritionRating(demand, vm.nutritionSupply[index])
         })
         vm.qaScore = vm.updateScore()
         this.pageMemo = vm.myFamily.feasibilityCases.map((item2) => {
           return item2.note
         })
+        //vm.updateShare(vm.currentFeasibility.prodTarget.share)
       }
     }
   },
@@ -557,20 +520,29 @@ export default {
     vm.itemsDRI = JSON.parse(JSON.stringify(vm.myDri))
     vm.targetCrop = vm.updateTargetCrop(vm.myFamilyWatcher)
     vm.targetGroup = vm.updateTargetGroup(vm.myFamilyWatcher.member, vm.maxPage)
-    vm.nutritionDemand = vm.updateNutritionDemand(vm.targetGroup, vm.itemsDRI)
-    vm.nutritionSum = vm.updateNutritionSupply(vm.targetCrop)
+    vm.nutritionDemand = getNutritionDemandList(vm.targetGroup, vm.itemsDRI)
+    vm.nutritionSupply = getNutritionSupplyList(vm.targetCrop)
     vm.cropName = vm.targetCrop.map(function (item) {
       return item.length > 0 ? item[0].Name : ''
     })
     vm.nutritionRatingSet = vm.nutritionDemand.map(function (demand, index) {
-      return vm.updateNutritionRating(demand, vm.nutritionSum[index])
+      return vm.updateNutritionRating(demand, vm.nutritionSupply[index])
     })
     vm.qaScore = vm.updateScore()
     this.pageMemo = vm.myFamilyWatcher.feasibilityCases.map((item2) => {
       return item2.note
     })
+    //初回読み込み時に対象栄養素に応じた目標生産量の最計算（ターゲット栄養素が変更された場合への対応）
+    vm.myFamilyWatcher.feasibilityCases.map((item, index)=>{
+      vm.updateShare(item.prodTarget.share, index)
+    })
+    //updateShareで[save]アイコンの変化を戻すためにフラグをセット
+    vm.$store.dispatch('fire/setHasDocumentChanged', false)
   },
   computed: {
+    currentFeasibility(){
+      return this.myFamilyWatcher.feasibilityCases[this.pageIdComputed]
+    },
     currentCrop(){
       return this.cropName[this.pageIdComputed]
     },
@@ -602,7 +574,11 @@ export default {
     pageOptions() {
       let res = []
       for (let i = 0; i < this.maxPage; i++) {
-        res.push({value: i, text: 'page:' + i + ': ' + this.pageMemo[i]})
+        res.push({
+          value: i,
+          text: 'page' + i + ': ' + this.cropName[i],
+          disabled: this.cropName[i] === ''
+        })
       }
       return res
     },
@@ -661,7 +637,7 @@ export default {
       /**
        * 栄養供給量
        */
-      nutritionSum: [],
+      nutritionSupply: [],
       /**
        * 栄養素の充足率
        */
