@@ -2,73 +2,9 @@
   <b-container>
     <b-card :header="'current family: ' + familyName">
       <b-tabs card>
-        <b-tab title="add family">
-          <b-row class="justify-content-center">
-            <b-col cols="8">
-              <b-input-group
-                size="sm"
-                prepend="family name"
-                class="mt-2 mb-0"
-              >
-                <b-form-input
-                  v-model="newFamilyName"
-                  :state="stateFamilyName"
-                ></b-form-input>
-                <template #append>
-                  <b-button
-                    :disabled="!stateFamilyName"
-                    :class="{'btn-info':stateFamilyName}"
-                    @click="addNewFamily(newFamilyName, newTarget)"
-                  >add new family
-                  </b-button>
-                </template>
-              </b-input-group>
-              <div class="small text-muted mb-2">you have to give unique family name</div>
-              <hr>
-              <dri-select-multi
-                :driItems="dri"
-                :target="newTarget"
-                :max="maxPopulation"
-                @update:target="updateNewFamily"
-                class="multi"
-              ></dri-select-multi>
-            </b-col>
-          </b-row>
-        </b-tab>
-        <b-tab title="select family" :disabled="familyList.length === 0">
-          <b-row class="justify-content-center border-primary">
-            <b-col cols="8">
-              <b-input-group size="sm" class="mb-2">
-                <template #prepend>
-                  <b-input-group-text>
-                    select family
-                  </b-input-group-text>
-                </template>
-                <b-form-select
-                  v-model="familyName"
-                  :options="familyList"
-                ></b-form-select>
-                <template #append>
-                  <b-button
-                    @click="removeFamily(familyName)"
-                  >
-                    <b-icon icon="trash"/>
-                  </b-button>
-                </template>
-              </b-input-group>
-              <dri-select-multi
-                :driItems="dri"
-                :target="currentTarget"
-                :max="maxPopulation"
-                @update:target="updateFamily(familyName, $event)"
-                class="multi"
-              ></dri-select-multi>
-            </b-col>
-          </b-row>
-        </b-tab>
         <b-tab title="current diet" :disabled="!myFamily">
           <b-card no-body>
-            <diet-calk-comp-eth
+            <diet-calk-community-comp-eth
               v-if="myFamily.name"
               :my-family="myFamily"
               :my-dri="myApp.dataSet.dri"
@@ -76,10 +12,13 @@
               :my-portion="myApp.dataSet.portionUnit"
               :page-id="pageId1"
               :max-page="maxPage"
-              :disabled-option="[1,2,3,4,5,6,7,8,9]"
               @update:myFamily="updateMyFamily"
             />
           </b-card>
+        </b-tab>
+
+        <b-tab title="diet summary" :disabled="!myFamily">
+          summary and average here
         </b-tab>
 
         <b-tab title="priority commodity" :disabled="!myFamily || (myFamily.menuCases[0].menu.length === 0)">
@@ -152,7 +91,7 @@
               {{selectedCropList[pageId3]}}
             </span>
           </div>
-          <b-row>
+          <b-row v-if="false">
             <feasibility-check-component-eth
               v-if="myFamily.name && selectedNutrient"
               :my-family="myFamily"
@@ -245,9 +184,11 @@ import feasibilityCheckComponentEth from "../components/organisms/feasibilityChe
 import fctTableModal from "../components/organisms/FctTableModal";
 import {getNutritionDemand, getNutritionSupply, getProductionTarget} from "../plugins/helper";
 import nutritionBar2 from "../components/molecules/nutritionBar2";
+import DietCalkCommunityCompEth from "../components/organisms/dietCalkCommunityCompEth";
 
 export default {
   components: {
+    DietCalkCommunityCompEth,
     driSelectMulti,
     dietCalkCompEth,
     feasibilityCheckComponentEth,

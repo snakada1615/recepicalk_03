@@ -115,6 +115,10 @@ export const state = () => ({
      */
     familyCases: [],
     /**
+     * 各シナリオに対応したデータ(community -> Eth向け)
+     */
+    communityCases: [],
+    /**
      * 現在対象になっている家族名
      */
     currentFamily: '',
@@ -278,6 +282,14 @@ export const mutations = {
     state.myApp.familyCases = JSON.parse(JSON.stringify(payload))
   },
   /**
+   * communityCasesを更新
+   * @param state
+   * @param payload
+   */
+  updateMyCommunity: function (state, payload) {
+    state.myApp.communityCases = JSON.parse(JSON.stringify(payload))
+  },
+  /**
    * ユーザー情報をpayloadで与えられた内容で更新する
    * @param state
    * @param payload
@@ -392,9 +404,15 @@ export const mutations = {
    * @param payload
    */
   updateFamilyCases: function (state, payload) {
-    console.log('updateFamilyCases')
     state.myApp.familyCases = JSON.parse(JSON.stringify(payload))
-    console.log(state.myApp.familyCases)
+  },
+  /**
+   * communityCasesを更新
+   * @param state
+   * @param payload
+   */
+  updateCommunityCases: function (state, payload) {
+    state.myApp.CommunityCases = JSON.parse(JSON.stringify(payload))
   },
   /**
    * 現在対象になっている家族名の更新
@@ -412,6 +430,14 @@ export const mutations = {
    */
   updateFeasibilityMemo: function (state, payload) {
     state.myApp.feasibilityCases[payload.pageId].pageMemo = payload.pageMemo
+  },
+  /**
+   * communityCaseのメモを更新
+   * @param state
+   * @param payload
+   */
+  updateCommunityMemo: function (state, payload) {
+    state.myApp.communityCases[payload.pageId].pageMemo = payload.pageMemo
   },
   /**
    * ログイン状態を更新
@@ -440,6 +466,25 @@ export const actions = {
       return item
     })
     dispatch('updateFamilyCases', familyCaseTemp)
+    dispatch('setHasDocumentChanged', true)
+  },
+  /**
+   * communityCasesを更新
+   * @param dispatch
+   * @param payload
+   */
+  updateCommunityCases({commit}, payload) {
+    commit('updateCommunityCases', payload)
+  },
+  updateCommunityCase({dispatch, state}, payload) {
+    let communityCasesTemp = JSON.parse(JSON.stringify(state.myApp.communityCases))
+    communityCasesTemp = communityCasesTemp.map((item) => {
+      if (item.name === payload.name) {
+        item.member = payload.member
+      }
+      return item
+    })
+    dispatch('updateCommunityCases', communityCasesTemp)
     dispatch('setHasDocumentChanged', true)
   },
   /**
