@@ -136,7 +136,7 @@
           </b-card>
         </b-tab>
         <b-tab title="crop feasibility" :disabled="familyList.length === 0 || !myFamily.keyNutrient">
-          <div class=" mb-2">
+          <div class=" mb-2 ml-3">
             identified nutrient gap:
             <span
               class="text-danger font-weight-bold"
@@ -144,7 +144,7 @@
               {{selectedNutrient}}
             </span>
           </div>
-          <div class=" mb-2">
+          <div class=" mb-2 ml-3">
             selected commodity:
             <span
               class="text-danger font-weight-bold"
@@ -168,6 +168,64 @@
             />
           </b-row>
         </b-tab>
+        <b-tab
+          title="summary result"
+          :disabled="!stateFeasibilityCheck"
+        >
+          <b-row>
+            <b-col
+              cols="12"
+              lg="6"
+              class="my-1"
+              v-for="pageId in maxPage"
+              :key="pageId"
+              v-if="selectedCropList[pageId - 1]"
+            >
+              <!--   スコアの総括票     -->
+              <b-card
+                style="min-width: 530px;"
+                header-bg-variant="success"
+                bg-variant="light"
+                border-variant="success"
+                class="mx-1 px-0 my-2">
+                <template #header>
+                  <div class="font-weight-bolder text-white">
+                    {{ myFamily.feasibilityCases[pageId - 1].note }}:
+                    {{ selectedCropList[pageId - 1] || 'not selected' }}
+                  </div>
+                </template>
+                <b-row>
+                  <b-col cols="6" >Crop name:</b-col>
+                  <b-col cols="6" class="text-info">{{ selectedCropList[pageId - 1] }}</b-col>
+                </b-row>
+                <b-row>
+                  <b-col cols="6">total score:</b-col>
+                  <b-col cols="6" >
+                    {{ qaScore[pageId - 1][qaScore[pageId - 1].length - 1].value }} /
+                    {{ 10 * qaList.length }}
+                  </b-col>
+                </b-row>
+                <b-row v-for="(qa, index) in qaScore[pageId-1]" :key="index">
+                  <b-col>
+                    <nutrition-bar2
+                      v-if="qa.id > 0"
+                      :colWidthFirst="3"
+                      :colwidthSecond="0"
+                      :colwidthThird="0"
+                      :colwidthFourth="2"
+                      :show-max-number="false"
+                      :max="10"
+                      :nutritionTarget="0"
+                      :cropName="qa.text"
+                      :rating="qa.value || 0"
+                      :label="qa.text"
+                    ></nutrition-bar2>
+                  </b-col>
+                </b-row>
+              </b-card>
+            </b-col>
+          </b-row>
+        </b-tab>
       </b-tabs>
     </b-card>
 
@@ -186,13 +244,15 @@ import dietCalkCompEth from "../components/organisms/dietCalkCompEth";
 import feasibilityCheckComponentEth from "../components/organisms/feasibilityCheckComponentEth";
 import fctTableModal from "../components/organisms/FctTableModal";
 import {getNutritionDemand, getNutritionSupply, getProductionTarget} from "../plugins/helper";
+import nutritionBar2 from "../components/molecules/nutritionBar2";
 
 export default {
   components: {
     driSelectMulti,
     dietCalkCompEth,
     feasibilityCheckComponentEth,
-    fctTableModal
+    fctTableModal,
+    nutritionBar2
   },
   data() {
     return {
@@ -220,9 +280,273 @@ export default {
        * fctTableModal表示用のフラグ
        */
       showFct: false,
+      /**
+       * 質問と回答一覧
+       */
+      qaList: [
+        {
+          categoryID: 1,
+          categoryText: 'Nutrient balance',
+          itemsQA: [
+            {
+              id: 1,
+              questionText: 'Is required amount for nutrition target feasible?',
+              answerList: [
+                {value: -99, text: 'please select', disabled: true},
+                {value: 3, text: 'yes'},
+                {value: 2, text: 'maybe yes'},
+                {value: 1, text: 'maybe no'},
+                {value: 0, text: 'no'},
+              ]
+            },
+          ]
+        },
+        {
+          categoryID: 2,
+          categoryText: 'Socioeconomic feasibility',
+          itemsQA: [
+            {
+              id: 2,
+              questionText: 'Is there any social barrier to consume this commodity in general?',
+              answerList: [
+                {value: -99, text: 'please select', disabled: true},
+                {value: 3, text: 'no'},
+                {value: 2, text: 'maybe no'},
+                {value: 1, text: 'maybe yes'},
+                {value: 0, text: 'yes'},
+              ]
+            },
+            {
+              id: 3,
+              questionText: 'Is there any social barrier to consume this commodity for women?',
+              answerList: [
+                {value: -99, text: 'please select', disabled: true},
+                {value: 3, text: 'no'},
+                {value: 2, text: 'maybe no'},
+                {value: 1, text: 'maybe yes'},
+                {value: 0, text: 'yes'},
+              ]
+            },
+            {
+              id: 4,
+              questionText: 'Is there any social barrier to consume this commodity for child?',
+              answerList: [
+                {value: -99, text: 'please select', disabled: true},
+                {value: 3, text: 'no'},
+                {value: 2, text: 'maybe no'},
+                {value: 1, text: 'maybe yes'},
+                {value: 0, text: 'yes'},
+              ]
+            },
+            {
+              id: 5,
+              questionText: 'Is this commodity affordable in the market for ordinary population?',
+              answerList: [
+                {value: -99, text: 'please select', disabled: true},
+                {value: 3, text: 'no'},
+                {value: 2, text: 'maybe no'},
+                {value: 1, text: 'maybe yes'},
+                {value: 0, text: 'yes'},
+              ]
+            },
+          ]
+        },
+        {
+          categoryID: 3,
+          categoryText: 'Technical feasibility',
+          itemsQA: [
+            {
+              id: 6,
+              questionText: 'do target beneficiary have enough skill to grow this commodity?',
+              answerList: [
+                {value: -99, text: 'please select', disabled: true},
+                {value: 3, text: 'yes'},
+                {value: 2, text: 'maybe yes'},
+                {value: 1, text: 'maybe no'},
+                {value: 0, text: 'no'},
+              ]
+            },
+            {
+              id: 7,
+              questionText: 'Does this commodity imply incremental workload for women?',
+              answerList: [
+                {value: -99, text: 'please select', disabled: true},
+                {value: 3, text: 'no'},
+                {value: 2, text: 'maybe no'},
+                {value: 1, text: 'maybe yes'},
+                {value: 0, text: 'yes'},
+              ]
+            },
+            {
+              id: 8,
+              questionText: 'Is technical service available for this commodity?',
+              answerList: [
+                {value: -99, text: 'please select', disabled: true},
+                {value: 3, text: 'yes / there is no need for it since beneficiaries already have enough skill'},
+                {value: 2, text: 'maybe yes'},
+                {value: 1, text: 'maybe no'},
+                {value: 0, text: 'no'},
+              ]
+            },
+          ]
+        },
+        {
+          categoryID: 4,
+          categoryText: 'Investment',
+          itemsQA: [
+            {
+              id: 9,
+              questionText: 'Is there need for specific infrastructure (irrigation / post harvest, etc.)?',
+              answerList: [
+                {value: -99, text: 'please select', disabled: true},
+                {value: 3, text: 'no'},
+                {value: 2, text: 'maybe no'},
+                {value: 1, text: 'maybe yes'},
+                {value: 0, text: 'yes'},
+              ]
+            },
+            {
+              id: 10,
+              questionText: 'Is production input (fertilizer, seed, feed) become financial burden for small farmer?',
+              answerList: [
+                {value: -99, text: 'please select', disabled: true},
+                {value: 3, text: 'no'},
+                {value: 2, text: 'maybe no'},
+                {value: 1, text: 'maybe yes'},
+                {value: 0, text: 'yes'},
+              ]
+            },
+          ]
+        },
+        {
+          categoryID: 5,
+          categoryText: 'Stability',
+          itemsQA: [
+            {
+              id: 11,
+              questionText: 'How many month can you harvest this commodity in a year?',
+              answerList: [
+                {value: -99, text: 'please select', disabled: true},
+                {value: 3, text: '10-12 mon'},
+                {value: 2, text: '7-9 mon'},
+                {value: 1, text: '4-6 mon'},
+                {value: 0, text: '0-3 mon'},
+              ]
+            },
+            {
+              id: 12,
+              questionText: 'Are there any feasible storage method available for this commodity?',
+              answerList: [
+                {value: -99, text: 'please select', disabled: true},
+                {value: 3, text: 'yes'},
+                {value: 2, text: 'maybe yes'},
+                {value: 1, text: 'maybe no'},
+                {value: 0, text: 'no'},
+              ]
+            },
+          ]
+        },
+        {
+          categoryID: 6,
+          categoryText: 'Market opportunity',
+          itemsQA: [
+            {
+              id: 13,
+              questionText: 'Do you find this commodity at local market?',
+              answerList: [
+                {value: -99, text: 'please select', disabled: true},
+                {value: 3, text: 'yes, it is quite common'},
+                {value: 2, text: 'yes, but limited period or limited seller'},
+                {value: 1, text: 'Not here, but I saw it in a big market'},
+                {value: 0, text: 'i have never seen this in the market'},
+              ]
+            },
+            {
+              id: 14,
+              questionText: 'When you sell your products, how it is delivered?',
+              answerList: [
+                {value: -99, text: 'please select', disabled: true},
+                {value: 3, text: 'There is a trader/middleman (going to big city)'},
+                {value: 2, text: 'There is a trader/middleman (going to local market)'},
+                {value: 1, text: 'I bring products to the market'},
+                {value: 0, text: 'I cannot bring products to the market'},
+              ]
+            },
+            {
+              id: 15,
+              questionText: 'How is your experience marketing your products?',
+              answerList: [
+                {value: -99, text: 'please select', disabled: true},
+                {value: 3, text: 'I usually sell staples and other cash crop'},
+                {value: 2, text: 'I usually sell mostly staples'},
+                {value: 1, text: 'I sell staples when there are surplus'},
+                {value: 0, text: 'I do not sell my products'},
+              ]
+            },
+          ]
+        },
+      ]
     }
   },
   computed: {
+    /**
+     * ansListをmyAppから読み込んでscoreに変換
+     * @returns {*[]}
+     */
+    qaScore() {
+      let res = []
+      const vm = this
+      console.log(vm.myFamily)
+      vm.myFamily.feasibilityCases.forEach(function (val) {
+        res.push(vm.summarizeQA(vm.ansId, val.ansList))
+      })
+      return res
+    },
+    /**
+     * QAリストのカテゴリ数
+     * @returns {*}
+     */
+    qaCategoryCount: function () {
+      if (this.ansId.length === 0) {
+        return 0
+      }
+      return this.ansId.reduce((a, b) => a.categoryID < b.categoryID ? a.categoryID : b.categoryID)
+    },
+    /**
+     * QAのカテゴリとIDをセットにしてArrayに追加（カテゴリ事の集計に用いる）
+     * @returns {*[]}
+     */
+    ansId() {
+      const vm = this
+      let res = []
+      vm.qaList.forEach(function (category) {
+        category.itemsQA.forEach(function (item) {
+          res.push({
+            'categoryID': category.categoryID,
+            'itemID': item.id
+          })
+        })
+      })
+      return res
+    },
+    stateSummary(){
+
+    },
+    stateFeasibilityCheck(){
+      let res = false
+      this.myFamily.feasibilityCases.forEach((item)=>{
+        if (item.selectedCrop.length > 0) {
+          res = true
+        }
+      })
+      if (this.familyList.length === 0) {
+        res = false
+      }
+      if (!this.myFamily.keyNutrient) {
+        res = false
+      }
+      return res
+    },
     selectedNutrient:{
       get(){
         return this.myFamily.keyNutrient
@@ -338,7 +662,6 @@ export default {
       this.showFct = !this.showFct
     },
     updateMyFamily(val) {
-      console.log(val)
       let res = JSON.parse(JSON.stringify(this.$store.state.fire.myApp.familyCases))
       res = res.map((item) => {
         let res2 = item
@@ -347,7 +670,6 @@ export default {
         }
         return res2
       })
-      console.log(res)
       this.$store.dispatch('fire/updateMyFamily', res)
     },
     updatePageMemo(val) {
@@ -380,6 +702,38 @@ export default {
       this.$store.dispatch('fire/removeFamily', val)
       const newVal = this.familyList[0]
       this.$store.dispatch('fire/updateCurrentFamilyName', newVal)
+    },
+    /**
+     * カテゴリ毎のスコアを集計して戻す
+     * @param keys カテゴリとQA_idのペア
+     * @param dat ansList[pageId]
+     * @returns {any[]}
+     */
+    summarizeQA(keys, dat) {
+      const vm = this
+      let res = Array(this.qaCategoryCount).fill(0);
+      let res2 = []
+      //カテゴリ毎の集計
+      keys.forEach(function (key) {
+        res[key.categoryID - 1] += (dat[key.itemID - 1] > 0 ? dat[key.itemID - 1] : 0)
+      })
+      //集計結果と合わせてカテゴリ情報をObjectにまとめる
+      res2 = res.map(function (item, index) {
+        const qaCategory = vm.qaList[index]
+        return {
+          id: qaCategory.categoryID,
+          text: qaCategory.categoryText,
+          value: Math.round(10 * item / (3 * qaCategory.itemsQA.length))
+        }
+      })
+      // 合計値をobjectに加える
+      const sumTemp = res2.reduce((p, x) => p + x.value, 0)
+      res2.push({
+        id: 0,
+        text: 'total score',
+        value: sumTemp
+      })
+      return res2
     },
   }
 }
