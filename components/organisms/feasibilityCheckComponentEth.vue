@@ -137,10 +137,12 @@
             <b-card class="px-0 mx-0">
               <b-row class="mt-0 bg-success mb-3">
                 <b-col cols="3" class="text-center mr-2 font-weight-bold">Nutrition</b-col>
-                <b-col cols="3" class="font-weight-bold">Balance</b-col>
+                <b-col cols="3" class="font-weight-bold">Target</b-col>
+                <b-col cols="3" class="font-weight-bold">Sufficiency</b-col>
               </b-row>
               <b-row v-for="(nut, index) in nutritionRatingSet[pageIdComputed]" :key="index">
                 <nutrition-bar
+                  v-if="nut.nameId === keyNutrient"
                   :label="nut.name"
                   :maxRatingAbsolute="nut.supply"
                   :nutritionTarget="nut.target"
@@ -151,7 +153,7 @@
             <b-row align-h="end" class="mt-2">
               <b-col cols="6">
                 <b-input-group
-                  prepend="sufficiency rate"
+                  prepend="set sufficiency rate"
                   append="%"
                   size="sm">
                   <b-form-input
@@ -311,6 +313,7 @@ export default {
       return [
         {
           name: 'Energy',
+          nameId: 'En',
           target: nutritionDemand.En ? Number(nutritionDemand.En) : 0,
           supply: nutritionSupply.En ? Number(nutritionSupply.En * nutritionSupply.Wt / 100) : 0,
           rating: nutritionDemand.En ?
@@ -318,6 +321,7 @@ export default {
         },
         {
           name: 'Protein',
+          nameId: 'Pr',
           target: nutritionDemand.Pr ? Number(nutritionDemand.Pr) : 0,
           supply: nutritionSupply.Pr ? Number(nutritionSupply.Pr * nutritionSupply.Wt / 100) : 0,
           rating: nutritionDemand.Pr ?
@@ -325,6 +329,7 @@ export default {
         },
         {
           name: 'VitA',
+          nameId: 'Va',
           target: nutritionDemand.Va ? Number(nutritionDemand.Va) : 0,
           supply: nutritionSupply.Va ? Number(nutritionSupply.Va * nutritionSupply.Wt / 100) : 0,
           rating: nutritionDemand.Va ?
@@ -332,6 +337,7 @@ export default {
         },
         {
           name: 'Fe',
+          nameId: 'Fe',
           target: nutritionDemand.Fe ? Number(nutritionDemand.Fe) : 0,
           supply: nutritionSupply.Fe ? Number(nutritionSupply.Fe * nutritionSupply.Wt / 100) : 0,
           rating: nutritionDemand.Fe ?
