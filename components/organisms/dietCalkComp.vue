@@ -630,7 +630,7 @@ export default {
           return datArray.menu.reduce((accumulator, item) => {
             let myPr = item.Pr ? item.Pr : 0
             let myFe = item.Fe ? item.Fe : 0
-            let myFat = item.Fe ? item.Fe : 0
+            let myFat = item.Fat ? item.Fat : 0
 
             // 食品群がstapleであった場合、Pr、Fe の値を無視
             if (Number(item.food_grp_id) === 1) {
