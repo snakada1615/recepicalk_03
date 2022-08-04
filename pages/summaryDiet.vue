@@ -368,12 +368,63 @@ export default {
       })
     },
     /**
+     * myApp.menuCases.menuの値を集計してnutritionSupplyWatcherに代入するための関数
+     * ただしfood_grp_idがStapleの場合、PrとFeを無視する
+     * @returns {*[]} 栄養素供給量の合計値
+     */
+    nutritionSupplyGetter2() {
+      const vm = this
+      return vm.myApp.menuCases.map((datArray) => {
+        if (datArray.menu.length > 0) {
+          return datArray.menu.reduce((accumulator, item) => {
+            let myPr = item.Pr ? item.Pr : 0
+            let myFe = item.Fe ? item.Fe : 0
+            let myFat = item.Fe ? item.Fe : 0
+
+            // 食品群がstapleであった場合、Pr、Fe の値を無視
+            if (Number(item.food_grp_id) === 1) {
+              myPr = 0
+              myFe = 0
+              myFat = 0
+            }
+
+            accumulator.En += Number(item.En ? item.En : 0) * Number(item.Wt) / 100
+            accumulator.Pr += Number(myPr) * Number(item.Wt) / 100
+            accumulator.Va += Number(item.Va ? item.Va : 0) * Number(item.Wt) / 100
+            accumulator.Fe += Number(myFe) * Number(item.Wt) / 100
+            accumulator.Carbohydrate += Number(item.Carbohydrate ? item.Carbohydrate : 0) * Number(item.Wt) / 100
+            accumulator.Fat += Number(myFat) * Number(item.Wt) / 100
+            accumulator.Wt += Number(item.Wt)
+            return accumulator
+          }, {
+            'En': 0,
+            'Pr': 0,
+            'Va': 0,
+            'Fe': 0,
+            'Wt': 0,
+            'Carbohydrate': 0,
+            'Fat': 0
+          })
+        } else {
+          return {
+            'En': 0,
+            'Pr': 0,
+            'Va': 0,
+            'Fe': 0,
+            'Wt': 0,
+            'Carbohydrate': 0,
+            'Fat': 0
+          }
+        }
+      })
+    },
+    /**
      * nutritionSupplyの平均値
      * @returns {{Pr: number, Fat: number, En: number, Carbohydrate: number, Va: number, Wt: number, Fe: number}}
      */
     averageNutritionSupplyGetter() {
       let count = 0
-      const supplySum = this.nutritionSupplyGetter.reduce((accumulator, item) => {
+      const supplySum = this.nutritionSupplyGetter2.reduce((accumulator, item) => {
         if (item.Wt > 0) {
           count += 1
           accumulator.En += Number(item.En)
@@ -436,7 +487,7 @@ export default {
       }
     },
     averageRatingGetter() {
-      const supply = this.averageNutritionSupplyGetter
+      const supply = this.averageNutritionSupplyGetter2
       const demand = this.averageNutritionDemandGetter
       return {
         En: demand.En ?
@@ -457,7 +508,7 @@ export default {
     ratingGetter() {
       const res = []
       for (let i = 0; i < this.sceneCount; i++) {
-        const supply = this.nutritionSupplyGetter[i]
+        const supply = this.nutritionSupplyGetter2[i]
         const demand = this.nutritionDemandGetter[i]
         res.push({
           En: demand.En ?
@@ -477,7 +528,7 @@ export default {
      * @returns {[{val: number, color: string},{val: number, color: string},{val: number, color: string}][]}
      */
     pfcBalanceCurrent() {
-      return this.nutritionSupplyGetter.map((dat, index) => {
+      return this.nutritionSupplyGetter2.map((dat, index) => {
         return [
           {val: Math.round(dat.Pr * 4), color: 'green', label: '%'},
           {val: Math.round(dat.Fat * 9), color: 'yellow', label: '%'},

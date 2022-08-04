@@ -630,11 +630,13 @@ export default {
           return datArray.menu.reduce((accumulator, item) => {
             let myPr = item.Pr ? item.Pr : 0
             let myFe = item.Fe ? item.Fe : 0
+            let myFat = item.Fe ? item.Fe : 0
 
             // 食品群がstapleであった場合、Pr、Fe の値を無視
             if (Number(item.food_grp_id) === 1) {
               myPr = 0
               myFe = 0
+              myFat = 0
             }
 
             accumulator.En += Number(item.En ? item.En : 0) * Number(item.Wt) / 100
@@ -642,7 +644,7 @@ export default {
             accumulator.Va += Number(item.Va ? item.Va : 0) * Number(item.Wt) / 100
             accumulator.Fe += Number(myFe) * Number(item.Wt) / 100
             accumulator.Carbohydrate += Number(item.Carbohydrate ? item.Carbohydrate : 0) * Number(item.Wt) / 100
-            accumulator.Fat += Number(item.Fat ? item.Fat : 0) * Number(item.Wt) / 100
+            accumulator.Fat += Number(myFat) * Number(item.Wt) / 100
             accumulator.Wt += Number(item.Wt)
             return accumulator
           }, {
