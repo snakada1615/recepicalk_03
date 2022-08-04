@@ -123,6 +123,10 @@ export const state = () => ({
      */
     currentFamily: '',
     /**
+     * 現在対象になっているコミュニティ名
+     */
+    currentCommunity: '',
+    /**
      * 最後に保存した日時
      */
     saveDate: {
@@ -280,14 +284,6 @@ export const mutations = {
     //const index = state.myApp.familyCases.findIndex((item)=> item.name === payload.name)
     //state.myApp.familyCases.splice(index, state.myApp.familyCases.length, JSON.parse(JSON.stringify(payload)))
     state.myApp.familyCases = JSON.parse(JSON.stringify(payload))
-  },
-  /**
-   * communityCasesを更新
-   * @param state
-   * @param payload
-   */
-  updateMyCommunity: function (state, payload) {
-    state.myApp.communityCases = JSON.parse(JSON.stringify(payload))
   },
   /**
    * ユーザー情報をpayloadで与えられた内容で更新する
@@ -476,13 +472,20 @@ export const actions = {
   updateCommunityCases({commit}, payload) {
     commit('updateCommunityCases', payload)
   },
+  /**
+   * communityCasesの一要素（payload）のみを更新
+   * @param dispatch
+   * @param state
+   * @param payload
+   */
   updateCommunityCase({dispatch, state}, payload) {
     let communityCasesTemp = JSON.parse(JSON.stringify(state.myApp.communityCases))
     communityCasesTemp = communityCasesTemp.map((item) => {
       if (item.name === payload.name) {
-        item.member = payload.member
+        return payload
+      } else {
+        return item
       }
-      return item
     })
     dispatch('updateCommunityCases', communityCasesTemp)
     dispatch('setHasDocumentChanged', true)
@@ -496,6 +499,28 @@ export const actions = {
   updateCurrentFamilyName({commit, dispatch}, payload) {
     commit('updateCurrentFamilyName', payload)
     dispatch('setHasDocumentChanged', true)
+  },
+  async addNewCommunity({state, dispatch}, payload) {
+    let currentCommunity = JSON.parse(JSON.stringify(payload.communityCases))
+    let arr = []
+    for (let i = 0; i < state.myApp.sceneCount; i++) {
+      const isTargetSingle = true
+      const note = ''
+      const menu = []
+      const target = payload.map(function (dat) {
+        return {id: dat.id, count: 0}
+      })
+      arr.push({target: target, menu: menu, note: note, isTargetSingle: isTargetSingle})
+    }
+
+    currentCommunity.push({
+      'name': payload.name,
+      'member': payload.member,
+      'keyNutrient': '',
+      'menuCases': arr,
+      'feasibilityCases': arr2
+    })
+
   },
   /**
    * 新しい家族構成の追加、併せて初期化
@@ -1157,21 +1182,14 @@ export const actions = {
   },
   /**
    * menuCasesを初期化（空白ArrayをsetCountの数だけ作成）
-   * @param payload driのセット(array of object)
    * @param state
    * @param commit
+   * @param dispatch
+   * @param payload
+   * @returns {Promise<void>}
    */
-  initMenu({state, commit}, payload) {
-    const arr = []
-    for (let i = 0; i < state.myApp.sceneCount; i++) {
-      const isTargetSingle = true
-      const note = ''
-      const menu = []
-      const target = payload.map(function (dat) {
-        return {id: dat.id, count: 0}
-      })
-      arr.push({target: target, menu: menu, note: note, isTargetSingle: isTargetSingle})
-    }
+  async initMenu({state, commit, dispatch}, payload) {
+    let arr = await dispatch('setInitialArray', {key:2, count: payload.count, data: payload.data})
     commit('updateMenuCases', arr)
   },
   /**
@@ -1194,23 +1212,54 @@ export const actions = {
     commit('updateProdTargetCases', arr)
   },
   /**
+   * menuCasesとfeasibilityCasesの初期化した配列を返す
+   *
+   * @param payload (key=1:feasibilityCases, 2:menuCases, data=dri/fct, count=繰り返し回数)
+   * @returns {*[]}
+   */
+  setInitialArray({}, payload){
+    let arr = []
+    //feasibilityの場合
+    if (Number(payload.key) === 1) {
+      for (let i = 0; i < payload.count; i++) {
+        const target = payload.data.map(function (dat) {
+          return {id: dat.id, count: 0}
+        })
+        const selectedCrop = []
+        const note = ''
+        const ansList = [-99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99]
+        arr.push({selectedCrop: selectedCrop, note: note, ansList: ansList, target: target})
+      }
+      return arr
+    }
+    //menuの場合
+    if (Number(payload.key) === 2){
+      for (let i = 0; i < payload.count; i++) {
+        const isTargetSingle = true
+        const note = ''
+        const menu = []
+        const target = payload.data.map(function (dat) {
+          return {id: dat.id, count: 0}
+        })
+        arr.push({target: target, menu: menu, note: note, isTargetSingle: isTargetSingle})
+      }
+      console.log(arr)
+      return arr
+    }
+  },
+  /**
    * feasibilityCasesを初期化（空白ArrayをsetCountの数だけ作成）
    * @param state
    * @param commit
-   * @param payload driテーブルんp情報
+   * @param dispatch
+   * @param payload
    */
-  initFeasibility({state, commit}, payload) {
-    const arr = []
-    for (let i = 0; i < state.myApp.sceneCount; i++) {
-      const target = payload.map(function (dat) {
-        return {id: dat.id, count: 0}
-      })
-      const selectedCrop = []
-      const note = ''
-      const ansList = [-99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99]
-      arr.push({selectedCrop: selectedCrop, note: note, ansList: ansList, target: target})
-    }
+  async initFeasibility({state, commit, dispatch}, payload) {
+    const arr = await dispatch('setInitialArray', {key:1, count: payload.count, data: payload.data})
     commit('updateFeasibilityCases', arr)
+  },
+  initCommunityCases(){
+
   },
   /**
    * まとめて初期化
@@ -1229,9 +1278,9 @@ export const actions = {
       await dispatch('initDri')
       await dispatch('initPortionUnit')
       await dispatch('initQuestions')
-      await dispatch('initMenu', state.myApp.dataSet.dri)
+      await dispatch('initMenu', {data: state.myApp.dataSet.dri, count: state.myApp.sceneCount})
       await dispatch('initProdTarget', state.myApp.dataSet.dri)
-      await dispatch('initFeasibility', state.myApp.dataSet.dri)
+      await dispatch('initFeasibility', {data: state.myApp.dataSet.dri, count: state.myApp.sceneCount})
       await dispatch('fireSaveAppdata')
       console.log('initAll: all done')
     } catch (err) {

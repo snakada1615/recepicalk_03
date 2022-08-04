@@ -565,6 +565,7 @@ export default {
      */
     nutritionDemandGetter() {
       const vm = this
+      console.log(vm.myApp.menuCases)
       return vm.myApp.menuCases.map((dat) => {
         return dat.target.reduce((accumulator, item, index) => {
           const dri = vm.myApp.dataSet.dri[index]

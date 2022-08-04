@@ -83,6 +83,7 @@
             <b-col class="font-weight-bold mx-0">
               <b-input-group prepend="target nutrient" size="sm">
                 <b-form-select
+                  :disabled="!nutritionDemandWatcher[pageIdComputed].En"
                   class="font-weight-bold"
                   v-model="nutrientTarget"
                   :options="Object.keys(rating[pageIdComputed])"
@@ -97,6 +98,7 @@
                 append="%"
                 size="sm">
                 <b-form-input
+                  :disabled="myAppWatcher.prodTargetCases[pageIdComputed].prodTarget.length === 0"
                   v-model="targetSufficicncy"
                   type="number"
                   size="sm"
@@ -327,10 +329,8 @@ export default {
         this.pageMemo = this.myAppWatcher.prodTargetCases.map(function (item) {
           return item.note
         })
-        this.targetSufficicncy = this.myAppWatcher.prodTargetCases[0] ?
-          this.myAppWatcher.prodTargetCases[0].prodTarget[0].share : 100
-        this.nutrientTarget = this.myAppWatcher.prodTargetCases[0] ?
-          this.myAppWatcher.prodTargetCases[0].prodTarget[0].nutrientTarget : 'Pr'
+        this.targetSufficicncy = this.initShare(this.myAppWatcher.prodTargetCases)
+        this.nutrientTarget = this.initTarget(this.myAppWatcher.prodTargetCases)
       }
     },
   },
@@ -345,10 +345,8 @@ export default {
     this.pageMemo = this.myAppWatcher.prodTargetCases.map(function (item) {
       return item.note
     })
-    this.targetSufficicncy = this.myAppWatcher.prodTargetCases[0] ?
-      this.myAppWatcher.prodTargetCases[0].prodTarget[0].share : 100
-    this.nutrientTarget = this.myAppWatcher.prodTargetCases[0] ?
-      this.myAppWatcher.prodTargetCases[0].prodTarget[0].nutrientTarget : 'Pr'
+    this.targetSufficicncy = this.initShare(this.myAppWatcher.prodTargetCases)
+    this.nutrientTarget = this.initTarget(this.myAppWatcher.prodTargetCases)
   },
   methods: {
     /**
@@ -388,6 +386,34 @@ export default {
 
       //更新されたmyAppをemit
       this.$emit('update:myApp', dat)
+    },
+    /**
+     * 充足率shareを取得(値が初期化されていない場合があるので)
+     * @param val
+     * @returns {number}
+     */
+    initShare(val){
+      let res = 100
+      if (val.length > 0){
+        if (val[0].prodTarget.length > 0){
+          res = val[0].prodTarget[0].share
+        }
+      }
+      return res
+    },
+    /**
+     *
+     * @param val
+     * @returns {string}
+     */
+    initTarget(val){
+      let res = 'Pr'
+      if (val.length > 0){
+        if (val[0].prodTarget.length > 0){
+          res = val[0].prodTarget[0].nutrientTarget
+        }
+      }
+      return res
     },
     /**
      * 栄養素充足目標（share）の更新：
