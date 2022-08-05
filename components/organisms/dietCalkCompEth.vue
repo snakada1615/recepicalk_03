@@ -161,7 +161,7 @@ import recepiTable from "@/components/molecules/recepiTable"
 import nutritionBar2 from "@/components/molecules/nutritionBar2"
 import macroNutrientBar from "@/components/molecules/macroNutrientBar";
 import fctTableModal2 from "@/components/organisms/FctTableModal2";
-import {validateMyFamily} from "../../plugins/helper";
+import {getNutritionSupply, validateMyFamily} from "../../plugins/helper";
 
 /**
  * @desc 6つのコンポーネントを組み合わせて食事評価
@@ -188,6 +188,7 @@ export default {
   },
   data() {
     return {
+      currentMenu: [],
       /**
        * 使用する全変数のobject
        * myFamilyから読み込んでこのページで利用。更新された時にemitを返す
@@ -417,9 +418,6 @@ export default {
     }
   },
   computed: {
-    currentMenu(){
-      return this.myFamilyWatcher.menuCases[this.pageIdComputed].menu
-    },
     /**
      * ratingを計算するにあたって、同一メニューを一日3回食べると仮定した場合の評価、
      *     (recepiTableの値×3)、または1回分が一日の栄養素に与える影響の評価を
@@ -526,6 +524,7 @@ export default {
         vm.pageMemo = vm.myFamily.menuCases.map((item2) => {
           return item2.note
         })
+        vm.currentMenu = JSON.parse(JSON.stringify(vm.myFamilyWatcher.menuCases[this.pageIdComputed].menu))
         vm.updatePfc()
       }
     },
@@ -548,6 +547,7 @@ export default {
     vm.pageMemo = vm.myFamily.menuCases.map((item2) => {
       return item2.note
     })
+    vm.currentMenu = JSON.parse(JSON.stringify(vm.myFamilyWatcher.menuCases[this.pageIdComputed].menu))
     vm.updatePfc()
   },
   methods: {
@@ -599,40 +599,6 @@ export default {
       const res = this.nutritionDemandCalk(member, dri)
       return [...Array(count)].map(() => res);
     },
-    nutritionSupplyCalk(menu) {
-      const initObj = {
-        'En': 0,
-        'Pr': 0,
-        'Va': 0,
-        'Fe': 0,
-        'Wt': 0,
-        'Carbohydrate': 0,
-        'Fat': 0
-      }
-      if (menu === []) {
-        return initObj
-      }
-      return menu.reduce((accumulator, item) => {
-        let myPr = item.Pr ? item.Pr : 0
-        let myFe = item.Fe ? item.Fe : 0
-        let myFat = item.Fat ? item.Fat : 0
-
-        // 食品群がstapleであった場合、Pr、Fe の値を無視
-        if (Number(item.food_grp_id) === 1) {
-          myPr = 0
-          myFe = 0
-          myFat = 0
-        }
-        accumulator.En += Number(item.En ? item.En : 0) * Number(item.Wt) / 100
-        accumulator.Pr += Number(myPr) * Number(item.Wt) / 100
-        accumulator.Va += Number(item.Va ? item.Va : 0) * Number(item.Wt) / 100
-        accumulator.Fe += Number(myFe) * Number(item.Wt) / 100
-        accumulator.Carbohydrate += Number(item.Carbohydrate ? item.Carbohydrate : 0) * Number(item.Wt) / 100
-        accumulator.Fat += Number(myFat) * Number(item.Wt) / 100
-        accumulator.Wt += Number(item.Wt)
-        return accumulator
-      }, initObj)
-    },
     /**
      * myApp.menuCases.menuの値を集計してnutritionSupplyWatcherに代入するための関数
      * ただしfood_grp_idがStapleの場合、PrとFeを無視する
@@ -654,7 +620,7 @@ export default {
       }
       return menuCases.map((datArray) => {
         if (datArray.menu.length > 0) {
-          return this.nutritionSupplyCalk(datArray.menu)
+          return getNutritionSupply(datArray.menu)
         } else {
           return initObj
         }

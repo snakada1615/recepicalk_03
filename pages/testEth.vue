@@ -25,7 +25,7 @@
               </b-input-group>
               <div class="small text-muted mb-2">you have to give unique family name</div>
               <hr>
-              {{$store.state.fire.myApp.currentFamily}}
+              {{ $store.state.fire.myApp.currentFamily }}
               <dri-select-multi
                 :driItems="dri"
                 :target="newTarget"
@@ -151,7 +151,7 @@
             <span
               class="text-danger font-weight-bold"
             >
-              {{ selectedCropList[pageId3]}}
+              {{ selectedCropList[pageId3] }}
             </span>
           </div>
           <b-row>
@@ -171,9 +171,47 @@
           </b-row>
         </b-tab>
         <b-tab
-          title="summary result"
+          title="crop feasibility assessment summary"
           :disabled="!stateFeasibilityCheck"
         >
+          <b-row>
+            <b-col
+              cols="12"
+              lg="6"
+              class="my-1"
+            >
+              <div class=" mb-2 ml-3">
+                identified nutrient gap:
+                <span class="text-danger font-weight-bold">
+                   {{ selectedNutrient }}
+                </span>
+              </div>
+              <b-card
+                style="min-width: 530px;"
+                header-bg-variant="success"
+                bg-variant="light"
+                border-variant="success"
+                class="mx-1 px-0 my-2">
+                <template #header>
+                  <div>Select nutrient dense food for your target family/HH</div>
+                </template>
+                <b-form-group
+                  class="ml-2"
+                >
+                  <b-form-radio-group
+                    v-model="selectedNutrient"
+                    :options="selectedCropListFiltered"
+                    button-variant="outline-primary"
+                    buttons
+                    stacked
+                    class="ml-4"
+                  ></b-form-radio-group>
+                </b-form-group>
+              </b-card>
+
+            </b-col>
+          </b-row>
+          <div class=" mt-2 mb-0 ml-3"> result of crop feasibility assessment: </div>
           <b-row>
             <b-col
               cols="12"
@@ -228,6 +266,30 @@
             </b-col>
           </b-row>
         </b-tab>
+        <b-tab
+          title="overall result"
+          :disabled="!stateFeasibilityCheck"
+        >
+          <div class=" mb-0 ml-3">
+            identified nutrient gap:
+            <span class="text-danger font-weight-bold">
+                   {{ selectedNutrient }}
+                </span>
+          </div>
+          <div class=" mb-2 ml-3">
+            identified nutrient dense food:
+            <span class="text-danger font-weight-bold">
+                   {{ selectedNutrient }}
+                </span>
+          </div>
+          <family-result-final
+            :my-scene-count= 10
+            :my-fct="fct"
+            :my-dri="dri"
+            :my-family-case="myFamily"
+          />
+
+        </b-tab>
       </b-tabs>
     </b-card>
 
@@ -247,6 +309,7 @@ import feasibilityCheckComponentEth from "../components/organisms/feasibilityChe
 import fctTableModal from "../components/organisms/FctTableModal";
 import {getNutritionDemand, getNutritionSupply, getProductionTarget} from "../plugins/helper";
 import nutritionBar2 from "../components/molecules/nutritionBar2";
+import familyResultFinal from "../components/organisms/familyResultFinal";
 
 export default {
   components: {
@@ -254,7 +317,8 @@ export default {
     dietCalkCompEth,
     feasibilityCheckComponentEth,
     fctTableModal,
-    nutritionBar2
+    nutritionBar2,
+    familyResultFinal
   },
   data() {
     return {
@@ -532,10 +596,10 @@ export default {
       })
       return res
     },
-    stateDiet(){
+    stateDiet() {
       const vm = this
       console.log(vm.familyName)
-      if (!vm.familyName){
+      if (!vm.familyName) {
         return false
       }
       return (vm.familyName.length > 3)
@@ -544,7 +608,7 @@ export default {
       const vm = this
       let res = false
       if (vm.myFamily) {
-        if (vm.myFamily.menuCases){
+        if (vm.myFamily.menuCases) {
           if (vm.myFamily.menuCases.length > 0) {
             if (vm.myFamily.menuCases[0].menu.length > 0) {
               res = true
@@ -559,7 +623,7 @@ export default {
     },
     stateFeasibilityCheck() {
       let res = false
-      if (this.myFamily.feasibilityCases){
+      if (this.myFamily.feasibilityCases) {
         this.myFamily.feasibilityCases.forEach((item) => {
           if (item.selectedCrop.length > 0) {
             res = true
@@ -596,24 +660,35 @@ export default {
     selectedCropList() {
       console.log(this.myFamily)
       console.log(this.myFamily.feasibilityCases)
-      if (!this.myFamily.feasibilityCases){
+      if (!this.myFamily.feasibilityCases) {
         return []
       }
       return this.myFamily.feasibilityCases.map((item) => {
         return item.selectedCrop[0] ? item.selectedCrop[0].Name : ''
       })
     },
-/*
-    familyName: {
-      get() {
-        console.log(this.$store.state.fire.myApp.currentFamily)
-        return this.myApp.currentFamily ? this.myApp.currentFamily : ''
-      },
-      set(newVal) {
-        this.$store.dispatch('fire/updateCurrentFamilyName', newVal)
-      }
+    selectedCropListFiltered() {
+      const vm = this
+      return vm.selectedCropList.filter((item, index) => {
+        if (item !== '') {
+          return {
+            text: item,
+            value: index
+          }
+        }
+      })
     },
-*/
+    /*
+        familyName: {
+          get() {
+            console.log(this.$store.state.fire.myApp.currentFamily)
+            return this.myApp.currentFamily ? this.myApp.currentFamily : ''
+          },
+          set(newVal) {
+            this.$store.dispatch('fire/updateCurrentFamilyName', newVal)
+          }
+        },
+    */
     currentTarget() {
       const temp = this.$store.state.fire.myApp.familyCases
       if (!temp) {
@@ -777,7 +852,7 @@ export default {
       })
       return res2
     },
-    changeFamily(val){
+    changeFamily(val) {
       this.$store.dispatch('fire/updateCurrentFamilyName', val)
     }
   }

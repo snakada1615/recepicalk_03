@@ -260,6 +260,7 @@ export function validateMacroNutrient(dat) {
       }
       if (!(item.val >= 0)) {
         console.log('Param Error: validateMacroNutrient')
+        console.log(dat)
         console.log(item)
         check2 = false
       }
@@ -287,18 +288,41 @@ export function getNutritionDemand(target, dri) {
 
 /**
  * 選択された作物一蘭から栄養供給量を計算
- * @param datArray [En, Pr, Va, Fe, Wt]
- * @returns {T}
+ * @param datArray
+ * @param stapleCheck
+ * @returns {*}
  */
-export function getNutritionSupply(datArray) {
+export function getNutritionSupply(datArray, stapleCheck = 0) {
   return datArray.reduce((accumulator, item) => {
-    accumulator.En = (accumulator.En || 0) + Number(item.En)
-    accumulator.Pr = (accumulator.Pr || 0) + Number(item.Pr)
-    accumulator.Va = (accumulator.Va || 0) + Number(item.Va)
-    accumulator.Fe = (accumulator.Fe || 0) + Number(item.Fe)
-    accumulator.Wt = (accumulator.Wt || 0) + Number(item.Wt)
+    //Pr, Fe, Fatについて、別変数を用意
+    let myPr = item.Pr ? item.Pr : 0
+    let myFe = item.Fe ? item.Fe : 0
+    let myFat = item.Fat ? item.Fat : 0
+
+    // stapleCheck=1, かつ食品群がstapleであった場合、Pr、Fe の値を無視
+    if (stapleCheck === 1 && Number(item.food_grp_id) === 1) {
+      myPr = 0
+      myFe = 0
+      myFat = 0
+    }
+
+    accumulator.En += Number(item.En ? item.En : 0) * Number(item.Wt) / 100
+    accumulator.Pr += Number(myPr) * Number(item.Wt) / 100
+    accumulator.Va += Number(item.Va ? item.Va : 0) * Number(item.Wt) / 100
+    accumulator.Fe += Number(myFe) * Number(item.Wt) / 100
+    accumulator.Carbohydrate += Number(item.Carbohydrate ? item.Carbohydrate : 0) * Number(item.Wt) / 100
+    accumulator.Fat += Number(myFat) * Number(item.Wt) / 100
+    accumulator.Wt += Number(item.Wt)
     return accumulator
-  }, {})
+  }, {
+    'En': 0,
+    'Pr': 0,
+    'Va': 0,
+    'Fe': 0,
+    'Wt': 0,
+    'Carbohydrate': 0,
+    'Fat': 0
+  })
 }
 
 /**
