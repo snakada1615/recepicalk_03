@@ -218,7 +218,9 @@ export default {
       const vm = this
       //作業用のmyFamilyコピー作成
       const dat = JSON.parse(JSON.stringify(vm.myFamily))
-      return getNutritionDemand(dat.member, vm.myDri)
+      const res = getNutritionDemand(dat.member, vm.myDri)
+      return [...Array(count)].map(() => res);
+
     },
     /**
      * myApp.menuCases.menuの値を集計してnutritionSupplyWatcherに代入するための関数
@@ -309,6 +311,9 @@ export default {
     myFamilyResult(){
       let res = []
       const dat = JSON.parse(JSON.stringify(this.myFamilyCase))
+      if (!dat.menuCases) {
+        return
+      }
       res.push(dat.menuCases[0])
 
       const dat2 = dat.feasibilityCases.find((item)=>{

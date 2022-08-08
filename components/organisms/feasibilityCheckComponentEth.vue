@@ -264,7 +264,7 @@ export default {
      */
     updateTargetCrop(myFamily) {
       return myFamily.feasibilityCases.map(function (item) {
-        return JSON.parse(JSON.stringify(item.selectedCrop))
+        return {menu: JSON.parse(JSON.stringify(item.selectedCrop))}
       })
     },
     /**
@@ -484,9 +484,9 @@ export default {
         vm.targetCrop = vm.updateTargetCrop(vm.myFamilyWatcher)
         vm.targetGroup = vm.updateTargetGroup(vm.myFamilyWatcher.member, vm.maxPage)
         vm.nutritionDemand = getNutritionDemandList(vm.targetGroup, vm.itemsDRI)
-        vm.nutritionSupply = getNutritionSupplyList(vm.targetCrop)
+        vm.nutritionSupply = getNutritionSupplyList(vm.targetCrop, vm.maxPage)
         vm.cropName = vm.targetCrop.map(function (item) {
-          return item.length > 0 ? item[0].Name : ''
+          return item.menu.length > 0 ? item.menu[0].Name : ''
         })
         vm.nutritionRatingSet = vm.nutritionDemand.map(function (demand, index) {
           return vm.updateNutritionRating(demand, vm.nutritionSupply[index])
@@ -526,10 +526,11 @@ export default {
     vm.itemsDRI = JSON.parse(JSON.stringify(vm.myDri))
     vm.targetCrop = vm.updateTargetCrop(vm.myFamilyWatcher)
     vm.targetGroup = vm.updateTargetGroup(vm.myFamilyWatcher.member, vm.maxPage)
+    console.log('created: feasibilityCases')
     vm.nutritionDemand = getNutritionDemandList(vm.targetGroup, vm.itemsDRI)
-    vm.nutritionSupply = getNutritionSupplyList(vm.targetCrop)
+    vm.nutritionSupply = getNutritionSupplyList(vm.targetCrop, vm.maxPage)
     vm.cropName = vm.targetCrop.map(function (item) {
-      return item.length > 0 ? item[0].Name : ''
+      return item.menu.length > 0 ? item.menu[0].Name : ''
     })
     vm.nutritionRatingSet = vm.nutritionDemand.map(function (demand, index) {
       return vm.updateNutritionRating(demand, vm.nutritionSupply[index])
@@ -540,6 +541,7 @@ export default {
     })
     //初回読み込み時に対象栄養素に応じた目標生産量の最計算（ターゲット栄養素が変更された場合への対応）
     vm.myFamilyWatcher.feasibilityCases.map((item, index)=>{
+      console.log(item)
       vm.updateShare(item.prodTarget.share, index)
     })
     //updateShareで[save]アイコンの変化を戻すためにフラグをセット

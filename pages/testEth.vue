@@ -137,7 +137,7 @@
             </b-list-group>
           </b-card>
         </b-tab>
-        <b-tab title="crop feasibility" :disabled="familyList.length === 0 || !myFamily.keyNutrient">
+        <b-tab title="crop feasibility" :disabled="!selectedCropList || familyList.length === 0 || !myFamily.keyNutrient">
           <div class=" mb-2 ml-3">
             identified nutrient gap:
             <span
@@ -197,6 +197,7 @@
                 </template>
                 <b-form-group
                   class="ml-2"
+                  v-if="selectedCropList.length !== 0"
                 >
                   <b-form-radio-group
                     v-model="selectedNutrient"
@@ -563,7 +564,6 @@ export default {
     qaScore() {
       let res = []
       const vm = this
-      console.log(vm.myFamily)
       vm.myFamily.feasibilityCases.forEach(function (val) {
         res.push(vm.summarizeQA(vm.ansId, val.ansList))
       })
@@ -658,8 +658,6 @@ export default {
       return res ? res : {}
     },
     selectedCropList() {
-      console.log(this.myFamily)
-      console.log(this.myFamily.feasibilityCases)
       if (!this.myFamily.feasibilityCases) {
         return []
       }
@@ -669,14 +667,12 @@ export default {
     },
     selectedCropListFiltered() {
       const vm = this
-      return vm.selectedCropList.filter((item, index) => {
-        if (item !== '') {
-          return {
-            text: item,
-            value: index
-          }
+      return vm.selectedCropList.map((item, index)=>{
+        return {
+          text: item,
+          value: index
         }
-      })
+      }).filter((item)=>item.text !=='')
     },
     /*
         familyName: {

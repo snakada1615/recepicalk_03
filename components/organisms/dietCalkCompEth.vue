@@ -161,7 +161,7 @@ import recepiTable from "@/components/molecules/recepiTable"
 import nutritionBar2 from "@/components/molecules/nutritionBar2"
 import macroNutrientBar from "@/components/molecules/macroNutrientBar";
 import fctTableModal2 from "@/components/organisms/FctTableModal2";
-import {getNutritionSupply, validateMyFamily} from "../../plugins/helper";
+import {getNutritionDemand, getNutritionSupplyList, validateMyFamily} from "../../plugins/helper";
 
 /**
  * @desc 6つのコンポーネントを組み合わせて食事評価
@@ -517,8 +517,8 @@ export default {
           vm.myDri,
           vm.maxPage
         )))
-        vm.nutritionSupplyWatcher = JSON.parse(JSON.stringify(vm.nutritionSupplyGetter(
-          vm.myFamily.menuCases)))
+        vm.nutritionSupplyWatcher = JSON.parse(JSON.stringify(getNutritionSupplyList(
+          vm.myFamily.menuCases, vm.maxPage)))
         vm.rating = JSON.parse(JSON.stringify(vm.ratingGetter(
           vm.nutritionSupplyWatcher, vm.nutritionDemandWatcher)))
         vm.pageMemo = vm.myFamily.menuCases.map((item2) => {
@@ -540,8 +540,8 @@ export default {
       vm.myDri,
       vm.maxPage
     )))
-    vm.nutritionSupplyWatcher = JSON.parse(JSON.stringify(vm.nutritionSupplyGetter(
-      vm.myFamily.menuCases)))
+    vm.nutritionSupplyWatcher = JSON.parse(JSON.stringify(getNutritionSupplyList(
+      vm.myFamily.menuCases, vm.maxPage)))
     vm.rating = JSON.parse(JSON.stringify(vm.ratingGetter(
       vm.nutritionSupplyWatcher, vm.nutritionDemandWatcher)))
     vm.pageMemo = vm.myFamily.menuCases.map((item2) => {
@@ -564,67 +564,12 @@ export default {
       this.$emit('update:myFamily', dat)
     },
     /**
-     * 年齢グループごとの構成員数と各グループの栄養需要から合計を計算
-     * @param member
-     * @param driAll
-     * @returns {{Pr: number, En: number, Va: number, Wt: number, Fe: number}|*}
-     */
-    nutritionDemandCalk(member, driAll) {
-      const initObj = {
-        'En': 0,
-        'Pr': 0,
-        'Va': 0,
-        'Fe': 0,
-        'Wt': 0,
-      }
-      if (!member || (member.length === 0)) {
-        return initObj
-      }
-      return member.reduce((accumulator, currentItem, index) => {
-        const dri = driAll[index]
-        const count = currentItem.count
-        accumulator.En = (accumulator.En || 0) + Number(count) * Number(dri.En)
-        accumulator.Pr = (accumulator.Pr || 0) + Number(count) * Number(dri.Pr)
-        accumulator.Va = (accumulator.Va || 0) + Number(count) * Number(dri.Va)
-        accumulator.Fe = (accumulator.Fe || 0) + Number(count) * Number(dri.Fe)
-        accumulator.Wt = (accumulator.Wt || 0) + Number(count) * Number(dri.Wt)
-        return accumulator
-      }, initObj)
-    },
-    /**
      * myApp.menuCases.targetの値を集計してnutritionDemandWatcherに代入するための関数
      * @returns {*[]} 栄養素必要量の合計値
      */
     nutritionDemandGetter(member, dri, count) {
-      const res = this.nutritionDemandCalk(member, dri)
+      const res = getNutritionDemand(member, dri)
       return [...Array(count)].map(() => res);
-    },
-    /**
-     * myApp.menuCases.menuの値を集計してnutritionSupplyWatcherに代入するための関数
-     * ただしfood_grp_idがStapleの場合、PrとFeを無視する
-     * @returns {*[]} 栄養素供給量の合計値
-     */
-    nutritionSupplyGetter(menuCases) {
-      const initObj = {
-        'En': 0,
-        'Pr': 0,
-        'Va': 0,
-        'Fe': 0,
-        'Wt': 0,
-        'Carbohydrate': 0,
-        'Fat': 0
-      }
-      //return vm.myApp.menuCases.map((datArray) => {
-      if (menuCases.length === 0) {
-        return [...Array(this.$store.state.fire.myApp.sceneCount)].map(() => initObj)
-      }
-      return menuCases.map((datArray) => {
-        if (datArray.menu.length > 0) {
-          return getNutritionSupply(datArray.menu)
-        } else {
-          return initObj
-        }
-      })
     },
     /**
      * nutritionSupplyとnutritionDemandの値に基づいて栄養素の充足率を算出
@@ -780,16 +725,15 @@ export default {
     updatePfc() {
       console.log('updatePfc')
       this.pfcBalanceCurrent = this.nutritionSupplyWatcher.map((dat, index) => {
+        let gap = this.nutritionDemandWatcher[index].En - dat.Carbohydrate * 4 - dat.Pr * 4 - dat.Fat * 9
+        if (gap < 0) {
+          gap = 0
+        }
         return [
           {val: Math.round(dat.Pr * 4), color: 'green', label: '%'},
           {val: Math.round(dat.Fat * 9), color: 'yellow', label: '%'},
           {val: Math.round(dat.Carbohydrate * 4), color: 'red', label: '%'},
-          {
-            val: Math.round(this.nutritionDemandWatcher[index].En
-              - dat.Carbohydrate * 4 - dat.Pr * 4 - dat.Fat * 9),
-            color: 'silver',
-            label: '$',
-          },
+          {val: Math.round(gap), color: 'silver', label: '$',},
         ]
       })
     },

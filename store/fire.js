@@ -264,6 +264,8 @@ export const mutations = {
     state.myApp.menuCases = []
     state.myApp.prodTargetCases = []
     state.myApp.feasibilityCases = []
+    state.myApp.familyCases = []
+    state.myApp.communityCases = []
     state.myApp.saveDate = {}
     state.hasMyAppLoaded = false
   },

@@ -276,15 +276,40 @@ export function validateMacroNutrient(dat) {
  * @returns {*}
  */
 export function getNutritionDemand(target, dri) {
-  return target.reduce((accumulator, item, index) => {
-    const count = item.count
-    accumulator.En += Number(count) * Number(dri[index].En)
-    accumulator.Pr += Number(count) * Number(dri[index].Pr)
-    accumulator.Va += Number(count) * Number(dri[index].Va)
-    accumulator.Fe += Number(count) * Number(dri[index].Fe)
+  console.log('getNutritionDemand')
+  const initObj = {
+    'En': 0,
+    'Pr': 0,
+    'Va': 0,
+    'Fe': 0,
+    'Wt': 0,
+  }
+  if (!target || (target.length === 0)) {
+    return initObj
+  }
+  return target.reduce((accumulator, currentItem, index) => {
+    const count = Number(currentItem.count)
+    accumulator.En += count * Number(dri[index].En)
+    accumulator.Pr += count * Number(dri[index].Pr)
+    accumulator.Va += count * Number(dri[index].Va)
+    accumulator.Fe += count * Number(dri[index].Fe)
+    accumulator.Wt += count * Number(dri[index].Wt)
     return accumulator
-  }, {'En': 0, 'Pr': 0, 'Va': 0, 'Fe': 0})
+  }, initObj)
 }
+/**
+ * targetグループから栄養摂取目標を計算
+ * @param targetGroup
+ * @param dri
+ * @returns {*}
+ */
+export function getNutritionDemandList(targetGroup, dri) {
+  return targetGroup.map(function (target) {
+    return getNutritionDemand(target, dri)
+  })
+}
+
+
 
 /**
  * 選択された作物一蘭から栄養供給量を計算
@@ -340,24 +365,34 @@ export function getProductionTarget(nutrientsDemand, nutrientsSupply, keyNutrien
 }
 
 /**
- * targetグループから栄養摂取目標を計算
- * @param targetGroup
- * @param dri
- * @returns {*}
- */
-export function getNutritionDemandList(targetGroup, dri) {
-  return targetGroup.map(function (target) {
-    return getNutritionDemand(target, dri)
-  })
-}
-
-/**
  * 選択された作物から栄養供給量を計算
  * @param crops
- * @returns {*}
+ * @param count
+ * @returns {{Pr: number, Fat: number, En: number, Carbohydrate: number, Va: number, Wt: number, Fe: number}[]|*}
  */
-export function getNutritionSupplyList(crops) {
-  return crops.map((cropList) => {
-    return getNutritionSupply(cropList)
+export function getNutritionSupplyList(crops, count) {
+  console.log('getNutritionSupplyList')
+  console.log(crops)
+  const initObj = {
+    'En': 0,
+    'Pr': 0,
+    'Va': 0,
+    'Fe': 0,
+    'Wt': 0,
+    'Carbohydrate': 0,
+    'Fat': 0
+  }
+  if (crops.length === 0) {
+    return [...Array(count)].map(() => initObj)
+  }
+  return crops.map((datArray) => {
+    console.log(datArray)
+    let res = initObj
+    if (datArray.length !== 0) {
+      if (datArray.menu.length > 0) {
+        res = getNutritionSupply(datArray.menu)
+      }
+    }
+    return res
   })
 }
