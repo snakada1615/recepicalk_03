@@ -598,7 +598,6 @@ export default {
     },
     stateDiet() {
       const vm = this
-      console.log(vm.familyName)
       if (!vm.familyName) {
         return false
       }
@@ -793,7 +792,6 @@ export default {
       this.newTarget = JSON.parse(JSON.stringify(val))
     },
     async addNewFamily(name, member) {
-      console.log(' start')
       await this.$store.dispatch('fire/addNewFamily', {
         'name': name,
         'member': member,

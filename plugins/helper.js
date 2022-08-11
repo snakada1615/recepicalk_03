@@ -276,7 +276,6 @@ export function validateMacroNutrient(dat) {
  * @returns {*}
  */
 export function getNutritionDemand(target, dri) {
-  console.log('getNutritionDemand')
   const initObj = {
     'En': 0,
     'Pr': 0,
@@ -371,8 +370,6 @@ export function getProductionTarget(nutrientsDemand, nutrientsSupply, keyNutrien
  * @returns {{Pr: number, Fat: number, En: number, Carbohydrate: number, Va: number, Wt: number, Fe: number}[]|*}
  */
 export function getNutritionSupplyList(crops, count) {
-  console.log('getNutritionSupplyList')
-  console.log(crops)
   const initObj = {
     'En': 0,
     'Pr': 0,
@@ -386,11 +383,10 @@ export function getNutritionSupplyList(crops, count) {
     return [...Array(count)].map(() => initObj)
   }
   return crops.map((datArray) => {
-    console.log(datArray)
     let res = initObj
     if (datArray.length !== 0) {
       if (datArray.menu.length > 0) {
-        res = getNutritionSupply(datArray.menu)
+        res = getNutritionSupply(datArray.menu, 1)
       }
     }
     return res

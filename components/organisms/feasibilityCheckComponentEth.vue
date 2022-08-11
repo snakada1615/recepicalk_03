@@ -264,7 +264,11 @@ export default {
      */
     updateTargetCrop(myFamily) {
       return myFamily.feasibilityCases.map(function (item) {
-        return {menu: JSON.parse(JSON.stringify(item.selectedCrop))}
+        let dat = JSON.parse(JSON.stringify(item.selectedCrop))
+        if (dat.length > 0) {
+          //dat[0].Wt = item.prodTarget.Wt
+        }
+        return {menu: dat}
       })
     },
     /**
@@ -308,40 +312,42 @@ export default {
      * 栄養摂取目標と栄養供給量から栄養スコアを計算
      * @param nutritionDemand
      * @param nutritionSupply
+     * @param weight
+     * @returns {[{name: string, rating: (number|number), nameId: string, supply: (number|number), target: (number|number)},{name: string, rating: (number|number), nameId: string, supply: (number|number), target: (number|number)},{name: string, rating: (number|number), nameId: string, supply: (number|number), target: (number|number)},{name: string, rating: (number|number), nameId: string, supply: (number|number), target: (number|number)}]}
      */
-    updateNutritionRating(nutritionDemand, nutritionSupply) {
+    updateNutritionRating(nutritionDemand, nutritionSupply, weight) {
       return [
         {
           name: 'Energy',
           nameId: 'En',
           target: nutritionDemand.En ? Number(nutritionDemand.En) : 0,
-          supply: nutritionSupply.En ? Number(nutritionSupply.En * nutritionSupply.Wt / 100) : 0,
+          supply: nutritionSupply.En ? Number(nutritionSupply.En * weight / 100) : 0,
           rating: nutritionDemand.En ?
-            Math.round((nutritionSupply.En * nutritionSupply.Wt / 100) / nutritionDemand.En * 10) : 0
+            Math.round((nutritionSupply.En * weight / 100) / nutritionDemand.En * 10) : 0
         },
         {
           name: 'Protein',
           nameId: 'Pr',
           target: nutritionDemand.Pr ? Number(nutritionDemand.Pr) : 0,
-          supply: nutritionSupply.Pr ? Number(nutritionSupply.Pr * nutritionSupply.Wt / 100) : 0,
+          supply: nutritionSupply.Pr ? Number(nutritionSupply.Pr * weight / 100) : 0,
           rating: nutritionDemand.Pr ?
-            Math.round((nutritionSupply.Pr * nutritionSupply.Wt / 100) / nutritionDemand.Pr * 10) : 0
+            Math.round((nutritionSupply.Pr * weight / 100) / nutritionDemand.Pr * 10) : 0
         },
         {
           name: 'VitA',
           nameId: 'Va',
           target: nutritionDemand.Va ? Number(nutritionDemand.Va) : 0,
-          supply: nutritionSupply.Va ? Number(nutritionSupply.Va * nutritionSupply.Wt / 100) : 0,
+          supply: nutritionSupply.Va ? Number(nutritionSupply.Va * weight / 100) : 0,
           rating: nutritionDemand.Va ?
-            Math.round((nutritionSupply.Va * nutritionSupply.Wt / 100) / nutritionDemand.Va * 10) : 0
+            Math.round((nutritionSupply.Va * weight / 100) / nutritionDemand.Va * 10) : 0
         },
         {
           name: 'Fe',
           nameId: 'Fe',
           target: nutritionDemand.Fe ? Number(nutritionDemand.Fe) : 0,
-          supply: nutritionSupply.Fe ? Number(nutritionSupply.Fe * nutritionSupply.Wt / 100) : 0,
+          supply: nutritionSupply.Fe ? Number(nutritionSupply.Fe * weight / 100) : 0,
           rating: nutritionDemand.Fe ?
-            Math.round((nutritionSupply.Fe * nutritionSupply.Wt / 100) / nutritionDemand.Fe * 10) : 0
+            Math.round((nutritionSupply.Fe * weight / 100) / nutritionDemand.Fe * 10) : 0
         },
       ]
     },
@@ -358,38 +364,67 @@ export default {
       this.$emit('update:myFamily', dat)
     },
     /**
+     * demand, supply, share, indexからターゲット生産量を計算して返す
+     * @param share
+     * @param demand
+     * @param supply
+     * @param target
+     * @returns {{share: number, Wt365: number, Wt: number}|{share, Wt365: number, Wt: *}}
+     */
+    updateProductionTarget(share, demand, supply, target) {
+      const vm = this
+      //作物が未選択の場合、初期値を返す
+      if (!vm.currentCrop || !target) {
+        return {
+          'share': 100,
+          'Wt': 0,
+          'Wt365': 0
+        }
+      }
+
+      //nutrientTargetを更新して入れ替える
+      const Wt = getProductionTarget(
+        demand,
+        supply,
+        target,
+        share
+      )
+
+      return {
+        'share': share,
+        'Wt': Wt,
+        'Wt365': Wt * 365
+      }
+    },
+    /**
      * shareの更新をmyFamilyに組み込んでemitで通知
      * 栄養素充足目標（share）の更新：
      * @param newVal
      * @param index
      */
     updateShare(newVal, index) {
-      console.log('updateNutrientTarget')
+      const vm = this
       //作業用のmyFamilyコピー作成w
       let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
 
       //作物が未選択の場合、何もしない
-      if (dat.feasibilityCases[index].selectedCrop.length === 0){
+      if (dat.feasibilityCases[index].selectedCrop.length === 0) {
         return
       }
 
-      //nutrientTargetを更新して入れ替える
-      const nutrientTarget = dat.keyNutrient
-      const vm = this
-      const Wt = getProductionTarget(
+      //生産目標の更新
+      const res = vm.updateProductionTarget(
+        newVal,
         vm.nutritionDemand[index],
         vm.nutritionSupply[index],
-        nutrientTarget,
-        newVal
+        dat.keyNutrient
       )
 
-      //prodTargetを更新
-      dat.feasibilityCases[index].prodTarget.share = newVal
-      dat.feasibilityCases[index].prodTarget.Wt = Wt
-      dat.feasibilityCases[index].prodTarget.Wt365 = Wt * 365
+      //prodTargetの更新
+      dat.feasibilityCases[index].prodTarget = JSON.parse(JSON.stringify(res))
 
       //selectedCrop[0]を更新
-      dat.feasibilityCases[index].selectedCrop[0].Wt = Wt
+      //dat.feasibilityCases[index].selectedCrop[0].Wt = res.Wt
 
       //更新されたmyAppをemit
       this.$emit('update:myFamily', dat)
@@ -489,13 +524,20 @@ export default {
           return item.menu.length > 0 ? item.menu[0].Name : ''
         })
         vm.nutritionRatingSet = vm.nutritionDemand.map(function (demand, index) {
-          return vm.updateNutritionRating(demand, vm.nutritionSupply[index])
+          const weight = vm.myFamilyWatcher.feasibilityCases[index].prodTarget ?
+            vm.myFamilyWatcher.feasibilityCases[index].prodTarget.Wt : 0
+          return vm.updateNutritionRating(
+            demand,
+            vm.nutritionSupply[index],
+            weight
+          )
         })
         vm.qaScore = vm.updateScore()
-        this.pageMemo = vm.myFamily.feasibilityCases.map((item2) => {
+        vm.pageMemo = vm.myFamily.feasibilityCases.map((item2) => {
           return item2.note
         })
-        //vm.updateShare(vm.currentFeasibility.prodTarget.share)
+        //初回読み込み時に対象栄養素に応じた目標生産量の最計算（ターゲット栄養素が変更された場合への対応）
+        vm.share = vm.myFamilyWatcher.feasibilityCases[vm.pageId].prodTarget.share
       }
     }
   },
@@ -526,32 +568,36 @@ export default {
     vm.itemsDRI = JSON.parse(JSON.stringify(vm.myDri))
     vm.targetCrop = vm.updateTargetCrop(vm.myFamilyWatcher)
     vm.targetGroup = vm.updateTargetGroup(vm.myFamilyWatcher.member, vm.maxPage)
-    console.log('created: feasibilityCases')
     vm.nutritionDemand = getNutritionDemandList(vm.targetGroup, vm.itemsDRI)
     vm.nutritionSupply = getNutritionSupplyList(vm.targetCrop, vm.maxPage)
     vm.cropName = vm.targetCrop.map(function (item) {
       return item.menu.length > 0 ? item.menu[0].Name : ''
     })
     vm.nutritionRatingSet = vm.nutritionDemand.map(function (demand, index) {
-      return vm.updateNutritionRating(demand, vm.nutritionSupply[index])
+      const weight = vm.myFamilyWatcher.feasibilityCases[index].prodTarget ?
+        vm.myFamilyWatcher.feasibilityCases[index].prodTarget.Wt : 0
+      return vm.updateNutritionRating(
+        demand,
+        vm.nutritionSupply[index],
+        weight
+      )
     })
     vm.qaScore = vm.updateScore()
     this.pageMemo = vm.myFamilyWatcher.feasibilityCases.map((item2) => {
       return item2.note
     })
+
     //初回読み込み時に対象栄養素に応じた目標生産量の最計算（ターゲット栄養素が変更された場合への対応）
-    vm.myFamilyWatcher.feasibilityCases.map((item, index)=>{
-      console.log(item)
-      vm.updateShare(item.prodTarget.share, index)
-    })
+    vm.share = vm.myFamilyWatcher.feasibilityCases[vm.pageId].prodTarget.share
+
     //updateShareで[save]アイコンの変化を戻すためにフラグをセット
     vm.$store.dispatch('fire/setHasDocumentChanged', false)
   },
   computed: {
-    currentFeasibility(){
+    currentFeasibility() {
       return this.myFamilyWatcher.feasibilityCases[this.pageIdComputed]
     },
-    currentCrop(){
+    currentCrop() {
       return this.cropName[this.pageIdComputed]
     },
     /**

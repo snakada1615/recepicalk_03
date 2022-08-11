@@ -132,7 +132,6 @@ export default {
     showScore() {
       let vm = this
       return vm.myApp.menuCases.map((val, index) => {
-        console.log(val.menu)
         if (val.menu.length === 0 ) {
           return false
         } else {
@@ -318,8 +317,6 @@ export default {
 
       const dat2 = dat.feasibilityCases.find((item)=>{
         if (item.selectedCrop.length > 0 && dat.keyCommodity) {
-          console.log(item.selectedCrop[0].Name)
-          console.log(dat.keyCommodity)
           return item.selectedCrop[0].Name === dat.keyCommodity
         }
         return false
