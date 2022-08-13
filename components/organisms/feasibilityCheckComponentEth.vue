@@ -122,7 +122,7 @@
               Daily Target:
               <span class="text-danger">
                 {{
-                  setDigit(currentFeasibility.prodTarget.Wt, 2)
+                  setDigit(productionTarget[pageIdComputed].Wt, 2)
                 }}
               </span>
             </div>
@@ -130,7 +130,7 @@
               Annual Target:
               <span class="text-danger">
                 {{
-                  setDigit(currentFeasibility.prodTarget.Wt365, 2)
+                  setDigit(productionTarget[pageIdComputed].Wt365, 2)
                 }}
               </span>
             </div>
@@ -265,9 +265,6 @@ export default {
     updateTargetCrop(myFamily) {
       return myFamily.feasibilityCases.map(function (item) {
         let dat = JSON.parse(JSON.stringify(item.selectedCrop))
-        if (dat.length > 0) {
-          //dat[0].Wt = item.prodTarget.Wt
-        }
         return {menu: dat}
       })
     },
@@ -423,9 +420,6 @@ export default {
       //prodTargetの更新
       dat.feasibilityCases[index].prodTarget = JSON.parse(JSON.stringify(res))
 
-      //selectedCrop[0]を更新
-      //dat.feasibilityCases[index].selectedCrop[0].Wt = res.Wt
-
       //更新されたmyAppをemit
       this.$emit('update:myFamily', dat)
     },
@@ -514,30 +508,36 @@ export default {
         vm.myFamilyWatcher = JSON.parse(JSON.stringify(newVal))
         vm.ansListWatcher = vm.updateAnsList()
         vm.ansId = vm.updateAnsId()
+        vm.share = vm.myFamilyWatcher.feasibilityCases[vm.pageId].prodTarget.share
         vm.items = JSON.parse(JSON.stringify(vm.myFct))
         vm.itemsDRI = JSON.parse(JSON.stringify(vm.myDri))
         vm.targetCrop = vm.updateTargetCrop(vm.myFamilyWatcher)
         vm.targetGroup = vm.updateTargetGroup(vm.myFamilyWatcher.member, vm.maxPage)
         vm.nutritionDemand = getNutritionDemandList(vm.targetGroup, vm.itemsDRI)
         vm.nutritionSupply = getNutritionSupplyList(vm.targetCrop, vm.maxPage)
+        vm.productionTarget = vm.nutritionDemand.map(function (demand, index){
+          return vm.updateProductionTarget(
+            vm.share,
+            demand,
+            vm.nutritionSupply[index],
+            vm.myFamilyWatcher.keyNutrient
+          )
+        })
         vm.cropName = vm.targetCrop.map(function (item) {
           return item.menu.length > 0 ? item.menu[0].Name : ''
         })
+
         vm.nutritionRatingSet = vm.nutritionDemand.map(function (demand, index) {
-          const weight = vm.myFamilyWatcher.feasibilityCases[index].prodTarget ?
-            vm.myFamilyWatcher.feasibilityCases[index].prodTarget.Wt : 0
           return vm.updateNutritionRating(
             demand,
             vm.nutritionSupply[index],
-            weight
+            vm.productionTarget[index].Wt
           )
         })
         vm.qaScore = vm.updateScore()
         vm.pageMemo = vm.myFamily.feasibilityCases.map((item2) => {
           return item2.note
         })
-        //初回読み込み時に対象栄養素に応じた目標生産量の最計算（ターゲット栄養素が変更された場合への対応）
-        vm.share = vm.myFamilyWatcher.feasibilityCases[vm.pageId].prodTarget.share
       }
     }
   },
@@ -564,34 +564,36 @@ export default {
     vm.myFamilyWatcher = JSON.parse(JSON.stringify(vm.myFamily))
     vm.ansListWatcher = vm.updateAnsList()
     vm.ansId = vm.updateAnsId()
+    vm.share = vm.myFamilyWatcher.feasibilityCases[vm.pageId].prodTarget.share
     vm.items = JSON.parse(JSON.stringify(vm.myFct))
     vm.itemsDRI = JSON.parse(JSON.stringify(vm.myDri))
     vm.targetCrop = vm.updateTargetCrop(vm.myFamilyWatcher)
     vm.targetGroup = vm.updateTargetGroup(vm.myFamilyWatcher.member, vm.maxPage)
     vm.nutritionDemand = getNutritionDemandList(vm.targetGroup, vm.itemsDRI)
     vm.nutritionSupply = getNutritionSupplyList(vm.targetCrop, vm.maxPage)
+    vm.productionTarget = vm.nutritionDemand.map(function (demand, index){
+      return vm.updateProductionTarget(
+        vm.share,
+        demand,
+        vm.nutritionSupply[index],
+        vm.myFamilyWatcher.keyNutrient
+      )
+    })
+
     vm.cropName = vm.targetCrop.map(function (item) {
       return item.menu.length > 0 ? item.menu[0].Name : ''
     })
     vm.nutritionRatingSet = vm.nutritionDemand.map(function (demand, index) {
-      const weight = vm.myFamilyWatcher.feasibilityCases[index].prodTarget ?
-        vm.myFamilyWatcher.feasibilityCases[index].prodTarget.Wt : 0
       return vm.updateNutritionRating(
         demand,
         vm.nutritionSupply[index],
-        weight
+        vm.productionTarget[index].Wt
       )
     })
     vm.qaScore = vm.updateScore()
     this.pageMemo = vm.myFamilyWatcher.feasibilityCases.map((item2) => {
       return item2.note
     })
-
-    //初回読み込み時に対象栄養素に応じた目標生産量の最計算（ターゲット栄養素が変更された場合への対応）
-    vm.share = vm.myFamilyWatcher.feasibilityCases[vm.pageId].prodTarget.share
-
-    //updateShareで[save]アイコンの変化を戻すためにフラグをセット
-    vm.$store.dispatch('fire/setHasDocumentChanged', false)
   },
   computed: {
     currentFeasibility() {
@@ -696,6 +698,10 @@ export default {
        * 栄養素の充足率
        */
       nutritionRatingSet: [],
+      /**
+       * 生産量目標Wt
+       */
+      productionTarget: [],
       /**
        * ページメモ
        */

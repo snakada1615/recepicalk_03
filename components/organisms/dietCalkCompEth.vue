@@ -723,7 +723,6 @@ export default {
      *
      */
     updatePfc() {
-      console.log('updatePfc')
       this.pfcBalanceCurrent = this.nutritionSupplyWatcher.map((dat, index) => {
         let gap = this.nutritionDemandWatcher[index].En - dat.Carbohydrate * 4 - dat.Pr * 4 - dat.Fat * 9
         if (gap < 0) {
