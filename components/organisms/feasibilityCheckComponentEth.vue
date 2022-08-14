@@ -116,7 +116,7 @@
             </div>
             <div class="font-weight-bold">
               Target nutrient: <span
-              class="text-danger">{{ keyNutrient }}</span>
+              class="text-danger">{{ myFamilyWatcher.keyNutrient }}</span>
             </div>
             <div class="font-weight-bold">
               Daily Target:
@@ -142,7 +142,7 @@
               </b-row>
               <b-row v-for="(nut, index) in nutritionRatingSet[pageIdComputed]" :key="index">
                 <nutrition-bar
-                  v-if="nut.nameId === keyNutrient"
+                  v-if="nut.nameId === myFamilyWatcher.keyNutrient"
                   :label="nut.name"
                   :maxRatingAbsolute="nut.supply"
                   :nutritionTarget="nut.target"
@@ -191,7 +191,7 @@
       my-name="modalTest"
       my-modal-header="Food Composition Table"
       :show-modal.sync="showFct"
-      :items="items"
+      :items="itemsFct"
       @modalOk="onItemSelected"
     ></FctTableModal>
   </b-container>
@@ -509,7 +509,7 @@ export default {
         vm.ansListWatcher = vm.updateAnsList()
         vm.ansId = vm.updateAnsId()
         vm.share = vm.myFamilyWatcher.feasibilityCases[vm.pageId].prodTarget.share
-        vm.items = JSON.parse(JSON.stringify(vm.myFct))
+        vm.itemsFct = JSON.parse(JSON.stringify(vm.myFct))
         vm.itemsDRI = JSON.parse(JSON.stringify(vm.myDri))
         vm.targetCrop = vm.updateTargetCrop(vm.myFamilyWatcher)
         vm.targetGroup = vm.updateTargetGroup(vm.myFamilyWatcher.member, vm.maxPage)
@@ -565,7 +565,7 @@ export default {
     vm.ansListWatcher = vm.updateAnsList()
     vm.ansId = vm.updateAnsId()
     vm.share = vm.myFamilyWatcher.feasibilityCases[vm.pageId].prodTarget.share
-    vm.items = JSON.parse(JSON.stringify(vm.myFct))
+    vm.itemsFct = JSON.parse(JSON.stringify(vm.myFct))
     vm.itemsDRI = JSON.parse(JSON.stringify(vm.myDri))
     vm.targetCrop = vm.updateTargetCrop(vm.myFamilyWatcher)
     vm.targetGroup = vm.updateTargetGroup(vm.myFamilyWatcher.member, vm.maxPage)
@@ -596,9 +596,6 @@ export default {
     })
   },
   computed: {
-    currentFeasibility() {
-      return this.myFamilyWatcher.feasibilityCases[this.pageIdComputed]
-    },
     currentCrop() {
       return this.cropName[this.pageIdComputed]
     },
@@ -632,7 +629,7 @@ export default {
       for (let i = 0; i < this.maxPage; i++) {
         res.push({
           value: i,
-          text: 'page' + i + ': ' + this.cropName[i],
+          text: this.cropName[i] || '--------------------',
           disabled: this.cropName[i] === ''
         })
       }
@@ -681,7 +678,7 @@ export default {
       /**
        * fctの一覧
        */
-      items: [],
+      itemsFct: [],
       /**
        * driの一覧
        */
@@ -799,10 +796,6 @@ export default {
       type: String,
       required: true
     },
-    keyNutrient: {
-      type: String,
-      required: true
-    }
   }
 }
 </script>

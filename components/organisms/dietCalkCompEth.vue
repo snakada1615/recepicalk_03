@@ -115,16 +115,6 @@
               ></macro-nutrient-bar>
             </b-col>
           </b-row>
-          <!--
-                    <b-row class="mt-2 small" align-h="end">
-                      <b-col class="border-primary small" cols="6" style="background-color: silver">
-                        PFC =>
-                        <span style="color: Red">Carbohydrate</span>
-                        <span style="color: Green">Fat</span>
-                        <span style="color: Yellow">Protein</span>
-                      </b-col>
-                    </b-row>
-          -->
         </b-card>
       </b-col>
       <b-col cols="12" lg="6">

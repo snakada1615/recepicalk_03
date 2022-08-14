@@ -164,7 +164,6 @@
               :page-id.sync="pageId3"
               :max-page="maxPage"
               :current-family="familyName"
-              :key-nutrient="selectedNutrient"
               @update:myFamily="updateMyFamily"
               @update:pageMemo="updatePageMemo"
             />
