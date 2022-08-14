@@ -101,7 +101,7 @@
             <div class="font-weight-bold">Record of Diet</div>
           </template>
           <recepi-table
-            :items="currentMenu"
+            :items="myCrops"
             @itemDeleted="notifiRecepiEdit"
             @rowClick="notifiRecepiEdit"
           ></recepi-table>
@@ -142,7 +142,6 @@ export default {
   },
   data() {
     return {
-      currentMenu: [],
       /**
        * 使用する全変数のobject
        * myFamilyから読み込んでこのページで利用。更新された時にemitを返す
@@ -176,42 +175,6 @@ export default {
        */
       maxRating: 10,
       /**
-       * ターゲットの1グループあたり設定人数の最大値
-       */
-      maxPopulation: 10000,
-      /**
-       * nutritionBarで評価するmenuを１日分で評価するか、一食分で評価するか判定
-       */
-      driSwitch: true,
-      /**
-       * 作物情報を表すobject：作物摂取量の設定ダイアログに渡すproperty
-       */
-      items_modal: [],
-      /**
-       * 作物摂取量を表す値：作物摂取量の設定ダイアログに渡すproperty
-       */
-      value_model: 0,
-      /**
-       * 当該作物がどのメニュに含まれるかを示す変数
-       */
-      menuName_modal: '',
-      /**
-       * driSelectAll表示用のフラグ
-       */
-      showDriSelect: false,
-      /**
-       * fctTableModal表示用のフラグ
-       */
-      showFct: false,
-      /**
-       * modal表示用のフラグ
-       */
-      showModal: false,
-      /**
-       * 各ページの捕捉情報
-       */
-      pageMemo: [],
-      /**
        * PFCバランスの推奨値
        */
       pfcBalanceStandard: [
@@ -237,19 +200,6 @@ export default {
     },
   },
   computed: {
-    /**
-     * ratingを計算するにあたって、同一メニューを一日3回食べると仮定した場合の評価、
-     *     (recepiTableの値×3)、または1回分が一日の栄養素に与える影響の評価を
-     *     切り替える
-     * @returns {number}
-     */
-    driRange: function () {
-      let res = 3
-      if (this.driSwitch) {
-        res = 1
-      }
-      return res
-    },
     /**
      * FCTからfood Groupを抽出
      * @returns {*}
@@ -281,16 +231,6 @@ export default {
       }
       return res
     },
-    /**
-     * noteの記入状態
-     * @returns {boolean}
-     */
-    noteInputState() {
-      if (this.pageMemo.length === 0) {
-        return false
-      }
-      return (this.pageMemo[this.pageIdComputed].length > 3)
-    }
   },
   watch: {
     /**
@@ -314,7 +254,6 @@ export default {
           vm.myCrops, 1)))
         vm.rating = JSON.parse(JSON.stringify(vm.ratingGetter(
           vm.nutritionSupplyWatcher, vm.nutritionDemandWatcher)))
-        vm.currentMenu = JSON.parse(JSON.stringify(vm.myCrops))
         vm.pfcBalanceCurrent = JSON.parse(JSON.stringify(vm.updatePfc(
           vm.nutritionSupplyWatcher,
           vm.nutritionDemandWatcher
@@ -328,8 +267,8 @@ export default {
   created() {
     const vm = this
     vm.myFamilyWatcher = JSON.parse(JSON.stringify(vm.myFamily))
-    vm.myCrops = vm.myFamilyWatcher.myCrops
     console.log(vm.myFamilyWatcher)
+    vm.myCrops = vm.myFamilyWatcher.myCrops
     vm.myMember = vm.myFamilyWatcher.myMember
     vm.myFct = vm.myFamilyWatcher.myFct
     vm.myDri = vm.myFamilyWatcher.myDri
@@ -341,7 +280,6 @@ export default {
       vm.myCrops, 1)))
     vm.rating = JSON.parse(JSON.stringify(vm.ratingGetter(
       vm.nutritionSupplyWatcher, vm.nutritionDemandWatcher)))
-    vm.currentMenu = JSON.parse(JSON.stringify(vm.myCrops))
     vm.pfcBalanceCurrent = JSON.parse(JSON.stringify(vm.updatePfc(
       vm.nutritionSupplyWatcher,
       vm.nutritionDemandWatcher
@@ -355,33 +293,14 @@ export default {
     ratingGetter(supply, demand) {
       return {
         En: demand.En ?
-          Math.round(100 * supply.En * this.driRange / demand.En) / 10 : 0,
+          Math.round(100 * supply.En / demand.En) / 10 : 0,
         Pr: demand.Pr ?
-          Math.round(100 * supply.Pr * this.driRange / demand.Pr) / 10 : 0,
+          Math.round(100 * supply.Pr / demand.Pr) / 10 : 0,
         Va: demand.Va ?
-          Math.round(100 * supply.Va * this.driRange / demand.Va) / 10 : 0,
+          Math.round(100 * supply.Va / demand.Va) / 10 : 0,
         Fe: demand.Fe ?
-          Math.round(100 * supply.Fe * this.driRange / demand.Fe) / 10 : 0
+          Math.round(100 * supply.Fe / demand.Fe) / 10 : 0
       }
-    },
-    /**
-     * ユーザーによりrecepiTableがクリックされた際に、行の内容を組み込んでfoodModalを開く
-     * @param val
-     */
-    onRecepiClicked(val) {
-      this.items_modal.length = 0
-      this.items_modal.push({
-        'id': val.id,
-        'Name': val.Name,
-        'Group': val.Group,
-        'En': val.En,
-        'Pr': val.Pr,
-        'Va': val.Va,
-        'Fe': val.Fe,
-      })
-      this.menuName_modal = val.menuName
-      this.value_model = val.Wt
-      this.showModal = true
     },
     /**
      * recepiTableが更新される度に、pfcBalanceCurrent

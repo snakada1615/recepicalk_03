@@ -310,6 +310,7 @@ import fctTableModal from "../components/organisms/FctTableModal";
 import {getNutritionDemand, getNutritionSupply, getProductionTarget} from "../plugins/helper";
 import nutritionBar2 from "../components/molecules/nutritionBar2";
 import familyResultFinal from "../components/organisms/familyResultFinal";
+import dietCalkDisplayEth from "../components/organisms/dietCalkDisplayEth";
 
 export default {
   components: {
@@ -318,7 +319,8 @@ export default {
     feasibilityCheckComponentEth,
     fctTableModal,
     nutritionBar2,
-    familyResultFinal
+    familyResultFinal,
+    dietCalkDisplayEth
   },
   data() {
     return {
