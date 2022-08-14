@@ -303,12 +303,10 @@ export function getNutritionDemand(target, dri) {
  * @returns {*}
  */
 export function getNutritionDemandList(targetGroup, dri) {
-  return targetGroup.map(function (target) {
-    return getNutritionDemand(target, dri)
+  return targetGroup.map(function (item) {
+    return getNutritionDemand(item.target, dri)
   })
 }
-
-
 
 /**
  * 選択された作物一蘭から栄養供給量を計算
