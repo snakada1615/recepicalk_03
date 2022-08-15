@@ -137,7 +137,8 @@
             </b-list-group>
           </b-card>
         </b-tab>
-        <b-tab title="crop feasibility" :disabled="!selectedCropList || familyList.length === 0 || !myFamily.keyNutrient">
+        <b-tab title="crop feasibility"
+               :disabled="!selectedCropList || familyList.length === 0 || !myFamily.keyNutrient">
           <div class=" mb-2 ml-3">
             identified nutrient gap:
             <span
@@ -199,7 +200,7 @@
                   v-if="selectedCropList.length !== 0"
                 >
                   <b-form-radio-group
-                    v-model="selectedNutrient"
+                    v-model="selectedCommodityId"
                     :options="selectedCropListFiltered"
                     button-variant="outline-primary"
                     buttons
@@ -211,7 +212,7 @@
 
             </b-col>
           </b-row>
-          <div class=" mt-2 mb-0 ml-3"> result of crop feasibility assessment: </div>
+          <div class=" mt-2 mb-0 ml-3"> result of crop feasibility assessment:</div>
           <b-row>
             <b-col
               cols="12"
@@ -279,16 +280,12 @@
           <div class=" mb-2 ml-3">
             identified nutrient dense food:
             <span class="text-danger font-weight-bold">
-                   {{ selectedNutrient }}
-                </span>
+              {{ selectedCropListFiltered[selectedCommodityId].text }}
+            </span>
           </div>
-          <family-result-final
-            :my-scene-count= 10
-            :my-fct="fct"
-            :my-dri="dri"
-            :my-family-case="myFamily"
+          <summary-diet-eth
+            :my-app="summaryResult"
           />
-
         </b-tab>
       </b-tabs>
     </b-card>
@@ -311,6 +308,7 @@ import {getNutritionDemand, getNutritionSupply, getProductionTarget} from "../pl
 import nutritionBar2 from "../components/molecules/nutritionBar2";
 import familyResultFinal from "../components/organisms/familyResultFinal";
 import dietCalkDisplayEth from "../components/organisms/dietCalkDisplayEth";
+import summaryDietEth from "../components/organisms/summaryDietEth";
 
 export default {
   components: {
@@ -320,7 +318,8 @@ export default {
     fctTableModal,
     nutritionBar2,
     familyResultFinal,
-    dietCalkDisplayEth
+    dietCalkDisplayEth,
+    summaryDietEth
   },
   data() {
     return {
@@ -558,6 +557,40 @@ export default {
     }
   },
   computed: {
+    menuUpdated() {
+      const vm = this
+      let res = JSON.parse(JSON.stringify(vm.myFamily.menuCases[0].menu))
+      const addedCommodity = vm.myFamily.feasibilityCases.find((item)=>{
+        if (item.selectedCrop.length > 0) {
+          return item.selectedCrop[0].Name === vm.selectedCommodity
+        } else {
+          return false
+        }
+      })
+      if (addedCommodity.selectedCrop.length > 0){
+        res.push(addedCommodity.selectedCrop[0])
+      }
+      return res
+    },
+    summaryResult() {
+      const vm = this
+      return {
+        menuCases: [
+          {
+            note: '',
+            menu: vm.myFamily.menuCases[0].menu,
+            target:vm.myFamily.member
+          },
+          {
+            note: '',
+            menu: vm.menuUpdated,
+            target:vm.myFamily.member
+          }
+        ],
+        fct: vm.fct,
+        dri: vm.dri,
+      }
+    },
     /**
      * ansListをmyAppから読み込んでscoreに変換
      * @returns {*[]}
@@ -647,7 +680,23 @@ export default {
         let res = JSON.parse(JSON.stringify(vm.myFamily))
         res.keyNutrient = val
         vm.updateMyFamily(res)
-      }
+      },
+    },
+    selectedCommodityId: {
+      get() {
+        return this.myFamily.keyCommodity
+      },
+      set(val) {
+        const vm = this
+        console.log(val)
+        let res = JSON.parse(JSON.stringify(vm.myFamily))
+        res.keyCommodity = val
+        vm.updateMyFamily(res)
+      },
+    },
+    selectedCommodity(){
+      const vm = this
+      return vm.selectedCropListFiltered[vm.selectedCommodityId].text
     },
     myApp: function () {
       return this.$store.state.fire.myApp
@@ -667,12 +716,12 @@ export default {
     },
     selectedCropListFiltered() {
       const vm = this
-      return vm.selectedCropList.map((item, index)=>{
+      return vm.selectedCropList.map((item, index) => {
         return {
           text: item,
           value: index
         }
-      }).filter((item)=>item.text !=='')
+      }).filter((item) => item.text !== '')
     },
     /*
         familyName: {
@@ -763,7 +812,8 @@ export default {
 
       //myFamilyを更新
       await this.updateMyFamily(dat)
-    },
+    }
+    ,
     /**
      * fctダイアログのトリガー
      */

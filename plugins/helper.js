@@ -304,6 +304,7 @@ export function getNutritionDemand(target, dri) {
  */
 export function getNutritionDemandList(targetGroup, dri) {
   return targetGroup.map(function (item) {
+    console.log(item)
     return getNutritionDemand(item.target, dri)
   })
 }

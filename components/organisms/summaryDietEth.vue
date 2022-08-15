@@ -103,6 +103,8 @@
                     </b-col>
                   </b-row>
                 </b-card>
+                <hr>
+                <hr>
               </div>
             </b-col>
           </b-row>
