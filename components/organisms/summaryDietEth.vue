@@ -103,8 +103,6 @@
                     </b-col>
                   </b-row>
                 </b-card>
-                <hr>
-                <hr>
               </div>
             </b-col>
           </b-row>
@@ -116,7 +114,7 @@
 <script>
 import nutritionBar2 from "@/components/molecules/nutritionBar2";
 import macroNutrientBar from "@/components/molecules/macroNutrientBar";
-import {getNutritionDemandList, getNutritionSupplyList} from "../../plugins/helper";
+import {getNutritionDemandList, getNutritionSupplyList, updatePfc} from "../../plugins/helper";
 
 export default {
   components: {
@@ -172,6 +170,10 @@ export default {
         return accumulator
       }, [])
     },
+    targetGroup(){
+        const res = JSON.parse(JSON.stringify(this.myApp.member))
+        return [...Array(this.myApp.menuCases.length)].map(() => res)
+    },
     fieldsFoodGroup() {
       const vm = this
       let res = [{key: 'case', label: 'Case'}]
@@ -217,7 +219,7 @@ export default {
      */
     nutritionDemandGetter() {
       const vm = this
-      return getNutritionDemandList(vm.myApp.menuCases, vm.myApp.dri)
+      return getNutritionDemandList(vm.targetGroup, vm.myApp.dri)
     },
     /**
      * myApp.menuCases.menuの値を集計してnutritionSupplyWatcherに代入するための関数
@@ -254,19 +256,7 @@ export default {
      * @returns {[{val: number, color: string},{val: number, color: string},{val: number, color: string}][]}
      */
     pfcBalanceCurrent() {
-      return this.nutritionSupplyGetter.map((dat, index) => {
-        return [
-          {val: Math.round(dat.Pr * 4), color: 'green', label: '%'},
-          {val: Math.round(dat.Fat * 9), color: 'yellow', label: '%'},
-          {val: Math.round(dat.Carbohydrate * 4), color: 'red', label: '%'},
-          {
-            val: Math.round(this.nutritionDemandGetter[index].En
-              - dat.Carbohydrate * 4 - dat.Pr * 4 - dat.Fat * 9),
-            color: 'silver',
-            label: '$',
-          },
-        ]
-      })
+      return updatePfc(this.nutritionSupplyGetter, this.nutritionDemandGetter)
     }
   },
   props: {

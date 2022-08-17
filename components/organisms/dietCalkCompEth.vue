@@ -109,7 +109,7 @@
             <b-col cols="4">
               <div>Current PFC</div>
             </b-col>
-            <b-col cols="7">
+            <b-col cols="7" v-if="false">
               <macro-nutrient-bar
                 :chart-values="pfcBalanceCurrent[pageIdComputed]"
               ></macro-nutrient-bar>
@@ -151,7 +151,8 @@ import recepiTable from "@/components/molecules/recepiTable"
 import nutritionBar2 from "@/components/molecules/nutritionBar2"
 import macroNutrientBar from "@/components/molecules/macroNutrientBar";
 import fctTableModal2 from "@/components/organisms/FctTableModal2";
-import {getNutritionDemand, getNutritionSupplyList, validateMyFamily} from "../../plugins/helper";
+import {getNutritionSupplyList, validateMyFamily,
+  getNutritionDemandList, updatePfc} from "../../plugins/helper";
 
 /**
  * @desc 6つのコンポーネントを組み合わせて食事評価
@@ -301,68 +302,7 @@ export default {
       /**
        * PFCバランスの現状
        */
-      pfcBalanceCurrent: [
-        [
-          {val: 55, color: 'red', label: '%'},
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 500, color: 'silver', label: '$'},
-        ],
-        [
-          {val: 55, color: 'red', label: '%'},
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 500, color: 'silver', label: '$'},
-        ],
-        [
-          {val: 55, color: 'red', label: '%'},
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 500, color: 'silver', label: '$'},
-        ],
-        [
-          {val: 55, color: 'red', label: '%'},
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 500, color: 'silver', label: '$'},
-        ],
-        [
-          {val: 55, color: 'red', label: '%'},
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 500, color: 'silver', label: '$'},
-        ],
-        [
-          {val: 55, color: 'red', label: '%'},
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 500, color: 'silver', label: '$'},
-        ],
-        [
-          {val: 55, color: 'red', label: '%'},
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 500, color: 'silver', label: '$'},
-        ],
-        [
-          {val: 55, color: 'red', label: '%'},
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 500, color: 'silver', label: '$'},
-        ],
-        [
-          {val: 55, color: 'red', label: '%'},
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 500, color: 'silver', label: '$'},
-        ],
-        [
-          {val: 55, color: 'red', label: '%'},
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 500, color: 'silver', label: '$'},
-        ],
-      ]
+      pfcBalanceCurrent: []
     }
   },
   props: {
@@ -502,10 +442,11 @@ export default {
       handler(newVal) {
         const vm = this
         vm.myFamilyWatcher = JSON.parse(JSON.stringify(newVal))
-        this.nutritionDemandWatcher = JSON.parse(JSON.stringify(vm.nutritionDemandGetter(
-          vm.myFamily.member,
-          vm.myDri,
-          vm.maxPage
+        const memberSet = JSON.parse(JSON.stringify(vm.myFamilyWatcher.member))
+        const memberSetList = [...Array(vm.maxPage)].map(() => memberSet)
+        vm.nutritionDemandWatcher = JSON.parse(JSON.stringify(getNutritionDemandList(
+          memberSetList,
+          vm.myDri
         )))
         vm.nutritionSupplyWatcher = JSON.parse(JSON.stringify(getNutritionSupplyList(
           vm.myFamily.menuCases, vm.maxPage)))
@@ -515,7 +456,9 @@ export default {
           return item2.note
         })
         vm.currentMenu = JSON.parse(JSON.stringify(vm.myFamilyWatcher.menuCases[this.pageIdComputed].menu))
-        vm.updatePfc()
+        vm.pfcBalanceCurrent  = JSON.parse(JSON.stringify(
+          updatePfc(vm.nutritionSupplyWatcher, vm.nutritionDemandWatcher)
+        ))
       }
     },
   },
@@ -525,10 +468,11 @@ export default {
   created() {
     const vm = this
     vm.myFamilyWatcher = JSON.parse(JSON.stringify(vm.myFamily))
-    this.nutritionDemandWatcher = JSON.parse(JSON.stringify(vm.nutritionDemandGetter(
-      vm.myFamily.member,
-      vm.myDri,
-      vm.maxPage
+    const memberSet = JSON.parse(JSON.stringify(vm.myFamilyWatcher.member))
+    const memberSetList = [...Array(vm.maxPage)].map(() => memberSet)
+    vm.nutritionDemandWatcher = JSON.parse(JSON.stringify(getNutritionDemandList(
+      memberSetList,
+      vm.myDri
     )))
     vm.nutritionSupplyWatcher = JSON.parse(JSON.stringify(getNutritionSupplyList(
       vm.myFamily.menuCases, vm.maxPage)))
@@ -538,7 +482,9 @@ export default {
       return item2.note
     })
     vm.currentMenu = JSON.parse(JSON.stringify(vm.myFamilyWatcher.menuCases[this.pageIdComputed].menu))
-    vm.updatePfc()
+    vm.pfcBalanceCurrent  = JSON.parse(JSON.stringify(
+      updatePfc(vm.nutritionSupplyWatcher, vm.nutritionDemandWatcher)
+    ))
   },
   methods: {
     /**
@@ -552,14 +498,6 @@ export default {
       dat.menuCases[this.pageIdComputed].note = newVal
       //更新されたmyAppをemit
       this.$emit('update:myFamily', dat)
-    },
-    /**
-     * myApp.menuCases.targetの値を集計してnutritionDemandWatcherに代入するための関数
-     * @returns {*[]} 栄養素必要量の合計値
-     */
-    nutritionDemandGetter(member, dri, count) {
-      const res = getNutritionDemand(member, dri)
-      return [...Array(count)].map(() => res);
     },
     /**
      * nutritionSupplyとnutritionDemandの値に基づいて栄養素の充足率を算出
@@ -699,32 +637,6 @@ export default {
     //fctとdriの表示調整
     toggleFctDri() {
       console.log('test')
-    }
-    ,
-    /**
-     * recepiTableが更新される度に、pfcBalanceCurrent
-     *    の値を更新
-     *    conversion factor
-     *    -Carbohydrate: 4Kcal/gram
-     *    -Protein: 4Kcal/gram
-     *    -Fat: 9Kcal/gram
-     *
-     * labelに指定した値が表示用に使われる。空白の場合はvalの値が表示される
-     *
-     */
-    updatePfc() {
-      this.pfcBalanceCurrent = this.nutritionSupplyWatcher.map((dat, index) => {
-        let gap = this.nutritionDemandWatcher[index].En - dat.Carbohydrate * 4 - dat.Pr * 4 - dat.Fat * 9
-        if (gap < 0) {
-          gap = 0
-        }
-        return [
-          {val: Math.round(dat.Pr * 4), color: 'green', label: '%'},
-          {val: Math.round(dat.Fat * 9), color: 'yellow', label: '%'},
-          {val: Math.round(dat.Carbohydrate * 4), color: 'red', label: '%'},
-          {val: Math.round(gap), color: 'silver', label: '$',},
-        ]
-      })
     },
     notifiRecepiEdit() {
       alert('you can edit diet record by clicking [add crop] button')

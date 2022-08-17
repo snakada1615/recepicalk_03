@@ -116,7 +116,7 @@ import driSelectModal from "@/components/organisms/driSelectModal";
 import recepiTable from "@/components/molecules/recepiTable"
 import nutritionBar2 from "@/components/molecules/nutritionBar2"
 import macroNutrientBar from "@/components/molecules/macroNutrientBar";
-import {getNutritionSupply, getNutritionDemand} from "../../plugins/helper";
+import {getNutritionSupply, getNutritionDemand, updatePfc} from "../../plugins/helper";
 
 /**
  * @desc 6つのコンポーネントを組み合わせて食事評価
@@ -254,10 +254,9 @@ export default {
           vm.myCrops, 1)))
         vm.rating = JSON.parse(JSON.stringify(vm.ratingGetter(
           vm.nutritionSupplyWatcher, vm.nutritionDemandWatcher)))
-        vm.pfcBalanceCurrent = JSON.parse(JSON.stringify(vm.updatePfc(
-          vm.nutritionSupplyWatcher,
-          vm.nutritionDemandWatcher
-        )))
+        this.pfcBalanceCurrent  = JSON.parse(JSON.stringify(
+          updatePfc(this.nutritionSupplyWatcher, this.nutritionDemandWatcher)
+        ))
       }
     },
   },
@@ -280,10 +279,9 @@ export default {
       vm.myCrops, 1)))
     vm.rating = JSON.parse(JSON.stringify(vm.ratingGetter(
       vm.nutritionSupplyWatcher, vm.nutritionDemandWatcher)))
-    vm.pfcBalanceCurrent = JSON.parse(JSON.stringify(vm.updatePfc(
-      vm.nutritionSupplyWatcher,
-      vm.nutritionDemandWatcher
-    )))
+    this.pfcBalanceCurrent  = JSON.parse(JSON.stringify(
+      updatePfc(this.nutritionSupplyWatcher, this.nutritionDemandWatcher)
+    ))
   },
   methods: {
     /**
@@ -301,30 +299,6 @@ export default {
         Fe: demand.Fe ?
           Math.round(100 * supply.Fe / demand.Fe) / 10 : 0
       }
-    },
-    /**
-     * recepiTableが更新される度に、pfcBalanceCurrent
-     *    の値を更新
-     *    conversion factor
-     *    -Carbohydrate: 4Kcal/gram
-     *    -Protein: 4Kcal/gram
-     *    -Fat: 9Kcal/gram
-     *
-     * labelに指定した値が表示用に使われる。空白の場合はvalの値が表示される
-     *
-     */
-    updatePfc(supply, demand) {
-      let gap = demand.En - supply.Carbohydrate * 4
-        - supply.Pr * 4 - supply.Fat * 9
-      if (gap < 0) {
-        gap = 0
-      }
-      return [
-        {val: Math.round(supply.Pr * 4), color: 'green', label: '%'},
-        {val: Math.round(supply.Fat * 9), color: 'yellow', label: '%'},
-        {val: Math.round(supply.Carbohydrate * 4), color: 'red', label: '%'},
-        {val: Math.round(gap), color: 'silver', label: '$',},
-      ]
     },
     notifiRecepiEdit() {
       alert('you can edit diet record by clicking [add crop] button')

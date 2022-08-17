@@ -304,8 +304,7 @@ export function getNutritionDemand(target, dri) {
  */
 export function getNutritionDemandList(targetGroup, dri) {
   return targetGroup.map(function (item) {
-    console.log(item)
-    return getNutritionDemand(item.target, dri)
+    return getNutritionDemand(item, dri)
   })
 }
 
@@ -389,5 +388,31 @@ export function getNutritionSupplyList(crops, count) {
       }
     }
     return res
+  })
+}
+
+/**
+ * recepiTableが更新される度に、pfcBalanceCurrent
+ *    の値を更新
+ *    conversion factor
+ *    -Carbohydrate: 4Kcal/gram
+ *    -Protein: 4Kcal/gram
+ *    -Fat: 9Kcal/gram
+ *
+ * labelに指定した値が表示用に使われる。空白の場合はvalの値が表示される
+ *
+ */
+export function updatePfc(supply, demand) {
+  return supply.map((dat, index) => {
+    let gap = demand[index].En - dat.Carbohydrate * 4 - dat.Pr * 4 - dat.Fat * 9
+    if (gap < 0) {
+      gap = 0
+    }
+    return [
+      {val: Math.round(dat.Pr * 4), color: 'green', label: '%'},
+      {val: Math.round(dat.Fat * 9), color: 'yellow', label: '%'},
+      {val: Math.round(dat.Carbohydrate * 4), color: 'red', label: '%'},
+      {val: Math.round(gap), color: 'silver', label: '$',},
+    ]
   })
 }

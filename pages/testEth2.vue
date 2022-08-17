@@ -2,9 +2,75 @@
   <b-container>
     <b-card :header="'current family: ' + familyName">
       <b-tabs card>
-        <b-tab title="current diet" :disabled="!myFamily">
+        <b-tab title="add family">
+          <b-row class="justify-content-center">
+            <b-col cols="8">
+              <b-input-group
+                size="sm"
+                prepend="family name"
+                class="mt-2 mb-0"
+              >
+                <b-form-input
+                  v-model="newFamilyName"
+                  :state="stateFamilyName"
+                ></b-form-input>
+                <template #append>
+                  <b-button
+                    :disabled="!stateFamilyName"
+                    :class="{'btn-info':stateFamilyName}"
+                    @click="addNewCommunity(newFamilyName, newTarget)"
+                  >add new family
+                  </b-button>
+                </template>
+              </b-input-group>
+              <div class="small text-muted mb-2">you have to give unique family name</div>
+              <hr>
+              {{ $store.state.fire.myApp.currentFamily }}
+              <dri-select-multi
+                :driItems="dri"
+                :target="newTarget"
+                :max="maxPopulation"
+                @update:target="updateNewFamily"
+                class="multi"
+              ></dri-select-multi>
+            </b-col>
+          </b-row>
+        </b-tab>
+        <b-tab title="select family" :disabled="familyList.length === 0" v-if="false">
+          <b-row class="justify-content-center border-primary">
+            <b-col cols="8">
+              <b-input-group size="sm" class="mb-2">
+                <template #prepend>
+                  <b-input-group-text>
+                    select family
+                  </b-input-group-text>
+                </template>
+                <b-form-select
+                  v-model="familyName"
+                  :options="familyList"
+                  @change="changeFamily"
+                ></b-form-select>
+                <template #append>
+                  <b-button
+                    @click="removeFamily(familyName)"
+                  >
+                    <b-icon icon="trash"/>
+                  </b-button>
+                </template>
+              </b-input-group>
+              <dri-select-multi
+                :driItems="dri"
+                :target="currentTarget"
+                :max="maxPopulation"
+                @update:target="updateFamily(familyName, $event)"
+                class="multi"
+              ></dri-select-multi>
+            </b-col>
+          </b-row>
+        </b-tab>
+        <b-tab title="current diet" :disabled="!stateDiet" v-if="false">
           <b-card no-body>
-            <diet-calk-community-comp-eth
+            <diet-calk-comp-eth
               v-if="myFamily.name"
               :my-family="myFamily"
               :my-dri="myApp.dataSet.dri"
@@ -12,16 +78,13 @@
               :my-portion="myApp.dataSet.portionUnit"
               :page-id="pageId1"
               :max-page="maxPage"
+              :disabled-option="[1,2,3,4,5,6,7,8,9]"
               @update:myFamily="updateMyFamily"
             />
           </b-card>
         </b-tab>
 
-        <b-tab title="diet summary" :disabled="!myFamily">
-          summary and average here
-        </b-tab>
-
-        <b-tab title="priority commodity" :disabled="!myFamily || (myFamily.menuCases[0].menu.length === 0)">
+        <b-tab title="priority commodity" :disabled="!statePriotiry" v-if="false">
           <b-card
             style="min-width: 530px;"
             header-bg-variant="success"
@@ -74,13 +137,14 @@
             </b-list-group>
           </b-card>
         </b-tab>
-        <b-tab title="crop feasibility" :disabled="familyList.length === 0 || !myFamily.keyNutrient">
+        <b-tab title="crop feasibility"
+               :disabled="!selectedCropList || familyList.length === 0 || !myFamily.keyNutrient" v-if="false">
           <div class=" mb-2 ml-3">
             identified nutrient gap:
             <span
               class="text-danger font-weight-bold"
             >
-              {{selectedNutrient}}
+              {{ selectedNutrient }}
             </span>
           </div>
           <div class=" mb-2 ml-3">
@@ -88,10 +152,10 @@
             <span
               class="text-danger font-weight-bold"
             >
-              {{selectedCropList[pageId3]}}
+              {{ selectedCropList[pageId3] }}
             </span>
           </div>
-          <b-row v-if="false">
+          <b-row>
             <feasibility-check-component-eth
               v-if="myFamily.name && selectedNutrient"
               :my-family="myFamily"
@@ -101,16 +165,54 @@
               :page-id.sync="pageId3"
               :max-page="maxPage"
               :current-family="familyName"
-              :key-nutrient="selectedNutrient"
               @update:myFamily="updateMyFamily"
               @update:pageMemo="updatePageMemo"
             />
           </b-row>
         </b-tab>
         <b-tab
-          title="summary result"
-          :disabled="!stateFeasibilityCheck"
+          title="crop feasibility assessment summary"
+          :disabled="!stateFeasibilityCheck" v-if="false"
         >
+          <b-row>
+            <b-col
+              cols="12"
+              lg="6"
+              class="my-1"
+            >
+              <div class=" mb-2 ml-3">
+                identified nutrient gap:
+                <span class="text-danger font-weight-bold">
+                   {{ selectedNutrient }}
+                </span>
+              </div>
+              <b-card
+                style="min-width: 530px;"
+                header-bg-variant="success"
+                bg-variant="light"
+                border-variant="success"
+                class="mx-1 px-0 my-2">
+                <template #header>
+                  <div>Select nutrient dense food for your target family/HH</div>
+                </template>
+                <b-form-group
+                  class="ml-2"
+                  v-if="selectedCropList.length !== 0"
+                >
+                  <b-form-radio-group
+                    v-model="selectedCommodityId"
+                    :options="selectedCropListFiltered"
+                    button-variant="outline-primary"
+                    buttons
+                    stacked
+                    class="ml-4"
+                  ></b-form-radio-group>
+                </b-form-group>
+              </b-card>
+
+            </b-col>
+          </b-row>
+          <div class=" mt-2 mb-0 ml-3"> result of crop feasibility assessment:</div>
           <b-row>
             <b-col
               cols="12"
@@ -134,12 +236,12 @@
                   </div>
                 </template>
                 <b-row>
-                  <b-col cols="6" >Crop name:</b-col>
+                  <b-col cols="6">Crop name:</b-col>
                   <b-col cols="6" class="text-info">{{ selectedCropList[pageId - 1] }}</b-col>
                 </b-row>
                 <b-row>
                   <b-col cols="6">total score:</b-col>
-                  <b-col cols="6" >
+                  <b-col cols="6">
                     {{ qaScore[pageId - 1][qaScore[pageId - 1].length - 1].value }} /
                     {{ 10 * qaList.length }}
                   </b-col>
@@ -165,6 +267,26 @@
             </b-col>
           </b-row>
         </b-tab>
+        <b-tab
+          title="overall result"
+          :disabled="!stateFeasibilityCheck" v-if="false"
+        >
+          <div class=" mb-0 ml-3">
+            identified nutrient gap:
+            <span class="text-danger font-weight-bold">
+                   {{ selectedNutrient }}
+                </span>
+          </div>
+          <div class=" mb-2 ml-3">
+            identified nutrient dense food:
+            <span class="text-danger font-weight-bold">
+              {{ selectedCropListFiltered[selectedCommodityId].text }}
+            </span>
+          </div>
+          <summary-diet-eth
+            :my-app="summaryResult"
+          />
+        </b-tab>
       </b-tabs>
     </b-card>
 
@@ -184,16 +306,20 @@ import feasibilityCheckComponentEth from "../components/organisms/feasibilityChe
 import fctTableModal from "../components/organisms/FctTableModal";
 import {getNutritionDemand, getNutritionSupply, getProductionTarget} from "../plugins/helper";
 import nutritionBar2 from "../components/molecules/nutritionBar2";
-import DietCalkCommunityCompEth from "../components/organisms/dietCalkCommunityCompEth";
+import familyResultFinal from "../components/organisms/familyResultFinal";
+import dietCalkDisplayEth from "../components/organisms/dietCalkDisplayEth";
+import summaryDietEth from "../components/organisms/summaryDietEth";
 
 export default {
   components: {
-    DietCalkCommunityCompEth,
     driSelectMulti,
     dietCalkCompEth,
     feasibilityCheckComponentEth,
     fctTableModal,
-    nutritionBar2
+    nutritionBar2,
+    familyResultFinal,
+    dietCalkDisplayEth,
+    summaryDietEth
   },
   data() {
     return {
@@ -211,6 +337,7 @@ export default {
        * workFlowの何ページ目まで読み込めるかのフラグ
        */
       workFlowStatus: 0,
+      familyName: '',
       keyNutrients: [
         {text: 'Energy', value: 'En'},
         {text: 'Protein', value: 'Pr'},
@@ -430,6 +557,39 @@ export default {
     }
   },
   computed: {
+    menuUpdated() {
+      const vm = this
+      let res = JSON.parse(JSON.stringify(vm.myFamily.menuCases[0].menu))
+      const addedCommodity = vm.myFamily.feasibilityCases.find((item)=>{
+        if (item.selectedCrop.length > 0) {
+          return item.selectedCrop[0].Name === vm.selectedCommodity
+        } else {
+          return false
+        }
+      })
+      if (addedCommodity.selectedCrop.length > 0){
+        res.push(addedCommodity.selectedCrop[0])
+      }
+      return res
+    },
+    summaryResult() {
+      const vm = this
+      return {
+        menuCases: [
+          {
+            note: '',
+            menu: vm.myFamily.menuCases[0].menu,
+          },
+          {
+            note: '',
+            menu: vm.menuUpdated,
+          }
+        ],
+        member: vm.myFamily.member,
+        fct: vm.fct,
+        dri: vm.dri,
+      }
+    },
     /**
      * ansListをmyAppから読み込んでscoreに変換
      * @returns {*[]}
@@ -437,7 +597,6 @@ export default {
     qaScore() {
       let res = []
       const vm = this
-      console.log(vm.myFamily)
       vm.myFamily.feasibilityCases.forEach(function (val) {
         res.push(vm.summarizeQA(vm.ansId, val.ansList))
       })
@@ -470,16 +629,39 @@ export default {
       })
       return res
     },
-    stateSummary(){
+    stateDiet() {
+      const vm = this
+      if (!vm.familyName) {
+        return false
+      }
+      return (vm.familyName.length > 3)
+    },
+    statePriotiry() {
+      const vm = this
+      let res = false
+      if (vm.myFamily) {
+        if (vm.myFamily.menuCases) {
+          if (vm.myFamily.menuCases.length > 0) {
+            if (vm.myFamily.menuCases[0].menu.length > 0) {
+              res = true
+            }
+          }
+        }
+      }
+      return res
+    },
+    stateSummary() {
 
     },
-    stateFeasibilityCheck(){
+    stateFeasibilityCheck() {
       let res = false
-      this.myFamily.feasibilityCases.forEach((item)=>{
-        if (item.selectedCrop.length > 0) {
-          res = true
-        }
-      })
+      if (this.myFamily.feasibilityCases) {
+        this.myFamily.feasibilityCases.forEach((item) => {
+          if (item.selectedCrop.length > 0) {
+            res = true
+          }
+        })
+      }
       if (this.familyList.length === 0) {
         res = false
       }
@@ -488,37 +670,69 @@ export default {
       }
       return res
     },
-    selectedNutrient:{
-      get(){
+    selectedNutrient: {
+      get() {
         return this.myFamily.keyNutrient
       },
-      set(val){
+      set(val) {
         const vm = this
         let res = JSON.parse(JSON.stringify(vm.myFamily))
         res.keyNutrient = val
         vm.updateMyFamily(res)
-      }
+      },
+    },
+    selectedCommodityId: {
+      get() {
+        return this.myFamily.keyCommodity
+      },
+      set(val) {
+        const vm = this
+        console.log(val)
+        let res = JSON.parse(JSON.stringify(vm.myFamily))
+        res.keyCommodity = val
+        vm.updateMyFamily(res)
+      },
+    },
+    selectedCommodity(){
+      const vm = this
+      return vm.selectedCropListFiltered[vm.selectedCommodityId].text
     },
     myApp: function () {
       return this.$store.state.fire.myApp
     },
     myFamily() {
-      let res = this.myApp.familyCases.find((item) => item.name === this.familyName)
+      const vm = this
+      let res = vm.myApp.familyCases.find((item) => item.name === vm.myApp.currentFamily)
       return res ? res : {}
     },
-    selectedCropList(){
-      return this.myFamily.feasibilityCases.map((item)=> {
-        return item.selectedCrop[0] ? item.selectedCrop[0].Name: ''
+    selectedCropList() {
+      if (!this.myFamily.feasibilityCases) {
+        return []
+      }
+      return this.myFamily.feasibilityCases.map((item) => {
+        return item.selectedCrop[0] ? item.selectedCrop[0].Name : ''
       })
     },
-    familyName: {
-      get() {
-        return this.$store.state.fire.myApp.currentFamily ? this.$store.state.fire.myApp.currentFamily : ''
-      },
-      set(newVal) {
-        this.$store.dispatch('fire/updateCurrentFamilyName', newVal)
-      }
+    selectedCropListFiltered() {
+      const vm = this
+      return vm.selectedCropList.map((item, index) => {
+        return {
+          text: item,
+          value: index
+        }
+      }).filter((item) => item.text !== '')
     },
+    /*
+        familyName: {
+          get() {
+            console.log(this.$store.state.fire.myApp.currentFamily)
+            return this.myApp.currentFamily ? this.myApp.currentFamily : ''
+          },
+          set(newVal) {
+            this.$store.dispatch('fire/updateCurrentFamilyName', newVal)
+          }
+        },
+    */
     currentTarget() {
       const temp = this.$store.state.fire.myApp.familyCases
       if (!temp) {
@@ -556,6 +770,9 @@ export default {
       })
     },
   },
+  created() {
+    this.familyName = this.$store.state.fire.myApp.currentFamily
+  },
   methods: {
     /**
      * cropの選択の変更をmyFamilyに組み込んでemitで通知
@@ -577,24 +794,25 @@ export default {
       let dat = JSON.parse(JSON.stringify(this.myFamily))
 
       //selectedCropを更新
-      dat.feasibilityCases[index-1].selectedCrop[0] = res
+      dat.feasibilityCases[index - 1].selectedCrop[0] = res
 
       //生産目標を計算
       const demand = getNutritionDemand(dat.member, this.dri)
-      const supply = getNutritionSupply(dat.feasibilityCases[index-1].selectedCrop)
+      const supply = getNutritionSupply(dat.feasibilityCases[index - 1].selectedCrop)
       const Wt = getProductionTarget(demand, supply, dat.keyNutrient, 100)
 
       //prodTargetを更新
-      dat.feasibilityCases[index-1].prodTarget.share = 100
-      dat.feasibilityCases[index-1].prodTarget.Wt = Wt
-      dat.feasibilityCases[index-1].prodTarget.Wt365 = Wt * 365
+      dat.feasibilityCases[index - 1].prodTarget.share = 100
+      dat.feasibilityCases[index - 1].prodTarget.Wt = Wt
+      dat.feasibilityCases[index - 1].prodTarget.Wt365 = Wt * 365
 
       //selectedCrop[0]を更新
-      dat.feasibilityCases[index-1].selectedCrop[0].Wt = Wt
+      dat.feasibilityCases[index - 1].selectedCrop[0].Wt = Wt
 
       //myFamilyを更新
       await this.updateMyFamily(dat)
-    },
+    }
+    ,
     /**
      * fctダイアログのトリガー
      */
@@ -623,13 +841,15 @@ export default {
     updateNewFamily(val) {
       this.newTarget = JSON.parse(JSON.stringify(val))
     },
-    addNewFamily(name, member) {
-      this.$store.dispatch('fire/addNewFamily', {
+    async addNewCommunity(name, member) {
+      await this.$store.dispatch('fire/addNewCommunity', {
         'name': name,
         'member': member,
       })
+
+      this.familyName = name
       //現在の家族名の更新
-      this.$store.dispatch('fire/updateCurrentFamilyName', name)
+      await this.$store.dispatch('fire/updateCurrentFamilyName', name)
 
       //変数のクリア
       this.newFamilyName = ''
@@ -676,6 +896,9 @@ export default {
       })
       return res2
     },
+    changeFamily(val) {
+      this.$store.dispatch('fire/updateCurrentFamilyName', val)
+    }
   }
 }
 </script>

@@ -116,6 +116,7 @@
 <script>
 import nutritionBar2 from "@/components/molecules/nutritionBar2";
 import macroNutrientBar from "@/components/molecules/macroNutrientBar";
+import {updatePfc} from "../plugins/helper";
 
 export default {
   components: {
@@ -304,19 +305,7 @@ export default {
      * @returns {[{val: number, color: string},{val: number, color: string},{val: number, color: string}][]}
      */
     pfcBalanceCurrent() {
-      return this.nutritionSupplyGetter.map((dat, index) => {
-        return [
-          {val: Math.round(dat.Pr * 4), color: 'green', label: '%'},
-          {val: Math.round(dat.Fat * 9), color: 'yellow', label: '%'},
-          {val: Math.round(dat.Carbohydrate * 4), color: 'red', label: '%'},
-          {
-            val: Math.round(this.nutritionDemandGetter[index].En
-              - dat.Carbohydrate * 4 - dat.Pr * 4 - dat.Fat * 9),
-            color: 'silver',
-            label: '$',
-          },
-        ]
-      })
+      return updatePfc(this.nutritionSupplyGetter2, this.nutritionDemandGetter)
     }
   },
   data() {

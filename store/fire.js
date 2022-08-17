@@ -503,10 +503,12 @@ export const actions = {
     dispatch('setHasDocumentChanged', true)
   },
   async addNewCommunity({state, dispatch}, payload) {
+    console.log(payload)
     let currentCommunity = JSON.parse(JSON.stringify(payload.communityCases))
+    console.log(currentCommunity)
     let arr = []
     for (let i = 0; i < state.myApp.sceneCount; i++) {
-      const isTargetSingle = true
+      const isTargetSingle = false
       const note = ''
       const menu = []
       const target = payload.map(function (dat) {
@@ -938,6 +940,12 @@ export const actions = {
     //familyCasesの新規追加
     if (!state.myApp.familyCases) {
       dispatch('updateFamilyCases', [])
+      needInitialization = true
+    }
+
+    //familyCasesの新規追加
+    if (!state.myApp.communityCases) {
+      dispatch('updateCommunityCases', [])
       needInitialization = true
     }
 

@@ -579,14 +579,13 @@ export default {
           {
             note: '',
             menu: vm.myFamily.menuCases[0].menu,
-            target:vm.myFamily.member
           },
           {
             note: '',
             menu: vm.menuUpdated,
-            target:vm.myFamily.member
           }
         ],
+        member: vm.myFamily.member,
         fct: vm.fct,
         dri: vm.dri,
       }

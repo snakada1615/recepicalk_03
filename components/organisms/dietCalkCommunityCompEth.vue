@@ -176,7 +176,7 @@ import recepiTable from "@/components/molecules/recepiTable"
 import nutritionBar2 from "@/components/molecules/nutritionBar2"
 import macroNutrientBar from "@/components/molecules/macroNutrientBar";
 import fctTableModal2 from "@/components/organisms/FctTableModal2";
-import {validateMyFamily} from "../../plugins/helper";
+import {validateMyFamily, updatePfc} from "../../plugins/helper";
 
 /**
  * @desc 6つのコンポーネントを組み合わせて食事評価
@@ -541,7 +541,9 @@ export default {
         vm.pageMemo = vm.myFamily.menuCases.map((item2) => {
           return item2.note
         })
-        vm.updatePfc()
+        this.pfcBalanceCurrent  = JSON.parse(JSON.stringify(
+          updatePfc(this.nutritionSupplyWatcher, this.nutritionDemandWatcher)
+        ))
       }
     },
   },
@@ -563,7 +565,9 @@ export default {
     vm.pageMemo = vm.myFamily.menuCases.map((item2) => {
       return item2.note
     })
-    vm.updatePfc()
+    this.pfcBalanceCurrent  = JSON.parse(JSON.stringify(
+      updatePfc(this.nutritionSupplyWatcher, this.nutritionDemandWatcher)
+    ))
   },
   methods: {
     /**
@@ -813,34 +817,6 @@ export default {
     //fctとdriの表示調整
     toggleFctDri() {
       console.log('test')
-    }
-    ,
-    /**
-     * recepiTableが更新される度に、pfcBalanceCurrent
-     *    の値を更新
-     *    conversion factor
-     *    -Carbohydrate: 4Kcal/gram
-     *    -Protein: 4Kcal/gram
-     *    -Fat: 9Kcal/gram
-     *
-     * labelに指定した値が表示用に使われる。空白の場合はvalの値が表示される
-     *
-     */
-    updatePfc() {
-      console.log('updatePfc')
-      this.pfcBalanceCurrent = this.nutritionSupplyWatcher.map((dat, index) => {
-        return [
-          {val: Math.round(dat.Pr * 4), color: 'green', label: '%'},
-          {val: Math.round(dat.Fat * 9), color: 'yellow', label: '%'},
-          {val: Math.round(dat.Carbohydrate * 4), color: 'red', label: '%'},
-          {
-            val: Math.round(this.nutritionDemandWatcher[index].En
-              - dat.Carbohydrate * 4 - dat.Pr * 4 - dat.Fat * 9),
-            color: 'silver',
-            label: '$',
-          },
-        ]
-      })
     },
     notifiRecepiEdit() {
       alert('you can edit diet record by clicking [add crop] button')
