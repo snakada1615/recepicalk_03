@@ -408,11 +408,20 @@ export function updatePfc(supply, demand) {
     if (gap < 0) {
       gap = 0
     }
-    return [
-      {val: Math.round(dat.Pr * 4), color: 'green', label: '%'},
-      {val: Math.round(dat.Fat * 9), color: 'yellow', label: '%'},
-      {val: Math.round(dat.Carbohydrate * 4), color: 'red', label: '%'},
-      {val: Math.round(gap), color: 'silver', label: '$',},
-    ]
+    return {
+      labels: ['protein', 'fat', 'carbo.', 'gap'],
+      datasets: [
+        {
+          label: 'Data One',
+          backgroundColor: ['green', 'yellow', 'red', 'silver'],
+          data: [
+            Math.round(dat.Pr * 4),
+            Math.round(dat.Fat * 9),
+            Math.round(dat.Carbohydrate * 4),
+            Math.round(gap)
+          ]
+        }
+      ]
+    }
   })
 }

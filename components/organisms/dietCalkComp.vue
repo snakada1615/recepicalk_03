@@ -101,35 +101,25 @@
             <div class="font-weight-bold">Dietary energy supply from PFC(Protein, Fat, Carbohydrate)</div>
           </template>
           <b-row>
-            <b-col cols="4">
-              <div>PFC recommend</div>
-            </b-col>
-            <b-col cols="7">
-              <macro-nutrient-bar
-                :chart-values="pfcBalanceStandard[pageIdComputed]"
-              ></macro-nutrient-bar>
-            </b-col>
+            <b-col cols="6">Recommended</b-col>
+            <b-col cols="6">Current</b-col>
           </b-row>
           <b-row>
-            <b-col cols="4">
-              <div>Current PFC</div>
+            <b-col cols="6">
+              <pie-chart
+                v-if="pfcStandard"
+                :chart-data="pfcStandard"
+                :height="chartHeight"
+              />
             </b-col>
-            <b-col cols="7">
-              <macro-nutrient-bar
-                :chart-values="pfcBalanceCurrent[pageIdComputed]"
-              ></macro-nutrient-bar>
+            <b-col cols="6">
+              <pie-chart
+                v-if="pfcBalanceCurrent[pageIdComputed]"
+                :chart-data="pfcBalanceCurrent[pageIdComputed]"
+                :height="chartHeight * pfcScale[pageIdComputed]"
+              />
             </b-col>
           </b-row>
-          <!--
-                    <b-row class="mt-2 small" align-h="end">
-                      <b-col class="border-primary small" cols="6" style="background-color: silver">
-                        PFC =>
-                        <span style="color: Red">Carbohydrate</span>
-                        <span style="color: Green">Fat</span>
-                        <span style="color: Yellow">Protein</span>
-                      </b-col>
-                    </b-row>
-          -->
         </b-card>
       </b-col>
       <b-col cols="12" lg="6">
@@ -177,6 +167,7 @@ import nutritionBar2 from "@/components/molecules/nutritionBar2"
 import macroNutrientBar from "@/components/molecules/macroNutrientBar";
 import {validateMyApp, updatePfc} from "@/plugins/helper";
 import fctTableModal2 from "@/components/organisms/FctTableModal2";
+import pieChart from "../atoms/pieChart";
 
 /**
  * @desc 6つのコンポーネントを組み合わせて食事評価
@@ -199,10 +190,12 @@ export default {
     nutritionBar2,
     driSelectModal,
     macroNutrientBar,
-    fctTableModal2
+    fctTableModal2,
+    pieChart
   },
   data() {
     return {
+      chartHeight: window.innerHeight / 2,
       /**
        * 使用する全変数のobject
        * myAppから読み込んでこのページで利用。更新された時にemitを返す
@@ -230,6 +223,19 @@ export default {
       /**
        * nutritionBar用のproperty：ratingの最大値
        */
+      /**
+       * PFCバランスの推奨値
+       */
+      pfcStandard: {
+        labels: ['protein', 'fat', 'carbo.'],
+        datasets: [
+          {
+            label: 'Data One',
+            backgroundColor: ['red', 'green', 'orange'],
+            data: [35, 10, 55]
+          }
+        ]
+      },
       maxRating: 10,
       /**
        * ターゲットの1グループあたり設定人数の最大値
@@ -406,6 +412,19 @@ export default {
     }
   },
   computed: {
+    pfcScale() {
+      const vm = this
+      return vm.rating.map((item) => {
+        let res = item.En
+        if (res < 0.5) {
+          res = 0.5
+        }
+        if (res > 1.5) {
+          res = 1.5
+        }
+        return res
+      })
+    },
     /**
      * ratingを計算するにあたって、同一メニューを一日3回食べると仮定した場合の評価、
      *     (recepiTableの値×3)、または1回分が一日の栄養素に与える影響の評価を
@@ -494,7 +513,7 @@ export default {
         this.pageMemo = this.myAppWatcher.menuCases.map(function (item) {
           return item.note
         })
-        this.pfcBalanceCurrent  = JSON.parse(JSON.stringify(
+        this.pfcBalanceCurrent = JSON.parse(JSON.stringify(
           updatePfc(this.nutritionSupplyWatcher, this.nutritionDemandWatcher)
         ))
       }
@@ -511,7 +530,7 @@ export default {
     this.pageMemo = this.myAppWatcher.menuCases.map(function (item) {
       return item.note
     })
-    this.pfcBalanceCurrent  = JSON.parse(JSON.stringify(
+    this.pfcBalanceCurrent = JSON.parse(JSON.stringify(
       updatePfc(this.nutritionSupplyWatcher, this.nutritionDemandWatcher)
     ))
   },

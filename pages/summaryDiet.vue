@@ -103,54 +103,47 @@
           </template>
           <b-row>
             <b-col>
-              <b-card
-                header="Overall Average"
-                border-variant="success">
+              <b-card border-variant="success">
+                Overall Average
                 <b-row>
-                  <b-col cols="3">
-                    <div style="font-size: 1vw">Recommend</div>
-                  </b-col>
-                  <b-col cols="9">
-                    <macro-nutrient-bar
-                      :chart-values="pfcBalanceStandard"
-                    ></macro-nutrient-bar>
-                  </b-col>
+                  <b-col cols="6">Recommended</b-col>
+                  <b-col cols="6">Current</b-col>
                 </b-row>
                 <b-row>
-                  <b-col cols="3">
-                    <div style="font-size: 1vw">Current</div>
+                  <b-col cols="6">
+                    <pie-chart
+                      v-if="pfcStandard"
+                      :chart-data="pfcStandard"
+                    />
                   </b-col>
-                  <b-col cols="9">
-                    <macro-nutrient-bar
-                      v-if="averagePfcBalance"
-                      :chart-values="averagePfcBalance"
-                    ></macro-nutrient-bar>
+                  <b-col cols="6" >
+                    <pie-chart
+                      v-if="averagePfcBalance[0]"
+                      :chart-data="averagePfcBalance[0]"
+                    />
                   </b-col>
                 </b-row>
               </b-card>
             </b-col>
-            <b-col cols="6" v-for="pageId in sceneCount" :key="pageId" class="my-1" v-if="showScore[pageId-1]">
+            <b-col v-for="pageId in sceneCount" :key="pageId" class="my-1" v-if="showScore[pageId-1]">
               <b-card>
                 Case{{ pageId }}
                 <b-row>
-                  <b-col cols="3">
-                    <div style="font-size: 1vw">Recommend</div>
-                  </b-col>
-                  <b-col cols="9">
-                    <macro-nutrient-bar
-                      :chart-values="pfcBalanceStandard"
-                    ></macro-nutrient-bar>
-                  </b-col>
+                  <b-col cols="6">Recommended</b-col>
+                  <b-col cols="6">Current</b-col>
                 </b-row>
                 <b-row>
-                  <b-col cols="3">
-                    <div style="font-size: 1vw">Current</div>
+                  <b-col cols="6">
+                    <pie-chart
+                      v-if="pfcStandard"
+                      :chart-data="pfcStandard"
+                    />
                   </b-col>
-                  <b-col cols="9">
-                    <macro-nutrient-bar
+                  <b-col cols="6">
+                    <pie-chart
                       v-if="pfcBalanceCurrent[pageId-1]"
-                      :chart-values="pfcBalanceCurrent[pageId-1]"
-                    ></macro-nutrient-bar>
+                      :chart-data="pfcBalanceCurrent[pageId-1]"
+                    />
                   </b-col>
                 </b-row>
               </b-card>
@@ -164,28 +157,20 @@
 <script>
 import nutritionBar2 from "@/components/molecules/nutritionBar2";
 import macroNutrientBar from "@/components/molecules/macroNutrientBar";
+import pieChart from "@/components/atoms/pieChart";
 import {updatePfc} from "../plugins/helper";
 
 export default {
   components: {
     nutritionBar2,
-    macroNutrientBar
+    macroNutrientBar,
+    pieChart
   },
   computed: {
     averagePfcBalance() {
-      const supply = this.averageNutritionSupplyGetter
-      const demand = this.averageNutritionDemandGetter
-      return [
-        {val: Math.round(supply.Pr * 4), color: 'green', label: '%'},
-        {val: Math.round(supply.Fat * 9), color: 'yellow', label: '%'},
-        {val: Math.round(supply.Carbohydrate * 4), color: 'red', label: '%'},
-        {
-          val: Math.round(demand.En
-            - supply.Carbohydrate * 4 - supply.Pr * 4 - supply.Fat * 9),
-          color: 'silver',
-          label: '$',
-        },
-      ]
+      const supply = [this.averageNutritionSupplyGetter]
+      const demand = [this.averageNutritionDemandGetter]
+      return updatePfc(supply, demand)
     },
     diversityStatusFiltered() {
       return this.diversityStatus.filter((val, index) => {
@@ -534,6 +519,19 @@ export default {
   },
   data() {
     return {
+      /**
+       * PFCバランスの推奨値
+       */
+      pfcStandard: {
+        labels: ['protein', 'fat', 'carbo.'],
+        datasets: [
+          {
+            label: 'Data One',
+            backgroundColor: ['green', 'yellow', 'red'],
+            data: [35, 10, 55]
+          }
+        ]
+      },
       /**
        * リストから選択されたnoteの値
        */

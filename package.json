@@ -23,7 +23,7 @@
     "markdown-it-vue": "^1.1.7",
     "nuxt": "^2.15.7",
     "sass": "^1.53.0",
-    "vue-chartjs": "^4.1.1",
+    "vue-chartjs": "^3.4.0",
     "vue-json-viewer": "^2.2.22",
     "vue-rate-it": "^2.1.0"
   },

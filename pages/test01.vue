@@ -1,33 +1,47 @@
 <template>
   <b-container>
-    <div>test</div>
-    <summary-diet-eth
-      :my-app="myApp2"
-    />
+    <donut-chart
+      :my-data="myData"
+      :styles="myStyles" />
+    <b-button @click="enlarge">here</b-button>
   </b-container>
 </template>
 
 <script>
-import summaryDietEth from "../components/organisms/summaryDietEth";
+import donutChart from "../components/atoms/donutChart.vue"
 
-export default{
+export default {
   components: {
-    summaryDietEth
+    donutChart
   },
-  computed: {
-    myApp(){
-      return this.$store.state.fire.myApp
-    },
-    myApp2(){
-      return {
-        menuCases: [
-          this.$store.state.fire.myApp.menuCases[0],
-          this.$store.state.fire.myApp.menuCases[1],
-        ],
-        fct: this.$store.state.fire.myApp.dataSet.fct,
-        dri: this.$store.state.fire.myApp.dataSet.dri,
-      }
+  data(){
+    return{
+      height:500,
+      myData: {
+        labels: ['teens','twenties', 'thirties', 'forties', 'fifties', 'sixties'],
+        datasets: [
+          {
+            label: 'Dataset',
+            data: [10, 50, 8, 15, 24, 30],
+            backgroundColor: ['blue', 'green', 'purple', 'yellow', 'pink', 'skyblue', 'gray']
+          }
+        ]
+      },
+
     }
   },
+  methods: {
+    enlarge(){
+      this.height += 10
+    }
+  },
+  computed:{
+    myStyles(){
+      return{
+        height: `${this.height}px`,
+        position:'relative'
+      }
+    }
+  }
 }
 </script>

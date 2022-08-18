@@ -77,33 +77,30 @@
             <div class="font-weight-bold">PFC balance</div>
           </template>
           <b-row>
-            <b-col cols="6" v-for="pageId in sceneCount" :key="pageId" class="my-1">
-              <div>
-                <b-card>
-                  Case{{ pageId }}
-                  <b-row>
-                    <b-col cols="3">
-                      <div style="font-size: 1vw">Recommend</div>
-                    </b-col>
-                    <b-col cols="9">
-                      <macro-nutrient-bar
-                        :chart-values="pfcBalanceStandard"
-                      ></macro-nutrient-bar>
-                    </b-col>
-                  </b-row>
-                  <b-row>
-                    <b-col cols="3">
-                      <div style="font-size: 1vw">Current</div>
-                    </b-col>
-                    <b-col cols="9">
-                      <macro-nutrient-bar
-                        v-if="pfcBalanceCurrent[pageId-1]"
-                        :chart-values="pfcBalanceCurrent[pageId-1]"
-                      ></macro-nutrient-bar>
-                    </b-col>
-                  </b-row>
-                </b-card>
-              </div>
+            <b-col cols="12" lg="6" v-for="pageId in sceneCount" :key="pageId" class="my-1">
+              <b-card>
+                Case{{ pageId }}
+                <b-row>
+                  <b-col cols="6">Recommended</b-col>
+                  <b-col cols="6">Current</b-col>
+                </b-row>
+                <b-row>
+                  <b-col cols="6">
+                    <pie-chart
+                      v-if="pfcStandard"
+                      :chart-data="pfcStandard"
+                      :height="chartHeight"
+                    />
+                  </b-col>
+                  <b-col cols="6">
+                    <pie-chart
+                      v-if="pfcBalanceCurrent[pageId-1]"
+                      :chart-data="pfcBalanceCurrent[pageId-1]"
+                      :height="chartHeight * pfcScale[pageId-1]"
+                    />
+                  </b-col>
+                </b-row>
+              </b-card>
             </b-col>
           </b-row>
         </b-card>
@@ -115,13 +112,28 @@
 import nutritionBar2 from "@/components/molecules/nutritionBar2";
 import macroNutrientBar from "@/components/molecules/macroNutrientBar";
 import {getNutritionDemandList, getNutritionSupplyList, updatePfc} from "../../plugins/helper";
+import pieChart from "../atoms/pieChart";
 
 export default {
   components: {
     nutritionBar2,
-    macroNutrientBar
+    macroNutrientBar,
+    pieChart
   },
   computed: {
+    pfcScale() {
+      const vm = this
+      return vm.ratingGetter.map((item) => {
+        let res = item.En
+        if (res < 0.5) {
+          res = 0.5
+        }
+        if (res > 1.5) {
+          res = 1.5
+        }
+        return res
+      })
+    },
     /**
      * 同一グループのidリスト
      * @returns {*[]}
@@ -170,9 +182,9 @@ export default {
         return accumulator
       }, [])
     },
-    targetGroup(){
-        const res = JSON.parse(JSON.stringify(this.myApp.member))
-        return [...Array(this.myApp.menuCases.length)].map(() => res)
+    targetGroup() {
+      const res = JSON.parse(JSON.stringify(this.myApp.member))
+      return [...Array(this.myApp.menuCases.length)].map(() => res)
     },
     fieldsFoodGroup() {
       const vm = this
@@ -267,6 +279,23 @@ export default {
   },
   data() {
     return {
+      /**
+       * チャートの基本の高さ
+       */
+      chartHeight: window.innerHeight / 2,
+      /**
+       * PFCバランスの推奨値
+       */
+      pfcStandard: {
+        labels: ['protein', 'fat', 'carbo.'],
+        datasets: [
+          {
+            label: 'Data One',
+            backgroundColor: ['green', 'yellow', 'red'],
+            data: [35, 10, 55]
+          }
+        ]
+      },
       /**
        * 選択されたfeasibilityCase
        */

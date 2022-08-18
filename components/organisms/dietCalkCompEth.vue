@@ -92,27 +92,24 @@
             <div class="font-weight-bold">Dietary energy supply from PFC(Protein, Fat, Carbohydrate)</div>
           </template>
           <b-row>
-            <b-col cols="4">
-              <div>PFC recommend</div>
-            </b-col>
-            <b-col cols="7">
-              <macro-nutrient-bar
-                :chart-values="[
-                  {val: 35, color: 'green', label: '%'},
-                  {val: 10, color: 'yellow', label: '%'},
-                  {val: 55, color: 'red', label: '%'},
-                ]"
-              ></macro-nutrient-bar>
-            </b-col>
+            <b-col cols="6">Recommended</b-col>
+            <b-col cols="6">Current</b-col>
           </b-row>
+          <b-button @click="enlargeChart">push</b-button>
           <b-row>
-            <b-col cols="4">
-              <div>Current PFC</div>
+            <b-col cols="6">
+              <pie-chart
+                v-if="pfcStandard"
+                :chart-data="pfcStandard"
+                :height="chartHeight"
+              />
             </b-col>
-            <b-col cols="7" v-if="false">
-              <macro-nutrient-bar
-                :chart-values="pfcBalanceCurrent[pageIdComputed]"
-              ></macro-nutrient-bar>
+            <b-col cols="6">
+              <pie-chart
+                v-if="pfcBalanceCurrent[pageIdComputed]"
+                :chart-data="pfcBalanceCurrent[pageIdComputed]"
+                :height="chartHeight * pfcScale[pageIdComputed]"
+              />
             </b-col>
           </b-row>
         </b-card>
@@ -146,13 +143,16 @@
 </template>
 
 <script>
+import pieChart from "../atoms/pieChart";
 import driSelectModal from "@/components/organisms/driSelectModal";
 import recepiTable from "@/components/molecules/recepiTable"
 import nutritionBar2 from "@/components/molecules/nutritionBar2"
 import macroNutrientBar from "@/components/molecules/macroNutrientBar";
 import fctTableModal2 from "@/components/organisms/FctTableModal2";
-import {getNutritionSupplyList, validateMyFamily,
-  getNutritionDemandList, updatePfc} from "../../plugins/helper";
+import {
+  getNutritionSupplyList, validateMyFamily,
+  getNutritionDemandList, updatePfc
+} from "../../plugins/helper";
 
 /**
  * @desc 6つのコンポーネントを組み合わせて食事評価
@@ -175,10 +175,13 @@ export default {
     nutritionBar2,
     driSelectModal,
     macroNutrientBar,
-    fctTableModal2
+    fctTableModal2,
+    pieChart
   },
   data() {
     return {
+      pfcBalanceCurrent: [],
+      chartHeight: window.innerHeight / 2,
       currentMenu: [],
       /**
        * 使用する全変数のobject
@@ -247,62 +250,16 @@ export default {
       /**
        * PFCバランスの推奨値
        */
-      pfcBalanceStandard: [
-        [
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 55, color: 'red', label: '%'},
-        ],
-        [
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 55, color: 'red', label: '%'},
-        ],
-        [
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 55, color: 'red', label: '%'},
-        ],
-        [
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 55, color: 'red', label: '%'},
-        ],
-        [
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 55, color: 'red', label: '%'},
-        ],
-        [
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 55, color: 'red', label: '%'},
-        ],
-        [
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 55, color: 'red', label: '%'},
-        ],
-        [
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 55, color: 'red', label: '%'},
-        ],
-        [
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 55, color: 'red', label: '%'},
-        ],
-        [
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 55, color: 'red', label: '%'},
-        ],
-      ],
-      /**
-       * PFCバランスの現状
-       */
-      pfcBalanceCurrent: []
+      pfcStandard: {
+        labels: ['protein', 'fat', 'carbo.'],
+        datasets: [
+          {
+            label: 'Data One',
+            backgroundColor: ['green', 'yellow', 'red'],
+            data: [35, 10, 55],
+          }
+        ]
+      },
     }
   },
   props: {
@@ -345,9 +302,28 @@ export default {
     disabledOption: {
       type: Array,
       default: []
-    }
+    },
   },
   computed: {
+    pfcScale() {
+      const vm = this
+      return vm.rating.map((item) => {
+        let res = item.En
+        if (res < 0.5) {
+          res = 0.5
+        }
+        if (res > 1.5) {
+          res = 1.5
+        }
+        return res
+      })
+    },
+    myChartStyles() {
+      return {
+        height: `${this.chartHeight}%`,
+        position: 'relative'
+      }
+    },
     /**
      * ratingを計算するにあたって、同一メニューを一日3回食べると仮定した場合の評価、
      *     (recepiTableの値×3)、または1回分が一日の栄養素に与える影響の評価を
@@ -456,7 +432,7 @@ export default {
           return item2.note
         })
         vm.currentMenu = JSON.parse(JSON.stringify(vm.myFamilyWatcher.menuCases[this.pageIdComputed].menu))
-        vm.pfcBalanceCurrent  = JSON.parse(JSON.stringify(
+        vm.pfcBalanceCurrent = JSON.parse(JSON.stringify(
           updatePfc(vm.nutritionSupplyWatcher, vm.nutritionDemandWatcher)
         ))
       }
@@ -482,11 +458,15 @@ export default {
       return item2.note
     })
     vm.currentMenu = JSON.parse(JSON.stringify(vm.myFamilyWatcher.menuCases[this.pageIdComputed].menu))
-    vm.pfcBalanceCurrent  = JSON.parse(JSON.stringify(
+    vm.pfcBalanceCurrent = JSON.parse(JSON.stringify(
       updatePfc(vm.nutritionSupplyWatcher, vm.nutritionDemandWatcher)
     ))
   },
   methods: {
+    enlargeChart() {
+      this.chartHeight += 10
+      console.log(this.chartHeight)
+    },
     /**
      * ページメモの更新：
      * @param newVal

@@ -274,8 +274,8 @@
           <div class=" mb-0 ml-3">
             identified nutrient gap:
             <span class="text-danger font-weight-bold">
-                   {{ selectedNutrient }}
-                </span>
+              {{ selectedNutrient }}
+            </span>
           </div>
           <div class=" mb-2 ml-3">
             identified nutrient dense food:
