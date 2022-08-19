@@ -25,7 +25,7 @@
               </b-input-group>
               <div class="small text-muted mb-2">you have to give unique family name</div>
               <hr>
-              {{ $store.state.fire.myApp.currentFamily }}
+              {{ myApp.currentFamily }}
               <dri-select-multi
                 :driItems="dri"
                 :target="newTarget"
@@ -279,7 +279,10 @@
           </div>
           <div class=" mb-2 ml-3">
             identified nutrient dense food:
-            <span class="text-danger font-weight-bold">
+            <span
+              class="text-danger font-weight-bold"
+              v-if="(selectedCropListFiltered.length > 0) && selectedCropListFiltered[selectedCommodityId]"
+            >
               {{ selectedCropListFiltered[selectedCommodityId].text }}
             </span>
           </div>
@@ -559,6 +562,10 @@ export default {
   computed: {
     menuUpdated() {
       const vm = this
+      if (!vm.myFamily.feasibilityCases){
+        console.log('dataset is broken in feasibilityCases')
+        return []
+      }
       let res = JSON.parse(JSON.stringify(vm.myFamily.menuCases[0].menu))
       const addedCommodity = vm.myFamily.feasibilityCases.find((item)=>{
         if (item.selectedCrop.length > 0) {
@@ -695,10 +702,18 @@ export default {
     },
     selectedCommodity(){
       const vm = this
+      if (vm.selectedCropListFiltered.length === 0){
+        return ''
+      }
+      if (!vm.selectedCropListFiltered[vm.selectedCommodityId]) {
+        return ''
+      }
       return vm.selectedCropListFiltered[vm.selectedCommodityId].text
     },
     myApp: function () {
-      return this.$store.state.fire.myApp
+      return JSON.parse(JSON.stringify(
+        this.$store.state.fire.myApp
+      ))
     },
     myFamily() {
       const vm = this
@@ -715,6 +730,9 @@ export default {
     },
     selectedCropListFiltered() {
       const vm = this
+      if (!vm.selectedCropList) {
+        return
+      }
       return vm.selectedCropList.map((item, index) => {
         return {
           text: item,
@@ -722,19 +740,8 @@ export default {
         }
       }).filter((item) => item.text !== '')
     },
-    /*
-        familyName: {
-          get() {
-            console.log(this.$store.state.fire.myApp.currentFamily)
-            return this.myApp.currentFamily ? this.myApp.currentFamily : ''
-          },
-          set(newVal) {
-            this.$store.dispatch('fire/updateCurrentFamilyName', newVal)
-          }
-        },
-    */
     currentTarget() {
-      const temp = this.$store.state.fire.myApp.familyCases
+      const temp = this.myApp.familyCases
       if (!temp) {
         return []
       }
@@ -747,10 +754,10 @@ export default {
       return res
     },
     dri() {
-      return JSON.parse(JSON.stringify(this.$store.state.fire.myApp.dataSet.dri))
+      return JSON.parse(JSON.stringify(this.myApp.dataSet.dri))
     },
     fct() {
-      return JSON.parse(JSON.stringify(this.$store.state.fire.myApp.dataSet.fct))
+      return JSON.parse(JSON.stringify(this.myApp.dataSet.fct))
     },
     stateFamilyName() {
       const familySize = this.newTarget.reduce((accum, curr) => {
@@ -761,7 +768,7 @@ export default {
         familySize > 0
     },
     familyList() {
-      const temp = this.$store.state.fire.myApp.familyCases
+      const temp = this.myApp.familyCases
       if (!temp) {
         return []
       }
@@ -771,7 +778,7 @@ export default {
     },
   },
   created() {
-    this.familyName = this.$store.state.fire.myApp.currentFamily
+    this.familyName = this.myApp.currentFamily
   },
   methods: {
     /**
@@ -821,7 +828,7 @@ export default {
       this.showFct = !this.showFct
     },
     updateMyFamily(val) {
-      let res = JSON.parse(JSON.stringify(this.$store.state.fire.myApp.familyCases))
+      let res = JSON.parse(JSON.stringify(this.myApp.familyCases))
       res = res.map((item) => {
         let res2 = item
         if (item.name === val.name) {

@@ -410,7 +410,9 @@ export const mutations = {
    * @param payload
    */
   updateCommunityCases: function (state, payload) {
-    state.myApp.CommunityCases = JSON.parse(JSON.stringify(payload))
+    state.myApp.communityCases = JSON.parse(JSON.stringify(payload))
+    console.log('initialized communityCases: the value is as following...')
+    console.log(state.myApp.communityCases)
   },
   /**
    * 現在対象になっている家族名の更新
@@ -930,6 +932,7 @@ export const actions = {
     const current = new Date()
     const limit = new Date(2022, 10, 30)
     if ((state.myApp.dataSet.fctId !== 'fct_eth0729') && (current < limit)) {
+      console.log('found some error and initialize FCT')
       //fctNameをstoreに保存
       await dispatch('updateFctId', 'fct_eth0729')
       //fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
@@ -938,19 +941,24 @@ export const actions = {
     }
 
     //familyCasesの新規追加
-    if (!state.myApp.familyCases) {
+    if (state.myApp.familyCases === undefined) {
+      console.log('found error and add familyCases')
       dispatch('updateFamilyCases', [])
       needInitialization = true
     }
 
     //familyCasesの新規追加
-    if (!state.myApp.communityCases) {
+    if (state.myApp.communityCases === undefined) {
+      console.log('found some error and initialize communityCases')
+      console.log(state.myApp.communityCases)
       dispatch('updateCommunityCases', [])
+      console.log(state.myApp.communityCases)
       needInitialization = true
     }
 
     //currentFamilyの新規追加
     if (state.myApp.currentFamily === null) {
+      console.log('found some error and initialize currentFamilyName')
       dispatch('updateCurrentFamilyName', '')
       needInitialization = true
     }
