@@ -560,18 +560,23 @@ export default {
     menuUpdated() {
       const vm = this
       if (!vm.myFamily.feasibilityCases){
-        console.log('dataset is broken in feasibilityCases')
+        console.log('dataset is broken in feasibilityCases: null')
+        return []
+      }
+      if (vm.myFamily.feasibilityCases.length === 0){
+        console.log('dataset is broken in feasibilityCases: length is 0')
         return []
       }
       let res = JSON.parse(JSON.stringify(vm.myFamily.menuCases[0].menu))
-      const addedCommodity = vm.myFamily.feasibilityCases.find((item) => {
+      const addedCommodity = vm.myFamily.feasibilityCases.find((item)=>{
         if (item.selectedCrop.length > 0) {
           return item.selectedCrop[0].Name === vm.selectedCommodity
         } else {
           return false
         }
       })
-      if (addedCommodity.selectedCrop.length > 0) {
+      //追加品目が存在する場合にはこれを追加、存在しない場合はもともとのmenuを返す
+      if (addedCommodity && addedCommodity.selectedCrop.length > 0){
         res.push(addedCommodity.selectedCrop[0])
       }
       return res
