@@ -296,6 +296,7 @@ export function getNutritionDemand(target, dri) {
     return accumulator
   }, initObj)
 }
+
 /**
  * targetグループから栄養摂取目標を計算
  * @param targetGroup
@@ -404,21 +405,16 @@ export function getNutritionSupplyList(crops, count) {
  */
 export function updatePfc(supply, demand) {
   return supply.map((dat, index) => {
-    let gap = demand[index].En - dat.Carbohydrate * 4 - dat.Pr * 4 - dat.Fat * 9
-    if (gap < 0) {
-      gap = 0
-    }
     return {
-      labels: ['protein', 'fat', 'carbo.', 'gap'],
+      labels: ['protein', 'fat', 'carbo.'],
       datasets: [
         {
           label: 'Data One',
-          backgroundColor: ['green', 'yellow', 'red', 'silver'],
+          backgroundColor: ['green', 'yellow', 'red'],
           data: [
             Math.round(dat.Pr * 4),
             Math.round(dat.Fat * 9),
             Math.round(dat.Carbohydrate * 4),
-            Math.round(gap)
           ]
         }
       ]

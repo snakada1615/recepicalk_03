@@ -1,21 +1,30 @@
 <template>
   <b-container>
-    <donut-chart
-      :my-data="myData"
-      :styles="myStyles" />
     <b-button @click="enlarge">here</b-button>
+    {{myStyles}}
+    <pie-chart
+      ref="pie1"
+      :chart-data="pfcStandard"
+      :options="options"
+      :styles="myStyles"
+    />
   </b-container>
 </template>
 
 <script>
-import donutChart from "../components/atoms/donutChart.vue"
+import pieChart from "../components/atoms/pieChart";
 
 export default {
   components: {
-    donutChart
+    pieChart
   },
   data(){
     return{
+      options: {
+        maintainAspectRatio: false,
+        responsive: true,
+      },
+      scale: 1,
       height:500,
       myData: {
         labels: ['teens','twenties', 'thirties', 'forties', 'fifties', 'sixties'],
@@ -27,21 +36,39 @@ export default {
           }
         ]
       },
-
+      /**
+       * PFCバランスの推奨値
+       */
+      pfcStandard: {
+        labels: ['protein', 'fat', 'carbo.'],
+        datasets: [
+          {
+            label: 'Data One',
+            backgroundColor: ['green', 'yellow', 'red'],
+            data: [35, 10, 55],
+          }
+        ]
+      },
     }
   },
   methods: {
     enlarge(){
-      this.height += 10
+      this.scale += 0.1
     }
   },
   computed:{
-    myStyles(){
-      return{
-        height: `${this.height}px`,
-        position:'relative'
+    myStyles() {
+      return {
+        height: `${this.chartBaseHeight}px`,
+        position: 'relative',
       }
-    }
+    },
+    chartBaseHeight(){
+      return window.innerHeight * this.scale / 5
+    },
+    chartBaseWidth(){
+      return window.innerHeight  * this.scale / 3
+    },
   }
 }
 </script>

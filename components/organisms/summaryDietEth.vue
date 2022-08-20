@@ -12,11 +12,11 @@
           </template>
           <b-card>
             Note for each case
-            <div v-for="pageId in sceneCount" :key="pageId" v-if="myApp" class="border bg-light">
-              Case {{ pageId }}: {{ myApp.menuCases[pageId - 1].note }}
+            <div v-for="pageId in sceneCount" :key="pageId" v-if="myAppComputed" class="border bg-light">
+              Case {{ pageId }}: {{ myAppComputed.menuCases[pageId - 1].note }}
             </div>
           </b-card>
-          <b-form-select v-model="selectedCaseId" :options="noteList" v-if="myApp"></b-form-select>
+          <b-form-select v-model="selectedCaseId" :options="noteList" v-if="myAppComputed"></b-form-select>
         </b-card>
       </b-col>
       <b-col cols="12" lg="6">
@@ -89,14 +89,16 @@
                     <pie-chart
                       v-if="pfcStandard"
                       :chart-data="pfcStandard"
-                      :height="chartHeight"
+                      :options="myChartOptions"
+                      :styles="myChartStylesOriginal"
                     />
                   </b-col>
                   <b-col cols="6">
                     <pie-chart
                       v-if="pfcBalanceCurrent[pageId-1]"
                       :chart-data="pfcBalanceCurrent[pageId-1]"
-                      :height="chartHeight * pfcScale[pageId-1]"
+                      :options="myChartOptions"
+                      :styles="myChartStyles[pageId-1]"
                     />
                   </b-col>
                 </b-row>
@@ -120,18 +122,50 @@ export default {
     macroNutrientBar,
     pieChart
   },
+  methods: {
+    getPfcScale(rating) {
+      const res = rating.En / 10
+      if (res < 0.5) {
+        return 0.5
+      }
+      if (res > 1.5) {
+        return 1.5
+      }
+      return res
+    },
+  },
   computed: {
+    myAppComputed: function () {
+      return JSON.parse(JSON.stringify(
+        this.myApp
+      ))
+    },
+    myChartStyles() {
+      return this.pfcScale.map((item) => {
+        return {
+          height: `${this.chartHeight * item}px`,
+          position: 'relative'
+        }
+      })
+    },
+    myChartStylesOriginal() {
+      return {
+        height: `${this.chartHeight}px`,
+        position: 'relative'
+      }
+    },
+    /**
+     * currentとrecommendを比較した場合のエネルギー量の充足度
+     * rating[].Enの値を1.5と0.5で足切りしたもの
+     */
     pfcScale() {
-      const vm = this
-      return vm.ratingGetter.map((item) => {
-        let res = item.En
-        if (res < 0.5) {
-          res = 0.5
-        }
-        if (res > 1.5) {
-          res = 1.5
-        }
-        return res
+      if (!this.ratingGetter) {
+        return []
+      }
+      return this.ratingGetter.map((item) => {
+        return JSON.parse(JSON.stringify(
+          this.getPfcScale(item)
+        ))
       })
     },
     /**
@@ -156,7 +190,7 @@ export default {
     noteList() {
       let res = []
       for (let index = 1; index <= this.sceneCount; index++) {
-        const myNote = this.myApp.menuCases[index - 1].note
+        const myNote = this.myAppComputed.menuCases[index - 1].note
         if (myNote) {
           res.push({
             'text': 'Case' + index + ':' + myNote,
@@ -168,14 +202,14 @@ export default {
       return res
     },
     sceneCount: function () {
-      return this.myApp.menuCases.length
+      return this.myAppComputed.menuCases.length
     },
     /**
      * FCTからfood Groupを抽出
      * @returns {*}
      */
     foodGroup() {
-      return this.myApp.fct.reduce((accumulator, dat) => {
+      return this.myAppComputed.fct.reduce((accumulator, dat) => {
         if (accumulator.indexOf(dat.Group) < 0) {
           accumulator.push(dat.Group)
         }
@@ -183,8 +217,8 @@ export default {
       }, [])
     },
     targetGroup() {
-      const res = JSON.parse(JSON.stringify(this.myApp.member))
-      return [...Array(this.myApp.menuCases.length)].map(() => res)
+      const res = JSON.parse(JSON.stringify(this.myAppComputed.member))
+      return [...Array(this.myAppComputed.menuCases.length)].map(() => res)
     },
     fieldsFoodGroup() {
       const vm = this
@@ -207,7 +241,7 @@ export default {
      */
     diversityStatus() {
       const vm = this
-      return this.myApp.menuCases.map((foodsTemp, index) => {
+      return this.myAppComputed.menuCases.map((foodsTemp, index) => {
         let res = {}
         let colorVariant = {}
         res['case'] = 'Case' + (index + 1)
@@ -226,20 +260,23 @@ export default {
       })
     },
     /**
-     * myApp.menuCases.targetの値を集計してnutritionDemandWatcherに代入するための関数
+     * myAppComputed.menuCases.targetの値を集計してnutritionDemandWatcherに代入するための関数
      * @returns {*[]} 栄養素必要量の合計値
      */
     nutritionDemandGetter() {
       const vm = this
-      return getNutritionDemandList(vm.targetGroup, vm.myApp.dri)
+      return getNutritionDemandList(vm.targetGroup, vm.myAppComputed.dri)
     },
     /**
-     * myApp.menuCases.menuの値を集計してnutritionSupplyWatcherに代入するための関数
+     * myAppComputed.menuCases.menuの値を集計してnutritionSupplyWatcherに代入するための関数
      * @returns {*[]} 栄養素供給量の合計値
      */
     nutritionSupplyGetter() {
       const vm = this
-      return getNutritionSupplyList(vm.myApp.menuCases, vm.myApp.menuCases.length)
+      return getNutritionSupplyList(vm.myAppComputed.menuCases, vm.myAppComputed.menuCases.length)
+    },
+    rating() {
+      return this.ratingGetter()
     },
     /**
      * nutritionSupplyとnutritionDemandの値に基づいて栄養素の充足率を算出
@@ -280,9 +317,20 @@ export default {
   data() {
     return {
       /**
+       * pie-chartのオプション
+       */
+      myChartOptions: {
+        maintainAspectRatio: false,
+        responsive: true,
+      },
+      /**
        * チャートの基本の高さ
        */
-      chartHeight: window.innerHeight / 2,
+      chartHeight: window.innerHeight / 4,
+      /**
+       * チャートの基本の幅
+       */
+      chartWidth: window.innerHeight / 4,
       /**
        * PFCバランスの推奨値
        */

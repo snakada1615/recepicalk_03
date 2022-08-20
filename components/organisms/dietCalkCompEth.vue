@@ -91,9 +91,10 @@
           <template #header>
             <div class="font-weight-bold">Dietary energy supply from PFC(Protein, Fat, Carbohydrate)</div>
           </template>
+          {{pfcScale[pageIdComputed]}}
           <b-row>
-            <b-col cols="6">Recommended</b-col>
             <b-col cols="6">Current</b-col>
+            <b-col cols="6">Recommended</b-col>
           </b-row>
           <b-button @click="enlargeChart">push</b-button>
           <b-row>
@@ -101,14 +102,16 @@
               <pie-chart
                 v-if="pfcStandard"
                 :chart-data="pfcStandard"
-                :height="chartHeight"
+                :options="myChartOptions"
+                :styles="myChartStylesOriginal"
               />
             </b-col>
             <b-col cols="6">
               <pie-chart
                 v-if="pfcBalanceCurrent[pageIdComputed]"
                 :chart-data="pfcBalanceCurrent[pageIdComputed]"
-                :height="chartHeight * pfcScale[pageIdComputed]"
+                :options="myChartOptions"
+                :styles="myChartStyles"
               />
             </b-col>
           </b-row>
@@ -181,8 +184,14 @@ export default {
   data() {
     return {
       pfcBalanceCurrent: [],
-      chartHeight: window.innerHeight / 2,
+      chartBaseHeight: window.innerHeight / 4,
+      chartBaseWidth: window.innerHeight / 4,
       currentMenu: [],
+      myChartOptions: {
+        maintainAspectRatio: false,
+        responsive: true,
+      },
+
       /**
        * 使用する全変数のobject
        * myFamilyから読み込んでこのページで利用。更新された時にemitを返す
@@ -260,6 +269,11 @@ export default {
           }
         ]
       },
+      /**
+       * currentとrecommendを比較した場合のエネルギー量の充足度
+       * rating[].Enの値を1.5と0.5で足切りしたもの
+       */
+      pfcScale: [],
     }
   },
   props: {
@@ -305,22 +319,15 @@ export default {
     },
   },
   computed: {
-    pfcScale() {
-      const vm = this
-      return vm.rating.map((item) => {
-        let res = item.En
-        if (res < 0.5) {
-          res = 0.5
-        }
-        if (res > 1.5) {
-          res = 1.5
-        }
-        return res
-      })
-    },
     myChartStyles() {
       return {
-        height: `${this.chartHeight}%`,
+        height: `${this.chartBaseHeight * this.pfcScale[this.pageIdComputed]}px`,
+        position: 'relative'
+      }
+    },
+    myChartStylesOriginal() {
+      return {
+        height: `${this.chartBaseHeight}px`,
         position: 'relative'
       }
     },
@@ -428,6 +435,9 @@ export default {
           vm.myFamily.menuCases, vm.maxPage)))
         vm.rating = JSON.parse(JSON.stringify(vm.ratingGetter(
           vm.nutritionSupplyWatcher, vm.nutritionDemandWatcher)))
+        vm.pfcScale = JSON.parse(JSON.stringify(
+          vm.getPfcScale(vm.rating)
+        ))
         vm.pageMemo = vm.myFamily.menuCases.map((item2) => {
           return item2.note
         })
@@ -454,6 +464,9 @@ export default {
       vm.myFamily.menuCases, vm.maxPage)))
     vm.rating = JSON.parse(JSON.stringify(vm.ratingGetter(
       vm.nutritionSupplyWatcher, vm.nutritionDemandWatcher)))
+    vm.pfcScale = JSON.parse(JSON.stringify(
+      vm.getPfcScale(vm.rating)
+    ))
     vm.pageMemo = vm.myFamily.menuCases.map((item2) => {
       return item2.note
     })
@@ -463,9 +476,21 @@ export default {
     ))
   },
   methods: {
+    getPfcScale(rating){
+      return rating.map((item) => {
+        const res = item.En / 10
+        if (res < 0.5) {
+          return 0.5
+        }
+        if (res > 1.5) {
+          return 1.5
+        }
+        return res
+      })
+    },
     enlargeChart() {
-      this.chartHeight += 10
-      console.log(this.chartHeight)
+      this.chartBaseHeight += 10
+      console.log(this.chartBaseHeight)
     },
     /**
      * ページメモの更新：
