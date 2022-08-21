@@ -542,7 +542,7 @@ export default {
           return item2.note
         })
         this.pfcBalanceCurrent  = JSON.parse(JSON.stringify(
-          updatePfc(this.nutritionSupplyWatcher, this.nutritionDemandWatcher)
+          updatePfc(this.nutritionSupplyWatcher)
         ))
       }
     },
@@ -566,7 +566,7 @@ export default {
       return item2.note
     })
     this.pfcBalanceCurrent  = JSON.parse(JSON.stringify(
-      updatePfc(this.nutritionSupplyWatcher, this.nutritionDemandWatcher)
+      updatePfc(this.nutritionSupplyWatcher)
     ))
   },
   methods: {

@@ -169,8 +169,7 @@ export default {
   computed: {
     averagePfcBalance() {
       const supply = [this.averageNutritionSupplyGetter]
-      const demand = [this.averageNutritionDemandGetter]
-      return updatePfc(supply, demand)
+      return updatePfc(supply)
     },
     diversityStatusFiltered() {
       return this.diversityStatus.filter((val, index) => {
@@ -514,7 +513,7 @@ export default {
      * @returns {[{val: number, color: string},{val: number, color: string},{val: number, color: string}][]}
      */
     pfcBalanceCurrent() {
-      return updatePfc(this.nutritionSupplyGetter2, this.nutritionDemandGetter)
+      return updatePfc(this.nutritionSupplyGetter2)
     }
   },
   data() {

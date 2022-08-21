@@ -305,7 +305,7 @@ export default {
      * @returns {[{val: number, color: string},{val: number, color: string},{val: number, color: string}][]}
      */
     pfcBalanceCurrent() {
-      return updatePfc(this.nutritionSupplyGetter2, this.nutritionDemandGetter)
+      return updatePfc(this.nutritionSupplyGetter2)
     }
   },
   data() {

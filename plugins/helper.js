@@ -299,13 +299,20 @@ export function getNutritionDemand(target, dri) {
 
 /**
  * targetグループから栄養摂取目標を計算
+ * targetGroupの構造が呼び出し元によって異なるため、フラグで切り分けられるように設定
  * @param targetGroup
  * @param dri
+ * @param dietCalkCheck dietCalkCheckから呼び出されたかどうかチェック
  * @returns {*}
  */
-export function getNutritionDemandList(targetGroup, dri) {
+export function getNutritionDemandList(targetGroup, dri, dietCalkCheck = 0) {
   return targetGroup.map(function (item) {
-    return getNutritionDemand(item, dri)
+    //targetGroupの構造が呼び出し元によって異なるため、フラグで切り分けられるように設定
+    if (dietCalkCheck){
+      return getNutritionDemand(item.target, dri)
+    } else {
+      return getNutritionDemand(item, dri)
+    }
   })
 }
 
@@ -328,14 +335,19 @@ export function getNutritionSupply(datArray, stapleCheck = 0) {
       myFe = 0
       myFat = 0
     }
+    //循環参照を回避するため定数に切り替えて代入
+    const En = item.En ? item.En : 0
+    const Va = item.Va ? item.Va : 0
+    const Carbohydrate = item.Carbohydrate ? item.Carbohydrate : 0
+    const Wt = item.Wt
 
-    accumulator.En += Number(item.En ? item.En : 0) * Number(item.Wt) / 100
-    accumulator.Pr += Number(myPr) * Number(item.Wt) / 100
-    accumulator.Va += Number(item.Va ? item.Va : 0) * Number(item.Wt) / 100
-    accumulator.Fe += Number(myFe) * Number(item.Wt) / 100
-    accumulator.Carbohydrate += Number(item.Carbohydrate ? item.Carbohydrate : 0) * Number(item.Wt) / 100
-    accumulator.Fat += Number(myFat) * Number(item.Wt) / 100
-    accumulator.Wt += Number(item.Wt)
+    accumulator.En += Number(En) * Number(Wt) / 100
+    accumulator.Pr += Number(myPr) * Number(Wt) / 100
+    accumulator.Va += Number(Va) * Number(Wt) / 100
+    accumulator.Fe += Number(myFe) * Number(Wt) / 100
+    accumulator.Carbohydrate += Number(Carbohydrate) * Number(Wt) / 100
+    accumulator.Fat += Number(myFat) * Number(Wt) / 100
+    accumulator.Wt += Number(Wt)
     return accumulator
   }, {
     'En': 0,
@@ -403,21 +415,56 @@ export function getNutritionSupplyList(crops, count) {
  * labelに指定した値が表示用に使われる。空白の場合はvalの値が表示される
  *
  */
-export function updatePfc(supply, demand) {
-  return supply.map((dat, index) => {
+export function updatePfc(supply) {
+  return supply.map((dat) => {
+    const Pr = Math.round(dat.Pr * 4)
+    const Fat = Math.round(dat.Fat * 9)
+    const Carbohydrate = Math.round(dat.Carbohydrate * 4)
+
     return {
       labels: ['protein', 'fat', 'carbo.'],
       datasets: [
         {
           label: 'Data One',
           backgroundColor: ['green', 'yellow', 'red'],
-          data: [
-            Math.round(dat.Pr * 4),
-            Math.round(dat.Fat * 9),
-            Math.round(dat.Carbohydrate * 4),
-          ]
+          data: [Pr, Fat, Carbohydrate]
         }
       ]
     }
   })
+}
+
+/**
+ * 総エネルギーの充足率をグラフ用のscaleに変更
+ * @param rating
+ * @returns {*}
+ */
+export function getPfcScale(rating){
+  return rating.map((item) => {
+    const res = item.En / 10
+    if (res < 0.5) {
+      return 0.5
+    }
+    if (res > 1.5) {
+      return 1.5
+    }
+    return res
+  })
+}
+
+/**
+ * Objectから循環参照を省く
+ * @returns {function(*, *): *}
+ */
+export function getCircularReplacer(){
+  const seen = new WeakSet();
+  return (key, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (seen.has(value)) {
+        return;
+      }
+      seen.add(value);
+    }
+    return value;
+  };
 }

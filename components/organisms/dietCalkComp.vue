@@ -106,17 +106,21 @@
           </b-row>
           <b-row>
             <b-col cols="6">
+<!--              v-if="pfcStandard"-->
               <pie-chart
-                v-if="pfcStandard"
+                v-if="false"
                 :chart-data="pfcStandard"
-                :height="chartHeight"
+                :options="myChartOptions"
+                :styles="myChartStylesOriginal"
               />
             </b-col>
             <b-col cols="6">
+<!--              v-if="pfcBalanceCurrent[pageIdComputed]"-->
               <pie-chart
-                v-if="pfcBalanceCurrent[pageIdComputed]"
+                v-if="false"
                 :chart-data="pfcBalanceCurrent[pageIdComputed]"
-                :height="chartHeight * pfcScale[pageIdComputed]"
+                :options="myChartOptions"
+                :styles="myChartStyles"
               />
             </b-col>
           </b-row>
@@ -165,9 +169,10 @@ import driSelectModal from "@/components/organisms/driSelectModal";
 import recepiTable from "@/components/molecules/recepiTable"
 import nutritionBar2 from "@/components/molecules/nutritionBar2"
 import macroNutrientBar from "@/components/molecules/macroNutrientBar";
-import {validateMyApp, updatePfc} from "@/plugins/helper";
+import {validateMyApp, updatePfc, getPfcScale, getCircularReplacer} from "@/plugins/helper";
 import fctTableModal2 from "@/components/organisms/FctTableModal2";
 import pieChart from "../atoms/pieChart";
+import { getNutritionDemandList, getNutritionSupplyList} from "../../plugins/helper";
 
 /**
  * @desc 6つのコンポーネントを組み合わせて食事評価
@@ -195,7 +200,19 @@ export default {
   },
   data() {
     return {
-      chartHeight: window.innerHeight / 2,
+      /**
+       * currentとrecommendを比較した場合のエネルギー量の充足度
+       * rating[].Enの値を1.5と0.5で足切りしたもの
+       */
+      pfcScale: [],
+      /**
+       * chartのオプション
+       */
+      myChartOptions: {
+        maintainAspectRatio: false,
+        responsive: true,
+      },
+      chartBaseHeight: window.innerHeight / 4,
       /**
        * 使用する全変数のobject
        * myAppから読み込んでこのページで利用。更新された時にemitを返す
@@ -412,18 +429,18 @@ export default {
     }
   },
   computed: {
-    pfcScale() {
-      const vm = this
-      return vm.rating.map((item) => {
-        let res = item.En
-        if (res < 0.5) {
-          res = 0.5
-        }
-        if (res > 1.5) {
-          res = 1.5
-        }
-        return res
-      })
+    myChartStyles() {
+      return {
+        height: `${this.chartBaseHeight * this.pfcScale[this.pageIdComputed]}px`,
+        position: 'relative'
+      }
+    },
+    myChartStylesOriginal() {
+      return {
+        height: `${this.chartBaseHeight}px`,
+        //height: `${this.chartBaseHeight}px`,
+        position: 'relative'
+      }
     },
     /**
      * ratingを計算するにあたって、同一メニューを一日3回食べると仮定した場合の評価、
@@ -465,7 +482,7 @@ export default {
      * @returns {*}
      */
     foodGroup() {
-      return this.myApp.dataSet.fct.reduce((accumulator, dat) => {
+      return this.myAppWatcher.dataSet.fct.reduce((accumulator, dat) => {
         if (accumulator.indexOf(dat.Group) < 0) {
           accumulator.push(dat.Group)
         }
@@ -478,7 +495,7 @@ export default {
      */
     diversityStatus() {
       const vm = this
-      return this.myApp.menuCases.map((foodsTemp) => {
+      return this.myAppWatcher.menuCases.map((foodsTemp) => {
         let res = vm.foodGroup.map((groupTemp) => {
           return {[groupTemp]: false}
         })
@@ -506,15 +523,23 @@ export default {
     myApp: {
       deep: true,
       handler(newVal) {
-        this.myAppWatcher = JSON.parse(JSON.stringify(newVal))
-        this.nutritionDemandWatcher = JSON.parse(JSON.stringify(this.nutritionDemandGetter()))
-        this.nutritionSupplyWatcher = JSON.parse(JSON.stringify(this.nutritionSupplyGetter2()))
-        this.rating = JSON.parse(JSON.stringify(this.ratingGetter()))
-        this.pageMemo = this.myAppWatcher.menuCases.map(function (item) {
+        const vm = this
+        vm.myAppWatcher = JSON.parse(JSON.stringify(newVal))
+        vm.nutritionDemandWatcher = JSON.parse(JSON.stringify(
+          getNutritionDemandList(vm.myAppWatcher.menuCases, vm.myAppWatcher.dataSet.dri, 1)
+        ))
+        vm.nutritionSupplyWatcher = JSON.parse(JSON.stringify(getNutritionSupplyList(
+          vm.myAppWatcher.menuCases, vm.maxPage)))
+        vm.rating = JSON.parse(JSON.stringify(vm.ratingGetter()))
+        vm.pfcScale = JSON.parse(JSON.stringify(
+          getPfcScale(vm.rating)
+        ))
+        vm.pageMemo = vm.myAppWatcher.menuCases.map(function (item) {
           return item.note
         })
-        this.pfcBalanceCurrent = JSON.parse(JSON.stringify(
-          updatePfc(this.nutritionSupplyWatcher, this.nutritionDemandWatcher)
+        vm.pfcBalanceCurrent = JSON.parse(JSON.stringify(
+          updatePfc(vm.nutritionSupplyWatcher),
+          getCircularReplacer()
         ))
       }
     },
@@ -523,15 +548,23 @@ export default {
    * 初期値の代入
    */
   created() {
-    this.myAppWatcher = JSON.parse(JSON.stringify(this.myApp))
-    this.nutritionDemandWatcher = JSON.parse(JSON.stringify(this.nutritionDemandGetter()))
-    this.nutritionSupplyWatcher = JSON.parse(JSON.stringify(this.nutritionSupplyGetter2()))
-    this.rating = JSON.parse(JSON.stringify(this.ratingGetter()))
-    this.pageMemo = this.myAppWatcher.menuCases.map(function (item) {
+    const vm = this
+    vm.myAppWatcher = JSON.parse(JSON.stringify(vm.myApp))
+    vm.nutritionDemandWatcher = JSON.parse(JSON.stringify(
+      getNutritionDemandList(vm.myAppWatcher.menuCases, vm.myAppWatcher.dataSet.dri, 1)
+    ))
+    vm.nutritionSupplyWatcher = JSON.parse(JSON.stringify(getNutritionSupplyList(
+      vm.myAppWatcher.menuCases, vm.maxPage)))
+    vm.rating = JSON.parse(JSON.stringify(vm.ratingGetter()))
+    vm.pfcScale = JSON.parse(JSON.stringify(
+      getPfcScale(vm.rating)
+    ))
+    vm.pageMemo = vm.myAppWatcher.menuCases.map(function (item) {
       return item.note
     })
-    this.pfcBalanceCurrent = JSON.parse(JSON.stringify(
-      updatePfc(this.nutritionSupplyWatcher, this.nutritionDemandWatcher)
+    vm.pfcBalanceCurrent = JSON.parse(JSON.stringify(
+      updatePfc(vm.nutritionSupplyWatcher),
+      getCircularReplacer()
     ))
   },
   methods: {
@@ -588,10 +621,9 @@ export default {
      */
     nutritionDemandGetter() {
       const vm = this
-      console.log(vm.myApp.menuCases)
-      return vm.myApp.menuCases.map((dat) => {
+      return vm.myAppWatcher.menuCases.map((dat) => {
         return dat.target.reduce((accumulator, item, index) => {
-          const dri = vm.myApp.dataSet.dri[index]
+          const dri = vm.myAppWatcher.dataSet.dri[index]
           const count = item.count
           accumulator.En = (accumulator.En || 0) + Number(count) * Number(dri.En)
           accumulator.Pr = (accumulator.Pr || 0) + Number(count) * Number(dri.Pr)
@@ -608,7 +640,7 @@ export default {
      */
     nutritionSupplyGetter() {
       const vm = this
-      return vm.myApp.menuCases.map((datArray) => {
+      return vm.myAppWatcher.menuCases.map((datArray) => {
         if (datArray.menu.length > 0) {
           return datArray.menu.reduce((accumulator, item) => {
             accumulator.En += Number(item.En ? item.En : 0) * Number(item.Wt) / 100
@@ -646,9 +678,8 @@ export default {
      * ただしfood_grp_idがStapleの場合、PrとFeを無視する
      * @returns {*[]} 栄養素供給量の合計値
      */
-    nutritionSupplyGetter2() {
-      const vm = this
-      return vm.myApp.menuCases.map((datArray) => {
+    nutritionSupplyGetter2(menuCases) {
+      return menuCases.map((datArray) => {
         if (datArray.menu.length > 0) {
           return datArray.menu.reduce((accumulator, item) => {
             let myPr = item.Pr ? item.Pr : 0
@@ -661,14 +692,19 @@ export default {
               myFe = 0
               myFat = 0
             }
+            //循環参照を回避するため定数に切り替えて代入
+            const En = item.En ? item.En : 0
+            const Va = item.Va ? item.Va : 0
+            const Carbohydrate = item.Carbohydrate ? item.Carbohydrate : 0
+            const Wt = item.Wt
 
-            accumulator.En += Number(item.En ? item.En : 0) * Number(item.Wt) / 100
-            accumulator.Pr += Number(myPr) * Number(item.Wt) / 100
-            accumulator.Va += Number(item.Va ? item.Va : 0) * Number(item.Wt) / 100
-            accumulator.Fe += Number(myFe) * Number(item.Wt) / 100
-            accumulator.Carbohydrate += Number(item.Carbohydrate ? item.Carbohydrate : 0) * Number(item.Wt) / 100
-            accumulator.Fat += Number(myFat) * Number(item.Wt) / 100
-            accumulator.Wt += Number(item.Wt)
+            accumulator.En += Number(En) * Number(Wt) / 100
+            accumulator.Pr += Number(myPr) * Number(Wt) / 100
+            accumulator.Va += Number(Va) * Number(Wt) / 100
+            accumulator.Fe += Number(myFe) * Number(Wt) / 100
+            accumulator.Carbohydrate += Number(Carbohydrate) * Number(Wt) / 100
+            accumulator.Fat += Number(myFat) * Number(Wt) / 100
+            accumulator.Wt += Number(Wt)
             return accumulator
           }, {
             'En': 0,
@@ -720,6 +756,7 @@ export default {
      */
     updateSupply(val) {
       const vm = this
+      console.log('updateSupply')
       //作業用のmyAppコピー作成
       let dat = JSON.parse(JSON.stringify(vm.myAppWatcher))
       //更新されたmenuを入れ替える

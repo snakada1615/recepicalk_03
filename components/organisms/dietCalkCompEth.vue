@@ -91,7 +91,6 @@
           <template #header>
             <div class="font-weight-bold">Dietary energy supply from PFC(Protein, Fat, Carbohydrate)</div>
           </template>
-          {{pfcScale[pageIdComputed]}}
           <b-row>
             <b-col cols="6">Current</b-col>
             <b-col cols="6">Recommended</b-col>
@@ -154,7 +153,7 @@ import macroNutrientBar from "@/components/molecules/macroNutrientBar";
 import fctTableModal2 from "@/components/organisms/FctTableModal2";
 import {
   getNutritionSupplyList, validateMyFamily,
-  getNutritionDemandList, updatePfc
+  getNutritionDemandList, updatePfc, getPfcScale
 } from "../../plugins/helper";
 
 /**
@@ -436,14 +435,14 @@ export default {
         vm.rating = JSON.parse(JSON.stringify(vm.ratingGetter(
           vm.nutritionSupplyWatcher, vm.nutritionDemandWatcher)))
         vm.pfcScale = JSON.parse(JSON.stringify(
-          vm.getPfcScale(vm.rating)
+          getPfcScale(vm.rating)
         ))
         vm.pageMemo = vm.myFamily.menuCases.map((item2) => {
           return item2.note
         })
         vm.currentMenu = JSON.parse(JSON.stringify(vm.myFamilyWatcher.menuCases[this.pageIdComputed].menu))
         vm.pfcBalanceCurrent = JSON.parse(JSON.stringify(
-          updatePfc(vm.nutritionSupplyWatcher, vm.nutritionDemandWatcher)
+          updatePfc(vm.nutritionSupplyWatcher)
         ))
       }
     },
@@ -465,29 +464,17 @@ export default {
     vm.rating = JSON.parse(JSON.stringify(vm.ratingGetter(
       vm.nutritionSupplyWatcher, vm.nutritionDemandWatcher)))
     vm.pfcScale = JSON.parse(JSON.stringify(
-      vm.getPfcScale(vm.rating)
+      getPfcScale(vm.rating)
     ))
     vm.pageMemo = vm.myFamily.menuCases.map((item2) => {
       return item2.note
     })
     vm.currentMenu = JSON.parse(JSON.stringify(vm.myFamilyWatcher.menuCases[this.pageIdComputed].menu))
     vm.pfcBalanceCurrent = JSON.parse(JSON.stringify(
-      updatePfc(vm.nutritionSupplyWatcher, vm.nutritionDemandWatcher)
+      updatePfc(vm.nutritionSupplyWatcher)
     ))
   },
   methods: {
-    getPfcScale(rating){
-      return rating.map((item) => {
-        const res = item.En / 10
-        if (res < 0.5) {
-          return 0.5
-        }
-        if (res > 1.5) {
-          return 1.5
-        }
-        return res
-      })
-    },
     enlargeChart() {
       this.chartBaseHeight += 10
       console.log(this.chartBaseHeight)

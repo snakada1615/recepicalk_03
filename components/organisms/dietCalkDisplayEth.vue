@@ -255,7 +255,7 @@ export default {
         vm.rating = JSON.parse(JSON.stringify(vm.ratingGetter(
           vm.nutritionSupplyWatcher, vm.nutritionDemandWatcher)))
         this.pfcBalanceCurrent  = JSON.parse(JSON.stringify(
-          updatePfc(this.nutritionSupplyWatcher, this.nutritionDemandWatcher)
+          updatePfc(this.nutritionSupplyWatcher)
         ))
       }
     },
@@ -280,7 +280,7 @@ export default {
     vm.rating = JSON.parse(JSON.stringify(vm.ratingGetter(
       vm.nutritionSupplyWatcher, vm.nutritionDemandWatcher)))
     this.pfcBalanceCurrent  = JSON.parse(JSON.stringify(
-      updatePfc(this.nutritionSupplyWatcher, this.nutritionDemandWatcher)
+      updatePfc(this.nutritionSupplyWatcher)
     ))
   },
   methods: {
