@@ -102,7 +102,7 @@
             <div class="font-weight-bold">PFC balance</div>
           </template>
           <b-row>
-            <b-col>
+            <b-col lg="6">
               <b-card border-variant="success">
                 Overall Average
                 <b-row>
@@ -125,7 +125,7 @@
                 </b-row>
               </b-card>
             </b-col>
-            <b-col v-for="pageId in sceneCount" :key="pageId" class="my-1" v-if="showScore[pageId-1]">
+            <b-col lg="6" v-for="pageId in sceneCount" :key="pageId" class="my-1" v-if="showScore[pageId-1]">
               <b-card>
                 Case{{ pageId }}
                 <b-row>

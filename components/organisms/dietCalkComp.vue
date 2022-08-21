@@ -106,18 +106,16 @@
           </b-row>
           <b-row>
             <b-col cols="6">
-<!--              v-if="pfcStandard"-->
               <pie-chart
-                v-if="false"
+                v-if="pfcStandard"
                 :chart-data="pfcStandard"
                 :options="myChartOptions"
                 :styles="myChartStylesOriginal"
               />
             </b-col>
             <b-col cols="6">
-<!--              v-if="pfcBalanceCurrent[pageIdComputed]"-->
               <pie-chart
-                v-if="false"
+                v-if="pfcBalanceCurrent[pageIdComputed]"
                 :chart-data="pfcBalanceCurrent[pageIdComputed]"
                 :options="myChartOptions"
                 :styles="myChartStyles"
@@ -169,10 +167,10 @@ import driSelectModal from "@/components/organisms/driSelectModal";
 import recepiTable from "@/components/molecules/recepiTable"
 import nutritionBar2 from "@/components/molecules/nutritionBar2"
 import macroNutrientBar from "@/components/molecules/macroNutrientBar";
-import {validateMyApp, updatePfc, getPfcScale, getCircularReplacer} from "@/plugins/helper";
+import {validateMyApp, updatePfc, getPfcScale} from "@/plugins/helper";
 import fctTableModal2 from "@/components/organisms/FctTableModal2";
 import pieChart from "../atoms/pieChart";
-import { getNutritionDemandList, getNutritionSupplyList} from "../../plugins/helper";
+import {getNutritionDemandList, getNutritionSupplyList} from "../../plugins/helper";
 
 /**
  * @desc 6つのコンポーネントを組み合わせて食事評価
@@ -537,10 +535,7 @@ export default {
         vm.pageMemo = vm.myAppWatcher.menuCases.map(function (item) {
           return item.note
         })
-        vm.pfcBalanceCurrent = JSON.parse(JSON.stringify(
-          updatePfc(vm.nutritionSupplyWatcher),
-          getCircularReplacer()
-        ))
+        vm.pfcBalanceCurrent = updatePfc(vm.nutritionSupplyWatcher)
       }
     },
   },
@@ -562,10 +557,7 @@ export default {
     vm.pageMemo = vm.myAppWatcher.menuCases.map(function (item) {
       return item.note
     })
-    vm.pfcBalanceCurrent = JSON.parse(JSON.stringify(
-      updatePfc(vm.nutritionSupplyWatcher),
-      getCircularReplacer()
-    ))
+    vm.pfcBalanceCurrent = updatePfc(vm.nutritionSupplyWatcher)
   },
   methods: {
     /**
