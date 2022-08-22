@@ -174,6 +174,7 @@
               :class="{'mt-3':index2!==0}"
             >
               {{ qa.questionText }}
+              {{ansListWatcher[pageIdComputed][qa.id-1]}}
               <b-form-select
                 :value="ansListWatcher[pageIdComputed][qa.id-1]"
                 :options="qa.answerList"

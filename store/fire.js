@@ -576,6 +576,21 @@ export const actions = {
     dispatch('setHasDocumentChanged', true)
   },
   /**
+   * questionsの質問内容を更新した際にfireStoreを更新する
+   * @param state
+   * @param payload
+   * @returns {Promise<boolean>}
+   */
+  async fireSaveQuestions({state}, payload) {
+    const ref = doc(firestoreDb, 'dataset', state.myApp.dataSet.questionsId)
+    //const ref = doc(firestoreDb, 'dataset', 'question_eth')
+    await setDoc(ref, payload).catch((err) => {
+      throw new Error('Error in fireSaveQuestions:' + err)
+    })
+    console.log('question saved to fireStore')
+    return true
+  },
+  /**
    * ユーザー登録時に基本データセット（FCT,DRI）をユーザースペースmyAppに
    *     コピーする
    */
@@ -937,6 +952,21 @@ export const actions = {
       await dispatch('updateFctId', 'fct_eth0729')
       //fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
       await dispatch('initFct')
+      needInitialization = true
+    }
+
+    //ETH研修向け暫定措置：questionデータベースを強制的にquestions_ethに変更してデータ更新
+    //2022年10月30日までの限定機能
+    //**********暫定措置、要削除***********
+    //**********暫定措置、要削除***********
+    //**********暫定措置、要削除***********
+    //**********暫定措置、要削除***********
+    if ((state.myApp.dataSet.questionsId !== 'question_eth') && (current < limit)) {
+      console.log('found some error and initialize feasibility questions')
+      //guestionsIdをstoreに保存
+      await dispatch('updateQuestionsId', 'question_eth')
+      //questionIdに基づいてfctを初期化（firestoreからfetch → storeに保存）
+      await dispatch('initQuestions')
       needInitialization = true
     }
 
