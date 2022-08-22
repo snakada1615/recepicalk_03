@@ -92,10 +92,9 @@
             <div class="font-weight-bold">Dietary energy supply from PFC(Protein, Fat, Carbohydrate)</div>
           </template>
           <b-row>
-            <b-col cols="6">Current</b-col>
             <b-col cols="6">Recommended</b-col>
+            <b-col cols="6">Current</b-col>
           </b-row>
-          <b-button @click="enlargeChart">push</b-button>
           <b-row>
             <b-col cols="6">
               <pie-chart
