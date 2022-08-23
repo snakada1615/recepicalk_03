@@ -578,16 +578,22 @@ export const actions = {
   /**
    * questionsの質問内容を更新した際にfireStoreを更新する
    * @param state
+   * @param dispatch
    * @param payload
    * @returns {Promise<boolean>}
    */
-  async fireSaveQuestions({state}, payload) {
+  async fireSaveQuestions({state, dispatch}, payload) {
     const ref = doc(firestoreDb, 'dataset', state.myApp.dataSet.questionsId)
     //const ref = doc(firestoreDb, 'dataset', 'question_eth')
     await setDoc(ref, payload).catch((err) => {
       throw new Error('Error in fireSaveQuestions:' + err)
     })
-    console.log('question saved to fireStore')
+    console.log('question saved to fireStore (payload -> fireStore')
+    console.log('Now question in store is replaced by the question from fireStore (fireStore -> store)')
+    await dispatch('initQuestions').catch((err)=>{
+      throw new Error('Error in fireSaveQuestions:' + err)
+    })
+    console.log('question in store refreshed!')
     return true
   },
   /**
