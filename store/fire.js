@@ -424,6 +424,15 @@ export const mutations = {
     state.myApp.currentFamily = payload
   },
   /**
+   * 現在対象になっているcommunity名の更新
+   * @param state
+   * @param payload
+   */
+  updateCurrentCommunityName: function (state, payload) {
+    console.log('updateCurrentCommunityName')
+    state.myApp.currentCommunity = payload
+  },
+  /**
    * feasibilityCaseのメモを更新
    * @param state
    * @param payload
@@ -486,6 +495,7 @@ export const actions = {
     let communityCasesTemp = JSON.parse(JSON.stringify(state.myApp.communityCases))
     communityCasesTemp = communityCasesTemp.map((item) => {
       if (item.name === payload.name) {
+        //ここはJSON.stringify出なくて良いか？
         return payload
       } else {
         return item
@@ -504,29 +514,34 @@ export const actions = {
     commit('updateCurrentFamilyName', payload)
     dispatch('setHasDocumentChanged', true)
   },
-  async addNewCommunity({state, dispatch}, payload) {
-    console.log(payload)
-    let currentCommunity = JSON.parse(JSON.stringify(payload.communityCases))
-    console.log(currentCommunity)
-    let arr = []
-    for (let i = 0; i < state.myApp.sceneCount; i++) {
-      const isTargetSingle = false
-      const note = ''
-      const menu = []
-      const target = payload.map(function (dat) {
-        return {id: dat.id, count: 0}
-      })
-      arr.push({target: target, menu: menu, note: note, isTargetSingle: isTargetSingle})
+  /**
+   * 現在対象になっているCommunityの更新
+   * @param commit
+   * @param dispatch
+   * @param payload
+   */
+  updateCurrentCommunityName({commit, dispatch}, payload) {
+    commit('updateCurrentCommunityName', payload)
+    dispatch('setHasDocumentChanged', true)
+  },
+  /**
+   * feasibilityCaseの初期化セットを返す
+   * @param myCount
+   * @returns {*[]}
+   */
+  createNewFeasibilityCases({}, myCount){
+    if (!myCount) {
+      return []
     }
-
-    currentCommunity.push({
-      'name': payload.name,
-      'member': payload.member,
-      'keyNutrient': '',
-      'menuCases': arr,
-      'feasibilityCases': arr2
-    })
-
+    let arr = []
+    for (let i = 0; i < myCount; i++) {
+      const selectedCrop = []
+      const note = ''
+      const ansList = [-99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99]
+      const prodTarget = {'share': 100, 'Wt': 0, 'Wt365': 0}
+      arr.push({selectedCrop: selectedCrop, note: note, ansList: ansList, prodTarget: prodTarget})
+    }
+    return arr
   },
   /**
    * 新しい家族構成の追加、併せて初期化
@@ -547,14 +562,9 @@ export const actions = {
     }
 
     //feasibilityリストの初期値設定
-    let arr2 = []
-    for (let i = 0; i < state.myApp.sceneCount; i++) {
-      const selectedCrop = []
-      const note = ''
-      const ansList = [-99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99]
-      const prodTarget = {'share': 100, 'Wt': 0, 'Wt365': 0}
-      arr2.push({selectedCrop: selectedCrop, note: note, ansList: ansList, prodTarget: prodTarget})
-    }
+    let arr2 = await dispatch('createNewFeasibilityCases', state.myApp.sceneCount)
+    console.log(arr2)
+
     currentFamily.push({
       'name': payload.name,
       'member': payload.member,
@@ -569,10 +579,63 @@ export const actions = {
     await dispatch('setHasDocumentChanged', true)
     //await dispatch('fireSaveAppdata')
   },
+  /**
+   * 新しいCommunityの追加、併せて初期化
+   * @param state
+   * @param dispatch
+   * @param payload
+   * @returns {Promise<void>}
+   */
+  async addNewCommunity({state, dispatch}, payload) {
+    console.log(payload)
+    let currentCommunity = JSON.parse(JSON.stringify(state.myApp.communityCases))
+    let arr = []
+    for (let i = 0; i < state.myApp.sceneCount; i++) {
+      const isTargetSingle = false
+      const note = ''
+      const menu = []
+      const target = payload.member.map(function (dat) {
+        return {id: dat.id, count: 0}
+      })
+      arr.push({target: target, menu: menu, note: note, isTargetSingle: isTargetSingle})
+    }
+
+    //feasibilityリストの初期値設定
+    let arr2 = await dispatch('createNewFeasibilityCases', state.myApp.sceneCount)
+    currentCommunity.push({
+      'name': payload.name,
+      'member': payload.member,
+      'keyNutrient': '',
+      'menuCases': arr,
+      'feasibilityCases': arr2
+    })
+    console.log(currentCommunity)
+    await dispatch('updateCurrentCommunityName', currentCommunity[0].name)
+    await dispatch('updateCommunityCases', currentCommunity)
+    await dispatch('setHasDocumentChanged', true)
+  },
+  /**
+   *
+   * @param state
+   * @param dispatch
+   * @param payload
+   */
   removeFamily({state, dispatch}, payload) {
     let currentFamily = JSON.parse(JSON.stringify(state.myApp.familyCases))
     currentFamily = currentFamily.filter((item) => item.name !== payload)
     dispatch('updateFamilyCases', currentFamily)
+    dispatch('setHasDocumentChanged', true)
+  },
+  /**
+   *
+   * @param state
+   * @param dispatch
+   * @param payload
+   */
+  removeCommunity({state, dispatch}, payload) {
+    let currentCommunity = JSON.parse(JSON.stringify(state.myApp.communityCases))
+    currentCommunity = currentCommunity.filter((item) => item.name !== payload)
+    dispatch('updateCommunityCases', currentCommunity)
     dispatch('setHasDocumentChanged', true)
   },
   /**
@@ -993,9 +1056,18 @@ export const actions = {
     }
 
     //currentFamilyの新規追加
-    if (state.myApp.currentFamily === null) {
+    //　X == null は　(X === null || X === undefined)と等値
+    if (state.myApp.currentFamily == null) {
       console.log('found some error and initialize currentFamilyName')
       dispatch('updateCurrentFamilyName', '')
+      needInitialization = true
+    }
+
+    //currentFamilyの新規追加
+    //　X == null は　(X === null || X === undefined)と等値
+    if (state.myApp.currentCommunity == null) {
+      console.log('found some error and initialize currentCommunity Name')
+      dispatch('updateCurrentCommunityName', '')
       needInitialization = true
     }
 

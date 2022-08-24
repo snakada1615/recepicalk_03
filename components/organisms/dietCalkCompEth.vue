@@ -313,7 +313,9 @@ export default {
      */
     disabledOption: {
       type: Array,
-      default: []
+      default(){
+        return []
+      }
     },
   },
   computed: {
