@@ -25,6 +25,12 @@
             variant="info"
           >add crop
           </b-button>
+          <b-button
+            v-if="!useCommonTarget"
+            @click="showDriSelect = !showDriSelect"
+            variant="info"
+          >set family
+          </b-button>
         </b-card>
       </b-col>
       <b-col cols="12" lg="6">
@@ -140,6 +146,17 @@
       :portion-units="myPortion"
       @update:menuCases="updateSupply($event, pageIdComputed)"
     ></fctTableModal2>
+    <dri-select-modal
+      v-if="!useCommonTarget"
+      my-modal-header="nutrition target"
+      my-name="driModal"
+      :show-modal.sync="showDriSelect"
+      :targetSwitch.sync="myCommunityWatcher.menuCases[pageIdComputed].isTargetSingle"
+      :max="maxPopulation"
+      :driPopulations="myCommunityWatcher.menuCases[pageIdComputed].target"
+      :driItems="myDri"
+      @update:target="updateDemand($event, pageIdComputed)"
+    />
   </b-container>
 </template>
 
@@ -194,7 +211,7 @@ export default {
        * 使用する全変数のobject
        * myFamilyから読み込んでこのページで利用。更新された時にemitを返す
        */
-      myFamilyWatcher: {},
+      myCommunityWatcher: {},
       /**
        * menuテーブルから計算される栄養供給量の合計値
        * menuCases[].menuから読み込んでこのページで利用。参照専用
@@ -309,11 +326,18 @@ export default {
       required: true
     },
     /**
+     * 共通のDRIを使うか、ケース毎に異なるDRIを設定するか決めるフラグ
+     */
+    useCommonTarget: {
+      type: Boolean,
+      default: true
+    },
+    /**
      * 最初のページを表示しないためのフラグ
      */
     disabledOption: {
       type: Array,
-      default(){
+      default() {
         return []
       }
     },
@@ -332,19 +356,6 @@ export default {
       }
     },
     /**
-     * ratingを計算するにあたって、同一メニューを一日3回食べると仮定した場合の評価、
-     *     (recepiTableの値×3)、または1回分が一日の栄養素に与える影響の評価を
-     *     切り替える
-     * @returns {number}
-     */
-    driRange: function () {
-      let res = 3
-      if (this.driSwitch) {
-        res = 1
-      }
-      return res
-    },
-    /**
      * 現在のページ番号
      */
     pageIdComputed: {
@@ -356,7 +367,7 @@ export default {
       }
     },
     /**
-     * 全ページ数
+     * ページ一覧：リストからページ選択するためのarray option
      * @returns {*[]}
      */
     pageOptions() {
@@ -388,8 +399,8 @@ export default {
      */
     diversityStatus() {
       const vm = this
-      if (vm.myFamilyWatcher.menuCases !== []) {
-        return vm.myFamilyWatcher.menuCases.map((foodsTemp) => {
+      if (vm.myCommunityWatcher.menuCases !== []) {
+        return vm.myCommunityWatcher.menuCases.map((foodsTemp) => {
           let res = vm.foodGroup.map((groupTemp) => {
             return {[groupTemp]: false}
           })
@@ -424,9 +435,28 @@ export default {
       deep: true,
       handler(newVal) {
         const vm = this
-        vm.myFamilyWatcher = JSON.parse(JSON.stringify(newVal))
-        const memberSet = JSON.parse(JSON.stringify(vm.myFamilyWatcher.member))
-        const memberSetList = [...Array(vm.maxPage)].map(() => memberSet)
+        vm.myCommunityWatcher = JSON.parse(JSON.stringify(newVal))
+        let memberSetList = []
+        if (vm.useCommonTarget) {
+          const memberSet = JSON.parse(JSON.stringify(vm.myCommunityWatcher.member))
+          memberSetList = [...Array(vm.maxPage)].map(() => memberSet)
+        } else {
+          memberSetList = vm.myCommunityWatcher.menuCases.map((item) => {
+            return item.target
+          })
+        }
+        /*
+                function memberSetList2(singleTarget){
+                  if (singleTarget) {
+                    const memberSet = JSON.parse(JSON.stringify(vm.myCommunityWatcher.member))
+                    return [...Array(vm.maxPage)].map(() => memberSet)
+                  } else {
+                    return vm.myCommunityWatcher.map((item)=>{
+                      return item.target
+                    })
+                  }
+                }
+        */
         vm.nutritionDemandWatcher = JSON.parse(JSON.stringify(getNutritionDemandList(
           memberSetList,
           vm.myDri
@@ -441,7 +471,7 @@ export default {
         vm.pageMemo = vm.myFamily.menuCases.map((item2) => {
           return item2.note
         })
-        vm.currentMenu = JSON.parse(JSON.stringify(vm.myFamilyWatcher.menuCases[this.pageIdComputed].menu))
+        vm.currentMenu = JSON.parse(JSON.stringify(vm.myCommunityWatcher.menuCases[this.pageIdComputed].menu))
         vm.pfcBalanceCurrent = JSON.parse(JSON.stringify(
           updatePfc(vm.nutritionSupplyWatcher)
         ))
@@ -453,9 +483,18 @@ export default {
    */
   created() {
     const vm = this
-    vm.myFamilyWatcher = JSON.parse(JSON.stringify(vm.myFamily))
-    const memberSet = JSON.parse(JSON.stringify(vm.myFamilyWatcher.member))
-    const memberSetList = [...Array(vm.maxPage)].map(() => memberSet)
+    vm.myCommunityWatcher = JSON.parse(JSON.stringify(vm.myFamily))
+
+    let memberSetList = []
+    if (vm.useCommonTarget) {
+      const memberSet = JSON.parse(JSON.stringify(vm.myCommunityWatcher.member))
+      memberSetList = [...Array(vm.maxPage)].map(() => memberSet)
+    } else {
+      memberSetList = vm.myCommunityWatcher.menuCases.map((item) => {
+        return item.target
+      })
+    }
+
     vm.nutritionDemandWatcher = JSON.parse(JSON.stringify(getNutritionDemandList(
       memberSetList,
       vm.myDri
@@ -470,7 +509,7 @@ export default {
     vm.pageMemo = vm.myFamily.menuCases.map((item2) => {
       return item2.note
     })
-    vm.currentMenu = JSON.parse(JSON.stringify(vm.myFamilyWatcher.menuCases[this.pageIdComputed].menu))
+    vm.currentMenu = JSON.parse(JSON.stringify(vm.myCommunityWatcher.menuCases[this.pageIdComputed].menu))
     vm.pfcBalanceCurrent = JSON.parse(JSON.stringify(
       updatePfc(vm.nutritionSupplyWatcher)
     ))
@@ -486,7 +525,7 @@ export default {
      */
     updatePageMemo(newVal) {
       //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
+      let dat = JSON.parse(JSON.stringify(this.myCommunityWatcher))
       //更新されたmenuを入れ替える
       dat.menuCases[this.pageIdComputed].note = newVal
       //更新されたmyAppをemit
@@ -507,13 +546,13 @@ export default {
         */
         res.push({
           En: demand.En ?
-            Math.round(100 * supply.En * this.driRange / demand.En) / 10 : 0,
+            Math.round(100 * supply.En / demand.En) / 10 : 0,
           Pr: demand.Pr ?
-            Math.round(100 * supply.Pr * this.driRange / demand.Pr) / 10 : 0,
+            Math.round(100 * supply.Pr / demand.Pr) / 10 : 0,
           Va: demand.Va ?
-            Math.round(100 * supply.Va * this.driRange / demand.Va) / 10 : 0,
+            Math.round(100 * supply.Va / demand.Va) / 10 : 0,
           Fe: demand.Fe ?
-            Math.round(100 * supply.Fe * this.driRange / demand.Fe) / 10 : 0
+            Math.round(100 * supply.Fe / demand.Fe) / 10 : 0
         })
       }
       return res
@@ -524,7 +563,7 @@ export default {
      */
     updateSupply(val, index) {
       //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
+      let dat = JSON.parse(JSON.stringify(this.myCommunityWatcher))
       //更新されたmenuを入れ替える
       dat.menuCases[index].menu = val
       //更新されたmyAppをemit
@@ -534,16 +573,20 @@ export default {
      * ユーザーによりtergetが変更された際に、栄養素必要量合計を再計算してemit
      * @param val 更新されたグループ構成
      */
-    updateDemand(val) {
+    updateDemand(val, index) {
       const vm = this
+      //targetrが固定の場合は何もせず終了
+      if (vm.useCommonTarget) {
+        return
+      }
+      console.log(vm.myCommunityWatcher.menuCases[0])
       //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(vm.myFamilyWatcher))
+      let dat = JSON.parse(JSON.stringify(vm.myCommunityWatcher))
       //更新されたtargetを入れ替える
-      dat.member = JSON.parse(JSON.stringify(val))
+      dat.menuCases[index].target = JSON.parse(JSON.stringify(val))
       //更新されたmyAppをemit
       this.$emit('update:myFamily', dat)
-    }
-    ,
+    },
     /**
      * ユーザーによりrecepiTableがクリックされた際に、行の内容を組み込んでfoodModalを開く
      * @param val
@@ -562,8 +605,7 @@ export default {
       this.menuName_modal = val.menuName
       this.value_model = val.Wt
       this.showModal = true
-    }
-    ,
+    },
     /**
      * ユーザーによりfctTableがクリックされた時に行の内容を組み込んでfoodModalを開く
      * @param val
@@ -583,8 +625,7 @@ export default {
       })
       this.value_model = 0
       this.showModal = true
-    }
-    ,
+    },
     /**
      * menuが変更・追加された際に、栄養素供給量合計を再計算してemit
      * 新規なら追加、変更なら更新
@@ -595,7 +636,7 @@ export default {
       //menuを更新する
       let existing = false
       let newMenu = []
-      newMenu = vm.myFamilyWatcher.menuCases[vm.pageIdComputed].menu.map((item) => {
+      newMenu = vm.myCommunityWatcher.menuCases[vm.pageIdComputed].menu.map((item) => {
         if (item.id === val.id && item.menuName === val.menuName) {
           existing = true
           return JSON.parse(JSON.stringify(val))
@@ -607,26 +648,24 @@ export default {
         newMenu.push(val)
       }
       //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(vm.myFamilyWatcher))
+      let dat = JSON.parse(JSON.stringify(vm.myCommunityWatcher))
       //更新されたmenuを入れ替える
       dat.menuCases[vm.pageIdComputed].menu = newMenu
       //更新されたmyAppをemit
       this.$emit('update:myFamily', dat)
-    }
-    ,
+    },
     /**
      * menuが削除された際に、栄養素供給量合計を再計算してemit
      * @param val 更新されたmenu
      */
     deleteSupply(val) {
       //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
+      let dat = JSON.parse(JSON.stringify(this.myCommunityWatcher))
       //更新されたmenuを入れ替える
       dat.menuCases[this.pageIdComputed].menu = val
       //更新されたmyAppをemit
       this.$emit('update:myFamily', dat)
-    }
-    ,
+    },
     //fctとdriの表示調整
     toggleFctDri() {
       console.log('test')

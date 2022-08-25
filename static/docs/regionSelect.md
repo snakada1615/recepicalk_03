@@ -10,8 +10,8 @@ storeからregion一覧を読み込んでリストボックスで選択し、プ
 | `key2` *required* | `String` | 選択された地域2    | `""`       |
 | `key3` *required* | `String` | 選択された地域3    | `""`       |
 | `label1`          | `String` | region1のラベル | `"Region"` |
-| `label2`          | `String` | region2のラベル | `"Woreda"` |
-| `label3`          | `String` | region3のラベル | `"Kebere"` |
+| `label2`          | `String` | region2のラベル | `"Zone"`   |
+| `label3`          | `String` | region3のラベル | `"Woreda"` |
 
 ## Data
 

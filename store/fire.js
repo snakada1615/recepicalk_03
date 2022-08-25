@@ -602,6 +602,7 @@ export const actions = {
 
     //feasibilityリストの初期値設定
     let arr2 = await dispatch('createNewFeasibilityCases', state.myApp.sceneCount)
+
     currentCommunity.push({
       'name': payload.name,
       'member': payload.member,
@@ -1452,6 +1453,7 @@ export const actions = {
   updateMyFamily: function ({commit, dispatch}, payload) {
     commit('updateMyFamily', payload)
     //myAppの変更時は、常に setHasDocumentChanged=true をセット
+    console.log('updateMyFamily')
     dispatch('setHasDocumentChanged', true)
   },
   /**

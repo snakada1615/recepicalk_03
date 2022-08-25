@@ -71,14 +71,15 @@
         <b-tab title="current diet" :disabled="!stateDiet">
           <b-card no-body>
             <diet-calk-comp-eth
-              v-if="myFamily.name"
-              :my-family="myFamily"
+              v-if="myCommunity.name"
+              :my-family="myCommunity"
               :my-dri="myApp.dataSet.dri"
               :my-fct="myApp.dataSet.fct"
               :my-portion="myApp.dataSet.portionUnit"
               :page-id="pageId1"
               :max-page="maxPage"
-              @update:myFamily="updateMyFamily"
+              :use-common-target="false"
+              @update:myFamily="updateMyCommunity"
             />
           </b-card>
         </b-tab>
@@ -94,7 +95,7 @@
               <div>Select key nutrient for your target family/HH</div>
             </template>
             <b-form-group
-              v-if="myFamily.name"
+              v-if="myCommunity.name"
               class="ml-2"
             >
               <b-form-radio-group
@@ -138,7 +139,7 @@
         </b-tab>
         <b-tab title="crop feasibility"
                v-if="false"
-               :disabled="!selectedCropList || communityList.length === 0 || !myFamily.keyNutrient">
+               :disabled="!selectedCropList || communityList.length === 0 || !myCommunity.keyNutrient">
           <div class=" mb-2 ml-3">
             identified nutrient gap:
             <span
@@ -157,15 +158,15 @@
           </div>
           <b-row>
             <feasibility-check-component-eth
-              v-if="myFamily.name && selectedNutrient"
-              :my-family="myFamily"
+              v-if="myCommunity.name && selectedNutrient"
+              :my-family="myCommunity"
               :my-dri="myApp.dataSet.dri"
               :my-fct="myApp.dataSet.fct"
               :my-questions="myApp.dataSet.questions"
               :page-id.sync="pageId3"
               :max-page="maxPage"
               :current-family="communityName"
-              @update:myFamily="updateMyFamily"
+              @update:myFamily="updateMyCommunity"
               @update:pageMemo="updatePageMemo"
             />
           </b-row>
@@ -232,7 +233,7 @@
                 class="mx-1 px-0 my-2">
                 <template #header>
                   <div class="font-weight-bolder text-white">
-                    {{ myFamily.feasibilityCases[pageId - 1].note }}:
+                    {{ myCommunity.feasibilityCases[pageId - 1].note }}:
                     {{ selectedCropList[pageId - 1] || 'not selected' }}
                   </div>
                 </template>
@@ -564,16 +565,16 @@ export default {
   computed: {
     menuUpdated() {
       const vm = this
-      if (!vm.myFamily.feasibilityCases) {
+      if (!vm.myCommunity.feasibilityCases) {
         console.log('dataset is broken in feasibilityCases: null')
         return []
       }
-      if (vm.myFamily.feasibilityCases.length === 0) {
+      if (vm.myCommunity.feasibilityCases.length === 0) {
         console.log('dataset is broken in feasibilityCases: length is 0')
         return []
       }
-      let res = JSON.parse(JSON.stringify(vm.myFamily.menuCases[0].menu))
-      const addedCommodity = vm.myFamily.feasibilityCases.find((item) => {
+      let res = JSON.parse(JSON.stringify(vm.myCommunity.menuCases[0].menu))
+      const addedCommodity = vm.myCommunity.feasibilityCases.find((item) => {
         if (item.selectedCrop.length > 0) {
           return item.selectedCrop[0].Name === vm.selectedCommodity
         } else {
@@ -592,14 +593,14 @@ export default {
         menuCases: [
           {
             note: '',
-            menu: vm.myFamily.menuCases[0].menu,
+            menu: vm.myCommunity.menuCases[0].menu,
           },
           {
             note: '',
             menu: vm.menuUpdated,
           }
         ],
-        member: vm.myFamily.member,
+        member: vm.myCommunity.member,
         fct: vm.fct,
         dri: vm.dri,
       }
@@ -611,7 +612,7 @@ export default {
     qaScore() {
       let res = []
       const vm = this
-      vm.myFamily.feasibilityCases.forEach(function (val) {
+      vm.myCommunity.feasibilityCases.forEach(function (val) {
         res.push(vm.summarizeQA(vm.ansId, val.ansList))
       })
       return res
@@ -653,10 +654,10 @@ export default {
     statePriotiry() {
       const vm = this
       let res = false
-      if (vm.myFamily) {
-        if (vm.myFamily.menuCases) {
-          if (vm.myFamily.menuCases.length > 0) {
-            if (vm.myFamily.menuCases[0].menu.length > 0) {
+      if (vm.myCommunity) {
+        if (vm.myCommunity.menuCases) {
+          if (vm.myCommunity.menuCases.length > 0) {
+            if (vm.myCommunity.menuCases[0].menu.length > 0) {
               res = true
             }
           }
@@ -669,8 +670,8 @@ export default {
     },
     stateFeasibilityCheck() {
       let res = false
-      if (this.myFamily.feasibilityCases) {
-        this.myFamily.feasibilityCases.forEach((item) => {
+      if (this.myCommunity.feasibilityCases) {
+        this.myCommunity.feasibilityCases.forEach((item) => {
           if (item.selectedCrop.length > 0) {
             res = true
           }
@@ -679,32 +680,32 @@ export default {
       if (this.communityList.length === 0) {
         res = false
       }
-      if (!this.myFamily.keyNutrient) {
+      if (!this.myCommunity.keyNutrient) {
         res = false
       }
       return res
     },
     selectedNutrient: {
       get() {
-        return this.myFamily.keyNutrient
+        return this.myCommunity.keyNutrient
       },
       set(val) {
         const vm = this
-        let res = JSON.parse(JSON.stringify(vm.myFamily))
+        let res = JSON.parse(JSON.stringify(vm.myCommunity))
         res.keyNutrient = val
-        vm.updateMyFamily(res)
+        vm.updateMyCommunity(res)
       },
     },
     selectedCommodityId: {
       get() {
-        return this.myFamily.keyCommodity
+        return this.myCommunity.keyCommodity
       },
       set(val) {
         const vm = this
         console.log(val)
-        let res = JSON.parse(JSON.stringify(vm.myFamily))
+        let res = JSON.parse(JSON.stringify(vm.myCommunity))
         res.keyCommodity = val
-        vm.updateMyFamily(res)
+        vm.updateMyCommunity(res)
       },
     },
     selectedCommodity() {
@@ -722,16 +723,16 @@ export default {
         this.$store.state.fire.myApp
       ))
     },
-    myFamily() {
+    myCommunity() {
       const vm = this
       let res = vm.myApp.communityCases.find((item) => item.name === vm.myApp.currentCommunity)
       return res ? res : {}
     },
     selectedCropList() {
-      if (!this.myFamily.feasibilityCases) {
+      if (!this.myCommunity.feasibilityCases) {
         return []
       }
-      return this.myFamily.feasibilityCases.map((item) => {
+      return this.myCommunity.feasibilityCases.map((item) => {
         return item.selectedCrop[0] ? item.selectedCrop[0].Name : ''
       })
     },
@@ -789,7 +790,7 @@ export default {
   },
   methods: {
     /**
-     * cropの選択の変更をmyFamilyに組み込んでemitで通知
+     * cropの選択の変更をmyCommunityに組み込んでemitで通知
      * @param value
      * @param index
      */
@@ -804,8 +805,8 @@ export default {
       //暫定的に100gにセット
       res.Wt = 100
 
-      //作業用のmyFamilyコピー作成
-      let dat = JSON.parse(JSON.stringify(this.myFamily))
+      //作業用のmyCommunityコピー作成
+      let dat = JSON.parse(JSON.stringify(this.myCommunity))
 
       //selectedCropを更新
       dat.feasibilityCases[index - 1].selectedCrop[0] = res
@@ -823,8 +824,8 @@ export default {
       //selectedCrop[0]を更新
       dat.feasibilityCases[index - 1].selectedCrop[0].Wt = Wt
 
-      //myFamilyを更新
-      await this.updateMyFamily(dat)
+      //myCommunityを更新
+      await this.updateMyCommunity(dat)
     }
     ,
     /**
@@ -834,19 +835,12 @@ export default {
       this.addCropId = index
       this.showFct = !this.showFct
     },
-    updateMyFamily(val) {
-      let res = JSON.parse(JSON.stringify(this.myApp.familyCases))
-      res = res.map((item) => {
-        let res2 = item
-        if (item.name === val.name) {
-          res2 = val
-        }
-        return res2
-      })
-      this.$store.dispatch('fire/updateMyFamily', res)
+    updateMyCommunity(val) {
+      console.log('updateFamily')
+      this.$store.dispatch('fire/updateCommunityCase', val)
     },
     updatePageMemo(val) {
-      this.$store.dispatch('fire/updateMyFamily', val)
+      this.$store.dispatch('fire/updateCommunityCase', val)
       this.$store.dispatch('fire/fireSaveAppdata')
     },
     updateFamily(name, member) {

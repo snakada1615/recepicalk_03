@@ -22,11 +22,13 @@ driSelectAllをモーダル化したもの
 
 ## Events
 
-| Name                   | Description                                                 |
-| ---------------------- | ----------------------------------------------------------- |
-| `update:showModal`     | <br/>**Arguments**<br/><ul><li>**`val: unknown`**</li></ul> |
-| `update:target`        |                                                             |
-| `changeNutritionValue` | &nbsp;                                                      |
+| Name                   | Description                                                          |
+| ---------------------- | -------------------------------------------------------------------- |
+| `update:showModal`     | <br/>**Arguments**<br/><ul><li>**`val: unknown`**</li></ul>          |
+| `driSelectOk`          | <br/>**Arguments**<br/><ul><li>**`driPopulations: array`**</li></ul> |
+| `update:targetSwitch`  |                                                                      |
+| `update:target`        |                                                                      |
+| `changeNutritionValue` | &nbsp;                                                               |
 
 ## Methods
 

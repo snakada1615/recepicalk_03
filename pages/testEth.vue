@@ -287,6 +287,7 @@
             </span>
           </div>
           <summary-diet-eth
+            v-if="Object.keys(summaryResult).length"
             :my-app="summaryResult"
           />
         </b-tab>
@@ -586,6 +587,9 @@ export default {
     },
     summaryResult() {
       const vm = this
+      if (!vm.myFamily.menuCases){
+        return {}
+      }
       return {
         menuCases: [
           {
@@ -662,9 +666,6 @@ export default {
       }
       return res
     },
-    stateSummary() {
-
-    },
     stateFeasibilityCheck() {
       let res = false
       if (this.myFamily.feasibilityCases) {
@@ -723,7 +724,7 @@ export default {
     myFamily() {
       const vm = this
       let res = vm.myApp.familyCases.find((item) => item.name === vm.myApp.currentFamily)
-      return res ? res : {}
+      return res ? res : []
     },
     selectedCropList() {
       if (!this.myFamily.feasibilityCases) {

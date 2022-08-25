@@ -39,13 +39,23 @@ FctTableをModal化したもの
 
 ### onFctClick()
 
+行をクリックされた場合にその内容をemitする
+
+**Syntax**
+
+```typescript
+onFctClick(rec: unknown): void
+```
+
+### onFctDblClick()
+
 行をクリックされた場合にその内容をemitして
 食品の摂取量の設定用の別のmodal（foodModal）を開く
 
 **Syntax**
 
 ```typescript
-onFctClick(rec: unknown): void
+onFctDblClick(rec: unknown): void
 ```
 
 ### clickOk()

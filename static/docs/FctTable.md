@@ -33,9 +33,10 @@ FCTをpropから読み込んで表示\
 
 ## Events
 
-| Name       | Description                                                    |
-| ---------- | -------------------------------------------------------------- |
-| `fctClick` | <br/>**Arguments**<br/><ul><li>**`record: unknown`**</li></ul> |
+| Name          | Description                                                    |
+| ------------- | -------------------------------------------------------------- |
+| `fctClick`    | <br/>**Arguments**<br/><ul><li>**`record: unknown`**</li></ul> |
+| `fctDblClick` | <br/>**Arguments**<br/><ul><li>**`record: unknown`**</li></ul> |
 
 ## Methods
 
@@ -67,5 +68,15 @@ onInput(): void
 
 ```typescript
 rowClick(record: unknown): void
+```
+
+### rowDblClick()
+
+テーブルの行をダブルクリックした際にその行の情報をemit
+
+**Syntax**
+
+```typescript
+rowDblClick(record: unknown): void
 ```
 
