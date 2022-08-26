@@ -411,8 +411,6 @@ export const mutations = {
    */
   updateCommunityCases: function (state, payload) {
     state.myApp.communityCases = JSON.parse(JSON.stringify(payload))
-    console.log('initialized communityCases: the value is as following...')
-    console.log(state.myApp.communityCases)
   },
   /**
    * 現在対象になっている家族名の更新
@@ -479,11 +477,13 @@ export const actions = {
   },
   /**
    * communityCasesを更新
+   * @param commit
    * @param dispatch
    * @param payload
    */
-  updateCommunityCases({commit}, payload) {
+  updateCommunityCases({commit, dispatch}, payload) {
     commit('updateCommunityCases', payload)
+    dispatch('setHasDocumentChanged', true)
   },
   /**
    * communityCasesの一要素（payload）のみを更新
@@ -502,7 +502,6 @@ export const actions = {
       }
     })
     dispatch('updateCommunityCases', communityCasesTemp)
-    dispatch('setHasDocumentChanged', true)
   },
   /**
    * 現在対象になっている家族の更新
@@ -612,7 +611,7 @@ export const actions = {
     })
     console.log(currentCommunity)
     await dispatch('updateCurrentCommunityName', currentCommunity[0].name)
-    await dispatch('updateCommunityCases', currentCommunity)
+      await dispatch('updateCommunityCases', currentCommunity)
     await dispatch('setHasDocumentChanged', true)
   },
   /**

@@ -113,7 +113,13 @@
 <script>
 import nutritionBar2 from "@/components/molecules/nutritionBar2";
 import macroNutrientBar from "@/components/molecules/macroNutrientBar";
-import {getNutritionDemandList, getNutritionSupplyList, updatePfc} from "../../plugins/helper";
+import {
+  getDiversityStatus,
+  getNutritionDemandList,
+  getNutritionSupplyList,
+  getRating,
+  updatePfc
+} from "../../plugins/helper";
 import pieChart from "../atoms/pieChart";
 
 export default {
@@ -240,24 +246,7 @@ export default {
      * @returns {*[]}
      */
     diversityStatus() {
-      const vm = this
-      return this.myAppComputed.menuCases.map((foodsTemp, index) => {
-        let res = {}
-        let colorVariant = {}
-        res['case'] = 'Case' + (index + 1)
-        colorVariant['case'] = 'primary'
-        vm.foodGroup.forEach((foodItem) => {
-          res[foodItem] = ''
-          colorVariant[foodItem] = 'danger'
-        })
-        foodsTemp.menu.forEach((dat1) => {
-          if (vm.foodGroup.indexOf(dat1.Group) >= 0) {
-            colorVariant[dat1.Group] = 'info'
-          }
-        })
-        res['_cellVariants'] = colorVariant
-        return res
-      })
+      return getDiversityStatus(this.myAppComputed.menuCases, this.foodGroup)
     },
     /**
      * myAppComputed.menuCases.targetの値を集計してnutritionDemandWatcherに代入するための関数
@@ -276,29 +265,14 @@ export default {
       return getNutritionSupplyList(vm.myAppComputed.menuCases, vm.myAppComputed.menuCases.length)
     },
     rating() {
-      return this.ratingGetter()
+      return this.ratingGetter
     },
     /**
      * nutritionSupplyとnutritionDemandの値に基づいて栄養素の充足率を算出
      * @returns {*[]} 栄養素ごとの充足率
      */
     ratingGetter() {
-      const res = []
-      for (let i = 0; i < this.sceneCount; i++) {
-        const supply = this.nutritionSupplyGetter[i]
-        const demand = this.nutritionDemandGetter[i]
-        res.push({
-          En: demand.En ?
-            Math.round(100 * supply.En / demand.En) / 10 : 0,
-          Pr: demand.Pr ?
-            Math.round(100 * supply.Pr / demand.Pr) / 10 : 0,
-          Va: demand.Va ?
-            Math.round(100 * supply.Va / demand.Va) / 10 : 0,
-          Fe: demand.Fe ?
-            Math.round(100 * supply.Fe / demand.Fe) / 10 : 0
-        })
-      }
-      return res
+      return getRating(this.nutritionSupplyGetter, this.nutritionDemandGetter, this.sceneCount)
     },
     /**
      *
@@ -326,11 +300,11 @@ export default {
       /**
        * チャートの基本の高さ
        */
-      chartHeight: window.innerHeight / 4,
+      chartHeight: window.innerHeight / 5,
       /**
        * チャートの基本の幅
        */
-      chartWidth: window.innerHeight / 4,
+      chartWidth: window.innerHeight / 5,
       /**
        * PFCバランスの推奨値
        */

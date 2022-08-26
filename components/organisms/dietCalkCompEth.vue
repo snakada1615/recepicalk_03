@@ -576,11 +576,10 @@ export default {
      */
     updateDemand(val, index) {
       const vm = this
-      //targetrが固定の場合は何もせず終了
+      //targetが固定の場合は何もせず終了
       if (vm.useCommonTarget) {
         return
       }
-      console.log(vm.myFamilyWatcher.menuCases[0])
       //作業用のmyAppコピー作成
       let dat = JSON.parse(JSON.stringify(vm.myFamilyWatcher))
       //更新されたtargetを入れ替える

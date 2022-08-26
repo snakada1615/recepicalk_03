@@ -2,12 +2,12 @@
   <b-container>
     <b-card :header="'current community: ' + communityName">
       <b-tabs card>
-        <b-tab title="add family">
+        <b-tab title="add community">
           <b-row class="justify-content-center">
             <b-col cols="8">
               <b-input-group
                 size="sm"
-                prepend="family name"
+                prepend="community name"
                 class="mt-2 mb-0"
               >
                 <b-form-input
@@ -36,13 +36,13 @@
             </b-col>
           </b-row>
         </b-tab>
-        <b-tab title="select family" :disabled="communityList.length === 0">
+        <b-tab title="select community" :disabled="communityList.length === 0">
           <b-row class="justify-content-center border-primary">
             <b-col cols="8">
               <b-input-group size="sm" class="mb-2">
                 <template #prepend>
                   <b-input-group-text>
-                    select family
+                    select community
                   </b-input-group-text>
                 </template>
                 <b-form-select
@@ -68,20 +68,26 @@
             </b-col>
           </b-row>
         </b-tab>
-        <b-tab title="current diet" :disabled="!stateDiet">
+        <b-tab title="sample diet pattern" :disabled="!stateDiet">
           <b-card no-body>
             <diet-calk-comp-eth
               v-if="myCommunity.name"
-              :my-family="myCommunity.menuCases[pageId1]"
+              :my-family="myCommunity"
               :my-dri="myApp.dataSet.dri"
               :my-fct="myApp.dataSet.fct"
               :my-portion="myApp.dataSet.portionUnit"
-              :page-id="pageId1"
+              :page-id.sync="pageId1"
               :max-page="maxPage"
               :use-common-target="false"
-              @update:myFamily="updateMyCommunity"
+              @update:myFamily="updateDietOrFeasibility($event, 1)"
             />
           </b-card>
+        </b-tab>
+
+        <b-tab title="sample diet pattern" :disabled="summaryAverage === {}">
+          <summary-diet-eth
+            :my-app="summaryAverage"
+          />
         </b-tab>
 
         <b-tab title="priority commodity" :disabled="!statePriotiry" v-if="false">
@@ -132,7 +138,6 @@
                     >select</b-button>
                   </span>
                 </div>
-
               </b-list-group-item>
             </b-list-group>
           </b-card>
@@ -309,7 +314,11 @@ import driSelectMulti from "../components/molecules/driSelectMulti";
 import dietCalkCompEth from "../components/organisms/dietCalkCompEth";
 import feasibilityCheckComponentEth from "../components/organisms/feasibilityCheckComponentEth";
 import fctTableModal from "../components/organisms/FctTableModal";
-import {getNutritionDemand, getNutritionSupply, getProductionTarget} from "../plugins/helper";
+import {
+  getNutritionDemand,
+  getNutritionSupply,
+  getProductionTarget
+} from "../plugins/helper";
 import nutritionBar2 from "../components/molecules/nutritionBar2";
 import familyResultFinal from "../components/organisms/familyResultFinal";
 import dietCalkDisplayEth from "../components/organisms/dietCalkDisplayEth";
@@ -586,6 +595,27 @@ export default {
       }
       return res
     },
+    summaryAverage() {
+      const vm = this
+      const menuCasesFiltered = vm.myCommunity.menuCases.filter((item) => item.note !== '')
+      if (menuCasesFiltered.length === 0){
+        return {}
+      }
+      // const arr1 = getAverageNutritionSupply(vm.nutritionSupply)
+      return {
+        menuCases: menuCasesFiltered.map((item) => {
+          return {
+            note: '',
+            menu: item.menu
+          }
+        }),
+        member: menuCasesFiltered.map((item) => {
+          return item.target
+        }),
+        fct: vm.fct,
+        dri: vm.dri,
+      }
+    },
     summaryResult() {
       const vm = this
       return {
@@ -835,8 +865,27 @@ export default {
       this.showFct = !this.showFct
     },
     updateMyCommunity(val) {
-      console.log('updateMyCommunity')
       this.$store.dispatch('fire/updateCommunityCases', val)
+    },
+    /**
+     * dietCalkおよびfeasibilityCheckでの更新を反映させる
+     * @param val
+     * @param flag
+     */
+    updateDietOrFeasibility(val, flag) {
+      const vm = this
+      let dat = JSON.parse(JSON.stringify(vm.myApp.communityCases))
+      dat = dat.map((item) => {
+        if (item.name === val.name) {
+          if (flag === 1) {
+            item.menuCases = val.menuCases
+          } else {
+            item.feasibilityCases = val.feasibilityCases
+          }
+        }
+        return item
+      })
+      this.$store.dispatch('fire/updateCommunityCases', dat)
     },
     updatePageMemo(val) {
       this.$store.dispatch('fire/updateCommunityCase', val)
@@ -872,14 +921,14 @@ export default {
      * 家族の削除
      * @param val
      */
-    removeCommunity(val) {
+    async removeCommunity(val) {
       if (this.communityList.length === 1) {
         alert('you cannot delete last item')
         return
       }
-      this.$store.dispatch('fire/removeCommunity', val)
+      await this.$store.dispatch('fire/removeCommunity', val)
       const newVal = this.communityList[0]
-      this.$store.dispatch('fire/updateCurrentFamilyName', newVal)
+      await this.$store.dispatch('fire/updateCurrentFamilyName', newVal)
     },
     /**
      * カテゴリ毎のスコアを集計して戻す
@@ -913,8 +962,8 @@ export default {
       })
       return res2
     },
-    changeFamily(val) {
-      this.$store.dispatch('fire/updateCurrentFamilyName', val)
+    async changeFamily(val) {
+      await this.$store.dispatch('fire/updateCurrentFamilyName', val)
     }
   }
 }

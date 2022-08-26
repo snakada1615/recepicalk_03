@@ -452,3 +452,127 @@ export function getPfcScale(rating){
     return res
   })
 }
+
+/**
+ * nutritionSupplyの平均値
+ * @param nutritionSupplyList
+ * @returns {{Pr: number, Fat: number, En: number, Carbohydrate: number, Va: number, Wt: number, Fe: number}}
+ */
+export function getAverageNutritionSupply(nutritionSupplyList) {
+  let count = 0
+  const supplySum = nutritionSupplyList.reduce((accumulator, item) => {
+    if (item.Wt > 0) {
+      count += 1
+      accumulator.En += Number(item.En)
+      accumulator.Pr += Number(item.Pr)
+      accumulator.Va += Number(item.Va)
+      accumulator.Fe += Number(item.Fe)
+      accumulator.Carbohydrate += Number(item.Carbohydrate)
+      accumulator.Fat += Number(item.Fat)
+      accumulator.Wt += Number(item.Wt)
+    }
+    return accumulator
+  }, {
+    'En': 0,
+    'Pr': 0,
+    'Va': 0,
+    'Fe': 0,
+    'Wt': 0,
+    'Carbohydrate': 0,
+    'Fat': 0
+  })
+  return {
+    'En': supplySum.En / count,
+    'Pr': supplySum.Pr / count,
+    'Va': supplySum.Va / count,
+    'Fe': supplySum.Fe / count,
+    'Wt': supplySum.Wt / count,
+    'Carbohydrate': supplySum.Carbohydrate / count,
+    'Fat': supplySum.Fat / count,
+  }
+}
+/**
+ * nutritionDemandGetterの平均値
+ * @param nutritionDemandList
+ * @returns {{Pr: number, En: number, Va: number, Wt: number, Fe: number}}
+ */
+export function getAverageNutritionDemand(nutritionDemandList) {
+  let count = 0
+  const demandSum = nutritionDemandList.reduce((accumulator, item) => {
+    if (item.En > 0) {
+      count += 1
+      accumulator.En += Number(item.En ? item.En : 0)
+      accumulator.Pr += Number(item.Pr ? item.Pr : 0)
+      accumulator.Va += Number(item.Va ? item.Va : 0)
+      accumulator.Fe += Number(item.Fe ? item.Fe : 0)
+      accumulator.Wt += Number(item.Wt ? item.Wt : 0)
+    }
+    return accumulator
+  }, {
+    'En': 0,
+    'Pr': 0,
+    'Va': 0,
+    'Fe': 0,
+    'Wt': 0,
+  })
+  return {
+    'En': demandSum.En / count,
+    'Pr': demandSum.Pr / count,
+    'Va': demandSum.Va / count,
+    'Fe': demandSum.Fe / count,
+    'Wt': demandSum.Wt / count,
+  }
+}
+
+/**
+ * nutritionSupplyとnutritionDemandの値に基づいて栄養素の充足率を算出
+ * @param nutritionSupply
+ * @param nutritionDemand
+ * @param count
+ * @returns {*[]}
+ */
+export function getRating(nutritionSupply, nutritionDemand, count) {
+  const res = []
+  for (let i = 0; i < count; i++) {
+    const supply = nutritionSupply[i]
+    const demand = nutritionDemand[i]
+    res.push({
+      En: demand.En ?
+        Math.round(100 * supply.En / demand.En) / 10 : 0,
+      Pr: demand.Pr ?
+        Math.round(100 * supply.Pr / demand.Pr) / 10 : 0,
+      Va: demand.Va ?
+        Math.round(100 * supply.Va / demand.Va) / 10 : 0,
+      Fe: demand.Fe ?
+        Math.round(100 * supply.Fe / demand.Fe) / 10 : 0
+    })
+  }
+  return res
+}
+
+/**
+ * menuCasesに含まれるfood Groupから、何種類の食品群が含まれるか判定
+ * @param menuCases
+ * @param foodGroup
+ * @returns {*}
+ */
+export function getDiversityStatus(menuCases, foodGroup) {
+  return menuCases.map((foodsTemp, index) => {
+    let res = {}
+    let colorVariant = {}
+    res['case'] = 'Case' + (index + 1)
+    colorVariant['case'] = 'primary'
+    foodGroup.forEach((foodItem) => {
+      res[foodItem] = ''
+      colorVariant[foodItem] = 'danger'
+    })
+    foodsTemp.menu.forEach((dat1) => {
+      if (foodGroup.indexOf(dat1.Group) >= 0) {
+        colorVariant[dat1.Group] = 'info'
+      }
+    })
+    res['_cellVariants'] = colorVariant
+    return res
+  })
+}
+
