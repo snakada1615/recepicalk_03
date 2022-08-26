@@ -80,6 +80,7 @@
               :max-page="maxPage"
               :disabled-option="[1,2,3,4,5,6,7,8,9]"
               @update:myFamily="updateMyFamily"
+              @update:pageMemo="updatePageMemo"
             />
           </b-card>
         </b-tab>
@@ -166,7 +167,6 @@
               :max-page="maxPage"
               :current-family="familyName"
               @update:myFamily="updateMyFamily"
-              @update:pageMemo="updatePageMemo"
             />
           </b-row>
         </b-tab>

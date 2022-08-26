@@ -184,6 +184,7 @@ export function validateMyFamily(dat) {
   let res = true
   const myError = validateObject(dat, typeName)
   if (myError.length > 0) {
+    console.log('validateMyFamily: property check failed')
     console.log(myError)
     res = false
   }

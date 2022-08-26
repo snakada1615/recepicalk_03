@@ -72,7 +72,7 @@
           <b-card no-body>
             <diet-calk-comp-eth
               v-if="myCommunity.name"
-              :my-family="myCommunity"
+              :my-family="myCommunity.menuCases[pageId1]"
               :my-dri="myApp.dataSet.dri"
               :my-fct="myApp.dataSet.fct"
               :my-portion="myApp.dataSet.portionUnit"
@@ -167,7 +167,6 @@
               :max-page="maxPage"
               :current-family="communityName"
               @update:myFamily="updateMyCommunity"
-              @update:pageMemo="updatePageMemo"
             />
           </b-row>
         </b-tab>
@@ -836,8 +835,8 @@ export default {
       this.showFct = !this.showFct
     },
     updateMyCommunity(val) {
-      console.log('updateFamily')
-      this.$store.dispatch('fire/updateCommunityCase', val)
+      console.log('updateMyCommunity')
+      this.$store.dispatch('fire/updateCommunityCases', val)
     },
     updatePageMemo(val) {
       this.$store.dispatch('fire/updateCommunityCase', val)

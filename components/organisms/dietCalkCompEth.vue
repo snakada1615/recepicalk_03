@@ -151,9 +151,9 @@
       my-modal-header="nutrition target"
       my-name="driModal"
       :show-modal.sync="showDriSelect"
-      :targetSwitch.sync="myCommunityWatcher.menuCases[pageIdComputed].isTargetSingle"
+      :targetSwitch.sync="myFamilyWatcher.menuCases[pageIdComputed].isTargetSingle"
       :max="maxPopulation"
-      :driPopulations="myCommunityWatcher.menuCases[pageIdComputed].target"
+      :driPopulations="myFamilyWatcher.menuCases[pageIdComputed].target"
       :driItems="myDri"
       @update:target="updateDemand($event, pageIdComputed)"
     />
@@ -211,7 +211,7 @@ export default {
        * 使用する全変数のobject
        * myFamilyから読み込んでこのページで利用。更新された時にemitを返す
        */
-      myCommunityWatcher: {},
+      myFamilyWatcher: {},
       /**
        * menuテーブルから計算される栄養供給量の合計値
        * menuCases[].menuから読み込んでこのページで利用。参照専用
@@ -399,8 +399,8 @@ export default {
      */
     diversityStatus() {
       const vm = this
-      if (vm.myCommunityWatcher.menuCases !== []) {
-        return vm.myCommunityWatcher.menuCases.map((foodsTemp) => {
+      if (vm.myFamilyWatcher.menuCases !== []) {
+        return vm.myFamilyWatcher.menuCases.map((foodsTemp) => {
           let res = vm.foodGroup.map((groupTemp) => {
             return {[groupTemp]: false}
           })
@@ -435,23 +435,23 @@ export default {
       deep: true,
       handler(newVal) {
         const vm = this
-        vm.myCommunityWatcher = JSON.parse(JSON.stringify(newVal))
+        vm.myFamilyWatcher = JSON.parse(JSON.stringify(newVal))
         let memberSetList = []
         if (vm.useCommonTarget) {
-          const memberSet = JSON.parse(JSON.stringify(vm.myCommunityWatcher.member))
+          const memberSet = JSON.parse(JSON.stringify(vm.myFamilyWatcher.member))
           memberSetList = [...Array(vm.maxPage)].map(() => memberSet)
         } else {
-          memberSetList = vm.myCommunityWatcher.menuCases.map((item) => {
+          memberSetList = vm.myFamilyWatcher.menuCases.map((item) => {
             return item.target
           })
         }
         /*
                 function memberSetList2(singleTarget){
                   if (singleTarget) {
-                    const memberSet = JSON.parse(JSON.stringify(vm.myCommunityWatcher.member))
+                    const memberSet = JSON.parse(JSON.stringify(vm.myFamilyWatcher.member))
                     return [...Array(vm.maxPage)].map(() => memberSet)
                   } else {
-                    return vm.myCommunityWatcher.map((item)=>{
+                    return vm.myFamilyWatcher.map((item)=>{
                       return item.target
                     })
                   }
@@ -471,7 +471,7 @@ export default {
         vm.pageMemo = vm.myFamily.menuCases.map((item2) => {
           return item2.note
         })
-        vm.currentMenu = JSON.parse(JSON.stringify(vm.myCommunityWatcher.menuCases[this.pageIdComputed].menu))
+        vm.currentMenu = JSON.parse(JSON.stringify(vm.myFamilyWatcher.menuCases[this.pageIdComputed].menu))
         vm.pfcBalanceCurrent = JSON.parse(JSON.stringify(
           updatePfc(vm.nutritionSupplyWatcher)
         ))
@@ -483,14 +483,14 @@ export default {
    */
   created() {
     const vm = this
-    vm.myCommunityWatcher = JSON.parse(JSON.stringify(vm.myFamily))
+    vm.myFamilyWatcher = JSON.parse(JSON.stringify(vm.myFamily))
 
     let memberSetList = []
     if (vm.useCommonTarget) {
-      const memberSet = JSON.parse(JSON.stringify(vm.myCommunityWatcher.member))
+      const memberSet = JSON.parse(JSON.stringify(vm.myFamilyWatcher.member))
       memberSetList = [...Array(vm.maxPage)].map(() => memberSet)
     } else {
-      memberSetList = vm.myCommunityWatcher.menuCases.map((item) => {
+      memberSetList = vm.myFamilyWatcher.menuCases.map((item) => {
         return item.target
       })
     }
@@ -509,7 +509,7 @@ export default {
     vm.pageMemo = vm.myFamily.menuCases.map((item2) => {
       return item2.note
     })
-    vm.currentMenu = JSON.parse(JSON.stringify(vm.myCommunityWatcher.menuCases[this.pageIdComputed].menu))
+    vm.currentMenu = JSON.parse(JSON.stringify(vm.myFamilyWatcher.menuCases[this.pageIdComputed].menu))
     vm.pfcBalanceCurrent = JSON.parse(JSON.stringify(
       updatePfc(vm.nutritionSupplyWatcher)
     ))
@@ -525,7 +525,7 @@ export default {
      */
     updatePageMemo(newVal) {
       //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(this.myCommunityWatcher))
+      let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
       //更新されたmenuを入れ替える
       dat.menuCases[this.pageIdComputed].note = newVal
       //更新されたmyAppをemit
@@ -563,7 +563,7 @@ export default {
      */
     updateSupply(val, index) {
       //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(this.myCommunityWatcher))
+      let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
       //更新されたmenuを入れ替える
       dat.menuCases[index].menu = val
       //更新されたmyAppをemit
@@ -571,7 +571,8 @@ export default {
     },
     /**
      * ユーザーによりtergetが変更された際に、栄養素必要量合計を再計算してemit
-     * @param val 更新されたグループ構成
+     * @param val
+     * @param index
      */
     updateDemand(val, index) {
       const vm = this
@@ -579,9 +580,9 @@ export default {
       if (vm.useCommonTarget) {
         return
       }
-      console.log(vm.myCommunityWatcher.menuCases[0])
+      console.log(vm.myFamilyWatcher.menuCases[0])
       //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(vm.myCommunityWatcher))
+      let dat = JSON.parse(JSON.stringify(vm.myFamilyWatcher))
       //更新されたtargetを入れ替える
       dat.menuCases[index].target = JSON.parse(JSON.stringify(val))
       //更新されたmyAppをemit
@@ -636,7 +637,7 @@ export default {
       //menuを更新する
       let existing = false
       let newMenu = []
-      newMenu = vm.myCommunityWatcher.menuCases[vm.pageIdComputed].menu.map((item) => {
+      newMenu = vm.myFamilyWatcher.menuCases[vm.pageIdComputed].menu.map((item) => {
         if (item.id === val.id && item.menuName === val.menuName) {
           existing = true
           return JSON.parse(JSON.stringify(val))
@@ -648,7 +649,7 @@ export default {
         newMenu.push(val)
       }
       //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(vm.myCommunityWatcher))
+      let dat = JSON.parse(JSON.stringify(vm.myFamilyWatcher))
       //更新されたmenuを入れ替える
       dat.menuCases[vm.pageIdComputed].menu = newMenu
       //更新されたmyAppをemit
@@ -660,7 +661,7 @@ export default {
      */
     deleteSupply(val) {
       //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(this.myCommunityWatcher))
+      let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
       //更新されたmenuを入れ替える
       dat.menuCases[this.pageIdComputed].menu = val
       //更新されたmyAppをemit
