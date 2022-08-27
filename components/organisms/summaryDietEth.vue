@@ -50,7 +50,7 @@
           <b-row>
             <b-col cols="6" v-for="pageId in sceneCount" :key="pageId" class="my-1">
               <b-card>
-                Case{{ pageId }}
+                Case {{ pageId }}: {{ myAppComputed.menuCases[pageId - 1].note }}
                 <nutrition-bar2
                   v-for="index in 4" :key="index"
                   :colWidthFirst="3"
@@ -79,7 +79,7 @@
           <b-row>
             <b-col cols="12" lg="6" v-for="pageId in sceneCount" :key="pageId" class="my-1">
               <b-card>
-                Case{{ pageId }}
+                Case {{ pageId }}: {{ myAppComputed.menuCases[pageId - 1].note }}
                 <b-row>
                   <b-col cols="6">Recommended</b-col>
                   <b-col cols="6">Current</b-col>

@@ -131,7 +131,7 @@
             <div class="font-weight-bold">Record of Diet</div>
           </template>
           <recepi-table
-            :items="currentMenu"
+            :items="currentMenu[pageIdComputed]"
             @itemDeleted="notifiRecepiEdit"
             @rowClick="notifiRecepiEdit"
           ></recepi-table>
@@ -142,7 +142,7 @@
       my-name="fctModal2"
       :show-modal.sync="showFct"
       :items="myFct"
-      :menu-cases.sync="currentMenu"
+      :menu-cases.sync="currentMenu[pageIdComputed]"
       :portion-units="myPortion"
       @update:menuCases="updateSupply($event, pageIdComputed)"
     ></fctTableModal2>
@@ -471,7 +471,11 @@ export default {
         vm.pageMemo = vm.myFamily.menuCases.map((item2) => {
           return item2.note
         })
-        vm.currentMenu = JSON.parse(JSON.stringify(vm.myFamilyWatcher.menuCases[this.pageIdComputed].menu))
+        vm.currentMenu = JSON.parse(JSON.stringify(
+          vm.myFamilyWatcher.menuCases.map((item)=>{
+            return item.menu
+          })
+        ))
         vm.pfcBalanceCurrent = JSON.parse(JSON.stringify(
           updatePfc(vm.nutritionSupplyWatcher)
         ))
@@ -509,7 +513,11 @@ export default {
     vm.pageMemo = vm.myFamily.menuCases.map((item2) => {
       return item2.note
     })
-    vm.currentMenu = JSON.parse(JSON.stringify(vm.myFamilyWatcher.menuCases[this.pageIdComputed].menu))
+    vm.currentMenu = JSON.parse(JSON.stringify(
+      vm.myFamilyWatcher.menuCases.map((item)=>{
+        return item.menu
+      })
+    ))
     vm.pfcBalanceCurrent = JSON.parse(JSON.stringify(
       updatePfc(vm.nutritionSupplyWatcher)
     ))

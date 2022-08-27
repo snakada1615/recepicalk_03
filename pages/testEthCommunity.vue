@@ -84,8 +84,9 @@
           </b-card>
         </b-tab>
 
-        <b-tab title="sample diet pattern" :disabled="summaryAverage === {}">
+        <b-tab title="sample diet pattern" :disabled="false">
           <summary-diet-eth
+            v-if="Object.keys(summaryAverage).length"
             :my-app="summaryAverage"
           />
         </b-tab>
@@ -315,6 +316,7 @@ import dietCalkCompEth from "../components/organisms/dietCalkCompEth";
 import feasibilityCheckComponentEth from "../components/organisms/feasibilityCheckComponentEth";
 import fctTableModal from "../components/organisms/FctTableModal";
 import {
+  getAverageNutritionDemand, getAverageNutritionSupply,
   getNutritionDemand,
   getNutritionSupply,
   getProductionTarget
@@ -595,23 +597,52 @@ export default {
       }
       return res
     },
+    /**
+     * menuCasesの中から値の含まれるものを抽出
+     * @returns {T[]}
+     */
+    menuCasesFiltered(){
+      return this.myCommunity.menuCases.filter((item) => item.menu.length > 0)
+    },
+    /**
+     * 平均値を含めたsummaryResult用の配列
+     * @returns {{fct: (function(): any), menuCases: {note: string, menu: *}[], member: *[], dri: (function(): any)}|{}}
+     */
     summaryAverage() {
       const vm = this
-      const menuCasesFiltered = vm.myCommunity.menuCases.filter((item) => item.note !== '')
-      if (menuCasesFiltered.length === 0){
+      if (vm.menuCasesFiltered.length === 0){
         return {}
       }
-      // const arr1 = getAverageNutritionSupply(vm.nutritionSupply)
+      //生産目標を計算
+      const member = vm.menuCasesFiltered.map((item)=>{
+        return item.target
+      })
+      const menu = vm.menuCasesFiltered.map((item)=>{
+        return item.menu
+      })
+      const demandList = member.map((item)=>{
+        return getNutritionDemand(item, vm.dri)
+      })
+      const supplyList = menu.map((item)=>{
+        return getNutritionSupply(item, 1)
+      })
+
+      const averageSupply = [getAverageNutritionSupply(supplyList)]
+      const averageDemand = [getAverageNutritionDemand(demandList)]
+
+      let overallSupply = []
+      overallSupply.push(averageSupply, ...menu)
+      let overallDemand = []
+      overallDemand.push(averageDemand, ...member)
+
       return {
-        menuCases: menuCasesFiltered.map((item) => {
+        menuCases: overallSupply.map((item, index) => {
           return {
-            note: '',
-            menu: item.menu
+            note: index===0 ? 'average': '',
+            menu: item
           }
         }),
-        member: menuCasesFiltered.map((item) => {
-          return item.target
-        }),
+        member: overallDemand,
         fct: vm.fct,
         dri: vm.dri,
       }
