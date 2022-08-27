@@ -134,6 +134,8 @@
                 }}
               </span>
             </div>
+            <hr>
+            currentCrop:{{currentCrop}}
             <b-card class="px-0 mx-0">
               <b-row class="mt-0 bg-success mb-3">
                 <b-col cols="3" class="text-center mr-2 font-weight-bold">Nutrition</b-col>
@@ -370,9 +372,8 @@ export default {
      * @returns {{share: number, Wt365: number, Wt: number}|{share, Wt365: number, Wt: *}}
      */
     updateProductionTarget(share, demand, supply, target) {
-      const vm = this
       //作物が未選択の場合、初期値を返す
-      if (!vm.currentCrop || !target) {
+      if (!target) {
         return {
           'share': 100,
           'Wt': 0,
@@ -402,6 +403,7 @@ export default {
      */
     updateShare(newVal, index) {
       const vm = this
+      console.log('updateShare')
       //作業用のmyFamilyコピー作成w
       let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
 
@@ -598,6 +600,8 @@ export default {
   },
   computed: {
     currentCrop() {
+      console.log('currentCrop changed')
+      console.log(this.cropName[this.pageIdComputed])
       return this.cropName[this.pageIdComputed]
     },
     /**
@@ -618,7 +622,9 @@ export default {
         return this.pageId
       },
       set: function (newVal) {
-        if (this.pageId !== newVal) this.$emit('update:pageId', newVal)
+        if (this.pageId !== newVal) {
+          this.$emit('update:pageId', newVal)
+        }
       }
     },
     /**

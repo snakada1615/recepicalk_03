@@ -116,7 +116,7 @@
 <script>
 import nutritionBar2 from "@/components/molecules/nutritionBar2";
 import macroNutrientBar from "@/components/molecules/macroNutrientBar";
-import {updatePfc} from "../plugins/helper";
+import {getDiversityStatusForTable, updatePfc} from "../plugins/helper";
 
 export default {
   components: {
@@ -196,23 +196,7 @@ export default {
      */
     diversityStatus() {
       const vm = this
-      return this.myApp.menuCases.map((foodsTemp, index) => {
-        let res = {}
-        let colorVariant = {}
-        res['case'] = 'Case' + (index + 1)
-        colorVariant['case'] = 'primary'
-        vm.foodGroup.forEach((foodItem) => {
-          res[foodItem] = ''
-          colorVariant[foodItem] = 'danger'
-        })
-        foodsTemp.menu.forEach((dat1) => {
-          if (vm.foodGroup.indexOf(dat1.Group) >= 0) {
-            colorVariant[dat1.Group] = 'info'
-          }
-        })
-        res['_cellVariants'] = colorVariant
-        return res
-      })
+      return getDiversityStatusForTable(vm.myApp.menuCases, vm.foodGroup)
     },
     /**
      * myApp.menuCases.targetの値を集計してnutritionDemandWatcherに代入するための関数

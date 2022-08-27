@@ -84,14 +84,14 @@
           </b-card>
         </b-tab>
 
-        <b-tab title="sample diet pattern" :disabled="false">
+        <b-tab title="summary of sample families" :disabled="!menuCasesFiltered.length">
           <summary-diet-eth
             v-if="Object.keys(summaryAverage).length"
             :my-app="summaryAverage"
           />
         </b-tab>
 
-        <b-tab title="priority commodity" :disabled="!statePriotiry" v-if="false">
+        <b-tab title="priority commodity" :disabled="!statePriotiry" v-if="true">
           <b-card
             style="min-width: 530px;"
             header-bg-variant="success"
@@ -143,8 +143,7 @@
             </b-list-group>
           </b-card>
         </b-tab>
-        <b-tab title="crop feasibility"
-               v-if="false"
+        <b-tab title="feasibility check"
                :disabled="!selectedCropList || communityList.length === 0 || !myCommunity.keyNutrient">
           <div class=" mb-2 ml-3">
             identified nutrient gap:
@@ -172,14 +171,13 @@
               :page-id.sync="pageId3"
               :max-page="maxPage"
               :current-family="communityName"
-              @update:myFamily="updateMyCommunity"
+              @update:myFamily="updateDietOrFeasibility($event, 4)"
             />
           </b-row>
         </b-tab>
         <b-tab
           title="crop feasibility assessment summary"
           :disabled="!stateFeasibilityCheck"
-          v-if="false"
         >
           <b-row>
             <b-col
@@ -276,7 +274,6 @@
         </b-tab>
         <b-tab
           title="overall result"
-          v-if="false"
           :disabled="!stateFeasibilityCheck"
         >
           <div class=" mb-0 ml-3">
@@ -295,6 +292,7 @@
             </span>
           </div>
           <summary-diet-eth
+            v-if="Object.keys(summaryResult).length"
             :my-app="summaryResult"
           />
         </b-tab>
@@ -602,7 +600,43 @@ export default {
      * @returns {T[]}
      */
     menuCasesFiltered(){
+      if (!Object.keys(this.myCommunity).length) {
+        return []
+      }
       return this.myCommunity.menuCases.filter((item) => item.menu.length > 0)
+    },
+    averageSupply(){
+      const vm = this
+      if (vm.menuCasesFiltered.length === 0){
+        return {}
+      }
+      const menu = vm.menuCasesFiltered.map((item)=>{
+        return item.menu
+      })
+      const supplyList = menu.map((item)=>{
+        return getNutritionSupply(item, 1)
+      })
+
+      return [
+        getAverageNutritionSupply(supplyList)
+      ]
+    },
+    averageDemand() {
+      const vm = this
+      if (vm.menuCasesFiltered.length === 0){
+        return {}
+      }
+      //生産目標を計算
+      const member = vm.menuCasesFiltered.map((item)=>{
+        return item.target
+      })
+      const demandList = member.map((item)=>{
+        return getNutritionDemand(item, vm.dri)
+      })
+
+      return  [
+        getAverageNutritionDemand(demandList)
+      ]
     },
     /**
      * 平均値を含めたsummaryResult用の配列
@@ -652,11 +686,11 @@ export default {
       return {
         menuCases: [
           {
-            note: '',
-            menu: vm.myCommunity.menuCases[0].menu,
+            note: 'current average',
+            menu: vm.averageSupply,
           },
           {
-            note: '',
+            note: 'improved',
             menu: vm.menuUpdated,
           }
         ],
@@ -753,7 +787,7 @@ export default {
         const vm = this
         let res = JSON.parse(JSON.stringify(vm.myCommunity))
         res.keyNutrient = val
-        vm.updateMyCommunity(res)
+        this.updateDietOrFeasibility(res, 2)
       },
     },
     selectedCommodityId: {
@@ -765,7 +799,7 @@ export default {
         console.log(val)
         let res = JSON.parse(JSON.stringify(vm.myCommunity))
         res.keyCommodity = val
-        vm.updateMyCommunity(res)
+        vm.updateDietOrFeasibility(res, 3)
       },
     },
     selectedCommodity() {
@@ -883,9 +917,10 @@ export default {
 
       //selectedCrop[0]を更新
       dat.feasibilityCases[index - 1].selectedCrop[0].Wt = Wt
+      console.log(dat)
 
       //myCommunityを更新
-      await this.updateMyCommunity(dat)
+      await this.updateDietOrFeasibility(dat, 4)
     }
     ,
     /**
@@ -903,20 +938,26 @@ export default {
      * @param val
      * @param flag
      */
-    updateDietOrFeasibility(val, flag) {
+    async updateDietOrFeasibility(val, flag) {
       const vm = this
       let dat = JSON.parse(JSON.stringify(vm.myApp.communityCases))
       dat = dat.map((item) => {
         if (item.name === val.name) {
           if (flag === 1) {
             item.menuCases = val.menuCases
+          } else if (flag === 2) {
+            item.keyNutrient = val.keyNutrient
+          } else if (flag === 3) {
+            item.keyCommodity = val.keyCommodity
+          } else if (flag === 4) {
+            item.feasibilityCases = val.feasibilityCases
           } else {
             item.feasibilityCases = val.feasibilityCases
           }
         }
         return item
       })
-      this.$store.dispatch('fire/updateCommunityCases', dat)
+      await this.$store.dispatch('fire/updateCommunityCases', dat)
     },
     updatePageMemo(val) {
       this.$store.dispatch('fire/updateCommunityCase', val)

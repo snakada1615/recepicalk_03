@@ -606,6 +606,7 @@ export const actions = {
       'name': payload.name,
       'member': payload.member,
       'keyNutrient': '',
+      'keyCommodity': '',
       'menuCases': arr,
       'feasibilityCases': arr2
     })

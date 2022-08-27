@@ -169,7 +169,7 @@ import macroNutrientBar from "@/components/molecules/macroNutrientBar";
 import fctTableModal2 from "@/components/organisms/FctTableModal2";
 import {
   getNutritionSupplyList, validateMyFamily,
-  getNutritionDemandList, updatePfc, getPfcScale
+  getNutritionDemandList, updatePfc, getPfcScale, getDiversityStatus
 } from "../../plugins/helper";
 
 /**
@@ -399,22 +399,7 @@ export default {
      */
     diversityStatus() {
       const vm = this
-      if (vm.myFamilyWatcher.menuCases !== []) {
-        return vm.myFamilyWatcher.menuCases.map((foodsTemp) => {
-          let res = vm.foodGroup.map((groupTemp) => {
-            return {[groupTemp]: false}
-          })
-          foodsTemp.menu.forEach((dat1) => {
-            const indexTemp = vm.foodGroup.indexOf(dat1.Group)
-            if (indexTemp >= 0) {
-              res[indexTemp][dat1.Group] = true
-            }
-          })
-          return res
-        })
-      } else {
-        return res
-      }
+      return getDiversityStatus(vm.myFamilyWatcher.menuCases, vm.foodGroup)
     },
     /**
      * noteの記入状態

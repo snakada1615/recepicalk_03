@@ -114,7 +114,7 @@
 import nutritionBar2 from "@/components/molecules/nutritionBar2";
 import macroNutrientBar from "@/components/molecules/macroNutrientBar";
 import {
-  getDiversityStatus,
+  getDiversityStatusForTable,
   getNutritionDemandList,
   getNutritionSupplyList,
   getRating,
@@ -246,7 +246,7 @@ export default {
      * @returns {*[]}
      */
     diversityStatus() {
-      return getDiversityStatus(this.myAppComputed.menuCases, this.foodGroup)
+      return getDiversityStatusForTable(this.myAppComputed.menuCases, this.foodGroup)
     },
     /**
      * myAppComputed.menuCases.targetの値を集計してnutritionDemandWatcherに代入するための関数

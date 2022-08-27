@@ -170,7 +170,7 @@ import macroNutrientBar from "@/components/molecules/macroNutrientBar";
 import {validateMyApp, updatePfc, getPfcScale} from "@/plugins/helper";
 import fctTableModal2 from "@/components/organisms/FctTableModal2";
 import pieChart from "../atoms/pieChart";
-import {getNutritionDemandList, getNutritionSupplyList} from "../../plugins/helper";
+import {getDiversityStatus, getNutritionDemandList, getNutritionSupplyList} from "../../plugins/helper";
 
 /**
  * @desc 6つのコンポーネントを組み合わせて食事評価
@@ -493,18 +493,7 @@ export default {
      */
     diversityStatus() {
       const vm = this
-      return this.myAppWatcher.menuCases.map((foodsTemp) => {
-        let res = vm.foodGroup.map((groupTemp) => {
-          return {[groupTemp]: false}
-        })
-        foodsTemp.menu.forEach((dat1) => {
-          const indexTemp = vm.foodGroup.indexOf(dat1.Group)
-          if (indexTemp >= 0) {
-            res[indexTemp][dat1.Group] = true
-          }
-        })
-        return res
-      })
+      return getDiversityStatus(vm.myAppWatcher.menuCases, vm.foodGroup)
     },
     /**
      * noteの記入状態

@@ -556,7 +556,10 @@ export function getRating(nutritionSupply, nutritionDemand, count) {
  * @param foodGroup
  * @returns {*}
  */
-export function getDiversityStatus(menuCases, foodGroup) {
+export function getDiversityStatusForTable(menuCases, foodGroup) {
+  if (!Object.keys(menuCases).length){
+    return {}
+  }
   return menuCases.map((foodsTemp, index) => {
     let res = {}
     let colorVariant = {}
@@ -576,3 +579,25 @@ export function getDiversityStatus(menuCases, foodGroup) {
   })
 }
 
+/**
+ * menuCasesに含まれるfood Groupから、何種類の食品群が含まれるか判定
+ * @returns {*[]}
+ */
+export function getDiversityStatus(menuCases, foodGroup) {
+  if (menuCases !== []) {
+    return menuCases.map((foodsTemp) => {
+      let res = foodGroup.map((groupTemp) => {
+        return {[groupTemp]: false}
+      })
+      foodsTemp.menu.forEach((dat1) => {
+        const indexTemp = foodGroup.indexOf(dat1.Group)
+        if (indexTemp >= 0) {
+          res[indexTemp][dat1.Group] = true
+        }
+      })
+      return res
+    })
+  } else {
+    return []
+  }
+}
