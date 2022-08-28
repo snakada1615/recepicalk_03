@@ -223,7 +223,11 @@ export default {
       }, [])
     },
     targetGroup() {
-      const res = JSON.parse(JSON.stringify(this.myAppComputed.member))
+      let res = []
+      console.log('tergetGroup..setting')
+      if (this.myAppComputed.member) {
+        res = JSON.parse(JSON.stringify(this.myAppComputed.member))
+      }
       return [...Array(this.myAppComputed.menuCases.length)].map(() => res)
     },
     fieldsFoodGroup() {

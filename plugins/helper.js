@@ -569,11 +569,13 @@ export function getDiversityStatusForTable(menuCases, foodGroup) {
       res[foodItem] = ''
       colorVariant[foodItem] = 'danger'
     })
-    foodsTemp.menu.forEach((dat1) => {
-      if (foodGroup.indexOf(dat1.Group) >= 0) {
-        colorVariant[dat1.Group] = 'info'
-      }
-    })
+    if (foodsTemp.menu.length){
+      foodsTemp.menu.forEach((dat1) => {
+        if (foodGroup.indexOf(dat1.Group) >= 0) {
+          colorVariant[dat1.Group] = 'info'
+        }
+      })
+    }
     res['_cellVariants'] = colorVariant
     return res
   })
@@ -589,12 +591,14 @@ export function getDiversityStatus(menuCases, foodGroup) {
       let res = foodGroup.map((groupTemp) => {
         return {[groupTemp]: false}
       })
-      foodsTemp.menu.forEach((dat1) => {
-        const indexTemp = foodGroup.indexOf(dat1.Group)
-        if (indexTemp >= 0) {
-          res[indexTemp][dat1.Group] = true
-        }
-      })
+      if (foodsTemp.menu.length){
+        foodsTemp.menu.forEach((dat1) => {
+          const indexTemp = foodGroup.indexOf(dat1.Group)
+          if (indexTemp >= 0) {
+            res[indexTemp][dat1.Group] = true
+          }
+        })
+      }
       return res
     })
   } else {
