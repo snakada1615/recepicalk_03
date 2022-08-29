@@ -114,7 +114,7 @@
 import nutritionBar2 from "@/components/molecules/nutritionBar2";
 import macroNutrientBar from "@/components/molecules/macroNutrientBar";
 import {
-  getDiversityStatusForTable,
+  getDiversityStatusForTable, getFoodGroup,
   getNutritionDemandList,
   getNutritionSupplyList,
   getRating,
@@ -130,12 +130,12 @@ export default {
   },
   methods: {
     getPfcScale(rating) {
-      const res = rating.En / 10
-      if (res < 0.5) {
-        return 0.5
+      const res = Math.sqrt(rating.En / 10)
+      if (res < 0.71) {
+        return 0.71
       }
-      if (res > 1.5) {
-        return 1.5
+      if (res > 1.23) {
+        return 1.23
       }
       return res
     },
@@ -215,20 +215,26 @@ export default {
      * @returns {*}
      */
     foodGroup() {
-      return this.myAppComputed.fct.reduce((accumulator, dat) => {
-        if (accumulator.indexOf(dat.Group) < 0) {
-          accumulator.push(dat.Group)
-        }
-        return accumulator
-      }, [])
+      return getFoodGroup(this.myAppComputed.fct)
     },
+    /**
+     * myAppのデータ構造に応じて対象グループの構成を変える
+     * 対象グループが共通の場合：myAppComputed.member × ケース数（10）
+     * 対処グループが異なる場合：myAppComputed.memberをそのまま利用
+     * @returns {*[][]|any}
+     */
     targetGroup() {
       let res = []
       console.log('tergetGroup..setting')
-      if (this.myAppComputed.member) {
-        res = JSON.parse(JSON.stringify(this.myAppComputed.member))
+      if (this.isCommonTargetGroup){
+        if (this.myAppComputed.member) {
+          res = JSON.parse(JSON.stringify(this.myAppComputed.member))
+        }
+        return [...Array(this.myAppComputed.menuCases.length)].map(() => res)
+      } else {
+        return JSON.parse(JSON.stringify(this.myAppComputed.member))
       }
-      return [...Array(this.myAppComputed.menuCases.length)].map(() => res)
+
     },
     fieldsFoodGroup() {
       const vm = this
@@ -266,7 +272,7 @@ export default {
      */
     nutritionSupplyGetter() {
       const vm = this
-      return getNutritionSupplyList(vm.myAppComputed.menuCases, vm.myAppComputed.menuCases.length)
+      return getNutritionSupplyList(vm.myAppComputed.menuCases, vm.myAppComputed.menuCases.length, 1)
     },
     rating() {
       return this.ratingGetter
@@ -290,6 +296,14 @@ export default {
     myApp: {
       type: Object,
       required: true,
+    },
+    /**
+     * 呼び出し元のデータ構造で、食事パターン毎に異なる家族構成なのか
+     * それとも全ての食事パターンで共通の家族構成なのか判定
+     */
+    isCommonTargetGroup:{
+      type: Boolean,
+      default: true,
     }
   },
   data() {

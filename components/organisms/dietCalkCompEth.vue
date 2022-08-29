@@ -447,7 +447,7 @@ export default {
           vm.myDri
         )))
         vm.nutritionSupplyWatcher = JSON.parse(JSON.stringify(getNutritionSupplyList(
-          vm.myFamily.menuCases, vm.maxPage)))
+          vm.myFamily.menuCases, vm.maxPage, 1)))
         vm.rating = JSON.parse(JSON.stringify(vm.ratingGetter(
           vm.nutritionSupplyWatcher, vm.nutritionDemandWatcher)))
         vm.pfcScale = JSON.parse(JSON.stringify(
@@ -489,7 +489,7 @@ export default {
       vm.myDri
     )))
     vm.nutritionSupplyWatcher = JSON.parse(JSON.stringify(getNutritionSupplyList(
-      vm.myFamily.menuCases, vm.maxPage)))
+      vm.myFamily.menuCases, vm.maxPage, 1)))
     vm.rating = JSON.parse(JSON.stringify(vm.ratingGetter(
       vm.nutritionSupplyWatcher, vm.nutritionDemandWatcher)))
     vm.pfcScale = JSON.parse(JSON.stringify(

@@ -516,7 +516,7 @@ export default {
           getNutritionDemandList(vm.myAppWatcher.menuCases, vm.myAppWatcher.dataSet.dri, 1)
         ))
         vm.nutritionSupplyWatcher = JSON.parse(JSON.stringify(getNutritionSupplyList(
-          vm.myAppWatcher.menuCases, vm.maxPage)))
+          vm.myAppWatcher.menuCases, vm.maxPage, 1)))
         vm.rating = JSON.parse(JSON.stringify(vm.ratingGetter()))
         vm.pfcScale = JSON.parse(JSON.stringify(
           getPfcScale(vm.rating)
@@ -538,7 +538,7 @@ export default {
       getNutritionDemandList(vm.myAppWatcher.menuCases, vm.myAppWatcher.dataSet.dri, 1)
     ))
     vm.nutritionSupplyWatcher = JSON.parse(JSON.stringify(getNutritionSupplyList(
-      vm.myAppWatcher.menuCases, vm.maxPage)))
+      vm.myAppWatcher.menuCases, vm.maxPage, 1)))
     vm.rating = JSON.parse(JSON.stringify(vm.ratingGetter()))
     vm.pfcScale = JSON.parse(JSON.stringify(
       getPfcScale(vm.rating)

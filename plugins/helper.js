@@ -379,9 +379,10 @@ export function getProductionTarget(nutrientsDemand, nutrientsSupply, keyNutrien
  * 選択された作物から栄養供給量を計算
  * @param crops
  * @param count
+ * @param stapleCheck
  * @returns {{Pr: number, Fat: number, En: number, Carbohydrate: number, Va: number, Wt: number, Fe: number}[]|*}
  */
-export function getNutritionSupplyList(crops, count) {
+export function getNutritionSupplyList(crops, count, stapleCheck = 1) {
   const initObj = {
     'En': 0,
     'Pr': 0,
@@ -391,6 +392,7 @@ export function getNutritionSupplyList(crops, count) {
     'Carbohydrate': 0,
     'Fat': 0
   }
+  //作物未選択の場合、初期値（全て0）を設定
   if (crops.length === 0) {
     return [...Array(count)].map(() => initObj)
   }
@@ -398,7 +400,7 @@ export function getNutritionSupplyList(crops, count) {
     let res = initObj
     if (datArray.length !== 0) {
       if (datArray.menu.length > 0) {
-        res = getNutritionSupply(datArray.menu, 1)
+        res = getNutritionSupply(datArray.menu, stapleCheck)
       }
     }
     return res
@@ -604,4 +606,17 @@ export function getDiversityStatus(menuCases, foodGroup) {
   } else {
     return []
   }
+}
+
+/**
+ * FCTからfood Groupを抽出
+ * @returns {*}
+ */
+export function getFoodGroup(fct) {
+  return fct.reduce((accumulator, dat) => {
+    if (accumulator.indexOf(dat.Group) < 0) {
+      accumulator.push(dat.Group)
+    }
+    return accumulator
+  }, [])
 }

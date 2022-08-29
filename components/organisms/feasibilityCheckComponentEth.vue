@@ -517,7 +517,7 @@ export default {
         vm.targetCrop = vm.updateTargetCrop(vm.myFamilyWatcher)
         vm.targetGroup = vm.updateTargetGroup(vm.myFamilyWatcher.member, vm.maxPage)
         vm.nutritionDemand = getNutritionDemandList(vm.targetGroup, vm.itemsDRI)
-        vm.nutritionSupply = getNutritionSupplyList(vm.targetCrop, vm.maxPage)
+        vm.nutritionSupply = getNutritionSupplyList(vm.targetCrop, vm.maxPage, 1)
         vm.productionTarget = vm.nutritionDemand.map(function (demand, index){
           return vm.updateProductionTarget(
             vm.share,
@@ -573,7 +573,7 @@ export default {
     vm.targetCrop = vm.updateTargetCrop(vm.myFamilyWatcher)
     vm.targetGroup = vm.updateTargetGroup(vm.myFamilyWatcher.member, vm.maxPage)
     vm.nutritionDemand = getNutritionDemandList(vm.targetGroup, vm.itemsDRI)
-    vm.nutritionSupply = getNutritionSupplyList(vm.targetCrop, vm.maxPage)
+    vm.nutritionSupply = getNutritionSupplyList(vm.targetCrop, vm.maxPage, 1)
     vm.productionTarget = vm.nutritionDemand.map(function (demand, index){
       return vm.updateProductionTarget(
         vm.share,

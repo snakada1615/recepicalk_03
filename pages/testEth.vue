@@ -289,6 +289,7 @@
           <summary-diet-eth
             v-if="Object.keys(summaryResult).length"
             :my-app="summaryResult"
+            :is-common-target-group="true"
           />
         </b-tab>
       </b-tabs>
