@@ -129,13 +129,20 @@ export default {
     pieChart
   },
   methods: {
+    /**
+     * piChartの半径を設定するための係数（標準値の0.2-2.0倍の範囲を超えたら変動しないよう設定）
+     * @param rating
+     * @returns {number}
+     */
     getPfcScale(rating) {
       const res = Math.sqrt(rating.En / 10)
-      if (res < 0.71) {
-        return 0.71
+      //Math.sqrt(0.3) = 0.547
+      if (res < 0.55) {
+        return 0.55
       }
-      if (res > 1.23) {
-        return 1.23
+      //Math.sqrt(2.0) = 1.44
+      if (res > 1.4) {
+        return 1.4
       }
       return res
     },
@@ -310,10 +317,16 @@ export default {
     return {
       /**
        * pie-chartのオプション
+       * maintainAspectRatio: コンテナ形状に対応してチャートを変化させない
+       * responsive: コンテナサイズ変更に応じて再描画
+       * legend: Legend表示しない
        */
       myChartOptions: {
         maintainAspectRatio: false,
         responsive: true,
+        legend: {
+          display: false
+        }
       },
       /**
        * チャートの基本の高さ

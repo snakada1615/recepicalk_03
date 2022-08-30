@@ -85,10 +85,9 @@
         </b-tab>
 
         <b-tab title="summary of sample families" :disabled="!menuCasesFiltered.length">
-          {{averageSupply}}<hr>
-          {{summaryAverage.menuCases[0]}},<hr>
-          {{summaryAverage.menuCases[1]}},<hr>
-          {{summaryAverage.menuCases[2]}},<hr>
+          {{currentCommunitySupply}}<hr>
+          {{averageSupply[0]}}<hr>
+          {{factorForSampleToCommunity}}<hr>
           <summary-diet-eth
             v-if="Object.keys(summaryAverage).length"
             :my-app="summaryAverage"
@@ -610,6 +609,10 @@ export default {
       }
       return this.myCommunity.menuCases.filter((item) => item.menu.length > 0)
     },
+    /**
+     * サンプル家族のメニュー配列（作物リスト）×食事パターン から、栄養供給量の平均値を算出
+     * @returns {{}|{Pr: number, Fat: number, En: number, Carbohydrate: number, Va: number, Wt: number, Fe: number}[]}
+     */
     averageSupply(){
       const vm = this
       if (vm.menuCasesFiltered.length === 0){
@@ -626,22 +629,56 @@ export default {
         getAverageNutritionSupply(supplyList)
       ]
     },
-    averageDemand() {
+    /**
+     * サンプル家族の栄養需要の平均値
+     * @returns {{}|{Pr: number, En: number, Va: number, Wt: number, Fe: number}[]}
+     */
+    averageSampleDemand() {
       const vm = this
       if (vm.menuCasesFiltered.length === 0){
         return {}
       }
-      //生産目標を計算
+      //ターゲットを特定
       const member = vm.menuCasesFiltered.map((item)=>{
         return item.target
       })
+      //ターゲットに応じた栄養要求量を算出
       const demandList = member.map((item)=>{
         return getNutritionDemand(item, vm.dri)
       })
 
+      //ターゲットの栄養要求量を合計する
       return  [
         getAverageNutritionDemand(demandList)
       ]
+    },
+    /**
+     * サンプル家族の栄養需要をコミュニティ全体に外挿するための係数
+     * @returns {{Pr: (number|number), En: (number|number), Va: (number|number), Fe: (number|number)}}
+     */
+    factorForSampleToCommunity(){
+      const communityDemand = getAverageNutritionDemand(this.myCommunity.member)
+      return {
+        'En': this.averageSampleDemand.En ? communityDemand.En/this.averageSampleDemand.En: 1,
+        'Pr': this.averageSampleDemand.Pr ? communityDemand.Pr/this.averageSampleDemand.Pr: 1,
+        'Va': this.averageSampleDemand.Va ? communityDemand.Va/this.averageSampleDemand.Va: 1,
+        'Fe': this.averageSampleDemand.Fe ? communityDemand.Fe/this.averageSampleDemand.Fe: 1,
+      }
+    },
+    /**
+     *
+     * @returns {{Pr: number, Fat: number, En: number, Carbohydrate: number, Va: number, Wt: number, Fe: number}}
+     */
+    currentCommunitySupply(){
+      return {
+        'En': this.averageSupply[0].En * this.factorForSampleToCommunity.En,
+        'Pr': this.averageSupply[0].Pr * this.factorForSampleToCommunity.En,
+        'Va': this.averageSupply[0].Va * this.factorForSampleToCommunity.En,
+        'Fe': this.averageSupply[0].Fe * this.factorForSampleToCommunity.En,
+        'Wt': this.averageSupply[0].Wt * this.factorForSampleToCommunity.En,
+        'Carbohydrate': this.averageSupply[0].Carbohydrate * this.factorForSampleToCommunity.En,
+        'Fat': this.averageSupply[0].Fat * this.factorForSampleToCommunity.En,
+      }
     },
     /**
      * 平均値を含めたsummaryResult用の配列
@@ -659,17 +696,14 @@ export default {
       const menu = vm.menuCasesFiltered.map((item)=>{
         return item.menu
       })
-      const supplyList = menu.map((item)=>{
-        return getNutritionSupply(item, 1)
-      })
 
-      const averageSupply = [getAverageNutritionSupply(supplyList)]
-      const averageDemand = vm.myCommunity.member
+      const communitySupply = [this.currentCommunitySupply]
+      const communityDemand = vm.myCommunity.member
 
       let overallSupply = []
-      overallSupply.push(averageSupply, ...menu)
+      overallSupply.push(communitySupply, ...menu)
       let overallDemand = []
-      overallDemand.push(averageDemand, ...member)
+      overallDemand.push(communityDemand, ...member)
 
       return {
         menuCases: overallSupply.map((item, index) => {
