@@ -85,9 +85,9 @@
         </b-tab>
 
         <b-tab title="summary of sample families" :disabled="!menuCasesFiltered.length">
-          {{currentCommunitySupply}}<hr>
-          {{averageSupply[0]}}<hr>
-          {{factorForSampleToCommunity}}<hr>
+          {{averageSupply}}<hr>
+          {{menuUpdated}}<hr>
+          {{ratingTemp}}
           <summary-diet-eth
             v-if="Object.keys(summaryAverage).length"
             :my-app="summaryAverage"
@@ -321,7 +321,7 @@ import {
   getAverageNutritionDemand, getAverageNutritionSupply,
   getNutritionDemand,
   getNutritionSupply,
-  getProductionTarget
+  getProductionTarget, getRating
 } from "../plugins/helper";
 import nutritionBar2 from "../components/molecules/nutritionBar2";
 import familyResultFinal from "../components/organisms/familyResultFinal";
@@ -654,30 +654,41 @@ export default {
     },
     /**
      * サンプル家族の栄養需要をコミュニティ全体に外挿するための係数
-     * @returns {{Pr: (number|number), En: (number|number), Va: (number|number), Fe: (number|number)}}
+     * @returns {*[]}
      */
-    factorForSampleToCommunity(){
-      const communityDemand = getAverageNutritionDemand(this.myCommunity.member)
-      return {
-        'En': this.averageSampleDemand.En ? communityDemand.En/this.averageSampleDemand.En: 1,
-        'Pr': this.averageSampleDemand.Pr ? communityDemand.Pr/this.averageSampleDemand.Pr: 1,
-        'Va': this.averageSampleDemand.Va ? communityDemand.Va/this.averageSampleDemand.Va: 1,
-        'Fe': this.averageSampleDemand.Fe ? communityDemand.Fe/this.averageSampleDemand.Fe: 1,
-      }
+    averageRating(){
+      return getRating(this.averageSupply, this.averageSampleDemand, 1)
+    },
+    ratingTemp(){
+      return getRating(this.averageSupply, this.averageSampleDemand, 1)
     },
     /**
      *
      * @returns {{Pr: number, Fat: number, En: number, Carbohydrate: number, Va: number, Wt: number, Fe: number}}
      */
     currentCommunitySupply(){
+      const communityDemand = getNutritionDemand(this.myCommunity.member, this.dri)
+      const myFactor = (communityDemand.En * this.averageRating[0].En / 10) / this.averageSupply[0].En
+      console.log('myFactor:' + myFactor)
+      const temp = {
+        'En': this.averageSupply[0].En * myFactor,
+        'Pr': this.averageSupply[0].Pr * myFactor,
+        'Va': this.averageSupply[0].Va * myFactor,
+        'Fe': this.averageSupply[0].Fe * myFactor,
+        'Wt': this.averageSupply[0].Wt * myFactor,
+        'Carbohydrate': this.averageSupply[0].Carbohydrate * myFactor,
+        'Fat': this.averageSupply[0].Fat * myFactor,
+      }
+      const res = getRating([temp], [communityDemand], 1)
+      console.log(res)
       return {
-        'En': this.averageSupply[0].En * this.factorForSampleToCommunity.En,
-        'Pr': this.averageSupply[0].Pr * this.factorForSampleToCommunity.En,
-        'Va': this.averageSupply[0].Va * this.factorForSampleToCommunity.En,
-        'Fe': this.averageSupply[0].Fe * this.factorForSampleToCommunity.En,
-        'Wt': this.averageSupply[0].Wt * this.factorForSampleToCommunity.En,
-        'Carbohydrate': this.averageSupply[0].Carbohydrate * this.factorForSampleToCommunity.En,
-        'Fat': this.averageSupply[0].Fat * this.factorForSampleToCommunity.En,
+        'En': this.averageSupply[0].En * myFactor,
+        'Pr': this.averageSupply[0].Pr * myFactor,
+        'Va': this.averageSupply[0].Va * myFactor,
+        'Fe': this.averageSupply[0].Fe * myFactor,
+        'Wt': this.averageSupply[0].Wt * myFactor,
+        'Carbohydrate': this.averageSupply[0].Carbohydrate * myFactor,
+        'Fat': this.averageSupply[0].Fat * myFactor,
       }
     },
     /**
@@ -697,13 +708,14 @@ export default {
         return item.menu
       })
 
-      const communitySupply = [this.currentCommunitySupply]
+      const communitySupply = [vm.currentCommunitySupply]
       const communityDemand = vm.myCommunity.member
 
       let overallSupply = []
       overallSupply.push(communitySupply, ...menu)
       let overallDemand = []
       overallDemand.push(communityDemand, ...member)
+      console.log(overallDemand)
 
       return {
         menuCases: overallSupply.map((item, index) => {
@@ -727,7 +739,7 @@ export default {
           },
           {
             note: 'improved',
-            menu: vm.menuUpdated,
+                                                                                          menu: vm.menuUpdated,
           }
         ],
         member: vm.myCommunity.member,

@@ -78,6 +78,10 @@
           </template>
           <b-row>
             <b-col cols="12" lg="6" v-for="pageId in sceneCount" :key="pageId" class="my-1">
+              {{ ratingGetter[pageId - 1] }}
+              <hr>
+              {{ nutritionSupplyGetter[pageId - 1] }}
+              <hr>
               <b-card>
                 Case {{ pageId }}: {{ myAppComputed.menuCases[pageId - 1].note }}
                 <b-row>
@@ -101,6 +105,14 @@
                       :styles="myChartStyles[pageId-1]"
                     />
                   </b-col>
+                </b-row>
+                <b-row align-h="between">
+                  <b-col class="h-25 small">Protein</b-col>
+                  <b-col class="h-25 small" style="background-color: green;color: green">a</b-col>
+                  <b-col class="h-25 small">Fat</b-col>
+                  <b-col class="h-25 small" style="background-color: yellow;color: yellow">a</b-col>
+                  <b-col class="h-25 small"><small>Carbo.</small></b-col>
+                  <b-col class="h-25 small" style="background-color: red;color: red">a</b-col>
                 </b-row>
               </b-card>
             </b-col>
@@ -233,7 +245,7 @@ export default {
     targetGroup() {
       let res = []
       console.log('tergetGroup..setting')
-      if (this.isCommonTargetGroup){
+      if (this.isCommonTargetGroup) {
         if (this.myAppComputed.member) {
           res = JSON.parse(JSON.stringify(this.myAppComputed.member))
         }
@@ -281,9 +293,6 @@ export default {
       const vm = this
       return getNutritionSupplyList(vm.myAppComputed.menuCases, vm.myAppComputed.menuCases.length, 1)
     },
-    rating() {
-      return this.ratingGetter
-    },
     /**
      * nutritionSupplyとnutritionDemandの値に基づいて栄養素の充足率を算出
      * @returns {*[]} 栄養素ごとの充足率
@@ -308,7 +317,7 @@ export default {
      * 呼び出し元のデータ構造で、食事パターン毎に異なる家族構成なのか
      * それとも全ての食事パターンで共通の家族構成なのか判定
      */
-    isCommonTargetGroup:{
+    isCommonTargetGroup: {
       type: Boolean,
       default: true,
     }
