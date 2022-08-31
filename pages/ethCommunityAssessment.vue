@@ -1,6 +1,10 @@
 <template>
   <b-container>
-    <b-card :header="'current community: ' + communityName">
+    <b-card
+      :header="'Community Assessment: ' + communityName"
+      header-text-variant="white"
+      header-bg-variant="success-5"
+    >
       <b-tabs pills card>
         <b-tab title="add community">
           <b-row class="justify-content-center">
@@ -326,6 +330,7 @@ import dietCalkDisplayEth from "../components/organisms/dietCalkDisplayEth";
 import summaryDietEth from "../components/organisms/summaryDietEth";
 
 export default {
+  layout:'defaultEth',
   components: {
     driSelectMulti,
     dietCalkCompEth,

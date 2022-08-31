@@ -1,6 +1,10 @@
 <template>
   <b-container>
-    <b-card :header="'current family: ' + familyName">
+    <b-card
+      :header="'Family Assessment: ' + familyName"
+      header-text-variant="white"
+      header-bg-variant="success-5"
+    >
       <b-tabs card>
         <b-tab title="add family">
           <b-row class="justify-content-center">
@@ -316,6 +320,7 @@ import dietCalkDisplayEth from "../components/organisms/dietCalkDisplayEth";
 import summaryDietEth from "../components/organisms/summaryDietEth";
 
 export default {
+  layout:'defaultEth',
   components: {
     driSelectMulti,
     dietCalkCompEth,
