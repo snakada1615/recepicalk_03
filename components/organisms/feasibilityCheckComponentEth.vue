@@ -600,8 +600,6 @@ export default {
   },
   computed: {
     currentCrop() {
-      console.log('currentCrop changed')
-      console.log(this.cropName[this.pageIdComputed])
       return this.cropName[this.pageIdComputed]
     },
     /**

@@ -85,9 +85,6 @@
         </b-tab>
 
         <b-tab title="summary of sample families" :disabled="!menuCasesFiltered.length">
-          {{averageSupply}}<hr>
-          {{menuUpdated}}<hr>
-          {{ratingTemp}}
           <summary-diet-eth
             v-if="Object.keys(summaryAverage).length"
             :my-app="summaryAverage"
@@ -669,24 +666,13 @@ export default {
     currentCommunitySupply(){
       const communityDemand = getNutritionDemand(this.myCommunity.member, this.dri)
       const myFactor = (communityDemand.En * this.averageRating[0].En / 10) / this.averageSupply[0].En
-      console.log('myFactor:' + myFactor)
-      const temp = {
-        'En': this.averageSupply[0].En * myFactor,
-        'Pr': this.averageSupply[0].Pr * myFactor,
-        'Va': this.averageSupply[0].Va * myFactor,
-        'Fe': this.averageSupply[0].Fe * myFactor,
-        'Wt': this.averageSupply[0].Wt * myFactor,
-        'Carbohydrate': this.averageSupply[0].Carbohydrate * myFactor,
-        'Fat': this.averageSupply[0].Fat * myFactor,
-      }
-      const res = getRating([temp], [communityDemand], 1)
-      console.log(res)
+      //Wt（重量）だけは平均値でなく、100gを返す
       return {
         'En': this.averageSupply[0].En * myFactor,
         'Pr': this.averageSupply[0].Pr * myFactor,
         'Va': this.averageSupply[0].Va * myFactor,
         'Fe': this.averageSupply[0].Fe * myFactor,
-        'Wt': this.averageSupply[0].Wt * myFactor,
+        'Wt': 100,
         'Carbohydrate': this.averageSupply[0].Carbohydrate * myFactor,
         'Fat': this.averageSupply[0].Fat * myFactor,
       }
@@ -715,7 +701,6 @@ export default {
       overallSupply.push(communitySupply, ...menu)
       let overallDemand = []
       overallDemand.push(communityDemand, ...member)
-      console.log(overallDemand)
 
       return {
         menuCases: overallSupply.map((item, index) => {
@@ -844,7 +829,6 @@ export default {
       },
       set(val) {
         const vm = this
-        console.log(val)
         let res = JSON.parse(JSON.stringify(vm.myCommunity))
         res.keyCommodity = val
         vm.updateDietOrFeasibility(res, 3)
@@ -965,7 +949,6 @@ export default {
 
       //selectedCrop[0]を更新
       dat.feasibilityCases[index - 1].selectedCrop[0].Wt = Wt
-      console.log(dat)
 
       //myCommunityを更新
       await this.updateDietOrFeasibility(dat, 4)

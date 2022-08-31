@@ -78,10 +78,6 @@
           </template>
           <b-row>
             <b-col cols="12" lg="6" v-for="pageId in sceneCount" :key="pageId" class="my-1">
-              {{ ratingGetter[pageId - 1] }}
-              <hr>
-              {{ nutritionSupplyGetter[pageId - 1] }}
-              <hr>
               <b-card>
                 Case {{ pageId }}: {{ myAppComputed.menuCases[pageId - 1].note }}
                 <b-row>
@@ -106,7 +102,7 @@
                     />
                   </b-col>
                 </b-row>
-                <b-row align-h="between">
+                <b-row align-h="between" class="mt-1">
                   <b-col class="h-25 small">Protein</b-col>
                   <b-col class="h-25 small" style="background-color: green;color: green">a</b-col>
                   <b-col class="h-25 small">Fat</b-col>
@@ -244,7 +240,6 @@ export default {
      */
     targetGroup() {
       let res = []
-      console.log('tergetGroup..setting')
       if (this.isCommonTargetGroup) {
         if (this.myAppComputed.member) {
           res = JSON.parse(JSON.stringify(this.myAppComputed.member))
