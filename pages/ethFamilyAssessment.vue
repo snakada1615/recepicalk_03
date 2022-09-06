@@ -8,7 +8,7 @@
       <b-tabs card>
         <b-tab title="add family">
           <b-row class="justify-content-center">
-            <b-col cols="8">
+            <b-col cols="12" lg="8">
               <b-input-group
                 size="sm"
                 prepend="family name"
@@ -42,7 +42,7 @@
         </b-tab>
         <b-tab title="select family" :disabled="familyList.length === 0">
           <b-row class="justify-content-center border-primary">
-            <b-col cols="8">
+            <b-col cols="12" lg="8">
               <b-input-group size="sm" class="mb-2">
                 <template #prepend>
                   <b-input-group-text>
