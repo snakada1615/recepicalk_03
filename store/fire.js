@@ -191,7 +191,7 @@ export const mutations = {
    */
   updateSaveDate: function (state) {
     let time = Date.now()
-    state.myApp.saveDate.jsDate = time
+    state.myApp.saveDate.jsDate = timee
     state.myApp.saveDate.date = Date(time)
   },
   /**
@@ -969,9 +969,6 @@ export const actions = {
         console.log('keeping state error: ', errorCode, errorMessage)
         throw error
       })
-    // fct. dri, portionUnit, questionsのオリジナルをfirebaseからコピーしてユーザースペースmyAppに貼り付ける
-    console.log('copy original database to user space')
-    dispatch('copyOriginalDataSet2UserDataOnRegistration', state.myApp)
   },
   //アプリを更新して、Storeに新たな変数が追加された場合、旧バージョンを使っている人向けにこれら新変数の追加更新(例外措置)
   async initFirebaseNewVariable({dispatch, state}) {

@@ -14,7 +14,12 @@
         <div>document</div>
         <b-input v-model="dbName2" placeholder="Enter doc name" class="my-1 mx-1"/>
       </div>
-      <b-button @click="getData(collection2, dbName2)" class="my-1">load from firebase</b-button>
+      <b-button @click="getData(collection2, dbName2)" class="my-1">
+        load from firebase
+      </b-button>
+      <b-button class="my-1" :disabled="!dataFire" @click="outputJson(dataFire)">
+        save to JSON file
+      </b-button>
     </b-card>
     <b-card v-if="dataFire" bg-variant="light">
       <json-viewer
@@ -219,8 +224,15 @@ export default {
       const querySnapshot = await getDocs(collection(firestoreDb, myCollection));
       this.myList.length = 0
       querySnapshot.forEach((doc) => {
-        this.myList.push(doc.id + ': ' + doc.data().user.displayName)
+        this.myList.push(doc.id )
       });
+    },
+    outputJson (str) {
+      const blob = new Blob([JSON.stringify(str)], { type: 'text/csv' }) // 配列に上記の文字列(str)を設定
+      const link = document.createElement('a')
+      link.href = URL.createObjectURL(blob)
+      link.download = 'tempdate.txt'
+      link.click()
     }
   }
 }
