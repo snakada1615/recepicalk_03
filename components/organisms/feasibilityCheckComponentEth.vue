@@ -388,7 +388,6 @@ export default {
         target,
         share
       )
-
       return {
         'share': share,
         'Wt': Wt,
@@ -522,7 +521,7 @@ export default {
           return vm.updateProductionTarget(
             vm.share,
             demand,
-            vm.nutritionSupply[index],
+            vm.nutrientSupplyPer100g[index],
             vm.myFamilyWatcher.keyNutrient
           )
         })
@@ -578,7 +577,7 @@ export default {
       return vm.updateProductionTarget(
         vm.share,
         demand,
-        vm.nutritionSupply[index],
+        vm.nutrientSupplyPer100g[index],
         vm.myFamilyWatcher.keyNutrient
       )
     })
@@ -646,6 +645,16 @@ export default {
      */
     noteInputState() {
       return (this.pageMemo[this.pageIdComputed].length > 3)
+    },
+    nutrientSupplyPer100g(){
+      return this.nutritionSupply.map((nutrient)=>{
+        const currentWt = nutrient.Wt
+        let res = {}
+        Object.entries(nutrient).forEach(([key, value])=>{
+          res[key] = value * (100 / currentWt)
+        })
+        return res
+      })
     }
   },
   data() {

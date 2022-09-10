@@ -191,7 +191,7 @@ export const mutations = {
    */
   updateSaveDate: function (state) {
     let time = Date.now()
-    state.myApp.saveDate.jsDate = timee
+    state.myApp.saveDate.jsDate = time
     state.myApp.saveDate.date = Date(time)
   },
   /**
@@ -1028,10 +1028,10 @@ export const actions = {
     //**********暫定措置、要削除***********
     //**********暫定措置、要削除***********
     //**********暫定措置、要削除***********
-    if ((state.myApp.dataSet.questionsId !== 'question_eth') && (current < limit)) {
+    if ((state.myApp.dataSet.questionsId !== 'question_eth2') && (current < limit)) {
       console.log('found some error and initialize feasibility questions')
       //guestionsIdをstoreに保存
-      await dispatch('updateQuestionsId', 'question_eth')
+      await dispatch('updateQuestionsId', 'question_eth2')
       //questionIdに基づいてfctを初期化（firestoreからfetch → storeに保存）
       await dispatch('initQuestions')
       needInitialization = true
