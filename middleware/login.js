@@ -15,7 +15,12 @@ export default async function ({store, redirect, route}) {
   ) {
     alert('please login/register first')
     console.log('not login')
-    return redirect('/')
+    // エチオピア版の場合は startPageEth に飛ぶ
+    if (route.name.indexOf('eth')>=0){
+      return redirect('/startPageEth')
+    } else {
+      return redirect('/')
+    }
   } else {
     if (store.state.fire.isLoggedIn){
       // 初期化されていない変数があった場合、firebaseからオリジナル変数をダウンロードして際読み込む

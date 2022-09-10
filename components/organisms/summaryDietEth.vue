@@ -3,6 +3,7 @@
     <b-row>
       <b-col cols="12" lg="6" class="my-1">
         <b-card
+          v-if="sceneCount !== 2"
           header-bg-variant="success"
           border-variant="success"
           bg-variant="light"
@@ -13,7 +14,8 @@
           <b-card>
             Note for each case
             <div v-for="pageId in sceneCount" :key="pageId" v-if="myAppComputed" class="border bg-light">
-              Case {{ pageId }}: {{ myAppComputed.menuCases[pageId - 1].note }}
+              <div v-if="sceneCount === 2">{{ caseTitles[pageId - 1] }}</div>
+              <div v-else>Case {{ pageId }}: {{ myAppComputed.menuCases[pageId - 1].note }}</div>
             </div>
           </b-card>
           <b-form-select v-model="selectedCaseId" :options="noteList" v-if="myAppComputed"></b-form-select>
@@ -50,7 +52,8 @@
           <b-row>
             <b-col cols="6" v-for="pageId in sceneCount" :key="pageId" class="my-1">
               <b-card>
-                Case {{ pageId }}: {{ myAppComputed.menuCases[pageId - 1].note }}
+                <div v-if="sceneCount === 2">{{ caseTitles[pageId - 1] }}</div>
+                <div v-else>Case {{ pageId }}: {{ myAppComputed.menuCases[pageId - 1].note }}</div>
                 <nutrition-bar2
                   v-for="index in 4" :key="index"
                   :colWidthFirst="3"
@@ -79,7 +82,8 @@
           <b-row>
             <b-col cols="12" lg="6" v-for="pageId in sceneCount" :key="pageId" class="my-1">
               <b-card>
-                Case {{ pageId }}: {{ myAppComputed.menuCases[pageId - 1].note }}
+                <div v-if="sceneCount === 2">{{ caseTitles[pageId - 1] }}</div>
+                <div v-else>Case {{ pageId }}: {{ myAppComputed.menuCases[pageId - 1].note }}</div>
                 <b-row>
                   <b-col cols="6">Recommended</b-col>
                   <b-col cols="6">Current</b-col>
@@ -372,6 +376,10 @@ export default {
         {val: 35, color: 'green', label: '%'},
         {val: 10, color: 'yellow', label: '%'},
         {val: 55, color: 'red', label: '%'},
+      ],
+      caseTitles:[
+        'current Diet',
+        'improved Diet'
       ],
     }
   },
