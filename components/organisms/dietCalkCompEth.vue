@@ -119,6 +119,14 @@
               />
             </b-col>
           </b-row>
+          <b-row align-h="between" class="mt-1">
+            <b-col class="h-25 small">Protein</b-col>
+            <b-col class="h-25 small" style="background-color: green;color: green">a</b-col>
+            <b-col class="h-25 small">Fat</b-col>
+            <b-col class="h-25 small" style="background-color: yellow;color: yellow">a</b-col>
+            <b-col class="h-25 small"><small>Carbo.</small></b-col>
+            <b-col class="h-25 small" style="background-color: red;color: red">a</b-col>
+          </b-row>
         </b-card>
       </b-col>
       <b-col cols="12" lg="6">
@@ -205,6 +213,9 @@ export default {
       myChartOptions: {
         maintainAspectRatio: false,
         responsive: true,
+        legend: {
+          display: false
+        }
       },
 
       /**

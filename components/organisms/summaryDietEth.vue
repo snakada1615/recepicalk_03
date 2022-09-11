@@ -134,6 +134,8 @@ import {
 } from "../../plugins/helper";
 import pieChart from "../atoms/pieChart";
 
+// TODO: family averageを表示する場合、Averageのみ強調表示にする
+
 export default {
   components: {
     nutritionBar2,
