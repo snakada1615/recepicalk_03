@@ -50,23 +50,56 @@
             <div class="font-weight-bold">Key nutrient sufficiency</div>
           </template>
           <b-row>
-            <b-col cols="6" v-for="pageId in sceneCount" :key="pageId" class="my-1">
-              <b-card>
-                <div v-if="sceneCount === 2">{{ caseTitles[pageId - 1] }}</div>
-                <div v-else>Case {{ pageId }}: {{ myAppComputed.menuCases[pageId - 1].note }}</div>
-                <nutrition-bar2
-                  v-for="index in 4" :key="index"
-                  :colWidthFirst="3"
-                  :colwidthSecond="0"
-                  :colwidthThird="0"
-                  :colwidthFourth="2"
-                  :show-max-number="false"
-                  :label="nutritionLabel[index-1]"
-                  :max-rating="maxRating"
-                  :rating="ratingGetter[pageId-1][nutritionLabel[index-1]]"
-                />
-              </b-card>
-            </b-col>
+            <template v-for="pageId in sceneCount">
+              <b-col v-if="(pageId === 1) && (isAverageIncluded)" cols="12">
+                <b-card class="my-1">
+                  <div v-if="sceneCount === 2">{{ caseTitles[pageId - 1] }}</div>
+                  <div v-else>
+                    <div v-if="myAppComputed.menuCases[pageId - 1].note">
+                      {{ myAppComputed.menuCases[pageId - 1].note }}
+                    </div>
+                    <div v-else>
+                      Case {{ pageId }}
+                    </div>
+                  </div>
+                  <nutrition-bar2
+                    v-for="index in 4" :key="index + 20"
+                    :colWidthFirst="1"
+                    :colwidthSecond="0"
+                    :colwidthThird="0"
+                    :colwidthFourth="2"
+                    :show-max-number="false"
+                    :label="nutritionLabel[index-1]"
+                    :max-rating="maxRating"
+                    :rating="ratingGetter[pageId-1][nutritionLabel[index-1]]"
+                  />
+                </b-card>
+              </b-col>
+              <b-col v-else cols="6">
+                <b-card class="my-1">
+                  <div v-if="sceneCount === 2">{{ caseTitles[pageId - 1] }}</div>
+                  <div v-else>
+                    <div v-if="myAppComputed.menuCases[pageId - 1].note">
+                      {{ myAppComputed.menuCases[pageId - 1].note }}
+                    </div>
+                    <div v-else>
+                      Case {{ pageId }}
+                    </div>
+                  </div>
+                  <nutrition-bar2
+                    v-for="index in 4" :key="index + 20"
+                    :colWidthFirst="3"
+                    :colwidthSecond="0"
+                    :colwidthThird="0"
+                    :colwidthFourth="2"
+                    :show-max-number="false"
+                    :label="nutritionLabel[index-1]"
+                    :max-rating="maxRating"
+                    :rating="ratingGetter[pageId-1][nutritionLabel[index-1]]"
+                  />
+                </b-card>
+              </b-col>
+            </template>
           </b-row>
         </b-card>
       </b-col>
@@ -80,42 +113,48 @@
             <div class="font-weight-bold">PFC balance</div>
           </template>
           <b-row>
-            <b-col cols="12" lg="6" v-for="pageId in sceneCount" :key="pageId" class="my-1">
-              <b-card>
-                <div v-if="sceneCount === 2">{{ caseTitles[pageId - 1] }}</div>
-                <div v-else>Case {{ pageId }}: {{ myAppComputed.menuCases[pageId - 1].note }}</div>
-                <b-row>
-                  <b-col cols="6">Recommended</b-col>
-                  <b-col cols="6">Current</b-col>
-                </b-row>
-                <b-row>
-                  <b-col cols="6">
-                    <pie-chart
-                      v-if="pfcStandard"
-                      :chart-data="pfcStandard"
-                      :options="myChartOptions"
-                      :styles="myChartStylesOriginal"
-                    />
-                  </b-col>
-                  <b-col cols="6">
-                    <pie-chart
-                      v-if="pfcBalanceCurrent[pageId-1]"
-                      :chart-data="pfcBalanceCurrent[pageId-1]"
-                      :options="myChartOptions"
-                      :styles="myChartStyles[pageId-1]"
-                    />
-                  </b-col>
-                </b-row>
-                <b-row align-h="between" class="mt-1">
-                  <b-col class="h-25 small">Protein</b-col>
-                  <b-col class="h-25 small" style="background-color: green;color: green">a</b-col>
-                  <b-col class="h-25 small">Fat</b-col>
-                  <b-col class="h-25 small" style="background-color: yellow;color: yellow">a</b-col>
-                  <b-col class="h-25 small"><small>Carbo.</small></b-col>
-                  <b-col class="h-25 small" style="background-color: red;color: red">a</b-col>
-                </b-row>
-              </b-card>
-            </b-col>
+            <template v-for="pageId in sceneCount">
+              <b-col
+                v-if="(isAverageIncluded && (pageId === 1)) || !isAverageIncluded"
+                cols="12"
+                lg="6"
+                class="my-1">
+                <b-card>
+                  <div v-if="sceneCount === 2">{{ caseTitles[pageId - 1] }}</div>
+                  <div v-else>Case {{ pageId }}: {{ myAppComputed.menuCases[pageId - 1].note }}</div>
+                  <b-row>
+                    <b-col cols="6">Recommended</b-col>
+                    <b-col cols="6">Current</b-col>
+                  </b-row>
+                  <b-row>
+                    <b-col cols="6">
+                      <pie-chart
+                        v-if="pfcStandard"
+                        :chart-data="pfcStandard"
+                        :options="myChartOptions"
+                        :styles="myChartStylesOriginal"
+                      />
+                    </b-col>
+                    <b-col cols="6">
+                      <pie-chart
+                        v-if="pfcBalanceCurrent[pageId-1]"
+                        :chart-data="pfcBalanceCurrent[pageId-1]"
+                        :options="myChartOptions"
+                        :styles="myChartStyles[pageId-1]"
+                      />
+                    </b-col>
+                  </b-row>
+                  <b-row align-h="between" class="mt-1">
+                    <b-col class="h-25 small">Protein</b-col>
+                    <b-col class="h-25 small" style="background-color: green;color: green">a</b-col>
+                    <b-col class="h-25 small">Fat</b-col>
+                    <b-col class="h-25 small" style="background-color: yellow;color: yellow">a</b-col>
+                    <b-col class="h-25 small"><small>Carbo.</small></b-col>
+                    <b-col class="h-25 small" style="background-color: red;color: red">a</b-col>
+                  </b-row>
+                </b-card>
+              </b-col>
+            </template>
           </b-row>
         </b-card>
       </b-col>
@@ -143,6 +182,13 @@ export default {
     pieChart
   },
   methods: {
+    setColWidth(val) {
+      if (val === 1) {
+        return 12
+      } else {
+        return 6
+      }
+    },
     /**
      * piChartの半径を設定するための係数（標準値の0.2-2.0倍の範囲を超えたら変動しないよう設定）
      * @param rating
@@ -321,6 +367,13 @@ export default {
     isCommonTargetGroup: {
       type: Boolean,
       default: true,
+    },
+    /**
+     * myAppに含まれる要素が平均値を含むかどうか示すフラグ
+     */
+    isAverageIncluded: {
+      type: Boolean,
+      default: false,
     }
   },
   data() {
@@ -379,7 +432,7 @@ export default {
         {val: 10, color: 'yellow', label: '%'},
         {val: 55, color: 'red', label: '%'},
       ],
-      caseTitles:[
+      caseTitles: [
         'current Diet',
         'improved Diet'
       ],

@@ -92,7 +92,8 @@
           <summary-diet-eth
             v-if="Object.keys(summaryAverage).length"
             :my-app="summaryAverage"
-            :is-common-target-group="false"
+            :is-common-target-group = "false"
+            :is-average-included = "true"
           />
         </b-tab>
 
@@ -330,7 +331,7 @@ import dietCalkDisplayEth from "../components/organisms/dietCalkDisplayEth";
 import summaryDietEth from "../components/organisms/summaryDietEth";
 
 export default {
-  layout:'defaultEth',
+  layout: 'defaultEth',
   components: {
     driSelectMulti,
     dietCalkCompEth,
@@ -605,7 +606,7 @@ export default {
      * menuCasesの中から値の含まれるものを抽出
      * @returns {T[]}
      */
-    menuCasesFiltered(){
+    menuCasesFiltered() {
       if (!Object.keys(this.myCommunity).length) {
         return []
       }
@@ -615,15 +616,15 @@ export default {
      * サンプル家族のメニュー配列（作物リスト）×食事パターン から、栄養供給量の平均値を算出
      * @returns {{}|{Pr: number, Fat: number, En: number, Carbohydrate: number, Va: number, Wt: number, Fe: number}[]}
      */
-    averageSupply(){
+    averageSupply() {
       const vm = this
-      if (vm.menuCasesFiltered.length === 0){
+      if (vm.menuCasesFiltered.length === 0) {
         return {}
       }
-      const menu = vm.menuCasesFiltered.map((item)=>{
+      const menu = vm.menuCasesFiltered.map((item) => {
         return item.menu
       })
-      const supplyList = menu.map((item)=>{
+      const supplyList = menu.map((item) => {
         return getNutritionSupply(item, 1)
       })
 
@@ -637,20 +638,20 @@ export default {
      */
     averageSampleDemand() {
       const vm = this
-      if (vm.menuCasesFiltered.length === 0){
+      if (vm.menuCasesFiltered.length === 0) {
         return {}
       }
       //ターゲットを特定
-      const member = vm.menuCasesFiltered.map((item)=>{
+      const member = vm.menuCasesFiltered.map((item) => {
         return item.target
       })
       //ターゲットに応じた栄養要求量を算出
-      const demandList = member.map((item)=>{
+      const demandList = member.map((item) => {
         return getNutritionDemand(item, vm.dri)
       })
 
       //ターゲットの栄養要求量を合計する
-      return  [
+      return [
         getAverageNutritionDemand(demandList)
       ]
     },
@@ -658,17 +659,17 @@ export default {
      * サンプル家族の栄養需要をコミュニティ全体に外挿するための係数
      * @returns {*[]}
      */
-    averageRating(){
+    averageRating() {
       return getRating(this.averageSupply, this.averageSampleDemand, 1)
     },
-    ratingTemp(){
+    ratingTemp() {
       return getRating(this.averageSupply, this.averageSampleDemand, 1)
     },
     /**
      *
      * @returns {{Pr: number, Fat: number, En: number, Carbohydrate: number, Va: number, Wt: number, Fe: number}}
      */
-    currentCommunitySupply(){
+    currentCommunitySupply() {
       const communityDemand = getNutritionDemand(this.myCommunity.member, this.dri)
       const myFactor = (communityDemand.En * this.averageRating[0].En / 10) / this.averageSupply[0].En
       //Wt（重量）だけは平均値でなく、100gを返す
@@ -688,14 +689,14 @@ export default {
      */
     summaryAverage() {
       const vm = this
-      if (vm.menuCasesFiltered.length === 0){
+      if (vm.menuCasesFiltered.length === 0) {
         return {}
       }
       //生産目標を計算
-      const member = vm.menuCasesFiltered.map((item)=>{
+      const member = vm.menuCasesFiltered.map((item) => {
         return item.target
       })
-      const menu = vm.menuCasesFiltered.map((item)=>{
+      const menu = vm.menuCasesFiltered.map((item) => {
         return item.menu
       })
 
@@ -710,7 +711,7 @@ export default {
       return {
         menuCases: overallSupply.map((item, index) => {
           return {
-            note: index===0 ? 'average': '',
+            note: index === 0 ? 'average' : '',
             menu: item
           }
         }),
@@ -729,7 +730,7 @@ export default {
           },
           {
             note: 'improved',
-                                                                                          menu: vm.menuUpdated,
+            menu: vm.menuUpdated,
           }
         ],
         member: vm.myCommunity.member,
