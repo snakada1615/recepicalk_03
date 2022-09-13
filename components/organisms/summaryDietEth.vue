@@ -157,6 +157,19 @@
             </template>
           </b-row>
         </b-card>
+        <b-card
+          v-if="!isAverageIncluded"
+          header-bg-variant="success"
+          border-variant="success"
+          bg-variant="light"
+          class="my-2">
+          <template #header>
+            <div class="font-weight-bold">Improved Diet Pattern</div>
+          </template>
+          <recepi-table
+            :items="myAppComputed.menuCases[1].menu"
+          ></recepi-table>
+        </b-card>
       </b-col>
     </b-row>
   </b-container>
@@ -172,6 +185,7 @@ import {
   updatePfc
 } from "../../plugins/helper";
 import pieChart from "../atoms/pieChart";
+import recepiTable from "../molecules/recepiTable";
 
 // TODO: family averageを表示する場合、Averageのみ強調表示にする
 
@@ -179,7 +193,8 @@ export default {
   components: {
     nutritionBar2,
     macroNutrientBar,
-    pieChart
+    pieChart,
+    recepiTable
   },
   methods: {
     setColWidth(val) {
