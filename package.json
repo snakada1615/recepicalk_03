@@ -46,7 +46,7 @@
     "d3-color": "3.1.0",
     "protobufjs": "6.11.3",
     "ansi-regex": "3.0.1",
-    "parse-url": "6.0.1",
+    "parse-url": "8.1.0",
     "terser": "4.8.1",
     "mermaid": "9.1.3"
   }

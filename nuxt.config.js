@@ -95,6 +95,7 @@ export default {
         'ListGroupPlugin',
         'DropdownPlugin',
         'ImagePlugin',
+        'ProgressPlugin'
       ],
     }],
     // https://go.nuxtjs.dev/axios

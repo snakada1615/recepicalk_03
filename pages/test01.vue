@@ -1,67 +1,17 @@
 <template>
   <b-container>
-    <page-changer
-      :tab-text-set="myTitles"
-      :tab-index.sync="tabIndex"
-      :page-count=6
-    />
-    <b-container
-      clsass="myTab"
-      v-if="tabOptions[0]"
-    >
-      cont1
-    </b-container>
-    <b-container
-      clsass="myTab"
-      v-if="tabOptions[1]"
-    >
-      cont2
-    </b-container>
-    <b-container
-      clsass="myTab"
-      v-if="tabOptions[2]"
-    >
-      cont3
-    </b-container>
-    <b-container
-      clsass="myTab"
-      v-if="tabOptions[3]"
-    >
-      cont4
-    </b-container>
-    <b-container
-      clsass="myTab"
-      v-if="tabOptions[4]"
-    >
-      cont5
-    </b-container>
-    <b-container
-      clsass="myTab"
-      v-if="tabOptions[5]"
-    >
-      cont6
-    </b-container>
+    <div>
+      aloha
+    </div>
   </b-container>
 </template>
 <script>
-import pageChanger from "../components/atoms/pageChanger";
 
 export default {
-  components: {
-    pageChanger
-  },
   data() {
     return {
-      tabIndex: 0,
-      tabCount: 6,
-      myTitles: [
-        'options 1',
-        'options 2',
-        'options 3',
-        'options 4',
-        'options 5',
-        'options 6',
-      ]
+      mySteps: ['Step 1', 'Step 2', 'Step 3'],
+      currentStep:0
     }
   },
   computed: {
