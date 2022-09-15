@@ -99,19 +99,30 @@
             <template #header>
               <div>Select key nutrient for your target family/HH</div>
             </template>
-            <b-form-group
-              v-if="myFamily.name"
-              class="ml-2"
-            >
-              <b-form-radio-group
-                v-model="selectedNutrient"
-                :options="keyNutrients"
-                button-variant="outline-primary"
-                buttons
-                stacked
-                class="ml-4"
-              ></b-form-radio-group>
-            </b-form-group>
+            <b-row>
+              <b-col>
+                <b-form-group
+                  v-if="myFamily.name"
+                  class="ml-2"
+                >
+                  <b-form-radio-group
+                    v-model="selectedNutrient"
+                    :options="keyNutrients"
+                    button-variant="outline-primary"
+                    buttons
+                    stacked
+                    class="ml-4"
+                  ></b-form-radio-group>
+                </b-form-group>
+              </b-col>
+              <b-col>
+                <div>Month</div>
+                <b-form-select
+                  v-model="monthValue"
+                  :options="monthOptions"
+                />
+              </b-col>
+            </b-row>
           </b-card>
           <b-card
             style="min-width: 530px;"
@@ -137,7 +148,6 @@
                     >select</b-button>
                   </span>
                 </div>
-
               </b-list-group-item>
             </b-list-group>
           </b-card>
@@ -303,7 +313,7 @@
       my-name="modalTest"
       my-modal-header="Food Composition Table"
       :show-modal.sync="showFct"
-      :items="fct"
+      :items="fctFilterByMonth"
       @modalOk="onCropSelected($event, addCropId)"
     />
   </b-container>
@@ -320,7 +330,7 @@ import dietCalkDisplayEth from "../components/organisms/dietCalkDisplayEth";
 import summaryDietEth from "../components/organisms/summaryDietEth";
 
 export default {
-  layout:'defaultEth',
+  layout: 'defaultEth',
   components: {
     driSelectMulti,
     dietCalkCompEth,
@@ -347,6 +357,28 @@ export default {
        * workFlowの何ページ目まで読み込めるかのフラグ
        */
       workFlowStatus: 0,
+      /**
+       * monthの選択肢
+       */
+      monthOptions: [
+        {value: -1, text: 'Any month'},
+        {value: 1, text: '1'},
+        {value: 2, text: '2'},
+        {value: 3, text: '3'},
+        {value: 4, text: '4'},
+        {value: 5, text: '5'},
+        {value: 6, text: '6'},
+        {value: 7, text: '7'},
+        {value: 8, text: '8'},
+        {value: 9, text: '9'},
+        {value: 10, text: '10'},
+        {value: 11, text: '11'},
+        {value: 12, text: '12'},
+      ],
+      /**
+       * 選択された月
+       */
+      monthValue: -1,
       familyName: '',
       keyNutrients: [
         {text: 'Energy', value: 'En'},
@@ -569,16 +601,16 @@ export default {
   computed: {
     menuUpdated() {
       const vm = this
-      if (!vm.myFamily.feasibilityCases){
+      if (!vm.myFamily.feasibilityCases) {
         console.log('dataset is broken in feasibilityCases: null')
         return []
       }
-      if (vm.myFamily.feasibilityCases.length === 0){
+      if (vm.myFamily.feasibilityCases.length === 0) {
         console.log('dataset is broken in feasibilityCases: length is 0')
         return []
       }
       let res = JSON.parse(JSON.stringify(vm.myFamily.menuCases[0].menu))
-      const addedCommodity = vm.myFamily.feasibilityCases.find((item)=>{
+      const addedCommodity = vm.myFamily.feasibilityCases.find((item) => {
         if (item.selectedCrop.length > 0) {
           return item.selectedCrop[0].Name === vm.selectedCommodity
         } else {
@@ -586,14 +618,14 @@ export default {
         }
       })
       //追加品目が存在する場合にはこれを追加、存在しない場合はもともとのmenuを返す
-      if (addedCommodity && addedCommodity.selectedCrop.length > 0){
+      if (addedCommodity && addedCommodity.selectedCrop.length > 0) {
         res.push(addedCommodity.selectedCrop[0])
       }
       return res
     },
     summaryResult() {
       const vm = this
-      if (!vm.myFamily.menuCases){
+      if (!vm.myFamily.menuCases) {
         return {}
       }
       return {
@@ -712,9 +744,9 @@ export default {
         vm.updateMyFamily(res)
       },
     },
-    selectedCommodity(){
+    selectedCommodity() {
       const vm = this
-      if (vm.selectedCropListFiltered.length === 0){
+      if (vm.selectedCropListFiltered.length === 0) {
         return ''
       }
       if (!vm.selectedCropListFiltered[vm.selectedCommodityId]) {
@@ -770,6 +802,17 @@ export default {
     },
     fct() {
       return JSON.parse(JSON.stringify(this.myApp.dataSet.fct))
+    },
+    fctFilterByMonth() {
+      if (this.monthValue === -1) {
+        return JSON.parse(JSON.stringify(this.myApp.dataSet.fct))
+      }
+      const myFilter = this.myApp.dataSet.cropCalendar.filter((item) =>
+        (item[this.monthValue] === '1') || (item[this.monthValue] === '2') )
+      const filteredId = myFilter.map((item) => {
+        return item.FCT_id
+      })
+      return this.myApp.dataSet.fct.filter((item) => filteredId.indexOf(item.id) >= 0)
     },
     stateFamilyName() {
       const familySize = this.newTarget.reduce((accum, curr) => {
@@ -836,6 +879,10 @@ export default {
      * fctダイアログのトリガー
      */
     showFctDialogue(index) {
+      if (this.fctFilterByMonth.length === 0){
+        alert('there is no available crop for this month')
+        return
+      }
       this.addCropId = index
       this.showFct = !this.showFct
     },

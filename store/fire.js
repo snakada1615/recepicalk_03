@@ -89,6 +89,14 @@ export const state = () => ({
        * feasibility Questionのデータ
        */
       questions: [],
+      /**
+       * cropCalendarのID
+       */
+      cropCalendarId: 'cropCalendar01',
+      /**
+       * cropCalendarのデータ
+       */
+      cropCalendar: []
     },
     /**
      * シナリオの数（各シナリオに10の食事パターンが存在）
@@ -236,6 +244,15 @@ export const mutations = {
     state.myApp.dataSet.questionsId = payload
   },
   /**
+   * cropCalendarIdを更新
+   * @param state
+   * @param payload
+   */
+  updateCropCalendarId: function (state, payload) {
+    console.log(payload)
+    state.myApp.dataSet.cropCalendarId = payload
+  },
+  /**
    * ユーザーデータ（myApp）が読み込まれたらTrueにセット
    * @param state
    */
@@ -260,6 +277,7 @@ export const mutations = {
     state.myApp.dataSet.fct = []
     state.myApp.dataSet.dri = []
     state.myApp.dataSet.portionUnit = []
+    state.myApp.dataSet.cropCalendar = []
     state.myApp.dataSet.questions = []
     state.myApp.menuCases = []
     state.myApp.prodTargetCases = []
@@ -371,6 +389,14 @@ export const mutations = {
    */
   updateQuestions: function (state, payload) {
     state.myApp.dataSet.questions = JSON.parse(JSON.stringify(payload))
+  },
+  /**
+   * cropCalendarを更新
+   * @param state
+   * @param payload 更新する値（Array of Objects）
+   */
+  updateCropCalendar: function (state, payload) {
+    state.myApp.dataSet.cropCalendar = JSON.parse(JSON.stringify(payload))
   },
   /**
    * menuCasesを更新
@@ -1005,6 +1031,17 @@ export const actions = {
       needInitialization = true
     }
 
+    //cropCalendarが読み込まれていない場合に強制的にfirestoreからコピー（過去バージョン使用者への例外措置）
+    console.log(state.myApp.dataSet.cropCalendarId)
+    if ((!state.myApp.dataSet.cropCalendarId) || (state.myApp.dataSet.cropCalendarId.indexOf('cropCalendar') < 0)) {
+      alert('cropCalendar Size is not initialized. data will be loaded from original copy')
+      //cropCalendarのオリジナルデータをコピーしてfireStoreに保存
+      const newCropCalendarId = 'cropCalendar01'
+      //fireStoreからcropCalendarのデータを読み込んでstoreに保存
+      await dispatch('initCropCalendar', newCropCalendarId)
+      needInitialization = true
+    }
+
     //ETH研修向け暫定措置：fctデータベースを強制的にfct_ethに変更してデータ更新
     //2022年10月30日までの限定機能
     //**********暫定措置、要削除***********
@@ -1177,6 +1214,32 @@ export const actions = {
     }
   },
   /**
+   * cropCalendarのデータをfireStoreから取得して返す
+   * @param state
+   * @param commit
+   * @param dispatch
+   * @param payload 初期値（db名）の指定があれば、これを元に初期化
+   * @returns {Promise<void>}
+   */
+  async initCropCalendar({state, commit, dispatch}, payload) {
+    if (payload){
+      await commit('updateCropCalendarId', payload)
+    }
+    // cropCalendarをfireStoreからfetch (cropCalendarIdを使う)
+    const cropCalendar = await fireGetDoc('dataset', state.myApp.dataSet.cropCalendarId).catch((err) => {
+      throw Error(err)
+    })
+
+    // cropCalendarをstoreに保存
+    if (cropCalendar) {
+      const cropCalendarArray = Object.values(cropCalendar)
+      console.log(cropCalendarArray)
+      commit('updateCropCalendar', cropCalendarArray)
+    } else {
+      throw new Error('initCropCalendar fail: no data')
+    }
+  },
+  /**
    * questionsのデータをfireStoreから取得して返す
    * @param state
    * @param commit
@@ -1184,7 +1247,6 @@ export const actions = {
    * @returns {Promise<void>}
    */
   async initQuestions({state, commit, dispatch}) {
-    console.log(state.myApp.dataSet.questionsId)
     // questionsをfireStoreからfetch (questionsIdを使う)
     const questions = await fireGetDoc('dataset', state.myApp.dataSet.questionsId).catch((err) => {
       throw Error(err)
@@ -1403,6 +1465,7 @@ export const actions = {
       await dispatch('initDri')
       await dispatch('initPortionUnit')
       await dispatch('initQuestions')
+      await dispatch('initCropCalendar')
       await dispatch('initMenu', {data: state.myApp.dataSet.dri, count: state.myApp.sceneCount})
       await dispatch('initProdTarget', state.myApp.dataSet.dri)
       await dispatch('initFeasibility', {data: state.myApp.dataSet.dri, count: state.myApp.sceneCount})
