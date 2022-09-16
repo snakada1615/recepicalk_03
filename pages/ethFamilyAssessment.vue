@@ -804,7 +804,6 @@ export default {
       return JSON.parse(JSON.stringify(this.myApp.dataSet.fct))
     },
     fctFilterByMonth() {
-      console.log(this.myApp.dataSet.cropCalendar)
       if (this.monthValue === -1) {
         return JSON.parse(JSON.stringify(this.myApp.dataSet.fct))
       }

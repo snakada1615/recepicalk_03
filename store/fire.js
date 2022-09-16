@@ -396,6 +396,9 @@ export const mutations = {
    * @param payload 更新する値（Array of Objects）
    */
   updateCropCalendar: function (state, payload) {
+    if (!Array.isArray(payload)) {
+      throw new Error('updateCropCalendar Err: payload should be Array')
+    }
     state.myApp.dataSet.cropCalendar = JSON.parse(JSON.stringify(payload))
   },
   /**
@@ -688,14 +691,13 @@ export const actions = {
   },
   /**
    * Calendarの質問内容を更新した際にfireStoreを更新する
-   * @param state
    * @param dispatch
    * @param payload
    * @returns {Promise<boolean>}
    */
-  async fireSaveCropCalendar({state, dispatch}, payload) {
-    const ref = await doc(firestoreDb, 'dataset', state.myApp.dataSet.cropCalendarId)
-    await setDoc(ref, payload).catch((err) => {
+  async fireSaveCropCalendar({dispatch}, payload) {
+    const ref = await doc(firestoreDb, 'dataset', payload.docName)
+    await setDoc(ref, payload.data).catch((err) => {
       throw new Error('Error in fireSaveCropCalendar:' + err)
     })
     console.log('cropCalendar saved to fireStore (payload -> fireStore')

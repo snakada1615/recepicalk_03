@@ -15,10 +15,11 @@
           <b-dropdown-item to="/ethCommunityAssessment">community assessment</b-dropdown-item>
 
           <!-- メニューグループ1　導入 -->
-          <b-dropdown size="sm" id="subMenu-0" text="Introduction" class="m-md-2" variant="light">
+          <b-dropdown size="sm" id="subMenu-0" text="Tools" class="m-md-2" variant="light">
             <b-dropdown-item to="/whatsNfa">what's NFA</b-dropdown-item>
             <b-dropdown-item to="/login">login/register</b-dropdown-item>
             <b-dropdown-item to="/userinfo">user info</b-dropdown-item>
+            <b-dropdown-item to="/setCalendarEth">crop calendar</b-dropdown-item>
             <b-dropdown-item to="/foodGroupInfo">about FoodGroup</b-dropdown-item>
           </b-dropdown>
 

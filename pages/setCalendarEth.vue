@@ -1,6 +1,7 @@
 <template>
   <b-container>
     <div>
+      aloha
       <b-card
         header="get fileList from firebase"
         header-bg-variant="success"
