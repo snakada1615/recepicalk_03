@@ -69,8 +69,11 @@
       </b-col>
     </b-row>
     <b-card>
-      note: this app is under frequent update. if you have any trouble, please go to option.
-      and try to 'delete user data' and start again using new data set
+      <div>
+        note: this app is under frequent update. if you have any trouble, please go to option.
+        and try to 'delete user data' and start again using new data set
+      </div>
+      <b-badge pill variant="info" to="startPageEth">switch to Eth version</b-badge>
     </b-card>
   </section>
 </template>

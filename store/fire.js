@@ -1034,7 +1034,7 @@ export const actions = {
     //cropCalendarが読み込まれていない場合に強制的にfirestoreからコピー（過去バージョン使用者への例外措置）
     console.log(state.myApp.dataSet.cropCalendarId)
     if ((!state.myApp.dataSet.cropCalendarId) || (state.myApp.dataSet.cropCalendarId.indexOf('cropCalendar') < 0)) {
-      alert('cropCalendar Size is not initialized. data will be loaded from original copy')
+      alert('cropCalendar is not initialized. data will be loaded from original copy')
       //cropCalendarのオリジナルデータをコピーしてfireStoreに保存
       const newCropCalendarId = 'cropCalendar01'
       //fireStoreからcropCalendarのデータを読み込んでstoreに保存

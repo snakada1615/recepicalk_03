@@ -4,14 +4,18 @@ export default async function ({store, redirect, route}) {
    * ログイン○、myAppのfetch×、の場合にはfireStoreからfetch(initFirebaseAuthの機能)
    */
   console.log('middleware: Check login status')
-  await store.dispatch('fire/initFirebaseAuth').catch(()=>{
-    //console.log(err)
+  await store.dispatch('fire/initFirebaseAuth').catch((err)=>{
+    console.log(err)
     console.log('login-middleware: Error')
+    alert('please login/register first to use all function')
   })
   if (
     route.name !== 'login'
+    && route.name
     && route.name !== 'index'
-    && !store.state.fire.isLoggedIn
+    && route.name !== 'startPageEth'
+    && route.name.indexOf('test')
+      && !store.state.fire.isLoggedIn
   ) {
     alert('please login/register first')
     console.log('not login')
