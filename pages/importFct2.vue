@@ -79,7 +79,7 @@ export default {
         //fctNameをstoreに保存
         await this.$store.dispatch('fire/updateFctId', fctName)
         //fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
-        await this.$store.dispatch('fire/initFct')
+        await this.$store.dispatch('fire/fetchFctFromFire')
         //更新された内容をfirestoreに戻す
         await this.$store.dispatch('fire/fireSaveAppdata')
         await this.$router.push('/')

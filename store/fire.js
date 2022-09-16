@@ -248,7 +248,7 @@ export const mutations = {
    * @param state
    * @param payload
    */
-  updateCropCalendarId: function (state, payload) {
+  updateCropCalendarId(state, payload) {
     console.log(payload)
     state.myApp.dataSet.cropCalendarId = payload
   },
@@ -554,7 +554,7 @@ export const actions = {
    * @param myCount
    * @returns {*[]}
    */
-  createNewFeasibilityCases({}, myCount){
+  createNewFeasibilityCases({}, myCount) {
     if (!myCount) {
       return []
     }
@@ -638,7 +638,7 @@ export const actions = {
     })
     console.log(currentCommunity)
     await dispatch('updateCurrentCommunityName', currentCommunity[0].name)
-      await dispatch('updateCommunityCases', currentCommunity)
+    await dispatch('updateCommunityCases', currentCommunity)
     await dispatch('setHasDocumentChanged', true)
   },
   /**
@@ -680,10 +680,25 @@ export const actions = {
     })
     console.log('question saved to fireStore (payload -> fireStore')
     console.log('Now question in store is replaced by the question from fireStore (fireStore -> store)')
-    await dispatch('initQuestions').catch((err)=>{
+    await dispatch('fetchQuestionsFromFire').catch((err) => {
       throw new Error('Error in fireSaveQuestions:' + err)
     })
     console.log('question in store refreshed!')
+    return true
+  },
+  /**
+   * Calendarの質問内容を更新した際にfireStoreを更新する
+   * @param state
+   * @param dispatch
+   * @param payload
+   * @returns {Promise<boolean>}
+   */
+  async fireSaveCropCalendar({state, dispatch}, payload) {
+    const ref = await doc(firestoreDb, 'dataset', state.myApp.dataSet.cropCalendarId)
+    await setDoc(ref, payload).catch((err) => {
+      throw new Error('Error in fireSaveCropCalendar:' + err)
+    })
+    console.log('cropCalendar saved to fireStore (payload -> fireStore')
     return true
   },
   /**
@@ -790,6 +805,24 @@ export const actions = {
    */
   updateQuestions({commit}, payload) {
     commit('updateQuestions', payload)
+  },
+  /**
+   * cropCalendarIdを更新
+   * @param commit
+   * @param payload
+   */
+  updateCropCalendarId({commit}, payload) {
+    commit('updateCropCalendarId', payload)
+  },
+  /**
+   * cropCalendarを更新
+   * @param commit
+   * @param dispatch
+   * @param payload
+   * @returns {Promise<void>}
+   */
+  updateCropCalendar({commit, dispatch}, payload) {
+    commit('updateCropCalendar', payload)
   },
   /**
    * ユーザーデータ（myApp）が読み込まれたらTrueにセット
@@ -1011,7 +1044,7 @@ export const actions = {
       })
       //fireStoreからquestionsのデータを読み込んでstoreに保存
       await dispatch('updateQuestionsId', newQuestionsId)
-      await dispatch('initQuestions')
+      await dispatch('fetchQuestionsFromFire')
       needInitialization = true
     }
 
@@ -1027,7 +1060,7 @@ export const actions = {
       })
       //fireStoreからportionのデータを読み込んでstoreに保存
       await dispatch('updatePortionUnitId', newPortionId)
-      await dispatch('initPortionUnit')
+      await dispatch('fetchPortionUnitFromFire')
       needInitialization = true
     }
 
@@ -1038,7 +1071,7 @@ export const actions = {
       //cropCalendarのオリジナルデータをコピーしてfireStoreに保存
       const newCropCalendarId = 'cropCalendar01'
       //fireStoreからcropCalendarのデータを読み込んでstoreに保存
-      await dispatch('initCropCalendar', newCropCalendarId)
+      await dispatch('fetchCropCalendarFromFire', newCropCalendarId)
       needInitialization = true
     }
 
@@ -1055,7 +1088,7 @@ export const actions = {
       //fctNameをstoreに保存
       await dispatch('updateFctId', 'fct_eth0729')
       //fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
-      await dispatch('initFct')
+      await dispatch('fetchFctFromFire')
       needInitialization = true
     }
 
@@ -1070,7 +1103,7 @@ export const actions = {
       //guestionsIdをstoreに保存
       await dispatch('updateQuestionsId', 'question_eth2')
       //questionIdに基づいてfctを初期化（firestoreからfetch → storeに保存）
-      await dispatch('initQuestions')
+      await dispatch('fetchQuestionsFromFire')
       needInitialization = true
     }
 
@@ -1165,14 +1198,14 @@ export const actions = {
    * @param dispatch
    * @returns {Promise<void>}
    */
-  async initFct({commit, dispatch, state}) {
+  async fetchFctFromFire({commit, dispatch, state}) {
     const fct = await fireGetDoc('dataset', state.myApp.dataSet.fctId)
     if (fct) {
       //ObjectをArrayに変換
       const fctArray = await dispatch('formatFct', fct)
       commit('updateFct', fctArray)
     } else {
-      throw new Error('initFct fail: no data')
+      throw new Error('fetchFctFromFire fail: no data')
     }
   },
   /**
@@ -1183,13 +1216,13 @@ export const actions = {
    * @param state
    * @returns {Promise<void>}
    */
-  async initDri({commit, dispatch, state}) {
+  async fetchDriFromFire({commit, dispatch, state}) {
     const dri = await fireGetDoc('dataset', state.myApp.dataSet.driId)
     if (dri) {
       const driArray = await dispatch('formatDri', dri)
       commit('updateDri', driArray)
     } else {
-      throw new Error('initDri fail: no data')
+      throw new Error('fetchDriFromFire fail: no data')
     }
   },
   /**
@@ -1199,7 +1232,7 @@ export const actions = {
    * @param dispatch
    * @returns {Promise<void>}
    */
-  async initPortionUnit({state, commit, dispatch}) {
+  async fetchPortionUnitFromFire({state, commit, dispatch}) {
     // portionUnitをfireStoreからfetch (portionUnitIdを使う)
     const portionUnit = await fireGetDoc('dataset', state.myApp.dataSet.portionUnitId).catch((err) => {
       throw Error(err)
@@ -1210,7 +1243,7 @@ export const actions = {
       const portionUnitArray = await dispatch('formatPortionUnit', portionUnit)
       commit('updatePortionUnit', portionUnitArray)
     } else {
-      throw new Error('initPortionUnit fail: no data')
+      throw new Error('fetchPortionUnitFromFire fail: no data')
     }
   },
   /**
@@ -1221,8 +1254,8 @@ export const actions = {
    * @param payload 初期値（db名）の指定があれば、これを元に初期化
    * @returns {Promise<void>}
    */
-  async initCropCalendar({state, commit, dispatch}, payload) {
-    if (payload){
+  async fetchCropCalendarFromFire({state, commit, dispatch}, payload) {
+    if (payload) {
       await commit('updateCropCalendarId', payload)
     }
     // cropCalendarをfireStoreからfetch (cropCalendarIdを使う)
@@ -1236,7 +1269,7 @@ export const actions = {
       console.log(cropCalendarArray)
       commit('updateCropCalendar', cropCalendarArray)
     } else {
-      throw new Error('initCropCalendar fail: no data')
+      throw new Error('fetchCropCalendarFromFire fail: no data')
     }
   },
   /**
@@ -1246,7 +1279,7 @@ export const actions = {
    * @param dispatch
    * @returns {Promise<void>}
    */
-  async initQuestions({state, commit, dispatch}) {
+  async fetchQuestionsFromFire({state, commit, dispatch}) {
     // questionsをfireStoreからfetch (questionsIdを使う)
     const questions = await fireGetDoc('dataset', state.myApp.dataSet.questionsId).catch((err) => {
       throw Error(err)
@@ -1257,7 +1290,7 @@ export const actions = {
       const questionsArray = await dispatch('formatQuestions', questions)
       commit('updateQuestions', questionsArray)
     } else {
-      throw new Error('initQuestions fail: no data')
+      throw new Error('fetchQuestionsFromFire fail: no data')
     }
   },
   /**
@@ -1376,7 +1409,7 @@ export const actions = {
    * @returns {Promise<void>}
    */
   async initMenu({state, commit, dispatch}, payload) {
-    let arr = await dispatch('setInitialArray', {key:2, count: payload.count, data: payload.data})
+    let arr = await dispatch('setInitialArray', {key: 2, count: payload.count, data: payload.data})
     commit('updateMenuCases', arr)
   },
   /**
@@ -1404,7 +1437,7 @@ export const actions = {
    * @param payload (key=1:feasibilityCases, 2:menuCases, data=dri/fct, count=繰り返し回数)
    * @returns {*[]}
    */
-  setInitialArray({}, payload){
+  setInitialArray({}, payload) {
     let arr = []
     //feasibilityの場合
     if (Number(payload.key) === 1) {
@@ -1420,7 +1453,7 @@ export const actions = {
       return arr
     }
     //menuの場合
-    if (Number(payload.key) === 2){
+    if (Number(payload.key) === 2) {
       for (let i = 0; i < payload.count; i++) {
         const isTargetSingle = true
         const note = ''
@@ -1442,10 +1475,10 @@ export const actions = {
    * @param payload
    */
   async initFeasibility({state, commit, dispatch}, payload) {
-    const arr = await dispatch('setInitialArray', {key:1, count: payload.count, data: payload.data})
+    const arr = await dispatch('setInitialArray', {key: 1, count: payload.count, data: payload.data})
     commit('updateFeasibilityCases', arr)
   },
-  initCommunityCases(){
+  initCommunityCases() {
 
   },
   /**
@@ -1461,11 +1494,11 @@ export const actions = {
     }
     try {
       await commit('initUser', payload)
-      await dispatch('initFct')
-      await dispatch('initDri')
-      await dispatch('initPortionUnit')
-      await dispatch('initQuestions')
-      await dispatch('initCropCalendar')
+      await dispatch('fetchFctFromFire')
+      await dispatch('fetchDriFromFire')
+      await dispatch('fetchPortionUnitFromFire')
+      await dispatch('fetchQuestionsFromFire')
+      await dispatch('fetchCropCalendarFromFire')
       await dispatch('initMenu', {data: state.myApp.dataSet.dri, count: state.myApp.sceneCount})
       await dispatch('initProdTarget', state.myApp.dataSet.dri)
       await dispatch('initFeasibility', {data: state.myApp.dataSet.dri, count: state.myApp.sceneCount})

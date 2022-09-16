@@ -2,7 +2,7 @@
 import {initializeApp} from "firebase/app"
 import {
   initializeFirestore, CACHE_SIZE_UNLIMITED,
-  enableMultiTabIndexedDbPersistence, doc, getDocFromCache, getDocFromServer
+  enableMultiTabIndexedDbPersistence, doc, getDocFromCache, getDocFromServer, getDocs, collection
 } from "firebase/firestore"
 
 /**
@@ -68,14 +68,25 @@ export const firestoreDb = firestore
 
 export async function fireGetDoc(collectionId, docId) {
   const ref = await doc(firestoreDb, collectionId, docId)
+  console.log('getData from cache')
   const docSnap = await getDocFromCache(ref).catch(async () => {
+    console.log('getData fail: no data in Cache. getData from fireBase')
     return await getDocFromServer(ref)
   })
   if (docSnap.exists()) {
-    console.log('getData from cache')
+    console.log('getData success')
     return docSnap.data()
   } else {
-    console.log('getData fail: no data in Cache')
+    console.log('getData fail: no data in Cache or Server')
     return ''
   }
+}
+
+export async function getFileList(myCollection) {
+  let res = []
+  const querySnapshot = await getDocs(collection(firestoreDb, myCollection));
+  querySnapshot.forEach((item)=>{
+    res.push(item.id)
+  })
+  return res
 }

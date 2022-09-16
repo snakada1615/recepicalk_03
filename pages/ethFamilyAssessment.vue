@@ -172,7 +172,7 @@
           </div>
           <b-row>
             <feasibility-check-component-eth
-              v-if="myFamily.name && selectedNutrient"
+              v-if="myFamily.name && selectedNutrient && myFamily.feasibilityCases[0].prodTarget"
               :my-family="myFamily"
               :my-dri="myApp.dataSet.dri"
               :my-fct="myApp.dataSet.fct"
@@ -804,6 +804,7 @@ export default {
       return JSON.parse(JSON.stringify(this.myApp.dataSet.fct))
     },
     fctFilterByMonth() {
+      console.log(this.myApp.dataSet.cropCalendar)
       if (this.monthValue === -1) {
         return JSON.parse(JSON.stringify(this.myApp.dataSet.fct))
       }

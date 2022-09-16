@@ -130,7 +130,7 @@ export default {
      */
     dataJson: function () {
       if (this.dataCsv.length === 0) {
-        return
+        return {}
       }
       const res = {}
       this.dataCsv.forEach((val) => {
