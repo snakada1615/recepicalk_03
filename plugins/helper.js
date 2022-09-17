@@ -309,7 +309,7 @@ export function getNutritionDemand(target, dri) {
 export function getNutritionDemandList(targetGroup, dri, dietCalkCheck = 0) {
   return targetGroup.map(function (item) {
     //targetGroupの構造が呼び出し元によって異なるため、フラグで切り分けられるように設定
-    if (dietCalkCheck){
+    if (dietCalkCheck) {
       return getNutritionDemand(item.target, dri)
     } else {
       return getNutritionDemand(item, dri)
@@ -442,7 +442,7 @@ export function updatePfc(supply) {
  * @param rating
  * @returns {*}
  */
-export function getPfcScale(rating){
+export function getPfcScale(rating) {
   return rating.map((item) => {
     const res = item.En / 10
     if (res < 0.5) {
@@ -493,6 +493,7 @@ export function getAverageNutritionSupply(nutritionSupplyList) {
     'Fat': supplySum.Fat / count,
   }
 }
+
 /**
  * nutritionDemandGetterの平均値
  * @param nutritionDemandList
@@ -559,7 +560,7 @@ export function getRating(nutritionSupply, nutritionDemand, count) {
  * @returns {*}
  */
 export function getDiversityStatusForTable(menuCases, foodGroup) {
-  if (!Object.keys(menuCases).length){
+  if (!Object.keys(menuCases).length) {
     return {}
   }
   return menuCases.map((foodsTemp, index) => {
@@ -571,7 +572,7 @@ export function getDiversityStatusForTable(menuCases, foodGroup) {
       res[foodItem] = ''
       colorVariant[foodItem] = 'danger'
     })
-    if (foodsTemp.menu.length){
+    if (foodsTemp.menu.length) {
       foodsTemp.menu.forEach((dat1) => {
         if (foodGroup.indexOf(dat1.Group) >= 0) {
           colorVariant[dat1.Group] = 'info'
@@ -593,7 +594,7 @@ export function getDiversityStatus(menuCases, foodGroup) {
       let res = foodGroup.map((groupTemp) => {
         return {[groupTemp]: false}
       })
-      if (foodsTemp.menu.length){
+      if (foodsTemp.menu.length) {
         foodsTemp.menu.forEach((dat1) => {
           const indexTemp = foodGroup.indexOf(dat1.Group)
           if (indexTemp >= 0) {
@@ -625,7 +626,7 @@ export function getFoodGroup(fct) {
  * jsonをCSVに変換
  * key0: [key1: value] 形式 → Array of CSV (val1, val2, val3, val4)
  */
-export function json2Csv (datJson) {
+export function json2Csv(datJson) {
   const commaDelimitedArray = []
   if (datJson) {
     const myKeys = Object.keys(Object.values(datJson)[0])
@@ -652,4 +653,15 @@ export function json2Csv (datJson) {
     }
   })
   return csvText
+}
+
+export function makeToast(vm, message = 'test', options = {}) {
+  vm.$bvToast.toast(message, {
+    title: options.title || 'message',
+    variant: options.variant || null,
+    autoHideDelay: options.autoHideDelay || 5000,
+    appendToast: options.autoHideDelay || true,
+    'no-auto-hide': options.noAutoHide || false,
+    solid: true
+  })
 }

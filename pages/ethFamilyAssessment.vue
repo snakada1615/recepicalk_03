@@ -83,6 +83,7 @@
               :page-id="pageId1"
               :max-page="maxPage"
               :disabled-option="[1,2,3,4,5,6,7,8,9]"
+              :hide-case-info = true
               @update:myFamily="updateMyFamily"
               @update:pageMemo="updatePageMemo"
             />

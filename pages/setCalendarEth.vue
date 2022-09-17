@@ -1,7 +1,6 @@
 <template>
   <b-container>
     <div>
-      aloha
       <b-card
         header="get fileList from firebase"
         header-bg-variant="success"
@@ -43,13 +42,24 @@
               >load
               </b-button>
             </b-overlay>
-            <a hidden>{{busy2}}</a>
-            <b-button
-              variant="info"
-              :disabled="!currentCalendarName"
-              @click="fireSaveCalendar"
-            >use this calendar
-            </b-button>
+
+            <!-- なぜか以下の行を入れないとoerlayが効かない  -->
+            <a hidden>{{ busy2 }}</a>
+            <b-overlay
+              :show="busy3"
+              rounded
+              opacity="0.6"
+              spinner-small
+              spinner-variant="primary"
+              class="d-inline-block"
+            >
+              <b-button
+                variant="info"
+                :disabled="!currentCalendarName"
+                @click="fireSaveCalendar"
+              >use this calendar
+              </b-button>
+            </b-overlay>
           </template>
           <b-form-select
             v-model="currentCalendarName"
@@ -64,12 +74,21 @@
               @click="onNameRegister(newCalendarName)"
             >initialize
             </b-button>
-            <b-button
-              variant="info"
-              :disabled="!stateNewCalendarName || (currentCalendar.length === 0)"
-              @click="fireSaveCalendar"
-            >add this calendar
-            </b-button>
+            <b-overlay
+              :show="busy3"
+              rounded
+              opacity="0.6"
+              spinner-small
+              spinner-variant="primary"
+              class="d-inline-block"
+            >
+              <b-button
+                variant="info"
+                :disabled="!stateNewCalendarName || (currentCalendar.length === 0)"
+                @click="fireSaveCalendar"
+              >add this calendar
+              </b-button>
+            </b-overlay>
           </template>
           <b-form-input
             v-model="newName"
@@ -380,6 +399,7 @@
 <script>
 import JsonViewer from 'vue-json-viewer'
 import {fireGetDoc, getFileList} from "../plugins/firebasePlugin";
+import {makeToast} from "../plugins/helper";
 
 export default {
   layout: 'defaultEth',
@@ -399,6 +419,7 @@ export default {
       ],
       busy: false,
       busy2: false,
+      busy3: false,
       addNewCalendarFlag: false,
       currentCalendarName: '',
       currentCalendar: [],
@@ -505,16 +526,23 @@ export default {
       })
       return res
     },
-    fireSaveCalendar() {
-      this.$store.dispatch('fire/updateCropCalendar', this.currentCalendar)
-      this.$store.dispatch(
+    async fireSaveCalendar() {
+      this.busy3 = true
+      await this.$store.dispatch('fire/updateCropCalendar', this.currentCalendar)
+      await this.$store.dispatch(
         'fire/fireSaveCropCalendar',
         {
           data: this.calendar2JSON(this.currentCalendar),
           docName: this.$store.state.fire.myApp.dataSet.cropCalendarId
         }
       )
-      this.$store.dispatch('fire/fireSaveAppdata')
+      await this.$store.dispatch('fire/fireSaveAppdata')
+      this.busy3 = false
+      makeToast(
+        this,
+        'crop calendar is set to ' + this.$store.state.fire.myApp.dataSet.cropCalendarId,
+        {variant: 'info'}
+      )
     },
     onChangeSwitch() {
       this.currentCalendar.splice(0)

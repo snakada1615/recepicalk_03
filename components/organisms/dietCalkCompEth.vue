@@ -10,7 +10,7 @@
           <template #header>
             <div class="font-weight-bold">Case information</div>
           </template>
-          <b-form-select v-model="pageIdComputed" :options="pageOptions"></b-form-select>
+          <b-form-select v-if="!hideCaseInfo" v-model="pageIdComputed" :options="pageOptions"></b-form-select>
           <div class="d-flex flex-row">
             <b-form-input
               v-model="pageMemo[pageIdComputed]"
@@ -352,6 +352,13 @@ export default {
         return []
       }
     },
+    /**
+     * 冒頭のCase infoを非表示にする（familyCaseの場合）
+     */
+    hideCaseInfo: {
+      type: Boolean,
+      default: false
+    }
   },
   computed: {
     myChartStyles() {
