@@ -69,6 +69,8 @@
 </template>
 <script>
 
+import {makeToast} from "../../plugins/helper";
+
 export default {
   methods: {
     /**
@@ -83,8 +85,9 @@ export default {
     /**
      * myAppをfireStoreに保存
      */
-    fireSaveAppdata() {
-      this.$store.dispatch('fire/fireSaveAppdata')
+    async fireSaveAppdata() {
+      await this.$store.dispatch('fire/fireSaveAppdata')
+      makeToast(this, 'data saved!')
     },
     async resetData() {
       const user = JSON.parse(JSON.stringify(this.$store.state.fire.myApp.user))

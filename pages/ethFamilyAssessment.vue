@@ -83,7 +83,7 @@
               :page-id="pageId1"
               :max-page="maxPage"
               :disabled-option="[1,2,3,4,5,6,7,8,9]"
-              :hide-case-info = true
+              :hide-case-info=true
               @update:myFamily="updateMyFamily"
               @update:pageMemo="updatePageMemo"
             />
@@ -632,11 +632,11 @@ export default {
       return {
         menuCases: [
           {
-            note: '',
+            note: 'current diet',
             menu: vm.myFamily.menuCases[0].menu,
           },
           {
-            note: '',
+            note: 'improved',
             menu: vm.menuUpdated,
           }
         ],
@@ -809,7 +809,7 @@ export default {
         return JSON.parse(JSON.stringify(this.myApp.dataSet.fct))
       }
       const myFilter = this.myApp.dataSet.cropCalendar.filter((item) =>
-        (item[this.monthValue] === '1') || (item[this.monthValue] === '2') )
+        (item[this.monthValue] === '1') || (item[this.monthValue] === '2'))
       const filteredId = myFilter.map((item) => {
         return item.FCT_id
       })
@@ -874,13 +874,12 @@ export default {
 
       //myFamilyを更新
       await this.updateMyFamily(dat)
-    }
-    ,
+    },
     /**
      * fctダイアログのトリガー
      */
     showFctDialogue(index) {
-      if (this.fctFilterByMonth.length === 0){
+      if (this.fctFilterByMonth.length === 0) {
         alert('there is no available crop for this month')
         return
       }

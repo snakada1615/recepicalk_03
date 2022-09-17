@@ -566,7 +566,7 @@ export function getDiversityStatusForTable(menuCases, foodGroup) {
   return menuCases.map((foodsTemp, index) => {
     let res = {}
     let colorVariant = {}
-    res['case'] = 'Case' + (index + 1)
+    res['case'] = foodsTemp.note || 'Case' + (index + 1)
     colorVariant['case'] = 'primary'
     foodGroup.forEach((foodItem) => {
       res[foodItem] = ''
