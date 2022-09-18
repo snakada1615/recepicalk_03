@@ -95,12 +95,26 @@
             :state="stateNewCalendarName"
           ></b-form-input>
         </b-input-group>
+        <b-input-group
+          v-if="currentCalendar.length"
+          class="mb-1 mt-3"
+          prepend="filter"
+        >
+          <b-form-input
+            v-model="filter"
+            type="search"
+            id="filterInput"
+            placeholder="Type to Search"
+          ></b-form-input>
+        </b-input-group>
         <b-table
           v-if="currentCalendar.length"
           striped
           sticky-header
           :items="currentCalendar"
           :fields="fields"
+          :filter="filter"
+          :filter-included-fields="filterOn"
         >
           <!-- A custom formatted footer cell for field '1-12' -->
           <template #cell(1)="data">
@@ -423,6 +437,14 @@ export default {
       addNewCalendarFlag: false,
       currentCalendarName: '',
       currentCalendar: [],
+      /**
+       * フィルターの内容
+       */
+      filter: null,
+      /**
+       * フィルター適用のスイッチ
+       */
+      filterOn: ['crop name'],
       /**
        * `calendar新規作成時の名前
        */

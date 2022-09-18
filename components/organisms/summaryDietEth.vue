@@ -187,8 +187,6 @@ import {
 import pieChart from "../atoms/pieChart";
 import recepiTable from "../molecules/recepiTable";
 
-// TODO: family averageを表示する場合、Averageのみ強調表示にする
-
 export default {
   components: {
     nutritionBar2,

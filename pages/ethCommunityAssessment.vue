@@ -8,7 +8,7 @@
       <b-tabs pills card>
         <b-tab title="add community">
           <b-row class="justify-content-center">
-            <b-col cols="8">
+            <b-col cols="12" lg="8">
               <b-input-group
                 size="sm"
                 prepend="community name"

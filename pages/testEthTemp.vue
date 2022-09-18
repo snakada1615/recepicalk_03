@@ -322,6 +322,7 @@ import summaryDietEth from "../components/organisms/summaryDietEth";
 import pageChanger from "../components/atoms/pageChanger";
 
 export default {
+  layout: 'defaultEth',
   components: {
     driSelectMulti,
     dietCalkCompEth,

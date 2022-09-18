@@ -5,6 +5,7 @@
         striped
         bordered
         small
+        sticky-header
         ref="table"
         :items="itemWeighted"
         :fields="fields"
