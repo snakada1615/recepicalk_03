@@ -6,8 +6,16 @@
       header-bg-variant="success-5"
     >
       <b-tabs pills card>
-        <b-tab title="add community">
-          <b-row class="justify-content-center">
+        <b-tab title="set community">
+          <b-row >
+            <b-col class="d-flex justify-content-end">
+              <b-form-checkbox v-model="addNewCommunityFlag" switch>
+                add new community
+              </b-form-checkbox>
+            </b-col>
+          </b-row>
+
+          <b-row v-if="addNewCommunityFlag" class="justify-content-center">
             <b-col cols="12" lg="8">
               <b-input-group
                 size="sm"
@@ -23,13 +31,12 @@
                     :disabled="!stateCommunityName"
                     :class="{'btn-info':stateCommunityName}"
                     @click="addNewCommunity(newCommunityName, newTarget)"
-                  >add new family
+                  >add new community
                   </b-button>
                 </template>
               </b-input-group>
               <div class="small text-muted mb-2">you have to give unique community name</div>
               <hr>
-              {{ myApp.currentCommunity }}
               <dri-select-multi
                 :driItems="dri"
                 :target="newTarget"
@@ -39,10 +46,9 @@
               ></dri-select-multi>
             </b-col>
           </b-row>
-        </b-tab>
-        <b-tab title="select community" :disabled="communityList.length === 0">
-          <b-row class="justify-content-center border-primary">
-            <b-col cols="8">
+
+          <b-row v-if="!addNewCommunityFlag" class="justify-content-center border-primary">
+            <b-col cols="12" lg="8">
               <b-input-group size="sm" class="mb-2">
                 <template #prepend>
                   <b-input-group-text>
@@ -365,6 +371,10 @@ export default {
       pageId3: 0,
       addCropId: 0,
       maxPage: 10,
+      /**
+       * Communityの新規追加or選択
+       */
+      addNewCommunityFlag: false,
       /**
        * workFlowの何ページ目まで読み込めるかのフラグ
        */
@@ -729,23 +739,23 @@ export default {
       const member = vm.menuCasesFiltered.map((item) => {
         return item.target
       })
-      const menu = vm.menuCasesFiltered.map((item) => {
-        return item.menu
+      const menuCase = vm.menuCasesFiltered.map((item) => {
+        return {'menu': item.menu, 'note': item.note}
       })
 
-      const communitySupply = [vm.currentCommunitySupply]
+      const communitySupply = {'menu': [vm.currentCommunitySupply], 'note':'average'}
       const communityDemand = vm.myCommunity.member
 
       let overallSupply = []
-      overallSupply.push(communitySupply, ...menu)
+      overallSupply.push(communitySupply, ...menuCase)
       let overallDemand = []
       overallDemand.push(communityDemand, ...member)
 
       return {
-        menuCases: overallSupply.map((item, index) => {
+        menuCases: overallSupply.map((item) => {
           return {
-            note: index === 0 ? 'average' : '',
-            menu: item
+            note: item.note,
+            menu: item.menu
           }
         }),
         member: overallDemand,

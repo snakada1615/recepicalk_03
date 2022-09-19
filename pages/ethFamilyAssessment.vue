@@ -6,8 +6,16 @@
       header-bg-variant="success-5"
     >
       <b-tabs card>
-        <b-tab title="add family">
-          <b-row class="justify-content-center">
+        <b-tab title="set family">
+          <b-row >
+            <b-col class="d-flex justify-content-end">
+              <b-form-checkbox v-model="addNewFamilyFlag" switch>
+                add new family
+              </b-form-checkbox>
+            </b-col>
+          </b-row>
+
+          <b-row v-if="addNewFamilyFlag" class="justify-content-center">
             <b-col cols="12" lg="8">
               <b-input-group
                 size="sm"
@@ -39,9 +47,7 @@
               ></dri-select-multi>
             </b-col>
           </b-row>
-        </b-tab>
-        <b-tab title="select family" :disabled="familyList.length === 0">
-          <b-row class="justify-content-center border-primary">
+          <b-row v-if="!addNewFamilyFlag" class="justify-content-center border-primary">
             <b-col cols="12" lg="8">
               <b-input-group size="sm" class="mb-2">
                 <template #prepend>
@@ -354,6 +360,10 @@ export default {
       pageId3: 0,
       addCropId: 0,
       maxPage: 10,
+      /**
+       * 家族の新規追加or選択
+       */
+      addNewFamilyFlag: false,
       /**
        * workFlowの何ページ目まで読み込めるかのフラグ
        */

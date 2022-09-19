@@ -3,7 +3,7 @@
     <b-row>
       <b-col cols="12" lg="6" class="my-1">
         <b-card
-          v-if="sceneCount !== 2"
+          v-if="(sceneCount !== 2) && !isAverageIncluded"
           header-bg-variant="success"
           border-variant="success"
           bg-variant="light"
@@ -18,7 +18,6 @@
               <div v-else>Case {{ pageId }}: {{ myAppComputed.menuCases[pageId - 1].note }}</div>
             </div>
           </b-card>
-          <b-form-select v-model="selectedCaseId" :options="noteList" v-if="myAppComputed"></b-form-select>
         </b-card>
       </b-col>
       <b-col cols="12" lg="6">
@@ -255,21 +254,6 @@ export default {
       })
     },
     /**
-     * 同一グループのidリスト
-     * @returns {*[]}
-     */
-    selectedCase() {
-      if (this.selectedCaseId === -1) {
-        return []
-      }
-      const selectedItem = this.noteList.find((dat) => dat.value === this.selectedCaseId).key
-      return this.noteList.filter((val) => {
-        return val.key === selectedItem
-      }).map((val2) => {
-        return val2.value
-      })
-    },
-    /**
      * 表示するfeasibilityCaseを選択するためのリスト
      * @returns {*[]}
      */
@@ -324,11 +308,6 @@ export default {
         )
       })
       return res
-    },
-    diversityStatusFiltered() {
-      return this.diversityStatus.filter((val, index) => {
-        return this.selectedCase.includes(index)
-      })
     },
     /**
      * menuCasesに含まれるfood Groupから、何種類の食品群が含まれるか判定
@@ -425,10 +404,6 @@ export default {
           }
         ]
       },
-      /**
-       * 選択されたfeasibilityCase
-       */
-      selectedCaseId: -1,
       /**
        * nutritionBar用のproperty：栄養素表示用のlabel
        */
