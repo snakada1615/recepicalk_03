@@ -1,38 +1,30 @@
 <template>
-  <b-container >
-    <b-row>
-      <fct-table-editor
-        :items = fctData
-        @changeFct="updateFct"
-      ></fct-table-editor>
-    </b-row>
+  <b-container>
+    <select-db-from-fire
+      :doc-name.sync="currentCalendarName"
+      db-key="FCT_id"
+      db-filter="fct"
+      @selected="setMyDoc"
+    />
   </b-container>
 </template>
-
 <script>
-import fctTableEditor from "@/components/molecules/FctTableEditor";
+import selectDbFromFire from "../components/organisms/selectDbFromFire";
 
-
-export default{
+export default {
+  layout: 'defaultEth',
   components: {
-    fctTableEditor
+    selectDbFromFire
   },
   data() {
     return {
-      fctData:[],
+      currentCalendarName: '',
     }
-  },
-  async fetch() {
-    this.fctData = JSON.parse(JSON.stringify(this.$store.state.fire.myApp.dataSet.fct))
   },
   methods: {
-    updateFct(val){
-      console.log(val);
-      //FCTの更新をstoreに指示
-      this.$store.dispatch('fire/updateFct',val)
-      //myAppの変更時は、常に setHasDocumentChanged=true をセット
-      this.$store.dispatch('fire/setHasDocumentChanged', true)
+    setMyDoc(doc) {
+      console.log(doc)
     }
-  }
+  },
 }
 </script>
