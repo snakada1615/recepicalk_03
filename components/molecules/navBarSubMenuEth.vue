@@ -21,6 +21,7 @@
             <b-dropdown-item to="/userinfo">user info</b-dropdown-item>
             <b-dropdown-item to="/setCalendarEth">crop calendar</b-dropdown-item>
             <b-dropdown-item to="/foodGroupInfo">about FoodGroup</b-dropdown-item>
+            <b-dropdown-item to="/changeCurrentDataset">change dataset</b-dropdown-item>
           </b-dropdown>
 
         </b-nav-item-dropdown>

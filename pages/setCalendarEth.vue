@@ -526,7 +526,7 @@ export default {
      * @param data
      */
     onCalendarClick(data) {
-      let res = Number(this.currentCalendar[data.index][data.field.key])
+      let res = Number(data.value)
       res += 1
       if (res > 2) {
         res = 0

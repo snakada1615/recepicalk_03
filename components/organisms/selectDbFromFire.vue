@@ -1,136 +1,116 @@
 <template>
   <b-container>
-    <b-card
-      header="get dataset from firebase"
-      header-bg-variant="success"
-      header-text-variant="light"
-      class="my-2"
-    >
-      <b-input-group v-if="showDbFilter" prepend="select data type">
-        <b-form-select
-          v-model="myDbFilter"
-          :options="filterList"
-        ></b-form-select>
-      </b-input-group>
+    <b-input-group v-if="showDbFilter" prepend="select data type">
+      <b-form-select
+        v-model="myDbFilter"
+        :options="filterList"
+      ></b-form-select>
+    </b-input-group>
 
-      <b-input-group class="mt-3" v-if="showButtonGetList" >
-        <b-input-group-prepend>
-          <b-overlay
-            :show="busy"
-            rounded
-            opacity="0.6"
-            spinner-small
-            spinner-variant="primary"
-            class="d-inline-block"
-          >
-            <b-button
-              variant="info"
-              @click="getDocList(myCollectionName)"
-            >get list
-            </b-button>
-          </b-overlay>
-        </b-input-group-prepend>
+    <b-input-group :class="topMargin1" v-if="showButtonGetList">
+      <b-input-group-prepend>
+        <b-overlay
+          :show="busy"
+          rounded
+          opacity="0.6"
+          spinner-small
+          spinner-variant="primary"
+          class="d-inline-block"
+        >
+          <b-button
+            variant="info"
+            @click="getDocList(myCollectionName)"
+          >get list
+          </b-button>
+        </b-overlay>
+      </b-input-group-prepend>
 
-        <b-form-select
-          v-model="myDocName"
-          :options="myListFiltered"
-        ></b-form-select>
+      <b-form-select
+        v-model="myDocName"
+        :options="myListFiltered"
+      ></b-form-select>
 
-        <b-input-group-append>
-          <b-overlay
-            :show="busy2"
-            rounded
-            opacity="0.6"
-            spinner-small
-            spinner-variant="primary"
-            class="d-inline-block"
-          >
-            <b-button
-              variant="gray-200"
-              @click="loadMyDoc(myDocName)"
-            >load
-            </b-button>
-          </b-overlay>
+      <b-input-group-append>
+        <b-overlay
+          :show="busy2"
+          rounded
+          opacity="0.6"
+          spinner-small
+          spinner-variant="primary"
+          class="d-inline-block"
+        >
+          <b-button
+            variant="gray-200"
+            @click="loadMyDoc(myDocName)"
+          >load
+          </b-button>
+        </b-overlay>
 
-          <!-- なぜか以下の行を入れないとoverlayが効かない  -->
-          <a hidden>{{ busy2 }}</a>
-          <b-overlay
-            :show="busy3"
-            rounded
-            opacity="0.6"
-            spinner-small
-            spinner-variant="primary"
-            class="d-inline-block"
-          >
-            <b-button
-              variant="info"
-              :disabled="!myDocName"
-              @click="docSelected(myDocName)"
-            >use this calendar
-            </b-button>
-          </b-overlay>
-        </b-input-group-append>
+        <b-button
+          variant="info"
+          :disabled="!myDocName"
+          @click="docSelected(myDocName)"
+        >use this dataset
+        </b-button>
+      </b-input-group-append>
 
-      </b-input-group>
+    </b-input-group>
 
-      <b-input-group class="mt-3" v-else >
-        <b-input-group-prepend>
-          <b-input-group-text>select</b-input-group-text>
-        </b-input-group-prepend>
+    <b-input-group :class="topMargin1" v-else>
+      <b-input-group-prepend>
+        <b-input-group-text>select</b-input-group-text>
+      </b-input-group-prepend>
 
-        <b-form-select
-          v-model="myDocName"
-          :options="myListFiltered"
-        ></b-form-select>
+      <b-form-select
+        v-model="myDocName"
+        :options="myListFiltered"
+      ></b-form-select>
 
-        <b-input-group-append>
-          <b-overlay
-            :show="busy2"
-            rounded
-            opacity="0.6"
-            spinner-small
-            spinner-variant="primary"
-            class="d-inline-block"
-          >
-            <b-button
-              variant="gray-200"
-              @click="loadMyDoc(myDocName)"
-            >load
-            </b-button>
-          </b-overlay>
+      <b-input-group-append>
+        <b-overlay
+          :show="busy2"
+          rounded
+          opacity="0.6"
+          spinner-small
+          spinner-variant="primary"
+          class="d-inline-block"
+        >
+          <b-button
+            variant="gray-200"
+            @click="loadMyDoc(myDocName)"
+          >load
+          </b-button>
+        </b-overlay>
 
-          <!-- なぜか以下の行を入れないとoverlayが効かない  -->
-          <a hidden>{{ busy2 }}</a>
-          <b-overlay
-            :show="busy3"
-            rounded
-            opacity="0.6"
-            spinner-small
-            spinner-variant="primary"
-            class="d-inline-block"
-          >
-            <b-button
-              variant="info"
-              :disabled="!myDocName"
-              @click="docSelected(myDocName)"
-            >use this calendar
-            </b-button>
-          </b-overlay>
-        </b-input-group-append>
+        <b-button
+          variant="info"
+          :disabled="!myDocName"
+          @click="docSelected(myDocName)"
+        >use this dataset
+        </b-button>
 
-      </b-input-group>
+        <div>
+          <B-button v-b-toggle="componentName" size="sm" variant="light">
+            <b-icon icon="caret-down-square"/>
+          </B-button>
+        </div>
 
-      <b-input-group v-if="showDbKey" prepend="JSON key" class="mt-2">
-        <b-form-input v-model="myDbKey"/>
-      </b-input-group>
+      </b-input-group-append>
 
+    </b-input-group>
+
+    <b-input-group v-if="showDbKey" prepend="JSON key" class="mt-2">
+      <b-form-input v-model="myDbKey"/>
+    </b-input-group>
+
+    <b-collapse :id="componentName" class="mt-2">
       <b-card class="mt-2">
         <json-viewer
           :value="doc2Json"
         />
       </b-card>
+    </b-collapse>
 
-    </b-card>
   </b-container>
 </template>
 
@@ -153,6 +133,13 @@ export default {
       required: true
     },
 
+    /**
+     * コンポーネントの名称（collapseを利用するため必要）
+     */
+    componentName:{
+      type: String,
+      required: true
+    },
     // optional----------------------------------------
     /**
      * documentを絞り込むためのフィルタ
@@ -161,7 +148,10 @@ export default {
       type: String,
       default: ''
     },
-    showButtonGetList:{
+    /**
+     * doc一覧をオプションとして指定する場合
+     */
+    showButtonGetList: {
       type: Boolean,
       default: true
     },
@@ -207,13 +197,20 @@ export default {
     return {
       busy: false,
       busy2: false,
-      busy3: false,
       myDoc: '',
       myList: [],
-      filterList:['fct', 'dri', 'cropCalendar'],
+      filterList: ['fct', 'dri', 'cropCalendar'],
     }
   },
   computed: {
+    topMargin1(){
+      if (this.showDbFilter){
+        return 'mt-3'
+      } else {
+        return 'mt-0'
+      }
+
+    },
     myDocName: {
       get() {
         return this.docName
