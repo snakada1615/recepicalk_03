@@ -658,7 +658,7 @@ export function json2Csv(datJson) {
 export function makeToast(vm, message = 'test', options = {}) {
   vm.$bvToast.toast(message, {
     title: options.title || 'message',
-    variant: options.variant || null,
+    variant: options.variant || 'danger',
     autoHideDelay: options.autoHideDelay || 5000,
     appendToast: options.autoHideDelay || true,
     'no-auto-hide': options.noAutoHide || false,

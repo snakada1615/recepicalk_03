@@ -25,9 +25,6 @@
       <json-viewer
         :value="dataFire"
       />
-      <b-card>
-        {{ dataFire2Csv }}
-      </b-card>
     </b-card>
     <b-card
       header="Load data from CSV and import to firebase"
@@ -117,6 +114,7 @@ import JsonViewer from 'vue-json-viewer'
 import csvImport from '@/components/molecules/csvImport'
 import { firestoreDb } from '~/plugins/firebasePlugin'
 import { json2Csv } from '@/plugins/helper'
+import {makeToast} from "../../plugins/helper";
 
 export default {
   components: {
@@ -278,7 +276,8 @@ export default {
         throw error
       }).then(() => {
         // eslint-disable-next-line no-console
-        console.log('import complete: ' + this.dbName)
+        console.log('import complete: ' + myDoc)
+        makeToast(this, myDoc + ' have added to fireBase')
       })
     },
     /**
@@ -290,6 +289,7 @@ export default {
       await getDoc(ref).then((doc) => {
         if (doc.exists()) {
           this.dataFire = doc.data()
+          makeToast(this, myDoc + ' have loaded from fireBase')
         } else {
           alert('id does not match')
         }
@@ -301,6 +301,7 @@ export default {
       querySnapshot.forEach((doc) => {
         this.myList.push(doc.id)
       })
+      makeToast(this,  'fetching file list completed')
     },
     outputCsv (str) {
       const blob = new Blob([str], { type: 'text/csv' }) // 配列に上記の文字列(str)を設定
