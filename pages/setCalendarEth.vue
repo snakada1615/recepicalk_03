@@ -482,6 +482,9 @@ export default {
       return this.newName.length > 4 && !this.myListFiltered.includes(this.newCalendarName)
     },
   },
+  created() {
+
+  },
   methods: {
     async getFileList(myCollection) {
       this.busy = true

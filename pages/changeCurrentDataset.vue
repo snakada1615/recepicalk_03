@@ -22,6 +22,7 @@
         />
       </b-card>
     </div>
+
   </b-container>
 </template>
 <script>
@@ -32,7 +33,7 @@ import {makeToast} from "../plugins/helper";
 export default {
   layout: 'defaultEth',
   components: {
-    selectDbFromFire
+    selectDbFromFire,
   },
   async asyncData() {
     const queryResult = await getFileList('dataset')

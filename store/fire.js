@@ -43,7 +43,8 @@ export const state = () => ({
       organization: '',
       title: '',
       uid: '',
-      phoneNumber: ''
+      phoneNumber: '',
+      userStatus: 'normal'
     },
     /**
      * 利用するデータセット：fctとdri
@@ -341,6 +342,7 @@ export const mutations = {
     state.myApp.user.subnational3 = ''
     state.myApp.user.organization = ''
     state.myApp.user.title = ''
+    state.myApp.user.userStatus = 'normal'
   },
   /**
    * user.Uidを更新

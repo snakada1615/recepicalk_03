@@ -34,6 +34,27 @@
             placeholder="Enter your role in the organization"/>
         </b-col>
       </b-row>
+      <b-row>
+        <b-col cols="3">user type</b-col>
+        <b-col cols="9">
+          <b-form-radio-group
+            v-model="user.userType"
+            :options="userOptions"
+            button-variant="outline-primary"
+            size="sm"
+            buttons
+            @input="onUserTypeChange"
+          />
+        </b-col>
+      </b-row>
+      <pass-check-dialogue
+        :password="myPass"
+        modal-name="passCheckBox"
+        :show-modal.sync="openPassCheckFlag"
+        text-description="you need password to have admin status"
+        @correctInput="onCorrectInput"
+        @wrongInput="onWrongInput"
+      />
     </b-card>
   </b-container>
 </template>
@@ -45,11 +66,14 @@
  */
 import regionSelect from "@/components/atoms/regionSelect";
 import countryNames from "@/components/atoms/countryNames";
+import passCheckDialogue from "../components/atoms/passCheckDialogue";
+import {makeToast} from "../plugins/helper";
 
 export default {
   components: {
     regionSelect,
-    countryNames
+    countryNames,
+    passCheckDialogue
   },
   data() {
     return {
@@ -71,10 +95,21 @@ export default {
        * 初回読み込みかどうかチェック
        */
       isInitialLoad: '',
+      /**
+       * userの権限設定
+       */
+      userOptions: [
+        {text: 'normal user', value: 'normal'},
+        {text: 'admin user', value: 'admin'},
+      ],
+      userType: 'normal',
+      openPassCheckFlag: false,
+      myPass: 'ifna2022'
     }
   },
   created() {
     this.user = JSON.parse(JSON.stringify(this.$store.state.fire.myApp.user))
+    this.user.userType = this.$store.state.fire.myApp.user.userType || 'normal'
     this.isInitialLoad = true
   },
   watch:{
@@ -93,5 +128,19 @@ export default {
       }
     }
   },
+  methods: {
+    onUserTypeChange(val){
+      if (val === 'admin'){
+        this.openPassCheckFlag = true
+      }
+    },
+    onWrongInput(){
+      alert('please check admin password')
+      this.userType = 'normal'
+    },
+    onCorrectInput(){
+      makeToast(this,'admin status have set')
+    }
+  }
 }
 </script>

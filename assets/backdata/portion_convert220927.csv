@@ -1,0 +1,115 @@
+﻿id,FCT_id,unit_weight,count_method,crop name
+1,20040,36,coffee_cup,Oats 
+2,20041,48,coffee_cup,Hulbat/Abish- Fanugreek
+3,20041,48,coffee_cup,Dagusa-Eleusine coracana
+4,20042,56,one_serving,Pasta 
+5,20044,80,medium_size,Anchote
+6,20044,50,small_size,Anchote
+7,10405,200,glass,"Milk, cow, whole, 3.5 % fat"
+8,10407,200,glass,"Milk, goat"
+9,10411,25,table_spoon,"Cheese, goat, hard type"
+10,10426,5,teaspoon,"Butter, from cow-s milk "
+11,10427,25,table_spoon,Coconut oil
+12,10428,25,table_spoon,Groundnut oil
+13,10429,25,table_spoon,"Palm oil, red"
+14,10430,25,table_spoon,Cottonseed oil
+15,10432,25,table_spoon,"Palm oil, refined"
+16,10434,25,table_spoon,Soya oil
+17,10435,25,table_spoon,Vegetable oil
+18,20042,200,glass,camel milk 
+19,8354,35,small_size,"Egg, chicken"
+20,20043,10,teaspoon, sun flower seeds oil 
+21,20044,5,teaspoon (minced),Camel Meat 
+22,20045,5,teaspoon (minced),Lamb meat(Motten raw)
+23,7292,5,teaspoon (minced),"Beef, meat, 15-20  % fat, boneless"
+24,7293,5,teaspoon (minced),"Chicken, dark meat"
+25,7295,5,teaspoon (minced),"Pork, meat, approx. 40 % fat, boneless"
+26,7326,5,teaspoon (minced),"Chicken, light meat, flesh and skin"
+27,7336,5,teaspoon (minced),"Goat, meat"
+28,9375,900,medium_size (20cm),Catfish
+29,9398,40,small_size (13cm),Tilapia
+30,9398,100,large_size (18cm),Tilapia
+31,20022,5,teaspoon (minced),"Goat meat, dried"
+32,1004,58,coffee_cup,"Maize, white"
+33,1034,45,coffee_cup,"Rice, brown"
+34,1037,45,coffee_cup,"Rice, white"
+35,1039,58,coffee_cup,Sorghum
+36,1043,45,half _coffee_cup,Wheat flour
+37,1045,100,medium_size,Bread white
+38,1057,55,half_coffe_cup,"Maize, white, flour of whole grain"
+39,1072,45,half_coffe_cup,"Sorghum, flour, degermed"
+40,2077,160,nuckle_size,"Cassava, tuber"
+41,2078,175,nuckle_size,"Cassava, tuber, dried"
+42,2080,45,half_coffe_cup,Cassava flour
+43,2083,80,medium_size,Potato
+44,2083,50,small_size,Potato
+45,10006,310,medium_size,Injera (teff)
+46,10006,60,1/5 medium_size,Injera (teff)
+47,20003,50,coffee_cup,Barley
+48,20007,45,half_coffe_cup,Teff flour
+49,3114,30,one handful,"Cowpea, dried"
+50,3118,30,one handful,"Soya bean, dried"
+51,3132,30,one handful,"Beans, white, dried"
+52,3134,30,one handful,"Broad beans, dried"
+53,3140,30,one handful,"Lentils, dried"
+54,6272,25,one handful,Groundnut
+55,6287,45,half_coffe_cup,"Groundnut flour, with fat"
+56,20005,30,one handful,"Haricot beans, red"
+57,20006,30,one handful,"Haricot beans, white"
+58,20014,30,one handful,"Chick peas, red"
+59,20018,30,one handful,Mung bean / Masho
+60,20021,30,one handful,Faba bean
+61,20033,30,one handful,"Chick peas, white"
+62,20035,30,one handful,Kidniey bean
+63,11445,15,medium_size (juica),"Juice, lemon, unsweetened"
+64,4155,13,one_leaf,Cabbage
+65,4168,40,medium_size,Onion
+66,4171,30,medium_size,"Tomato, red"
+67,5222,100,medium_size,"Avocado, "
+68,5222,50,1/2 medium_size,"Avocado, "
+69,5233,35,medium_size,Lemon
+70,5237,35,one_slice,"Pineapple, "
+71,20017,13,leave,Kale(yabesha gomen)
+72,2085,130,medium_size,"Sweet potato, deep yellow"
+73,2085,60,small_size,"Sweet potato, deep yellow"
+74,4154,120,two-hands,Okra leaves
+75,4156,30,medium_size,Carrot
+76,4156,120,large_size,Carrot
+77,4156,15,small_size,Carrot
+78,4154,60,single-hand,Okra leaves
+79,4158,120,two-hands,"Cassava, leaves"
+80,4158,60,single-hand,"Cassava, leaves"
+81,4160,120,two-hands,"Cowpea, leaves"
+82,4160,60,single-hand,"Cowpea, leaves"
+83,4163,120,two-hands,Eggplant leaves
+84,4163,60,single-hand,Eggplant leaves
+85,4170,120,two-hands,"Taro, leaves"
+86,4170,60,single-hand,"Taro, leaves"
+87,4173,120,two-hands,Amaranth leaves
+88,4173,60,single-hand,Amaranth leaves
+89,4181,120,two-hands,"Cowpea leaves, dried"
+90,4201,10,slice,"Pumpkin, squash"
+91,4181,60,single-hand,"Cowpea leaves, dried"
+92,4205,120,two-hands,"Pumpkin leaves, dried"
+93,4205,60,single-hand,"Pumpkin leaves, dried"
+94,4209,120,two-hands,"Sweet potato, leaves"
+95,4209,60,single-hand,"Sweet potato, leaves"
+96,5234,250,medium_size,"Mango, orange "
+97,5234,125,1/2 medium_size,"Mango, orange "
+98,5236,240,small_size,"Papaya, fruit, ripe"
+99,5236,60,1/4 small_size,"Papaya, fruit, ripe"
+100,5236,75,medium_slice,"Papaya, fruit, ripe"
+101,5247,50,medium_size,"Banana, yellow "
+102,5247,25,1/2 medium_size,"Banana, yellow "
+103,1043,5,teaspoon,Wheat flour
+104,1057,5,teaspoon,"Maize, white, flour of whole grain"
+105,1072,5,teaspoon,"Sorghum, flour, degermed"
+106,2080,5,teaspoon,Cassava flour
+107,20007,5,teaspoon,Teff flour
+108,6287,5,teaspoon,"Groundnut flour, with fat"
+109,1043,10,medium_table_spoon,Wheat flour
+110,1057,10,medium_table_spoon,"Maize, white, flour of whole grain"
+111,1072,10,medium_table_spoon,"Sorghum, flour, degermed"
+112,2080,10,medium_table_spoon,Cassava flour
+113,20007,10,medium_table_spoon,Teff flour
+114,6287,10,medium_table_spoon,"Groundnut flour, with fat"
