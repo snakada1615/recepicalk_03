@@ -1,15 +1,18 @@
 <template>
   <b-container>
     <b-button
-      @click="register"
-      variant="primary"
-      :disabled="!inputValidate"
-    >register</b-button>
-    <b-button
       @click="login"
       variant="primary"
       :disabled="!inputValidate"
     >login</b-button>
+    <b-button
+      to="/registUser"
+      variant="info"
+    >register</b-button>
+    <b-button
+      to="/userInfo"
+      variant="info"
+    >edit current user</b-button>
     <b-button
       @click="logOut"
       variant="warning"

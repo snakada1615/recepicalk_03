@@ -1,6 +1,11 @@
 <template>
   <b-container>
-    <b-card>
+    <b-card
+      header="edit current user"
+      header-bg-variant="success"
+      header-text-variant="light"
+      class="my-2"
+    >
       <b-row class="my-1">
         <b-col cols="3">displayName</b-col>
         <b-col cols="9">
