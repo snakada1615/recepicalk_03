@@ -44,7 +44,7 @@ export const state = () => ({
       title: '',
       uid: '',
       phoneNumber: '',
-      userStatus: 'normal'
+      userType: 'normal'
     },
     /**
      * 利用するデータセット：fctとdri
@@ -147,6 +147,10 @@ export const state = () => ({
      */
     foodDictionaryId: 'foodDictionary_eth',
   },
+  /**
+   * admin登録に必要なパスワード
+   */
+  adminPass: 'nfa2022',
   /**
    * ログイン状態のフラグ
    */
@@ -325,6 +329,7 @@ export const mutations = {
     state.myApp.user.subnational3 = payload.subnational3 || ''
     state.myApp.user.organization = payload.organization || ''
     state.myApp.user.title = payload.title || ''
+    state.myApp.user.userType = payload.userType || ''
   },
   /**
    * ユーザー情報をfireAuthから得たログイン情報に基づいて初期化する
@@ -342,7 +347,7 @@ export const mutations = {
     state.myApp.user.subnational3 = ''
     state.myApp.user.organization = ''
     state.myApp.user.title = ''
-    state.myApp.user.userStatus = 'normal'
+    state.myApp.user.userType = 'normal'
   },
   /**
    * user.Uidを更新
@@ -1110,6 +1115,21 @@ export const actions = {
       needInitialization = true
     }
 
+    //ETH研修向け暫定措置：questionデータベースを強制的にquestions_ethに変更してデータ更新
+    //2022年10月30日までの限定機能
+    //**********暫定措置、要削除***********
+    //**********暫定措置、要削除***********
+    //**********暫定措置、要削除***********
+    //**********暫定措置、要削除***********
+    if ((state.myApp.dataSet.portionUnitId !== 'portion_0927') && (current < limit)) {
+      console.log('found some error and initialize portion unit')
+      //guestionsIdをstoreに保存
+      await dispatch('updatePortionUnitId', 'portion_0927')
+      //questionIdに基づいてfctを初期化（firestoreからfetch → storeに保存）
+      await dispatch('fetchPortionUnitFromFire')
+      needInitialization = true
+    }
+
     //familyCasesの新規追加
     if (state.myApp.familyCases === undefined) {
       console.log('found error and add familyCases')
@@ -1680,5 +1700,31 @@ export const actions = {
       myAppWatcher.feasibilityCases[payload.toId - 100 * (toRange + 1)].note = note
     }
     dispatch('updateMyApp', myAppWatcher)
+  },
+  /**
+   * userの所属地域が特定の範囲に合致するか確認
+   * @param state
+   * @param payload
+   * @returns {boolean}
+   */
+  checkUserRegion({state}, payload) {
+    let res1 = true
+    let res2 = true
+    let res3 = true
+    let res4 = true
+
+    if (payload.country) {
+      res1 = (state.myApp.user.country === payload.country)
+    }
+    if (payload.subnational1) {
+      res2 = (state.myApp.user.subnational1 === payload.subnational1)
+    }
+    if (payload.subnational2) {
+      res3 = (state.myApp.user.subnational2 === payload.subnational2)
+    }
+    if (payload.subnational3) {
+      res4 = (state.myApp.user.subnational3 === payload.subnational3)
+    }
+    return (res1 && res2 && res3 && res4)
   }
 }

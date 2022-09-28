@@ -7,11 +7,13 @@
     >login</b-button>
     <b-button
       to="/registUser"
-      variant="info"
+      variant="info-2"
+      class="text-white"
     >register</b-button>
     <b-button
       to="/userInfo"
-      variant="info"
+      variant="info-2"
+      class="text-white"
     >edit current user</b-button>
     <b-button
       @click="logOut"

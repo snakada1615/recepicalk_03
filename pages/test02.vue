@@ -1,97 +1,33 @@
 <template>
   <b-container>
-    <div v-for="(item, index) in myDataSet" :key="index">
-      <b-card
-        :header="item.text"
-        header-bg-variant="success"
-        header-text-variant="light"
-        class="my-2"
-      >
-        <div >
-          current dataset: <span class="text-danger font-weight-bold">{{originalDocName[index]}}</span>
-        </div>
-        <select-db-from-fire
-          :component-name="'collapse-' + index"
-          :doc-name.sync="item.docName"
-          :db-key="item.key"
-          :db-filter="item.filter"
-          :db-list="docListOriginal"
-          :show-button-get-list="false"
-          @selected="setMyDoc"
-        />
-      </b-card>
-    </div>
+    <country-names :key1.sync="country"/>
+    {{country}}:{{myResult}}
+    <b-button @click="onClick">test</b-button>
   </b-container>
 </template>
 <script>
-import selectDbFromFire from "../components/organisms/selectDbFromFire";
-import {getFileList} from "../plugins/firebasePlugin";
+
+import countryNames from "../components/atoms/countryNames";
 
 export default {
-  layout: 'defaultEth',
   components: {
-    selectDbFromFire
-  },
-  async asyncData() {
-    const queryResult = await getFileList('dataset')
-    return {
-      docListOriginal: queryResult
-    }
-  },
-  created() {
-    this.myDataSet[0].docName = this.$store.state.fire.myApp.dataSet.fctId
-    this.myDataSet[1].docName = this.$store.state.fire.myApp.dataSet.driId
-    this.myDataSet[2].docName = this.$store.state.fire.myApp.dataSet.portionUnitId
-    this.myDataSet[3].docName = this.$store.state.fire.myApp.dataSet.questionsId
-    this.myDataSet[4].docName = this.$store.state.fire.myApp.dataSet.cropCalendarId
-    this.originalDocName.push(this.$store.state.fire.myApp.dataSet.fctId)
-    this.originalDocName.push(this.$store.state.fire.myApp.dataSet.driId)
-    this.originalDocName.push(this.$store.state.fire.myApp.dataSet.portionUnitId)
-    this.originalDocName.push(this.$store.state.fire.myApp.dataSet.questionsId)
-    this.originalDocName.push(this.$store.state.fire.myApp.dataSet.cropCalendarId)
+    countryNames
   },
   data() {
     return {
-      currentCalendarName: '',
-      originalDocName: [],
-      myDataSet: [
-        {
-          key: 'FCT_id',
-          filter: 'fct_',
-          docName: '',
-          text: 'food composition table'
-        },
-        {
-          key: 'id',
-          filter: 'dri_',
-          docName: '',
-          text: 'nutrition requirement'
-        },
-        {
-          key: 'id',
-          filter: 'portion_',
-          docName: '',
-          text: 'food weight measurement unit'
-        },
-        {
-          key: 'id',
-          filter: 'question_',
-          docName: '',
-          text: 'question for feasiblity assessment'
-        },
-        {
-          key: 'FCT_id',
-          filter: 'cropCalendar',
-          docName: '',
-          text: 'crop calendar'
-        },
-      ]
+      country: '',
+      myResult: false
     }
   },
   methods: {
-    setMyDoc(doc) {
-      console.log(doc)
+    onClick(){
+      this.myResult = this.checkRegion()
+    },
+    checkRegion() {
+      return this.$store.dispatch('fire/checkUserRegion', {
+        country: this.country
+      })
     }
-  },
+  }
 }
 </script>

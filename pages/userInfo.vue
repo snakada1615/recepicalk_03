@@ -9,7 +9,7 @@
       <b-row class="my-1">
         <b-col cols="3">displayName</b-col>
         <b-col cols="9">
-          {{user.displayName}}
+          {{ user.displayName }}
         </b-col>
       </b-row>
       <b-row class="my-1">
@@ -52,6 +52,7 @@
           />
         </b-col>
       </b-row>
+      {{isInitialLoad}}
       <pass-check-dialogue
         :password="myPass"
         modal-name="passCheckBox"
@@ -85,21 +86,22 @@ export default {
       /**
        * state.fire.myApp.userのクローン
        */
-      user:{
+      user: {
         displayName: '',
         country: '',
         organization: '',
         title: '',
         uid: '',
         phoneNumber: '',
-        subnational1:'',
-        subnational2:'',
-        subnational3:'',
+        subnational1: '',
+        subnational2: '',
+        subnational3: '',
+        userType: 'normal'
       },
       /**
        * 初回読み込みかどうかチェック
        */
-      isInitialLoad: '',
+      isInitialLoad: false,
       /**
        * userの権限設定
        */
@@ -109,20 +111,21 @@ export default {
       ],
       userType: 'normal',
       openPassCheckFlag: false,
-      myPass: 'ifna2022'
+      myPass: ''
     }
   },
   created() {
     this.user = JSON.parse(JSON.stringify(this.$store.state.fire.myApp.user))
     this.user.userType = this.$store.state.fire.myApp.user.userType || 'normal'
     this.isInitialLoad = true
+    this.myPass = this.$store.state.fire.adminPass
   },
-  watch:{
-    user:{
+  watch: {
+    user: {
       deep: true,
       async handler() {
         //初回読み込み時は何もしない（フラグを変更するのみ）
-        if (this.isInitialLoad){
+        if (this.isInitialLoad) {
           this.isInitialLoad = false
           return
         }
@@ -134,17 +137,22 @@ export default {
     }
   },
   methods: {
-    onUserTypeChange(val){
-      if (val === 'admin'){
+    onUserTypeChange(val) {
+      if (val === 'admin') {
         this.openPassCheckFlag = true
       }
     },
-    onWrongInput(){
+    onWrongInput() {
       alert('please check admin password')
       this.userType = 'normal'
     },
-    onCorrectInput(){
-      makeToast(this,'admin status have set')
+    async onCorrectInput() {
+      console.log(this.user)
+      //storeのアップデート
+      await this.$store.dispatch('fire/updateUser', this.user)
+      //userの変更時は、常に setHasDocumentChanged=true をセット
+      await this.$store.dispatch('fire/setHasDocumentChanged', true)
+      makeToast(this, 'admin status have set')
     }
   }
 }

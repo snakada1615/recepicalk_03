@@ -140,7 +140,7 @@ export default {
         'registration error: username already in use'
       ],
       openPassCheckFlag: false,
-      myPass: 'ifna2022'
+      myPass: ''
     }
   },
   computed: {
@@ -153,6 +153,9 @@ export default {
     inputValidate() {
       return this.statePass && this.stateName
     },
+  },
+  created() {
+    this.myPass = this.$store.state.fire.adminPass
   },
   methods: {
     togglePass() {
