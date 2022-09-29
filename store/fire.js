@@ -8,6 +8,7 @@ import {
 } from "firebase/auth";
 import {fireGetDoc, firestoreDb} from "~/plugins/firebasePlugin";
 import {doc, setDoc} from "firebase/firestore";
+import {checkUserRegion} from "../plugins/helper";
 
 /*
 function MenuItem(id, Group, Name, En, Pr, Va, Fe, Wt) {
@@ -26,7 +27,6 @@ function Target(id, count) {
   this.count = count
 }
 */
-
 
 export const state = () => ({
   myApp: {
@@ -97,7 +97,44 @@ export const state = () => ({
       /**
        * cropCalendarのデータ
        */
-      cropCalendar: []
+      cropCalendar: [],
+      /*
+             * 以下の構造
+             searchReg: {
+              country:'',
+              subnational1: '',
+              subnational2: '',
+              subnational3: '',
+            },
+             setData:{
+              fctId: '',
+              driId: '',
+              portionUnitId: '',
+              questionsId: '',
+              cropCalendarId: '',
+            }
+      */
+      /**
+       * 上記の構造をとなる
+       */
+      forcedUpdateInfo: [
+        //Eth限定のデータセット
+        {
+          searchReg: {
+            country:'Ethiopia',
+            subnational1: '',
+            subnational2: '',
+            subnational3: '',
+          },
+          setData:{
+            fctId: 'fct_eth0729',
+            driId: '',
+            portionUnitId: 'portion_0927',
+            questionsId: 'question_eth2',
+            cropCalendarId: '',
+          }
+        },
+      ],
     },
     /**
      * シナリオの数（各シナリオに10の食事パターンが存在）
@@ -1083,53 +1120,6 @@ export const actions = {
       needInitialization = true
     }
 
-    //ETH研修向け暫定措置：fctデータベースを強制的にfct_ethに変更してデータ更新
-    //2022年10月30日までの限定機能
-    //**********暫定措置、要削除***********
-    //**********暫定措置、要削除***********
-    //**********暫定措置、要削除***********
-    //**********暫定措置、要削除***********
-    const current = new Date()
-    const limit = new Date(2022, 10, 30)
-    if ((state.myApp.dataSet.fctId !== 'fct_eth0729') && (current < limit)) {
-      console.log('found some error and initialize FCT')
-      //fctNameをstoreに保存
-      await dispatch('updateFctId', 'fct_eth0729')
-      //fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
-      await dispatch('fetchFctFromFire')
-      needInitialization = true
-    }
-
-    //ETH研修向け暫定措置：questionデータベースを強制的にquestions_ethに変更してデータ更新
-    //2022年10月30日までの限定機能
-    //**********暫定措置、要削除***********
-    //**********暫定措置、要削除***********
-    //**********暫定措置、要削除***********
-    //**********暫定措置、要削除***********
-    if ((state.myApp.dataSet.questionsId !== 'question_eth2') && (current < limit)) {
-      console.log('found some error and initialize feasibility questions')
-      //guestionsIdをstoreに保存
-      await dispatch('updateQuestionsId', 'question_eth2')
-      //questionIdに基づいてfctを初期化（firestoreからfetch → storeに保存）
-      await dispatch('fetchQuestionsFromFire')
-      needInitialization = true
-    }
-
-    //ETH研修向け暫定措置：questionデータベースを強制的にquestions_ethに変更してデータ更新
-    //2022年10月30日までの限定機能
-    //**********暫定措置、要削除***********
-    //**********暫定措置、要削除***********
-    //**********暫定措置、要削除***********
-    //**********暫定措置、要削除***********
-    if ((state.myApp.dataSet.portionUnitId !== 'portion_0927') && (current < limit)) {
-      console.log('found some error and initialize portion unit')
-      //guestionsIdをstoreに保存
-      await dispatch('updatePortionUnitId', 'portion_0927')
-      //questionIdに基づいてfctを初期化（firestoreからfetch → storeに保存）
-      await dispatch('fetchPortionUnitFromFire')
-      needInitialization = true
-    }
-
     //familyCasesの新規追加
     if (state.myApp.familyCases === undefined) {
       console.log('found error and add familyCases')
@@ -1165,6 +1155,96 @@ export const actions = {
     if (needInitialization) {
       await dispatch('fireSaveAppdata')
       await this.$router.push('/')
+    }
+  },
+  /**
+   * 特定の国・地域に対して強制的に基本データを指定
+   * @param dispatch
+   * @param state
+   * @returns {Promise<void>}
+   */
+  async forcedUpdate({dispatch, state}) {
+    // forcedUpdateInfoが存在しなければ終了
+    if (!state.myApp.dataSet.forcedUpdateInfo) {
+      return
+    }
+
+    // forcedUpdateInfoの値がblank/nullの場合は終了
+    if (Array.isArray(state.myApp.dataSet.forcedUpdateInfo) && !state.myApp.dataSet.forcedUpdateInfo.length) {
+      return
+    }
+
+    //現在のuserが合致している検索条件を抽出
+    const myUser = state.myApp.user
+    let filtered = state.myApp.dataSet.forcedUpdateInfo.filter((item) => {
+      return checkUserRegion(myUser, item.searchReg)
+    })
+
+    //一つも合致していない場合は終了
+    if (!filtered.length) {
+      return
+    }
+
+    //複数合致している場合は最もdeepな検索条件を抽出
+    let maxIndex = 0
+    if (filtered.length > 0) {
+      const depth = filtered.map((item2) => {
+        let count = 0
+        if (item2.country) {
+          count += 1
+        }
+        if (item2.subnational1) {
+          count += 1
+        }
+        if (item2.subnational2) {
+          count += 1
+        }
+        if (item2.subnational3) {
+          count += 1
+        }
+        return count
+      })
+      const maxDepth = depth.reduce((a, b) => {
+        return Math.max(a, b)
+      })
+      maxIndex = depth.indexOf(maxDepth)
+    }
+
+    //指定されたdocument-Idでデータ更新
+    let needInitialization = false
+    const forcedDatasets = filtered[maxIndex].setData
+    if (forcedDatasets.fctId && state.myApp.dataSet.fctId !== forcedDatasets.fctId) {
+      //fctNameをstoreに保存
+      await dispatch('updateFctId', forcedDatasets.fctId)
+      //fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
+      await dispatch('fetchFctFromFire')
+      needInitialization = true
+    }
+    if (forcedDatasets.driId && state.myApp.dataSet.driId !== forcedDatasets.driId) {
+      //fctNameをstoreに保存
+      await dispatch('updateDriId', forcedDatasets.driId)
+      //fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
+      await dispatch('fetchDriFromFire')
+      needInitialization = true
+    }
+    if (forcedDatasets.portionUnitId && state.myApp.dataSet.portionUnitId !== forcedDatasets.portionUnitId) {
+      //fctNameをstoreに保存
+      await dispatch('updatePortionUnitId', forcedDatasets.portionUnitId)
+      //fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
+      await dispatch('fetchPortionUnitFromFire')
+      needInitialization = true
+    }
+    if (forcedDatasets.cropCalendarId && state.myApp.dataSet.cropCalendarId !== forcedDatasets.cropCalendarId) {
+      //fctNameをstoreに保存
+      await dispatch('updatePortionUnitId', forcedDatasets.cropCalendarId)
+      //fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
+      await dispatch('fetchCropCalendarFromFire')
+      needInitialization = true
+    }
+
+    if (needInitialization) {
+      await dispatch('fireSaveAppdata')
+      await this.$router.push('/startPageEth')
     }
   },
   /**
@@ -1701,30 +1781,4 @@ export const actions = {
     }
     dispatch('updateMyApp', myAppWatcher)
   },
-  /**
-   * userの所属地域が特定の範囲に合致するか確認
-   * @param state
-   * @param payload
-   * @returns {boolean}
-   */
-  checkUserRegion({state}, payload) {
-    let res1 = true
-    let res2 = true
-    let res3 = true
-    let res4 = true
-
-    if (payload.country) {
-      res1 = (state.myApp.user.country === payload.country)
-    }
-    if (payload.subnational1) {
-      res2 = (state.myApp.user.subnational1 === payload.subnational1)
-    }
-    if (payload.subnational2) {
-      res3 = (state.myApp.user.subnational2 === payload.subnational2)
-    }
-    if (payload.subnational3) {
-      res4 = (state.myApp.user.subnational3 === payload.subnational3)
-    }
-    return (res1 && res2 && res3 && res4)
-  }
 }

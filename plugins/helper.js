@@ -665,3 +665,30 @@ export function makeToast(vm, message = 'test', options = {}) {
     solid: true
   })
 }
+
+/**
+ * userの所属地域が特定の範囲に合致するか確認
+ * @param currentUser
+ * @param searchReg
+ * @returns {boolean}
+ */
+export function checkUserRegion(currentUser, searchReg) {
+  let res1 = true
+  let res2 = true
+  let res3 = true
+  let res4 = true
+
+  if (searchReg.country) {
+    res1 = (currentUser.country === searchReg.country)
+  }
+  if (searchReg.subnational1) {
+    res2 = (currentUser.subnational1 === searchReg.subnational1)
+  }
+  if (searchReg.subnational2) {
+    res3 = (currentUser.subnational2 === searchReg.subnational2)
+  }
+  if (searchReg.subnational3) {
+    res4 = (currentUser.subnational3 === searchReg.subnational3)
+  }
+  return (res1 && res2 && res3 && res4)
+}

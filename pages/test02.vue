@@ -1,13 +1,14 @@
 <template>
   <b-container>
     <country-names :key1.sync="country"/>
-    {{country}}:{{myResult}}
-    <b-button @click="onClick">test</b-button>
+    {{country}}:{{checkRegion}}
+    <b-button >test</b-button>
   </b-container>
 </template>
 <script>
 
 import countryNames from "../components/atoms/countryNames";
+import {checkUserRegion} from "../plugins/helper";
 
 export default {
   components: {
@@ -19,15 +20,14 @@ export default {
       myResult: false
     }
   },
-  methods: {
-    onClick(){
-      this.myResult = this.checkRegion()
-    },
+  computed: {
     checkRegion() {
-      return this.$store.dispatch('fire/checkUserRegion', {
+      return checkUserRegion(this.$store.state.fire.myApp.user, {
         country: this.country
       })
     }
+  },
+  methods: {
   }
 }
 </script>
