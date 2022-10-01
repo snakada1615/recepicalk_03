@@ -2,10 +2,10 @@
   <b-container>
     <b-card v-if="regionObj" class="border-0">
       <b-row>
-        <b-col cols="2">
+        <b-col cols="2" sm="3">
           <div>{{label1}}</div>
         </b-col>
-        <b-col cols="10">
+        <b-col cols="10" sm="9">
           <b-form-select
             v-if="regionObj"
             :value="key1Temp"
@@ -15,10 +15,10 @@
         </b-col>
       </b-row>
       <b-row>
-        <b-col cols="2">
+        <b-col cols="2" sm="3">
           <div>{{label2}}</div>
         </b-col>
-        <b-col cols="10">
+        <b-col cols="10" sm="9">
           <b-form-select
             v-if="regionObj"
             :value="key2Temp"
@@ -28,10 +28,10 @@
         </b-col>
       </b-row>
       <b-row>
-        <b-col cols="2">
+        <b-col cols="2" sm="3">
           <div>{{label3}}</div>
         </b-col>
-        <b-col cols="10">
+        <b-col cols="10" sm="9">
           <b-form-select
             v-if="regionObj"
             :value="key3Temp"
@@ -122,7 +122,7 @@ export default {
       if (this.dataCsv.length === 0) {
         return
       }
-      return Object.entries(this.dataCsv).reduce((accum, [key, item]) => {
+      return Object.values(this.dataCsv).reduce((accum, item) => {
         const index1 = Object.keys(accum).indexOf(item.region1)
         if (index1 === -1) {
           accum[item.region1] = {[item.region2]: new Array(item.region3)}

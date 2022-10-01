@@ -692,3 +692,35 @@ export function checkUserRegion(currentUser, searchReg) {
   }
   return (res1 && res2 && res3 && res4)
 }
+
+export function constructForceUpdateItem(param){
+    this.searchReg = {
+      country:param.country || '',
+      subnational1: param.subnational1 || '',
+      subnational2: param.subnational2 || '',
+      subnational3: param.subnational3 || '',
+    }
+    this.setData = {
+      fctId: param.fctId || '',
+      driId: param.driId || '',
+      portionUnitId: param.portionUnitId || '',
+      questionsId: param.questionsId || '',
+      cropCalendarId: param.cropCalendarId || '',
+    }
+}
+
+export function array2JSON(array, key) {
+  let res = {}
+  array.forEach((item, index) => {
+    if (key){
+      if (item[key]){
+        res[item[key]] = item
+      } else {
+        res[index] = item
+      }
+    } else {
+      res[index] = item
+    }
+  })
+  return res
+}

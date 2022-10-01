@@ -47,10 +47,11 @@
         </b-overlay>
 
         <b-button
+          v-if="showButtonSelect"
           variant="info"
           :disabled="!myDocName"
           @click="docSelected(myDocName)"
-        >use this dataset
+        >select dataset
         </b-button>
       </b-input-group-append>
 
@@ -83,10 +84,11 @@
         </b-overlay>
 
         <b-button
+          v-if="showButtonSelect"
           variant="info"
           :disabled="!myDocName"
           @click="docSelected(myDocName)"
-        >use this dataset
+        >select dataset
         </b-button>
 
         <div>
@@ -191,6 +193,10 @@ export default {
     collectionName: {
       type: String,
       default: 'dataset'
+    },
+    showButtonSelect:{
+      type: Boolean,
+      default: true
     }
   },
   data() {

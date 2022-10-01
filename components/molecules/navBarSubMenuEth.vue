@@ -17,8 +17,9 @@
           <!-- メニューグループ1　導入 -->
           <b-dropdown size="sm" id="subMenu-0" text="other function" class="m-md-2" variant="light">
             <b-dropdown-item to="/whatsNfa">what's NFA</b-dropdown-item>
-            <b-dropdown-item to="/login">login/register</b-dropdown-item>
-            <b-dropdown-item to="/userinfo">user info</b-dropdown-item>
+            <b-dropdown-item to="/login">login</b-dropdown-item>
+            <b-dropdown-item to="/userReg">new user</b-dropdown-item>
+            <b-dropdown-item to="/userEdit">edit user</b-dropdown-item>
             <b-dropdown-item to="/setCalendarEth">crop calendar</b-dropdown-item>
             <b-dropdown-item to="/foodGroupInfo">about FoodGroup</b-dropdown-item>
             <b-dropdown-item to="/changeCurrentDataset">change dataset</b-dropdown-item>

@@ -13,7 +13,7 @@
           <b-dropdown-item to="/">top</b-dropdown-item>
           <b-dropdown-item to="/whatsNfa">what's NFA</b-dropdown-item>
           <b-dropdown-item to="/login">login</b-dropdown-item>
-          <b-dropdown-item to="/userinfo">user info</b-dropdown-item>
+          <b-dropdown-item to="/userEdit">user info</b-dropdown-item>
           <b-dropdown-item
             to="/dietcalk"
             :disabled="!isLoggedIn"

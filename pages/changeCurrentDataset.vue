@@ -1,15 +1,54 @@
 <template>
   <b-container>
+    <h4>1. Check area to apply</h4>
+    <b-card
+      header="area to apply datasets below"
+      header-bg-variant="warning-6"
+      header-text-variant="light"
+      bg-variant="gray-200"
+      class="my-2"
+    >
+      <b-row class="my-1">
+        <b-col cols="3">country</b-col>
+        <b-col cols="9">
+          <country-names :key1.sync="userScope.country"/>
+        </b-col>
+        <region-select
+          v-if="userScope.country === 'Ethiopia'"
+          :key3.sync="userScope.subnational3"
+          :key2.sync="userScope.subnational2"
+          :key1.sync="userScope.subnational1"/>
+      </b-row>
+      <b-row align-v="center">
+        <b-col>
+          <div class="font-weight-light text-danger">
+            <ul>
+              <li><p class="my-0">please select area of users to change dataset.</p></li>
+              <li><p class="my-0">If you do not set area, only your app will be affected</p></li>
+            </ul>
+          </div>
+        </b-col>
+      </b-row>
+    </b-card>
+
+    <hr>
+    <h4>2. Select datasets to change</h4>
     <div v-for="(item, index) in myDataSet" :key="index">
       <b-card
         :header="item.text"
         header-bg-variant="success"
         header-text-variant="light"
-        bg-variant="gray-200"
+        bg-variant="gray-100"
         class="my-2"
       >
-        <div >
-          current dataset: <span class="text-danger font-weight-bold">{{originalDocName[index]}}</span>
+        <div>
+          current dataset: <span class="text-danger font-weight-bold">{{ originalDocName[index] }}</span>
+        </div>
+        <div class="mb-2">
+          replace to:
+          <span class="text-primary font-weight-bold" v-if="item.docName !== originalDocName[index]">
+            {{ item.docName }}
+          </span>
         </div>
         <select-db-from-fire
           :component-name="'collapse-' + index"
@@ -18,22 +57,28 @@
           :db-filter="item.filter"
           :db-list="docListOriginal"
           :show-button-get-list="false"
-          @selected="setMyDoc(index, $event)"
+          :show-button-select="false"
         />
       </b-card>
     </div>
-
+    <hr>
+    <h4>3. Save your selection</h4>
+    <b-button @click="setMyDoc" variant="primary">save all</b-button>
   </b-container>
 </template>
 <script>
 import selectDbFromFire from "../components/organisms/selectDbFromFire";
 import {getFileList} from "../plugins/firebasePlugin";
-import {makeToast} from "../plugins/helper";
+import {array2JSON, isObjectDeepEqual, makeToast} from "../plugins/helper";
+import countryNames from "../components/atoms/countryNames";
+import regionSelect from "../components/atoms/regionSelect";
 
 export default {
   layout: 'defaultEth',
   components: {
     selectDbFromFire,
+    countryNames,
+    regionSelect
   },
   async asyncData() {
     const queryResult = await getFileList('dataset')
@@ -41,7 +86,7 @@ export default {
       docListOriginal: queryResult
     }
   },
-  created() {
+  async created() {
     this.myDataSet[0].docName = this.$store.state.fire.myApp.dataSet.fctId
     this.myDataSet[1].docName = this.$store.state.fire.myApp.dataSet.driId
     this.myDataSet[2].docName = this.$store.state.fire.myApp.dataSet.portionUnitId
@@ -52,10 +97,14 @@ export default {
     this.originalDocName.push(this.$store.state.fire.myApp.dataSet.portionUnitId)
     this.originalDocName.push(this.$store.state.fire.myApp.dataSet.questionsId)
     this.originalDocName.push(this.$store.state.fire.myApp.dataSet.cropCalendarId)
+    this.originalForcedUpdateInfo = await this.$store.dispatch('fire/fetchForcedUpdateInfoFromFire').catch((err) => {
+      console.log(err)
+      return []
+    })
   },
   data() {
     return {
-      currentCalendarName: '',
+      originalForcedUpdateInfo: [],
       originalDocName: [],
       myDataSet: [
         {
@@ -88,7 +137,7 @@ export default {
           docName: '',
           command1: 'fire/updateQuestionsId',
           command2: 'fire/fetchQuestionsFromFire',
-          text: 'question for feasiblity assessment'
+          text: 'question for feasibility assessment'
         },
         {
           key: 'FCT_id',
@@ -98,30 +147,97 @@ export default {
           command2: 'fire/fetchCropCalendarFromFire',
           text: 'crop calendar'
         },
-      ]
+      ],
+      /**
+       * userを絞り込むためのデータ
+       */
+      userScope: {
+        country: '',
+        subnational1: '',
+        subnational2: '',
+        subnational3: '',
+      },
+      /**
+       * modal表示フラグ
+       */
+      showModal: false,
+      /**
+       * 更新するdocumentのID
+       */
+      docIndex: 0,
+      myForcedUpdateInfo: {
+        searchReg: {
+          country: '',
+          subnational1: '',
+          subnational2: '',
+          subnational3: '',
+        },
+        setData: {
+          fctId: '',
+          driId: '',
+          portionUnitId: '',
+          questionsId: '',
+          cropCalendarId: '',
+        }
+      }
     }
   },
   methods: {
-    async setMyDoc(index, doc) {
-      await this.$store.dispatch(this.myDataSet[index].command1, doc)
-      await this.$store.dispatch(this.myDataSet[index].command2)
-      await this.$store.dispatch('fire/fireSaveAppdata')
+    async setMyDoc() {
+      const vm = this
+      // 更新されたdocNameをstoreに記録 → このdocNameをもとにfireBaseからfetchしてデータ → storeへ
+      await Promise.all(vm.myDataSet.map(async (item) => {
+          if (item.docName) {
+            await vm.$store.dispatch(item.command1, item.docName)
+            await vm.$store.dispatch(item.command2)
+          }
+        })
+      )
+
+      // setrDataの更新
+      vm.myForcedUpdateInfo.setData.fctId =
+        vm.myDataSet[0].docName !== vm.originalDocName[0] ? vm.myDataSet[0].docName : ''
+      vm.myForcedUpdateInfo.setData.driId =
+        vm.myDataSet[1].docName !== vm.originalDocName[1] ? vm.myDataSet[1].docName : ''
+      vm.myForcedUpdateInfo.setData.portionUnitId =
+        vm.myDataSet[2].docName !== vm.originalDocName[2] ? vm.myDataSet[2].docName : ''
+      vm.myForcedUpdateInfo.setData.questionsId =
+        vm.myDataSet[3].docName !== vm.originalDocName[3] ? vm.myDataSet[3].docName : ''
+      vm.myForcedUpdateInfo.setData.cropCalendarId =
+        vm.myDataSet[4].docName !== vm.originalDocName[4] ? vm.myDataSet[4].docName : ''
+
+      // searchRegの更新
+      vm.myForcedUpdateInfo.searchReg.country = vm.userScope.country
+      vm.myForcedUpdateInfo.searchReg.subnational1 = vm.userScope.subnational1
+      vm.myForcedUpdateInfo.searchReg.subnational2 = vm.userScope.subnational2
+      vm.myForcedUpdateInfo.searchReg.subnational3 = vm.userScope.subnational3
+
+      // 重複したscope設定（myForcedUpdateInfo.searchReg）を回避するため、同一のsearchRegの場合は上書きする
+      let myFlag = true
+      vm.originalForcedUpdateInfo = vm.originalForcedUpdateInfo.map((item) =>{
+        if (isObjectDeepEqual(item.searchReg, vm.myForcedUpdateInfo.searchReg)){
+          myFlag = false
+          return {
+            searchReg: vm.myForcedUpdateInfo.searchReg,
+            setData: vm.myForcedUpdateInfo.setData
+          }
+        } else {
+          return item
+        }
+      })
+      if (myFlag){
+        vm.originalForcedUpdateInfo.push(vm.myForcedUpdateInfo)
+      }
+
+      await vm.$store.dispatch('fire/fireSaveForceUpdateInfo', array2JSON(vm.originalForcedUpdateInfo))
+      await vm.$store.dispatch('fire/fireSaveAppdata')
+
       makeToast(
         this,
-        'dataset is set to ' + this.myDataSet[index].docName,
+        'data have been successfully updated',
         {variant: 'info'}
       )
-    },
-    async fireSaveCalendar() {
-      this.busy3 = true
-      await this.$store.dispatch('fire/updateCropCalendar', this.currentCalendar)
-      await this.$store.dispatch('fire/fireSaveAppdata')
-      this.busy3 = false
-      makeToast(
-        this,
-        'crop calendar is set to ' + this.$store.state.fire.myApp.dataSet.cropCalendarId,
-        {variant: 'info'}
-      )
+      console.log('setMyDoc: data have been successfully updated')
     },
   },
 }

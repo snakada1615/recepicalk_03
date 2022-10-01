@@ -75,6 +75,10 @@ export const state = () => ({
        */
       questionsId: 'questions01',
       /**
+       * forcedUpdateInfoのId
+       */
+      forcedUpdateInfoId: 'forcedUpdateInfoId01',
+      /**
        * fctのデータ
        */
       fct: [],
@@ -121,12 +125,12 @@ export const state = () => ({
         //Eth限定のデータセット
         {
           searchReg: {
-            country:'Ethiopia',
+            country: 'Ethiopia',
             subnational1: '',
             subnational2: '',
             subnational3: '',
           },
-          setData:{
+          setData: {
             fctId: 'fct_eth0729',
             driId: '',
             portionUnitId: 'portion_0927',
@@ -369,6 +373,24 @@ export const mutations = {
     state.myApp.user.userType = payload.userType || ''
   },
   /**
+   * forcedUpdateInfoの更新
+   * @param state
+   * @param payload
+   */
+  updateForcedUpdateInfo(state, payload) {
+    state.myApp.dataSet.forcedUpdateInfo = JSON.parse(JSON.stringify(payload))
+  },
+  /**
+   * forcedUpdateInfoIdの更新
+   * @param state
+   * @param payload
+   */
+  updateForcedUpdateInfoId: function (state, payload) {
+    console.log('g00000oooooo00000ooooo')
+    state.myApp.dataSet.forcedUpdateInfoId = payload
+    console.log('hey g00000oooooo00000ooooo')
+  },
+  /**
    * ユーザー情報をfireAuthから得たログイン情報に基づいて初期化する
    * @param state
    * @param payload
@@ -577,6 +599,23 @@ export const actions = {
     dispatch('updateCommunityCases', communityCasesTemp)
   },
   /**
+   * forcedUpdateInfoIdの更新
+   * @param commit
+   * @param payload
+   */
+  updateForcedUpdateInfoId({commit}, payload) {
+    commit('updateForcedUpdateInfoId', payload)
+  },
+  /**
+   * forcedUpdateInfoの更新
+   * @param commit
+   * @param payload
+   */
+  updateForcedUpdateInfo({commit}, payload) {
+    commit('updateForcedUpdateInfo', payload)
+  },
+
+  /**
    * 現在対象になっている家族の更新
    * @param commit
    * @param dispatch
@@ -745,6 +784,21 @@ export const actions = {
       throw new Error('Error in fireSaveCropCalendar:' + err)
     })
     console.log('cropCalendar saved to fireStore (payload -> fireStore')
+    return true
+  },
+  /**
+   * firebase -> dataSet -> forceUpdateInfoにpayloadを保存
+   * @param dispatch
+   * @param state
+   * @param payload
+   * @returns {Promise<boolean>}
+   */
+  async fireSaveForceUpdateInfo({dispatch, state}, payload) {
+    const ref = await doc(firestoreDb, 'dataset', state.myApp.dataSet.forcedUpdateInfoId)
+    await setDoc(ref, payload).catch((err) => {
+      throw new Error('Error in fireSaveForceUpdateInfo:' + err)
+    })
+    console.log('forcedUpdateInfo saved to fireStore (payload -> fireStore')
     return true
   },
   /**
@@ -1152,6 +1206,14 @@ export const actions = {
       needInitialization = true
     }
 
+    // forcedUpdateInfoIdの新規追加
+    //　X == null は　(X === null || X === undefined)と等値
+    if (state.myApp.dataSet.forcedUpdateInfoId == null) {
+      console.log('There are no information for forcedUpdateInfo. The app will be updated')
+      dispatch('updateForcedUpdateInfoId', 'forcedUpdateInfoId01')
+      needInitialization = true
+    }
+
     if (needInitialization) {
       await dispatch('fireSaveAppdata')
       await this.$router.push('/')
@@ -1394,6 +1456,17 @@ export const actions = {
       commit('updateQuestions', questionsArray)
     } else {
       throw new Error('fetchQuestionsFromFire fail: no data')
+    }
+  },
+  async fetchForcedUpdateInfoFromFire({state}) {
+    // ForcedUpdateInfoをfireStoreからfetch (forcedUpdateInfoIdを使う)
+    const forcedUpdateInfo = await fireGetDoc('dataset', state.myApp.dataSet.forcedUpdateInfoId).catch((err) => {
+      throw Error(err)
+    })
+    if (forcedUpdateInfo){
+      return Object.values(forcedUpdateInfo)
+    } else {
+      return []
     }
   },
   /**

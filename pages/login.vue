@@ -6,12 +6,12 @@
       :disabled="!inputValidate"
     >login</b-button>
     <b-button
-      to="/registUser"
+      to="/userReg"
       variant="info-2"
       class="text-white"
     >register</b-button>
     <b-button
-      to="/userInfo"
+      to="/userEdit"
       variant="info-2"
       class="text-white"
     >edit current user</b-button>

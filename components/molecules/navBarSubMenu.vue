@@ -15,8 +15,9 @@
           <!-- メニューグループ1　導入 -->
           <b-dropdown size="sm" id="subMenu-0" text="Introduction" class="m-md-2" variant="light">
             <b-dropdown-item to="/whatsNfa">what's NFA</b-dropdown-item>
-            <b-dropdown-item to="/login">login/register</b-dropdown-item>
-            <b-dropdown-item to="/userinfo">user info</b-dropdown-item>
+            <b-dropdown-item to="/login">login</b-dropdown-item>
+            <b-dropdown-item to="/userReg">new user</b-dropdown-item>
+            <b-dropdown-item to="/userEdit">edit user</b-dropdown-item>
             <b-dropdown-item to="/foodGroupInfo">about FoodGroup</b-dropdown-item>
           </b-dropdown>
 
@@ -102,6 +103,8 @@
 </template>
 <script>
 
+import {makeToast} from "../../plugins/helper";
+
 export default {
   methods: {
     /**
@@ -118,6 +121,7 @@ export default {
      */
     fireSaveAppdata() {
       this.$store.dispatch('fire/fireSaveAppdata')
+      makeToast(this, 'data saved!')
     },
     async resetData() {
       const user = JSON.parse(JSON.stringify(this.$store.state.fire.myApp.user))
