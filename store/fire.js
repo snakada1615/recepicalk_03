@@ -787,6 +787,20 @@ export const actions = {
     return true
   },
   /**
+   * portionUnit更新時にfireStore->dataSetを更新
+   * @param dispatch
+   * @param payload
+   * @returns {Promise<boolean>}
+   */
+  async fireSavePortionUnit({dispatch}, payload){
+    const ref = await doc(firestoreDb, 'dataset', payload.docName)
+    await setDoc(ref, payload.data).catch((err) => {
+      throw new Error('Error in fireSavePortionUnit:' + err)
+    })
+    console.log('portionUnit saved to fireStore (payload -> fireStore')
+    return true
+  },
+  /**
    * firebase -> dataSet -> forceUpdateInfoにpayloadを保存
    * @param dispatch
    * @param state

@@ -64,7 +64,7 @@
       title="set portion-size"
       header-bg-variant="info-2"
     >
-      <h5>{{modalValue.name}}</h5>
+      <h5>{{ modalValue.name }}</h5>
       <b-input-group prepend="counting method" class="my-1">
         <b-form-input v-model="modalValue.count_method"></b-form-input>
       </b-input-group>
@@ -77,7 +77,7 @@
 </template>
 <script>
 import FctTable from "../components/molecules/FctTable";
-import {myUid} from "../plugins/helper";
+import {array2JSON, myUid} from "../plugins/helper";
 
 export default {
   components: {FctTable},
@@ -102,14 +102,15 @@ export default {
         FCT_id: '',
         name: '',
         count_method: '',
-        unit_weight: 0
+        unit_weight: 0,
+        photoLink: []
       }
     }
   },
   computed: {
     cropList() {
       const fct = this.$store.state.fire.myApp.dataSet.fct
-      if (fct){
+      if (fct) {
         return this.$store.state.fire.myApp.dataSet.fct.map((item) => {
           return item
         })
@@ -136,37 +137,48 @@ export default {
       this.cropId = val.id
       this.cropName = val.Name
     },
-    editItem(item){
+    editItem(item) {
       this.modalValue.id = item.id
       this.modalValue.FCT_id = item.FCT_id
       this.modalValue.name = item.name
       this.modalValue.count_method = item.count_method
       this.modalValue.unit_weight = item.unit_weight
+      this.modalValue.photoLink = item.photoLink || []
       this.showModal1 = true
     },
-    addItem(){
+    addItem() {
       this.modalValue.id = myUid()
       this.modalValue.FCT_id = this.cropId
       this.modalValue.name = this.cropName
       this.modalValue.count_method = ''
       this.modalValue.unit_weight = ''
+      this.modalValue.photoLink = []
       this.showModal1 = true
     },
-    async deleteItem(index){
+    async deleteItem(index) {
       const vm = this
       // idがval.idに合致するものだけを排除
-      const myPortionUnit = JSON.parse(JSON.stringify(vm.$store.state.fire.myApp.dataSet.portionUnit)).filter((item)=>{
+      const myPortionUnit = JSON.parse(JSON.stringify(vm.$store.state.fire.myApp.dataSet.portionUnit)).filter((item) => {
         return item.id !== index
       })
+
+      // storeを更新
       await vm.$store.dispatch('fire/updatePortionUnit', myPortionUnit)
+
+      // fireBaseを更新
+      await vm.$store.dispatch('fire/fireSavePortionUnit', {
+          'docName': vm.$store.state.fire.myApp.dataSet.portionUnitId,
+          'data': array2JSON(myPortionUnit, 'id')
+        }
+      )
       //更新フラグをon
       await vm.$store.dispatch('fire/setHasDocumentChanged', true)
     },
-    async modalOk1(){
+    async modalOk1() {
       const vm = this
       let isNewValue = true
       // idの重複がある場合には、値を更新、ない場合には単純にデータ追加
-      const myPortionUnit = JSON.parse(JSON.stringify(vm.$store.state.fire.myApp.dataSet.portionUnit)).map((item)=>{
+      const myPortionUnit = JSON.parse(JSON.stringify(vm.$store.state.fire.myApp.dataSet.portionUnit)).map((item) => {
         if (item.id === vm.modalValue.id) {
           isNewValue = false
           return vm.modalValue
@@ -178,7 +190,15 @@ export default {
         myPortionUnit.push(vm.modalValue)
       }
 
+      // storeを更新
       await vm.$store.dispatch('fire/updatePortionUnit', myPortionUnit)
+      // fireBaseを更新
+      await vm.$store.dispatch('fire/fireSavePortionUnit', {
+          'docName': vm.$store.state.fire.myApp.dataSet.portionUnitId,
+          'data': array2JSON(myPortionUnit, 'id')
+        }
+      )
+
       //更新フラグをon
       await vm.$store.dispatch('fire/setHasDocumentChanged', true)
 
@@ -187,6 +207,7 @@ export default {
       this.modalValue.name = ''
       this.modalValue.count_method = ''
       this.modalValue.unit_weight = ''
+      this.modalValue.photoLink = []
     },
   }
 }

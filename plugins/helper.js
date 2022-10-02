@@ -739,5 +739,5 @@ export function myUid() {
   let month = today.getMonth() + 1;
   let day = today.getDate();
 
-  return year + month + day + '-' + s4() + s4()
+  return String(year) + String(month) + String(day) + '-' + s4() + s4()
 }
