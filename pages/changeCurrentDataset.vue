@@ -1,6 +1,6 @@
 <template>
   <b-container>
-    <h4>1. Check area to apply</h4>
+    <h4 class="text-primary">1. Check area to apply</h4>
     <b-card
       header="area to apply datasets below"
       header-bg-variant="warning-6"
@@ -32,7 +32,7 @@
     </b-card>
 
     <hr>
-    <h4>2. Select datasets to change</h4>
+    <h4 class="text-primary">2. Select datasets to change</h4>
     <div v-for="(item, index) in myDataSet" :key="index">
       <b-card
         :header="item.text"
@@ -62,7 +62,7 @@
       </b-card>
     </div>
     <hr>
-    <h4>3. Save your selection</h4>
+    <h4 class="text-primary">3. Save your selection</h4>
     <b-button @click="setMyDoc" variant="primary">save all</b-button>
   </b-container>
 </template>

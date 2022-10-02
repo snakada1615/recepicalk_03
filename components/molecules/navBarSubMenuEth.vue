@@ -21,6 +21,7 @@
             <b-dropdown-item to="/userReg">new user</b-dropdown-item>
             <b-dropdown-item to="/userEdit">edit user</b-dropdown-item>
             <b-dropdown-item to="/setCalendarEth">crop calendar</b-dropdown-item>
+            <b-dropdown-item to="/setPortionUnit">set portion size</b-dropdown-item>
             <b-dropdown-item to="/foodGroupInfo">about FoodGroup</b-dropdown-item>
             <b-dropdown-item to="/changeCurrentDataset">change dataset</b-dropdown-item>
           </b-dropdown>

@@ -891,6 +891,14 @@ export const actions = {
     commit('updatePortionUnitId', payload)
   },
   /**
+   * portionUnitを更新
+   * @param commit
+   * @param payload 更新する値（Array of Objects）
+   */
+  updatePortionUnit({commit}, payload) {
+    commit('updatePortionUnit', payload)
+  },
+  /**
    * questionsIdを更新
    * @param commit
    * @param payload

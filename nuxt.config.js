@@ -19,6 +19,14 @@ export default {
     ]
   },
 
+  // style for loading screen
+  loadingIndicator: {
+    name: 'circle',
+    color: '#9b3470',
+    background: 'white'
+  },
+
+
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
     '@/assets/scss/app.scss'
@@ -68,7 +76,9 @@ export default {
         'BIconBookmarkCheck',
         'BIconEye',
         'BIconEyeSlash',
-        'BIconTrash'
+        'BIconTrash',
+        'BIconTrashFill',
+        'BIconPencilSquare',
       ],
       componentPlugins: [
         'NavbarPlugin',

@@ -693,27 +693,27 @@ export function checkUserRegion(currentUser, searchReg) {
   return (res1 && res2 && res3 && res4)
 }
 
-export function constructForceUpdateItem(param){
-    this.searchReg = {
-      country:param.country || '',
-      subnational1: param.subnational1 || '',
-      subnational2: param.subnational2 || '',
-      subnational3: param.subnational3 || '',
-    }
-    this.setData = {
-      fctId: param.fctId || '',
-      driId: param.driId || '',
-      portionUnitId: param.portionUnitId || '',
-      questionsId: param.questionsId || '',
-      cropCalendarId: param.cropCalendarId || '',
-    }
+export function constructForceUpdateItem(param) {
+  this.searchReg = {
+    country: param.country || '',
+    subnational1: param.subnational1 || '',
+    subnational2: param.subnational2 || '',
+    subnational3: param.subnational3 || '',
+  }
+  this.setData = {
+    fctId: param.fctId || '',
+    driId: param.driId || '',
+    portionUnitId: param.portionUnitId || '',
+    questionsId: param.questionsId || '',
+    cropCalendarId: param.cropCalendarId || '',
+  }
 }
 
 export function array2JSON(array, key) {
   let res = {}
   array.forEach((item, index) => {
-    if (key){
-      if (item[key]){
+    if (key) {
+      if (item[key]) {
         res[item[key]] = item
       } else {
         res[index] = item
@@ -723,4 +723,21 @@ export function array2JSON(array, key) {
     }
   })
   return res
+}
+
+export function myUid() {
+  let s4 = () => {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+  }
+//今日の日付データを変数hidukeに格納
+  let today = new Date();
+
+//年・月・日・曜日を取得する
+  let year = today.getFullYear();
+  let month = today.getMonth() + 1;
+  let day = today.getDate();
+
+  return year + month + day + '-' + s4() + s4()
 }
