@@ -210,7 +210,7 @@
                 button-variant="outline-success"
               ></b-form-radio-group>
             </b-form-group>
-            <b-badge variant="info" size="sm" pill>picture</b-badge>
+            <b-badge variant="info" size="sm" pill　@click="showModal2 = true">picture</b-badge>
           </b-col>
         </b-row>
       </b-card>
@@ -236,6 +236,19 @@
 
         </b-col>
       </b-row>
+    </b-modal>
+    <b-modal
+      v-model="showModal2"
+    >
+      halo
+      <b-carousel :img-height="120">
+        <b-carousel-slide
+          v-for="(item, index) in portionList" :key="index"
+          :caption="'unit: ' + item.count_method + ', weight: '+ item.unit_weight + 'g'"
+          :img-src="item.photoLink ? item.photoLink[0]: '/img/crops/food_icon.png'"
+        ></b-carousel-slide>
+        {{portionList}}
+      </b-carousel>
     </b-modal>
   </b-container>
 </template>
@@ -406,6 +419,10 @@ export default {
   },
   data() {
     return {
+      /**
+       * 写真表示用のダイアログ
+       */
+      showModal2: false,
       /**
        * 食材の重さの入力値:portion数
        */
