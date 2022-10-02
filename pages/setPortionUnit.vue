@@ -52,6 +52,20 @@
             </div>
           </template>
         </b-table>
+        <div>
+          <B-button v-b-toggle.showImage size="sm" variant="light" class="small">
+            show image <b-icon icon="caret-down-square"/>
+          </B-button>
+        </div>
+        <b-collapse id="showImage" class="mt-2">
+          <b-carousel :img-height="120">
+            <b-carousel-slide
+              v-for="(item, index) in portionList" :key="index"
+              :caption="'unit: ' + item.count_method + ', weight: '+ item.unit_weight + 'g'"
+              :img-src="item.photoLink ? item.photoLink[0]: '/img/crops/food_icon.png'"
+            ></b-carousel-slide>
+          </b-carousel>
+        </b-collapse>
       </b-card>
     </b-card>
 
@@ -140,6 +154,7 @@ export default {
   methods: {
     getLink(val) {
       this.modalValue.photoLink.push(val)
+      console.log('getLink:' + val)
     },
     onFctClick(val) {
       this.cropId = val.id
@@ -151,7 +166,7 @@ export default {
       this.modalValue.name = item.name
       this.modalValue.count_method = item.count_method
       this.modalValue.unit_weight = item.unit_weight
-      this.modalValue.photoLink = item.photoLink || []
+      this.modalValue.photoLink = JSON.parse(JSON.stringify(item.photoLink)) || []
       this.showModal1 = true
     },
     addItem() {
@@ -181,6 +196,13 @@ export default {
       )
       //更新フラグをon
       await vm.$store.dispatch('fire/setHasDocumentChanged', true)
+
+      this.modalValue.id = ''
+      this.modalValue.FCT_id = ''
+      this.modalValue.name = ''
+      this.modalValue.count_method = ''
+      this.modalValue.unit_weight = ''
+      this.modalValue.photoLink.length = 0
     },
     async modalOk1() {
       const vm = this
@@ -215,7 +237,7 @@ export default {
       this.modalValue.name = ''
       this.modalValue.count_method = ''
       this.modalValue.unit_weight = ''
-      this.modalValue.photoLink = []
+      this.modalValue.photoLink.length = 0
     },
   }
 }
