@@ -4,6 +4,7 @@ import {
   initializeFirestore, CACHE_SIZE_UNLIMITED,
   enableMultiTabIndexedDbPersistence, doc, getDocFromCache, getDocFromServer, getDocs, collection
 } from "firebase/firestore"
+import { getStorage } from "firebase/storage";
 
 /**
  * データベースの設定情報
@@ -65,6 +66,13 @@ enableMultiTabIndexedDbPersistence(firestore)
 //firestore.enablePersistence({synchronizeTabs:true})
 
 export const firestoreDb = firestore
+
+/**
+ * fireStoreの初期化
+ * @type {FirebaseStorage}
+ */
+export const storage = getStorage(firebase);
+
 
 export async function fireGetDoc(collectionId, docId) {
   const ref = await doc(firestoreDb, collectionId, docId)

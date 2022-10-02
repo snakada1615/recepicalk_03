@@ -71,6 +71,10 @@
       <b-input-group prepend="unit weight" class="my-1">
         <b-form-input v-model="modalValue.unit_weight"></b-form-input>
       </b-input-group>
+      <hr>
+      <upload-picture
+        @get-link="getLink"
+      />
     </b-modal>
 
   </b-container>
@@ -78,12 +82,13 @@
 <script>
 import FctTable from "../components/molecules/FctTable";
 import {array2JSON, myUid} from "../plugins/helper";
+import uploadPicture from "~/components/atoms/uploadPicture";
 
 export default {
-  components: {FctTable},
   layout: 'defaultEth',
-  component: {
-    FctTable
+  components: {
+    FctTable,
+    uploadPicture
   },
   data() {
     return {
@@ -133,6 +138,9 @@ export default {
     }
   },
   methods: {
+    getLink(val) {
+      this.modalValue.photoLink.push(val)
+    },
     onFctClick(val) {
       this.cropId = val.id
       this.cropName = val.Name

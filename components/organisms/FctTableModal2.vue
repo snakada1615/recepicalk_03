@@ -210,6 +210,7 @@
                 button-variant="outline-success"
               ></b-form-radio-group>
             </b-form-group>
+            <b-badge variant="info" size="sm" pill>picture</b-badge>
           </b-col>
         </b-row>
       </b-card>
