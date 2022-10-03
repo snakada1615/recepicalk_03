@@ -9,6 +9,26 @@
       @cancel="clickCancel"
       hide-header
     >
+      <!--   Add/Cancelボタン   -->
+      <b-row align-h="end" class="my-2">
+        <b-col cols="4">
+          <b-button
+            variant="primary"
+            class="mx-1"
+            size="sm"
+            :disabled="!stateFoodName || !stateFoodVolume"
+            @click="addItem"
+          >Add
+          </b-button>
+
+          <b-button
+            class="mx-1"
+            size="sm"
+            @click="showModalInput = false"
+          >Cancel
+          </b-button>
+        </b-col>
+      </b-row>
       <b-card
         class="mb-2"
         border-variant="success"
@@ -104,13 +124,18 @@
       </b-card>
 
       <!--  ここから食事記録の表示    -->
-      <span class="font-weight-bold text-primary">diet record</span>
-      <recepi-table
-        :items="menuCases"
-        head-row-variant="success"
-        @itemDeleted="deleteSupply"
-        @rowClick="onRecepiClicked"
-      />
+      <b-card
+        class="mb-2"
+        border-variant="success"
+      >
+        <span class="font-weight-bold text-primary">diet record</span>
+        <recepi-table
+          :items="menuCases"
+          head-row-variant="success"
+          @itemDeleted="deleteSupply"
+          @rowClick="onRecepiClicked"
+        />
+      </b-card>
     </b-modal>
 
     <!--  ここからデータ入力用modal  -->
@@ -183,7 +208,7 @@
           class="mx-0"
         >
           <template #prepend>
-            <b-button size="sm" variant="info">volume</b-button>
+            <b-button size="sm" variant="info">portion count</b-button>
           </template>
           <b-form-input
             id="inputVolume"
@@ -194,61 +219,27 @@
         </b-input-group>
         <b-row class="mt-2">
           <b-col>
-            portionSize:{{ portionSize }}
-            <b-form-group
-              description="select measurement unit and put number"
+            total weight:<span class="text-danger font-weight-bold">{{ foodVolume }}</span> gram
+            <b-table
+              bordered
+              small
+              sticky-header
+              selectable
+              select-mode="single"
+              head-row-variant="success"
+              :items="portionList"
+              :fields="fields1"
+              @row-selected="onPortionSelected"
             >
-              <b-form-radio-group
-                id="btn-radios-1"
-                v-model="portionSize"
-                size="sm"
-                :options="portionList"
-                value-field="unit_weight"
-                text-field="count_method"
-                name="radios-btn-default"
-                buttons
-                button-variant="outline-success"
-              ></b-form-radio-group>
-            </b-form-group>
-            <b-badge variant="info" size="sm" pill　@click="showModal2 = true">picture</b-badge>
+            </b-table>
+            <b-card
+              class="border-0 py-2 px-2"
+            >
+              <b-img :src="portionImg" fluid></b-img>
+            </b-card>
           </b-col>
         </b-row>
       </b-card>
-
-      <!--   Add/Cancelボタン   -->
-      <b-row align-h="end" class="mt-2">
-        <b-col cols="4">
-          <b-button
-            variant="primary"
-            class="mx-1"
-            size="sm"
-            :disabled="!stateFoodName || !stateFoodVolume"
-            @click="addItem"
-          >Add
-          </b-button>
-
-          <b-button
-            class="mx-1"
-            size="sm"
-            @click="showModalInput = false"
-          >Cancel
-          </b-button>
-
-        </b-col>
-      </b-row>
-    </b-modal>
-    <b-modal
-      v-model="showModal2"
-    >
-      halo
-      <b-carousel :img-height="120">
-        <b-carousel-slide
-          v-for="(item, index) in portionList" :key="index"
-          :caption="'unit: ' + item.count_method + ', weight: '+ item.unit_weight + 'g'"
-          :img-src="item.photoLink ? item.photoLink[0]: '/img/crops/food_icon.png'"
-        ></b-carousel-slide>
-        {{portionList}}
-      </b-carousel>
     </b-modal>
   </b-container>
 </template>
@@ -420,9 +411,19 @@ export default {
   data() {
     return {
       /**
-       * 写真表示用のダイアログ
+       * portion表示用設定
        */
-      showModal2: false,
+      fields1: [
+        {key: 'id', tdClass: 'd-none', thClass: 'd-none'},
+        {key: 'FCT_id', tdClass: 'd-none', thClass: 'd-none'},
+        {key: 'name', tdClass: 'd-none', thClass: 'd-none'},
+        {key: 'count_method', label:'Portion'},
+        {key: 'unit_weight'},
+      ],
+      /**
+       * portionの画像リンク
+       */
+      portionImg: '',
       /**
        * 食材の重さの入力値:portion数
        */
@@ -469,6 +470,10 @@ export default {
     }
   },
   methods: {
+    onPortionSelected(item){
+      this.portionImg = item[0].photoLink ? item[0].photoLink[0]: '/img/crops/no_image.png'
+      this.portionSize = item[0].unit_weight
+    },
     /**
      * 各栄養素の値の表示用に、桁数を調整
      * @param item

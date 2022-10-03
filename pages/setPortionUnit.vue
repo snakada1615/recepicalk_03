@@ -58,12 +58,23 @@
           </B-button>
         </div>
         <b-collapse id="showImage" class="mt-2">
-          <b-carousel :img-height="120">
+          <b-carousel
+            :img-height="120"
+            controls
+            indicators
+          >
             <b-carousel-slide
               v-for="(item, index) in portionList" :key="index"
-              :caption="'unit: ' + item.count_method + ', weight: '+ item.unit_weight + 'g'"
-              :img-src="item.photoLink ? item.photoLink[0]: '/img/crops/food_icon.png'"
-            ></b-carousel-slide>
+              :img-src="item.photoLink ? item.photoLink[0]: '/img/crops/no_image.png'"
+            >
+              <div class="carousel-caption d-none d-md-block">
+                <b-card bg-variant="light">
+                  <div class="text-primary">
+                    unit: {{ item.count_method }}, weight: {{ item.unit_weight }}g
+                  </div>
+                </b-card>
+              </div>
+            </b-carousel-slide>
           </b-carousel>
         </b-collapse>
       </b-card>
