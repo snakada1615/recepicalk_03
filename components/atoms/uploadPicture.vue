@@ -2,8 +2,8 @@
   <b-container>
     <b-form-file
       v-model="newImage"
-      @change="upload"
-      accept=".jpg, .png, .gif"
+      @input="compressUpload"
+      accept="image/*"
       ref="file-input"
       class="mb-2"
       size="sm"
@@ -15,53 +15,49 @@
 import {storage} from "~/plugins/firebasePlugin";
 import {ref, uploadBytes, getDownloadURL} from "firebase/storage";
 import {makeToast} from "~/plugins/helper";
+import Compressor from 'compressorjs';
 
 export default {
   data() {
     return {
-      newImage: [],
+      newImage: null,
       maxSize: 1000000, // 10MB
       validationError: ''
     }
   },
   methods: {
-    validation(file) {
-      // 1. アップロードされるファイルが画像であること
-      if (!(file.type.includes('image'))) {
-        this.validationError = 'only picture file can be uploaded'
-        return true
-      }
-
-      // 2. 画像のサイズが10MB未満であること
-      if (!(parseInt(file.size) < this.maxSize)) {
-        this.validationError = 'file size should be smaller than ' + (this.maxSize / 1000000) + ' MB'
-        return true
-      }
-      return false
-    },
-    upload(p) {
+    compressUpload(image) {
       const vm = this
-      const file = p.target.files[0]
-      const storageRef = ref(storage, file.name)
+      console.log("original size: " + image.size);
 
-      if (vm.validation(file)) {
-        alert(this.validationError)
-        return
-      }
-      // 画像をStorageにアップロード
-      uploadBytes(storageRef, file).then(() => {
-        console.log('upload success')
-        // アップロードした画像のURLを取得
-        getDownloadURL(storageRef).then((url) => {
-          console.log(url)
-          vm.$emit("get-link", url)
-          makeToast(vm, 'upload picture success!')
-        })
-      }).catch((error) => {
-        console.log(error)
-        makeToast(vm, 'upload fail')
-      })
-    }
+      new Compressor(image, {
+        quality: 0.6,
+        maxWidth: 400,
+        maxHeight: 200,
+        success(result) {
+          console.log("compressed size", result.size);
+
+          const storageRef = ref(storage, result.name)
+          // 画像をStorageにアップロード
+          uploadBytes(storageRef, result).then(() => {
+            console.log('upload picture success')
+            // アップロードした画像のURLを取得
+            getDownloadURL(storageRef).then((url) => {
+              vm.$emit("get-link", url)
+              console.log('upload-link acquired')
+            })
+          }).catch((error) => {
+            console.log(error)
+            makeToast(vm, 'picture upload fail')
+          })
+
+        },
+        error(err) {
+          console.log(err.message);
+          throw err
+        },
+      });
+    },
   }
 }
 </script>

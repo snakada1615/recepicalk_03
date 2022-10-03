@@ -232,9 +232,7 @@
               @row-selected="onPortionSelected"
             >
             </b-table>
-            <b-card
-              class="border-0 py-2 px-2"
-            >
+            <b-card class="border-0 py-2 px-2" align="center">
               <b-img :src="portionImg" fluid></b-img>
             </b-card>
           </b-col>

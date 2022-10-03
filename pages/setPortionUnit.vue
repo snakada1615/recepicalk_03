@@ -25,13 +25,15 @@
         class="border-0"
       >
         <b-table
-          striped
+          selectable
+          select-mode="single"
           bordered
           small
           sticky-header
           head-row-variant="success"
           :items="portionList"
           :fields="fields1"
+          @row-selected="onPortionSelected"
         >
           <!-- A custom formatted cell for field 'name' -->
           <template #cell(name)="data">
@@ -52,31 +54,9 @@
             </div>
           </template>
         </b-table>
-        <div>
-          <B-button v-b-toggle.showImage size="sm" variant="light" class="small">
-            show image <b-icon icon="caret-down-square"/>
-          </B-button>
-        </div>
-        <b-collapse id="showImage" class="mt-2">
-          <b-carousel
-            :img-height="120"
-            controls
-            indicators
-          >
-            <b-carousel-slide
-              v-for="(item, index) in portionList" :key="index"
-              :img-src="item.photoLink ? item.photoLink[0]: '/img/crops/no_image.png'"
-            >
-              <div class="carousel-caption d-none d-md-block">
-                <b-card bg-variant="light">
-                  <div class="text-primary">
-                    unit: {{ item.count_method }}, weight: {{ item.unit_weight }}g
-                  </div>
-                </b-card>
-              </div>
-            </b-carousel-slide>
-          </b-carousel>
-        </b-collapse>
+        <b-card class="border-0 py-2 px-2" align="center">
+          <b-img :src="portionImg" fluid></b-img>
+        </b-card>
       </b-card>
     </b-card>
 
@@ -127,6 +107,7 @@ export default {
       cropId: '',
       cropName: '',
       showModal1: false,
+      portionImg: '',
       modalValue: {
         id: '',
         FCT_id: '',
@@ -153,19 +134,45 @@ export default {
       if (!vm.cropId) {
         return []
       } else {
-        return vm.$store.state.fire.myApp.dataSet.portionUnit.filter((item) => {
+        const res = vm.$store.state.fire.myApp.dataSet.portionUnit.filter((item) => {
           return item.FCT_id === vm.cropId
         }).map((item2) => {
           item2.name = vm.cropName
           return item2
         })
+        res.push(
+          {
+            'name': vm.cropName,
+            'FCT_id': '0',
+            'id': '999',
+            'count_method': 'ton',
+            'unit_weight': 1000000,
+          },
+          {
+            'name': vm.cropName,
+            'FCT_id': '0',
+            'id': '998',
+            'count_method': 'Kg',
+            'unit_weight': 1000,
+          },
+          {
+            'name': vm.cropName,
+            'FCT_id': '0',
+            'id': '997',
+            'count_method': 'gram',
+            'unit_weight': 1,
+          }
+        )
+        return res
       }
     }
   },
   methods: {
+    onPortionSelected(item){
+      this.portionImg = item[0].photoLink ? item[0].photoLink[0]: '/img/crops/no_image.png'
+    },
     getLink(val) {
       this.modalValue.photoLink.push(val)
-      console.log('getLink:' + val)
     },
     onFctClick(val) {
       this.cropId = val.id
