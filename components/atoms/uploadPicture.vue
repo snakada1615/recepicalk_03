@@ -5,6 +5,7 @@
       @input="compressUpload"
       accept="image/*"
       ref="file-input"
+      capture
       class="mb-2"
       size="sm"
     />

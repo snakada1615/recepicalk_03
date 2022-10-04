@@ -4,8 +4,7 @@
       <b-navbar-brand to="/startPageEth">
         <b-icon icon="BIconHouseFill"/>
         <span class="small"> Nutrients App</span></b-navbar-brand>
-
-      <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+      <img src="/img/eth_flag.png" alt="Eth">
 
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto" :small=true>
@@ -147,7 +146,7 @@ export default {
         removeEventListener("beforeunload", this.beforeUnloadListener, {capture: true});
       }
     },
-    $route(){
+    $route() {
       //ページ移動前にメニューを折りたたむ
       this.$refs.rootMenu.hide();
     }

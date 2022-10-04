@@ -18,7 +18,7 @@
       <h4 class="text-primary">
         2. Add(modify) portion-size
         <span @click="addItem">
-          <B-badge variant="success" class="pointer">+</B-badge>
+          <B-badge variant="success" class="pointer" v-show="cropId">+</B-badge>
         </span>
       </h4>
       <b-card
@@ -41,12 +41,20 @@
               <span class="text-info">{{ data.value }}</span>
               <span>
               <b-button class="px-0 py-0 mx-0 my-0 border-0" variant="light" @click="editItem(data.item)">
-                <b-badge variant="light" class="px-0 py-0">
+                <b-badge
+                  variant="light"
+                  class="px-0 py-0"
+                  v-if="['ton', 'Kg', 'gram'].indexOf(data.item.count_method) < 0"
+                >
                   <b-icon icon="PencilSquare" variant="secondary"></b-icon>
                 </b-badge>
               </b-button>
               <b-button class="px-0 py-0 mx-0 my-0 border-0" variant="light" @click="deleteItem(data.item.id)">
-                <b-badge variant="light" class="px-0 py-0">
+                <b-badge
+                  variant="light"
+                  class="px-0 py-0"
+                  v-if="['ton', 'Kg', 'gram'].indexOf(data.item.count_method) < 0"
+                >
                   <b-icon icon="TrashFill" variant="secondary"></b-icon>
                 </b-badge>
               </b-button>
@@ -71,15 +79,60 @@
     >
       <h5>{{ modalValue.name }}</h5>
       <b-input-group prepend="counting method" class="my-1">
-        <b-form-input v-model="modalValue.count_method"></b-form-input>
+        <b-form-input
+          v-model="modalValue.count_method"
+          :state="stateCountMethod"
+          type="text"
+        ></b-form-input>
+        <b-row>
+          <b-col>
+            <b-button
+              v-for="name in typicalUnit"
+              :key="name"
+              pill
+              size="sm"
+              class="px-2 py-1 my-1 mx-1"
+              variant="success-2"
+              @click="modalValue.count_method = name"
+            >
+              <span class="small ">{{ name }}</span>
+            </b-button>
+          </b-col>
+        </b-row>
       </b-input-group>
       <b-input-group prepend="unit weight" class="my-1">
-        <b-form-input v-model="modalValue.unit_weight"></b-form-input>
+        <b-form-input
+          type="number"
+          v-model="modalValue.unit_weight"
+          :state="statePortionSize"
+          @input="formatterNumber"
+        ></b-form-input>
       </b-input-group>
       <hr>
       <upload-picture
         @get-link="getLink"
       />
+      <template #modal-footer>
+        <div class="w-100">
+          <b-button
+            variant="primary"
+            size="sm"
+            class="float-right mx-1"
+            :disabled="!statePortionDialog"
+            @click="modalOk1"
+          >
+            Ok
+          </b-button>
+          <b-button
+            variant="warning"
+            size="sm"
+            class="float-right mx-1"
+            @click="showModal1 =false"
+          >
+            Cancel
+          </b-button>
+        </div>
+      </template>
     </b-modal>
 
   </b-container>
@@ -114,11 +167,30 @@ export default {
         name: '',
         count_method: '',
         unit_weight: 0,
-        photoLink: []
-      }
+        photoLink: [],
+      },
+      typicalUnit: [
+        'small_size',
+        'medium_size',
+        'large_size',
+        'teaspoon',
+        'coffee_cup',
+        'single_handful',
+        'two_handful',
+      ],
     }
   },
   computed: {
+    stateCountMethod(){
+      let re = /.+/;
+      return re.test(this.modalValue.count_method);
+    },
+    statePortionSize(){
+      return ((typeof this.modalValue.unit_weight === 'number') && (this.modalValue.unit_weight > 0));
+    },
+    statePortionDialog(){
+      return this.stateCountMethod && this.statePortionSize
+    },
     cropList() {
       const fct = this.$store.state.fire.myApp.dataSet.fct
       if (fct) {
@@ -168,6 +240,9 @@ export default {
     }
   },
   methods: {
+    formatterNumber(val){
+      this.modalValue.unit_weight = Number(val)
+    },
     onPortionSelected(item){
       this.portionImg = item[0].photoLink ? item[0].photoLink[0]: '/img/crops/no_image.png'
     },
@@ -183,7 +258,7 @@ export default {
       this.modalValue.FCT_id = item.FCT_id
       this.modalValue.name = item.name
       this.modalValue.count_method = item.count_method
-      this.modalValue.unit_weight = item.unit_weight
+      this.modalValue.unit_weight = Number(item.unit_weight)
       this.modalValue.photoLink = JSON.parse(JSON.stringify(item.photoLink)) || []
       this.showModal1 = true
     },
@@ -192,7 +267,7 @@ export default {
       this.modalValue.FCT_id = this.cropId
       this.modalValue.name = this.cropName
       this.modalValue.count_method = ''
-      this.modalValue.unit_weight = ''
+      this.modalValue.unit_weight = 0
       this.modalValue.photoLink = []
       this.showModal1 = true
     },
@@ -219,7 +294,7 @@ export default {
       this.modalValue.FCT_id = ''
       this.modalValue.name = ''
       this.modalValue.count_method = ''
-      this.modalValue.unit_weight = ''
+      this.modalValue.unit_weight = 0
       this.modalValue.photoLink.length = 0
     },
     async modalOk1() {
@@ -254,8 +329,10 @@ export default {
       this.modalValue.FCT_id = ''
       this.modalValue.name = ''
       this.modalValue.count_method = ''
-      this.modalValue.unit_weight = ''
+      this.modalValue.unit_weight = 0
       this.modalValue.photoLink.length = 0
+
+      this.showModal1 = false
     },
   }
 }
