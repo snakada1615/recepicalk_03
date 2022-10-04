@@ -141,9 +141,8 @@
     <!--  ここからデータ入力用modal  -->
     <b-modal
       v-model="showModalInput"
-      id="modalInput"
+      id="modalInputWeight"
       hide-header
-      hide-footer
     >
       <!--   タイトル   -->
       <b-row class="px-0 mx-0 my-1">

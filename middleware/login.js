@@ -26,6 +26,12 @@ export default async function ({store, redirect, route}) {
       return redirect('/')
     }
   } else {
+    // TODO: 円グラフのlegendを小さくする
+    // TODO: 円グラフの%表示を変更
+    // TODO: 円グラフの実数値をテーブルにする
+    // TODO: PFCの色構成が悪いので変更
+    // TODO: crop Calendarの月表示をJan/Fev/Mar形式に
+    // TODO: dbの修正権限を適用しない
     if (store.state.fire.isLoggedIn) {
       // 初期化されていない変数があった場合、firebaseからオリジナル変数をダウンロードして際読み込む
       // （下位互換のための例外措置）
