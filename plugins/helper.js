@@ -433,7 +433,7 @@ export function updatePfc(supply) {
       datasets: [
         {
           label: 'Data One',
-          backgroundColor: ['green', 'yellow', 'red'],
+          backgroundColor: ['lightGreen', 'hotPink', 'lightSkyBlue'],
           data: [Pr100, Fat100, Carbohydrate100]
         }
       ]

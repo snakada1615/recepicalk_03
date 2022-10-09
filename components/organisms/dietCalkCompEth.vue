@@ -231,24 +231,24 @@ export default {
             'text': 'Protein',
             'x': 20,
             'y': 20,
-            'bgColor': 'green',
-            'textColor': 'white',
+            'bgColor': 'lightGreen',
+            'textColor': 'black',
             'fontSize': '10px'
           },
           {
             'text': 'Fat',
             'x': 20,
             'y': 20,
-            'bgColor': 'yellow',
-            'textColor': 'brown',
+            'bgColor': 'hotPink',
+            'textColor': 'black',
             'fontSize': '10px'
           },
           {
             'text': 'Carbo.',
             'x': 20,
             'y': 20,
-            'bgColor': 'red',
-            'textColor': 'white',
+            'bgColor': 'lightSkyBlue',
+            'textColor': 'black',
             'fontSize': '10px'
           },
         ]
@@ -325,7 +325,7 @@ export default {
         datasets: [
           {
             label: 'Data One',
-            backgroundColor: ['green', 'yellow', 'red'],
+            backgroundColor: ['lightGreen', 'hotPink', 'lightSkyBlue'],
             data: [35, 10, 55],
           }
         ]
