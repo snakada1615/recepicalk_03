@@ -232,7 +232,7 @@
             >
             </b-table>
             <b-card class="border-0 py-2 px-2" align="center">
-              <b-img :src="portionImg" fluid></b-img>
+              <b-img-lazy :src="portionImg" fluid></b-img-lazy>
             </b-card>
           </b-col>
         </b-row>
@@ -407,6 +407,18 @@ export default {
   },
   data() {
     return {
+      /**
+       * 画像表示用property
+       */
+      imgProps: {
+        center: true,
+        fluidGrow: true,
+        blank: true,
+        blankColor: '#bbb',
+        width: 200,
+        height: 200,
+        class: 'my-5'
+      },
       /**
        * portion表示用設定
        */

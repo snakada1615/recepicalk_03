@@ -119,13 +119,10 @@
               />
             </b-col>
           </b-row>
-          <b-row align-h="between" class="mt-1">
-            <b-col class="h-25 small">Protein</b-col>
-            <b-col class="h-25 small" style="background-color: green;color: green">a</b-col>
-            <b-col class="h-25 small">Fat</b-col>
-            <b-col class="h-25 small" style="background-color: yellow;color: yellow">a</b-col>
-            <b-col class="h-25 small"><small>Carbo.</small></b-col>
-            <b-col class="h-25 small" style="background-color: red;color: red">a</b-col>
+          <b-row fluid class="mt-2 text-center">
+            <b-col>
+              <legend-set :legend-dataset="legendDataset"/>
+            </b-col>
           </b-row>
         </b-card>
       </b-col>
@@ -175,6 +172,7 @@ import recepiTable from "@/components/molecules/recepiTable"
 import nutritionBar2 from "@/components/molecules/nutritionBar2"
 import macroNutrientBar from "@/components/molecules/macroNutrientBar";
 import fctTableModal2 from "@/components/organisms/FctTableModal2";
+import legendSet from "../atoms/legendSet";
 import {
   getNutritionSupplyList, validateMyFamily,
   getNutritionDemandList, updatePfc, getPfcScale, getDiversityStatus
@@ -202,7 +200,8 @@ export default {
     driSelectModal,
     macroNutrientBar,
     fctTableModal2,
-    pieChart
+    pieChart,
+    legendSet
   },
   data() {
     return {
@@ -217,7 +216,43 @@ export default {
           display: false
         }
       },
-
+      /**
+       * legend表示用のデータ
+       */
+      legendDataset: {
+        rectOptions: {
+          'x': '10',
+          'y': '10',
+          'width': '70',
+          'height': '14',
+        },
+        dataset: [
+          {
+            'text': 'Protein',
+            'x': 20,
+            'y': 20,
+            'bgColor': 'green',
+            'textColor': 'white',
+            'fontSize': '10px'
+          },
+          {
+            'text': 'Fat',
+            'x': 20,
+            'y': 20,
+            'bgColor': 'yellow',
+            'textColor': 'brown',
+            'fontSize': '10px'
+          },
+          {
+            'text': 'Carbo.',
+            'x': 20,
+            'y': 20,
+            'bgColor': 'red',
+            'textColor': 'white',
+            'fontSize': '10px'
+          },
+        ]
+      },
       /**
        * 使用する全変数のobject
        * myFamilyから読み込んでこのページで利用。更新された時にemitを返す
@@ -475,7 +510,7 @@ export default {
           return item2.note
         })
         vm.currentMenu = JSON.parse(JSON.stringify(
-          vm.myFamilyWatcher.menuCases.map((item)=>{
+          vm.myFamilyWatcher.menuCases.map((item) => {
             return item.menu
           })
         ))
@@ -517,7 +552,7 @@ export default {
       return item2.note
     })
     vm.currentMenu = JSON.parse(JSON.stringify(
-      vm.myFamilyWatcher.menuCases.map((item)=>{
+      vm.myFamilyWatcher.menuCases.map((item) => {
         return item.menu
       })
     ))

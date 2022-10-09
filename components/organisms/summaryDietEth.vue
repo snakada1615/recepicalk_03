@@ -143,13 +143,10 @@
                       />
                     </b-col>
                   </b-row>
-                  <b-row align-h="between" class="mt-1">
-                    <b-col class="h-25 small">Protein</b-col>
-                    <b-col class="h-25 small" style="background-color: green;color: green">a</b-col>
-                    <b-col class="h-25 small">Fat</b-col>
-                    <b-col class="h-25 small" style="background-color: yellow;color: yellow">a</b-col>
-                    <b-col class="h-25 small"><small>Carbo.</small></b-col>
-                    <b-col class="h-25 small" style="background-color: red;color: red">a</b-col>
+                  <b-row fluid class="mt-2 text-center">
+                    <b-col>
+                      <legend-set :legend-dataset="legendDataset"/>
+                    </b-col>
                   </b-row>
                 </b-card>
               </b-col>
@@ -185,13 +182,15 @@ import {
 } from "../../plugins/helper";
 import pieChart from "../atoms/pieChart";
 import recepiTable from "../molecules/recepiTable";
+import legendSet from "../atoms/legendSet";
 
 export default {
   components: {
     nutritionBar2,
     macroNutrientBar,
     pieChart,
-    recepiTable
+    recepiTable,
+    legendSet
   },
   methods: {
     setColWidth(val) {
@@ -370,6 +369,43 @@ export default {
   },
   data() {
     return {
+      /**
+       * legend表示用のデータ
+       */
+      legendDataset: {
+        rectOptions: {
+          'x': '10',
+          'y': '10',
+          'width': '70',
+          'height': '14',
+        },
+        dataset: [
+          {
+            'text': 'Protein',
+            'x': 20,
+            'y': 20,
+            'bgColor': 'green',
+            'textColor': 'white',
+            'fontSize': '10px'
+          },
+          {
+            'text': 'Fat',
+            'x': 20,
+            'y': 20,
+            'bgColor': 'yellow',
+            'textColor': 'brown',
+            'fontSize': '10px'
+          },
+          {
+            'text': 'Carbo.',
+            'x': 20,
+            'y': 20,
+            'bgColor': 'red',
+            'textColor': 'white',
+            'fontSize': '10px'
+          },
+        ]
+      },
       /**
        * pie-chartのオプション
        * maintainAspectRatio: コンテナ形状に対応してチャートを変化させない
