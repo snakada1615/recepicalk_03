@@ -26,8 +26,6 @@ export default async function ({store, redirect, route}) {
       return redirect('/')
     }
   } else {
-    // TODO: 円グラフのlegendを小さくする
-    // TODO: 円グラフの%表示を変更
     // TODO: 円グラフの実数値をテーブルにする
     // TODO: PFCの色構成が悪いので変更
     // TODO: crop Calendarの月表示をJan/Fev/Mar形式に

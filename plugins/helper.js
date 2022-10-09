@@ -423,6 +423,10 @@ export function updatePfc(supply) {
     const Pr = Math.round(dat.Pr * 4)
     const Fat = Math.round(dat.Fat * 9)
     const Carbohydrate = Math.round(dat.Carbohydrate * 4)
+    const sum = Pr + Fat + Carbohydrate
+    const Pr100 = sum ? Math.round(100 * Pr / sum) : 0
+    const Fat100 = sum ? Math.round(100 * Fat / sum) : 0
+    const Carbohydrate100 = sum ? Math.round(100 * Carbohydrate / sum) : 0
 
     return {
       labels: ['protein', 'fat', 'carbo.'],
@@ -430,7 +434,7 @@ export function updatePfc(supply) {
         {
           label: 'Data One',
           backgroundColor: ['green', 'yellow', 'red'],
-          data: [Pr, Fat, Carbohydrate]
+          data: [Pr100, Fat100, Carbohydrate100]
         }
       ]
     }
