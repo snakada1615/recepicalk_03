@@ -7,7 +7,7 @@
     >
       <b-tabs pills card>
         <b-tab title="set community">
-          <b-row >
+          <b-row>
             <b-col class="d-flex justify-content-end">
               <b-form-checkbox v-model="addNewCommunityFlag" switch>
                 add new community
@@ -28,14 +28,17 @@
                 ></b-form-input>
                 <template #append>
                   <b-button
-                    :disabled="!stateCommunityName"
-                    :class="{'btn-info':stateCommunityName}"
+                    :disabled="!(stateCommunityName && familySize)"
+                    :class="{'btn-info':(stateCommunityName && familySize)}"
                     @click="addNewCommunity(newCommunityName, newTarget)"
                   >add new community
                   </b-button>
                 </template>
               </b-input-group>
-              <div class="small text-muted mb-2">you have to give unique community name</div>
+              <div class="small text-muted mb-2">
+                <span>You have to give unique community name. </span>
+                <span>Community name should be longer than 4 letters</span>
+              </div>
               <hr>
               <dri-select-multi
                 :driItems="dri"
@@ -743,7 +746,7 @@ export default {
         return {'menu': item.menu, 'note': item.note}
       })
 
-      const communitySupply = {'menu': [vm.currentCommunitySupply], 'note':'average'}
+      const communitySupply = {'menu': [vm.currentCommunitySupply], 'note': 'average'}
       const communityDemand = vm.myCommunity.member
 
       let overallSupply = []
@@ -954,12 +957,13 @@ export default {
       return this.myApp.dataSet.fct.filter((item) => filteredId.indexOf(item.id) >= 0)
     },
     stateCommunityName() {
-      const familySize = this.newTarget.reduce((accum, curr) => {
+      return this.newCommunityName.length > 4 && !this.communityList.includes(this.newCommunityName)
+    },
+    familySize() {
+      return this.newTarget.reduce((accum, curr) => {
         accum += curr.count
         return accum
       }, 0)
-      return this.newCommunityName.length > 4 && !this.communityList.includes(this.newCommunityName) &&
-        familySize > 0
     },
     communityList() {
       const temp = this.myApp.communityCases
@@ -1018,7 +1022,7 @@ export default {
      * fctダイアログのトリガー
      */
     showFctDialogue(index) {
-      if (this.fctFilterByMonth.length === 0){
+      if (this.fctFilterByMonth.length === 0) {
         alert('there is no available crop for this month')
         return
       }

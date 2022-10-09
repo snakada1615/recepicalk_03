@@ -28,14 +28,17 @@
                 ></b-form-input>
                 <template #append>
                   <b-button
-                    :disabled="!stateFamilyName"
-                    :class="{'btn-info':stateFamilyName}"
+                    :disabled="!(stateFamilyName && familySize) "
+                    :class="{'btn-info':(stateFamilyName && familySize)}"
                     @click="addNewFamily(newFamilyName, newTarget)"
                   >add new family
                   </b-button>
                 </template>
               </b-input-group>
-              <div class="small text-muted mb-2">you have to give unique family name</div>
+              <div class="small text-muted mb-2">
+                <span>You have to give unique family name. </span>
+                <span>Family name should be longer than 4 letters</span>
+              </div>
               <hr>
               {{ myApp.currentFamily }}
               <dri-select-multi
@@ -826,12 +829,13 @@ export default {
       return this.myApp.dataSet.fct.filter((item) => filteredId.indexOf(item.id) >= 0)
     },
     stateFamilyName() {
-      const familySize = this.newTarget.reduce((accum, curr) => {
+      return this.newFamilyName.length > 4 && !this.familyList.includes(this.newFamilyName)
+    },
+    familySize(){
+      return this.newTarget.reduce((accum, curr) => {
         accum += curr.count
         return accum
       }, 0)
-      return this.newFamilyName.length > 4 && !this.familyList.includes(this.newFamilyName) &&
-        familySize > 0
     },
     familyList() {
       const temp = this.myApp.familyCases
