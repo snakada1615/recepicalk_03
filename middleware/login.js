@@ -27,7 +27,6 @@ export default async function ({store, redirect, route}) {
     }
   } else {
     // TODO: 円グラフの実数値をテーブルにする
-    // TODO: PFCの色構成が悪いので変更
     // TODO: crop Calendarの月表示をJan/Fev/Mar形式に
     // TODO: dbの修正権限を適用しない
     if (store.state.fire.isLoggedIn) {
