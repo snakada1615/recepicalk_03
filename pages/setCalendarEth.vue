@@ -106,12 +106,19 @@
             id="filterInput"
             placeholder="Type to Search"
           ></b-form-input>
+          <template #append>
+            <b-input-group-text>Group</b-input-group-text>
+            <b-form-select
+              v-model="groupFilter"
+              :options="FoodGrp"
+            />
+          </template>
         </b-input-group>
         <b-table
           v-if="currentCalendar.length"
           striped
           sticky-header
-          :items="currentCalendar"
+          :items="currentCalendarFiltered"
           :fields="fields"
           :filter="filter"
           :filter-included-fields="filterOn"
@@ -422,6 +429,10 @@ export default {
   },
   data() {
     return {
+      /**
+       * cropList用のfilter by Group
+       */
+      groupFilter: '',
       myList: [],
       /**
        * コレクション名(firebaseからの読み込み用)
@@ -456,22 +467,46 @@ export default {
         {key: 'id', sortable: false, tdClass: 'd-none', thClass: 'd-none'},
         {key: 'Group', sortable: true, tdClass: 'd-none', thClass: 'd-none'},
         {key: 'crop name', sortable: true, thStyle: {width: "200px"}},
-        {key: '1', sortable: false, thStyle: {width: "10px"}, label:'Jan'},
-        {key: '2', sortable: false, thStyle: {width: "10px"}, label:'Feb'},
-        {key: '3', sortable: false, thStyle: {width: "10px"}, label:'Mar'},
-        {key: '4', sortable: false, thStyle: {width: "10px"}, label:'Apr'},
-        {key: '5', sortable: false, thStyle: {width: "10px"}, label:'May'},
-        {key: '6', sortable: false, thStyle: {width: "10px"}, label:'Jun'},
-        {key: '7', sortable: false, thStyle: {width: "10px"}, label:'Jul'},
-        {key: '8', sortable: false, thStyle: {width: "10px"}, label:'Aug'},
-        {key: '9', sortable: false, thStyle: {width: "10px"}, label:'Sep'},
-        {key: '10', sortable: false, thStyle: {width: "10px"}, label:'Oct'},
-        {key: '11', sortable: false, thStyle: {width: "10px"}, label:'Nov'},
-        {key: '12', sortable: false, thStyle: {width: "10px"}, label:'Dec'}
+        {key: '1', sortable: false, thStyle: {width: "10px"}, label: 'Jan'},
+        {key: '2', sortable: false, thStyle: {width: "10px"}, label: 'Feb'},
+        {key: '3', sortable: false, thStyle: {width: "10px"}, label: 'Mar'},
+        {key: '4', sortable: false, thStyle: {width: "10px"}, label: 'Apr'},
+        {key: '5', sortable: false, thStyle: {width: "10px"}, label: 'May'},
+        {key: '6', sortable: false, thStyle: {width: "10px"}, label: 'Jun'},
+        {key: '7', sortable: false, thStyle: {width: "10px"}, label: 'Jul'},
+        {key: '8', sortable: false, thStyle: {width: "10px"}, label: 'Aug'},
+        {key: '9', sortable: false, thStyle: {width: "10px"}, label: 'Sep'},
+        {key: '10', sortable: false, thStyle: {width: "10px"}, label: 'Oct'},
+        {key: '11', sortable: false, thStyle: {width: "10px"}, label: 'Nov'},
+        {key: '12', sortable: false, thStyle: {width: "10px"}, label: 'Dec'}
       ],
     }
   },
   computed: {
+    /**
+     * FCTに含まれるFood Groupの一覧
+     * @returns {*[]}
+     * @constructor
+     */
+    FoodGrp() {
+      let uniqueGroup = []
+      const calendar = this.$store.state.fire.myApp.dataSet.cropCalendar
+      if (calendar) {
+        calendar.forEach(function (elem) {
+          if (uniqueGroup.indexOf(elem.Group) === -1) {
+            uniqueGroup.push(elem.Group)
+          }
+        })
+      }
+      return uniqueGroup
+    },
+    currentCalendarFiltered() {
+      if (!this.groupFilter) {
+        return this.currentCalendar
+      } else {
+        return this.currentCalendar.filter((item) => item.Group === this.groupFilter)
+      }
+    },
     newCalendarName() {
       return 'cropCalendar_' + this.newName
     },
@@ -534,8 +569,12 @@ export default {
       if (res > 2) {
         res = 0
       }
-      this.currentCalendar[data.index][data.field.key] = String(res)
-      //console.log(this.currentCalendar[data.index][data.field.key])
+      //this.currentCalendar[data.index][data.field.key] = String(res)
+      this.currentCalendar.forEach((item) => {
+        if (item.id === data.item.id) {
+          this.$set(item, data.field.key, String(res))
+        }
+      })
     },
     /**
      * currentCalendarをJsonに変換
@@ -575,9 +614,10 @@ export default {
     newCropCalendar() {
       return this.$store.state.fire.myApp.dataSet.fct.map((item, index) => {
         return {
-          FCT_id: item.id,
+          'FCT_id': item.id,
+          'Group': item.Group,
           'crop name': item.Name,
-          id: index,
+          'id': index,
           '1': '0',
           '2': '0',
           '3': '0',

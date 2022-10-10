@@ -27,7 +27,6 @@ export default async function ({store, redirect, route}) {
     }
   } else {
     // TODO: 円グラフの実数値をテーブルにする
-    // TODO: crop Calendarの月表示をJan/Fev/Mar形式に
     // TODO: dbの修正権限を適用しない
     if (store.state.fire.isLoggedIn) {
       // 初期化されていない変数があった場合、firebaseからオリジナル変数をダウンロードして際読み込む
