@@ -124,6 +124,12 @@
               <legend-set :legend-dataset="legendDataset"/>
             </b-col>
           </b-row>
+          <b-row fluid class="mt-0 text-right">
+            <b-col><span v-b-toggle.pieTable01 class="pointer"><b-icon-table scale="0.8"/></span></b-col>
+          </b-row>
+          <b-collapse id="pieTable01">
+            <pfc-table :items="currentMenu[pageIdComputed]"/>
+          </b-collapse>
         </b-card>
       </b-col>
       <b-col cols="12" lg="6">
@@ -169,6 +175,7 @@
 import pieChart from "../atoms/pieChart";
 import driSelectModal from "@/components/organisms/driSelectModal";
 import recepiTable from "@/components/molecules/recepiTable"
+import pfcTable from "../molecules/pfcTable";
 import nutritionBar2 from "@/components/molecules/nutritionBar2"
 import macroNutrientBar from "@/components/molecules/macroNutrientBar";
 import fctTableModal2 from "@/components/organisms/FctTableModal2";
@@ -196,6 +203,7 @@ import {
 export default {
   components: {
     recepiTable,
+    pfcTable,
     nutritionBar2,
     driSelectModal,
     macroNutrientBar,

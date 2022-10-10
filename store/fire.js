@@ -1190,7 +1190,7 @@ export const actions = {
     if ((!state.myApp.dataSet.cropCalendarId) || (state.myApp.dataSet.cropCalendarId.indexOf('cropCalendar') < 0)) {
       alert('cropCalendar is not initialized. data will be loaded from original copy')
       //cropCalendarのオリジナルデータをコピーしてfireStoreに保存
-      const newCropCalendarId = 'cropCalendar01'
+      const newCropCalendarId = 'cropCalendar_221010'
       //fireStoreからcropCalendarのデータを読み込んでstoreに保存
       await dispatch('fetchCropCalendarFromFire', newCropCalendarId)
       needInitialization = true

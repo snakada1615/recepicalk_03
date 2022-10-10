@@ -148,6 +148,12 @@
                       <legend-set :legend-dataset="legendDataset"/>
                     </b-col>
                   </b-row>
+                  <b-row fluid class="mt-0 text-right">
+                    <b-col><span v-b-toggle="'pieTable' + pageId" class="pointer"><b-icon-table scale="0.8"/></span></b-col>
+                  </b-row>
+                  <b-collapse :id="'pieTable' + pageId">
+                    <pfc-table :items="myAppComputed.menuCases[pageId - 1].menu"/>
+                  </b-collapse>
                 </b-card>
               </b-col>
             </template>
@@ -183,6 +189,7 @@ import {
 import pieChart from "../atoms/pieChart";
 import recepiTable from "../molecules/recepiTable";
 import legendSet from "../atoms/legendSet";
+import pfcTable from "../molecules/pfcTable";
 
 export default {
   components: {
@@ -190,7 +197,8 @@ export default {
     macroNutrientBar,
     pieChart,
     recepiTable,
-    legendSet
+    legendSet,
+    pfcTable
   },
   methods: {
     setColWidth(val) {

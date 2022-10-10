@@ -79,6 +79,7 @@ export default {
         'BIconTrash',
         'BIconTrashFill',
         'BIconPencilSquare',
+        'BIconTable'
       ],
       componentPlugins: [
         'NavbarPlugin',
