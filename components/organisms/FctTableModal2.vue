@@ -7,8 +7,6 @@
       static
       @ok="clickOk"
       @cancel="clickCancel"
-      hide-header
-      hide-footer
     >
       <b-card
         class="mb-2"
