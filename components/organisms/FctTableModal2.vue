@@ -8,27 +8,8 @@
       @ok="clickOk"
       @cancel="clickCancel"
       hide-header
+      hide-footer
     >
-      <!--   Add/Cancelボタン   -->
-      <b-row align-h="end" class="my-2">
-        <b-col cols="4">
-          <b-button
-            variant="primary"
-            class="mx-1"
-            size="sm"
-            :disabled="!stateFoodName || !stateFoodVolume"
-            @click="addItem"
-          >Add
-          </b-button>
-
-          <b-button
-            class="mx-1"
-            size="sm"
-            @click="showModalInput = false"
-          >Cancel
-          </b-button>
-        </b-col>
-      </b-row>
       <b-card
         class="mb-2"
         border-variant="success"
@@ -143,6 +124,7 @@
       v-model="showModalInput"
       id="modalInputWeight"
       hide-header
+      hide-footer
     >
       <!--   タイトル   -->
       <b-row class="px-0 mx-0 my-1">
@@ -232,11 +214,32 @@
             >
             </b-table>
             <b-card class="border-0 py-2 px-2" align="center">
-              <b-img-lazy :src="portionImg" fluid></b-img-lazy>
+              <b-img-lazy :src="portionImg" fluid alt="Loading"></b-img-lazy>
             </b-card>
           </b-col>
         </b-row>
       </b-card>
+
+      <!--   Add/Cancelボタン   -->
+      <b-row align-h="end" class="my-2">
+        <b-col cols="4">
+          <b-button
+            variant="primary"
+            class="mx-1"
+            size="sm"
+            :disabled="!stateFoodName || !stateFoodVolume"
+            @click="addItem"
+          >Add
+          </b-button>
+
+          <b-button
+            class="mx-1"
+            size="sm"
+            @click="showModalInput = false"
+          >Cancel
+          </b-button>
+        </b-col>
+      </b-row>
     </b-modal>
   </b-container>
 </template>
@@ -480,8 +483,11 @@ export default {
   },
   methods: {
     onPortionSelected(item){
-      this.portionImg = item[0].photoLink ? item[0].photoLink[0]: '/img/crops/no_image.png'
-      this.portionSize = item[0].unit_weight
+      console.log(item)
+      if (item.length){
+        this.portionImg = item[0].photoLink ? item[0].photoLink[0]: '/img/crops/no_image.png'
+        this.portionSize = item[0].unit_weight
+      }
     },
     /**
      * 各栄養素の値の表示用に、桁数を調整

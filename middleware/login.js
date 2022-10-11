@@ -26,7 +26,6 @@ export default async function ({store, redirect, route}) {
       return redirect('/')
     }
   } else {
-    // TODO: 円グラフの実数値をテーブルにする
     // TODO: dbの修正権限を適用しない
     if (store.state.fire.isLoggedIn) {
       // 初期化されていない変数があった場合、firebaseからオリジナル変数をダウンロードして際読み込む
@@ -36,10 +35,12 @@ export default async function ({store, redirect, route}) {
       // 特定の地域に対して適用するdbを指定
       await store.dispatch('fire/forcedUpdate')
 
+/*
       if ((route.name === 'changeCurrentDataset') && store.state.fire.myApp.user.userType !== 'admin'){
         alert('you need to have admin status to enter this page')
         return redirect('/startPageEth')
       }
+*/
     }
     console.log('autologin complete:')
   }

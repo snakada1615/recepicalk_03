@@ -616,6 +616,8 @@ export default {
      * @param index
      */
     updateSupply(val, index) {
+      console.log('updateSupply')
+      console.log(val)
       //作業用のmyAppコピー作成
       let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
       //更新されたmenuを入れ替える
