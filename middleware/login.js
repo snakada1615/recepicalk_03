@@ -26,7 +26,7 @@ export default async function ({store, redirect, route}) {
       return redirect('/')
     }
   } else {
-    // TODO: dbの修正権限を適用しない
+    // TODO: Food Groupで作成する作付けカレンダー
     if (store.state.fire.isLoggedIn) {
       // 初期化されていない変数があった場合、firebaseからオリジナル変数をダウンロードして際読み込む
       // （下位互換のための例外措置）
