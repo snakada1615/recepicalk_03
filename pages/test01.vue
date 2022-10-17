@@ -1,24 +1,58 @@
 <template>
   <b-container>
-    <pfc-table :items="crops"/>
+    nutrient: {{ selectedNutrient }}
+    month: {{ selectedMonth }}
+    <priority-commodity
+      :crop-list="cropList"
+      :crop-calendar="cropCalendar"
+      :fct="fct"
+      :selected-nutrient.sync="selectedNutrient"
+      :selected-month.sync="selectedMonth"
+    />
   </b-container>
 </template>
 <script>
-import pfcTable from "../components/molecules/pfcTable";
+import priorityCommodity from '@/components/organisms/priorityCommodity'
 
 export default {
   components: {
-    pfcTable
+    priorityCommodity
   },
-  data() {
+  data () {
     return {
-      crops: [
-        {id:"1", Group: "legume", Name: "edamame", En: "25", Pr: "5", Va: "109", Fe: "13", Wt: "196", menuName: "otusmami"},
-        {id:"1", Group: "grain", Name: "taro", En: "25", Pr: "5", Va: "109", Fe: "13", Wt: "196", menuName: "Curry"},
-        {id:"2", Group: "meat", Name: "pork", En: "15", Pr: "9", Va: "58", Fe: "31", Wt: "208", menuName: "Oyako-don"}
-      ]
+      cropList: [],
+      selectedNutrient: '',
+      selectedMonth: 4
     }
   },
-
+  computed: {
+    fct () {
+      return JSON.parse(JSON.stringify(this.$store.state.fire.myApp.dataSet.fct))
+    },
+    cropCalendar () {
+      return JSON.parse(JSON.stringify(this.$store.state.fire.myApp.dataSet.cropCalendar))
+    }
+  },
+  created () {
+    const arr = []
+    for (let mon = 1; mon < 13; mon++) {
+      for (let i = 0; i < 10; i++) {
+        const selectedCrop = []
+        const month = mon
+        const note = ''
+        const index = i
+        const ansList = [-99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99]
+        const prodTarget = { share: 100, Wt: 0, Wt365: 0 }
+        arr.push({ selectedCrop, note, ansList, prodTarget, month, index })
+      }
+    }
+    this.cropList = arr.map((item) => {
+      return {
+        month: item.month,
+        index: item.index,
+        selectedCrop: item.selectedCrop
+      }
+    })
+  }
 }
 </script>
