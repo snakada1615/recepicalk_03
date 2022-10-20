@@ -96,7 +96,7 @@
               :disabled-option="[1,2,3,4,5,6,7,8,9]"
               :hide-case-info="true"
               @update:myFamily="updateMyFamily"
-              @update:pageMemo="updatePageMemo"
+              @update:feasibilityPageMemo="updateFeasibilityPageMemo"
             />
           </b-card>
         </b-tab>
@@ -113,43 +113,60 @@
         </b-tab>
 
         <b-tab
+          v-if="stateFeasibilityCase"
           title="crop feasibility"
-          :disabled="!selectedCropList || familyList.length === 0 || !myFamily.keyNutrient"
+          :disabled="familyList.length === 0 || !myFamily.keyNutrient"
         >
           <div class=" mb-2 ml-3">
             identified nutrient gap:
-            <span
-              class="text-danger font-weight-bold"
-            >
+            <span class="text-danger font-weight-bold">
               {{ selectedNutrient }}
             </span>
           </div>
+
           <div class=" mb-2 ml-3">
             selected month:
-            <span
-              class="text-danger font-weight-bold"
-            >
+            <span class="text-danger font-weight-bold">
               {{ monthValueText }}
             </span>
           </div>
+
+          <!--   ページ情報とページの切り替え   -->
+          <b-card class="px-3" border-variant="light">
+            <b-row class="mt-2">
+              <b-col class="mx-0 mb-0 py-2 bg-dark rounded text-light font-weight-bold">
+                Feasibility assessment result
+                <b-form-select v-model="selectedFeasibilityCase" :options="feasibilityCaseByMonth" />
+                <div class="d-flex flex-row">
+                  <b-form-input
+                    v-model="feasibilityPageMemo"
+                    placeholder="memo for this page"
+                    :state="stateMemoInput"
+                    class="my-1"
+                  />
+                </div>
+              </b-col>
+            </b-row>
+          </b-card>
+
+          <!-- feasibility checkの実施 -->
           <b-row>
-            <feasibility-check-component-eth
-              v-if="myFamily.name && selectedNutrient && (selectedMonth !== -1)"
-              :my-family="myFamily"
+            <feasibility-check-minimal-eth
+              :feasibility-case.sync="feasibilityCase"
+              :nutrient="selectedNutrient"
+              :target-group="member"
+              :current-family="familyName"
+              :my-questions="myApp.dataSet.questions"
               :my-dri="myApp.dataSet.dri"
               :my-fct="myApp.dataSet.fct"
-              :my-questions="myApp.dataSet.questions"
-              :page-id.sync="pageId3"
-              :max-page="maxPage"
-              :current-family="familyName"
-              @update:myFamily="updateMyFamily"
+              :no-header="true"
             />
           </b-row>
         </b-tab>
 
         <b-tab
+          v-if="selectedCropListFiltered.length"
           title="crop feasibility assessment summary"
-          :disabled="!stateFeasibilityCheck"
         >
           <b-row>
             <b-col
@@ -157,12 +174,22 @@
               lg="6"
               class="my-1"
             >
+              <!-- まず注目する栄養素と選択した月を表示  -->
               <div class=" mb-2 ml-3">
                 identified nutrient gap:
                 <span class="text-danger font-weight-bold">
                   {{ selectedNutrient }}
                 </span>
               </div>
+
+              <div class=" mb-2 ml-3">
+                selected month:
+                <span class="text-danger font-weight-bold">
+                  {{ monthValueText }}
+                </span>
+              </div>
+
+              <!--  ここで優先作物を決定する -->
               <b-card
                 style="min-width: 530px;"
                 header-bg-variant="success"
@@ -174,7 +201,6 @@
                   <div>Select nutrient dense food for your target family/HH</div>
                 </template>
                 <b-form-group
-                  v-if="selectedCropList.length !== 0"
                   class="ml-2"
                 >
                   <b-form-radio-group
@@ -194,9 +220,8 @@
           </div>
           <b-row>
             <b-col
-              v-for="pageId in maxPage"
-              v-if="selectedCropList[pageId - 1]"
-              :key="pageId"
+              v-for="(crop, index0) in selectedCropListFiltered"
+              :key="index0"
               cols="12"
               lg="6"
               class="my-1"
@@ -211,8 +236,8 @@
               >
                 <template #header>
                   <div class="font-weight-bolder text-white">
-                    {{ myFamily.feasibilityCases[pageId - 1].note }}:
-                    {{ selectedCropList[pageId - 1] || 'not selected' }}
+                    {{ crop.text|| 'not selected' }}:
+                    {{ myFamily.feasibilityCases[index0].note }}
                   </div>
                 </template>
                 <b-row>
@@ -220,7 +245,7 @@
                     Crop name:
                   </b-col>
                   <b-col cols="6" class="text-info">
-                    {{ selectedCropList[pageId - 1] }}
+                    {{ crop.text }}
                   </b-col>
                 </b-row>
                 <b-row>
@@ -228,11 +253,11 @@
                     total score:
                   </b-col>
                   <b-col cols="6">
-                    {{ qaScore[pageId - 1][qaScore[pageId - 1].length - 1].value }} /
+                    {{ qaScore[index0][qaScore[index0].length - 1].value }} /
                     {{ 10 * qaList.length }}
                   </b-col>
                 </b-row>
-                <b-row v-for="(qa, index) in qaScore[pageId-1]" :key="index">
+                <b-row v-for="(qa, index1) in qaScore[index0]" :key="index1">
                   <b-col>
                     <nutrition-bar2
                       v-if="qa.id > 0"
@@ -253,7 +278,9 @@
             </b-col>
           </b-row>
         </b-tab>
+
         <b-tab
+          v-if="stateFeasibilityCase"
           title="overall result"
           :disabled="!stateFeasibilityCheck"
         >
@@ -285,17 +312,17 @@
 <script>
 import driSelectMulti from '../components/molecules/driSelectMulti'
 import dietCalkCompEth from '../components/organisms/dietCalkCompEth'
-import feasibilityCheckComponentEth from '../components/organisms/feasibilityCheckComponentEth'
 import nutritionBar2 from '../components/molecules/nutritionBar2'
 import summaryDietEth from '../components/organisms/summaryDietEth'
-import { getNutritionDemand, getNutritionSupply, getProductionTarget } from '@/plugins/helper'
+import feasibilityCheckMinimalEth from '@/components/organisms/feasibilityCheckMinimalEth'
+import { getNutritionDemand, getNutritionSupply, getProductionTarget, summarizeQA } from '@/plugins/helper'
 import priorityCommodity from '@/components/organisms/priorityCommodity'
 
 export default {
   components: {
     driSelectMulti,
     dietCalkCompEth,
-    feasibilityCheckComponentEth,
+    feasibilityCheckMinimalEth,
     nutritionBar2,
     summaryDietEth,
     priorityCommodity
@@ -303,6 +330,7 @@ export default {
   layout: 'defaultEth',
   data () {
     return {
+      selectedFeasibilityCase: 0,
       showDriSelect: false,
       isTargetSingle: false,
       maxPopulation: 10000,
@@ -556,6 +584,58 @@ export default {
   },
   computed: {
     /**
+     * noteの記入状態
+     * @returns {boolean}
+     */
+    stateMemoInput () {
+      return (this.feasibilityPageMemo.length > 3)
+    },
+    /**
+     * 月毎のfeasibilityCaseの選択肢一覧
+     */
+    feasibilityCaseByMonth: {
+      get () {
+        const vm = this
+        return vm.myFamily.feasibilityCases.filter(item => item.month === vm.myFamily.currentMonth).map((item2) => {
+          return {
+            value: item2.index,
+            text: item2.selectedCrop.Name || '--------------------',
+            disabled: !Object.keys(item2.selectedCrop).length
+          }
+        })
+      }
+    },
+    /**
+     * 選択されたfeasibilityCase
+     */
+    feasibilityCase: {
+      get () {
+        const vm = this
+        return vm.myFamily.feasibilityCases.find(
+          item => (item.month === vm.myFamily.currentMonth) && (item.index === vm.selectedFeasibilityCase)
+        )
+      },
+      set (val) {
+        this.onFeasibilityCaseChange(val)
+      }
+    },
+    /**
+     * feasibilityPageMemoの更新
+     */
+    feasibilityPageMemo: {
+      get () {
+        return this.feasibilityCase ? this.feasibilityCase.note : ''
+      },
+      set (val) {
+        this.updateFeasibilityPageMemo(val)
+      }
+    },
+    member: {
+      get () {
+        return this.myFamily.member
+      }
+    },
+    /**
      * 現在選択された月をtext表示
      */
     monthValueText: {
@@ -625,8 +705,8 @@ export default {
     qaScore () {
       const res = []
       const vm = this
-      vm.myFamily.feasibilityCases.forEach(function (val) {
-        res.push(vm.summarizeQA(vm.ansId, val.ansList))
+      vm.myFamily.feasibilityCases.filter(item => item.month === vm.selectedMonth).forEach(function (val) {
+        res.push(summarizeQA(vm.ansId, val.ansList, vm.qaList))
       })
       return res
     },
@@ -678,6 +758,11 @@ export default {
       }
       return res
     },
+    stateFeasibilityCase: {
+      get () {
+        return Object.keys(this.feasibilityCase.selectedCrop).length > 0
+      }
+    },
     stateFeasibilityCheck () {
       let res = false
       if (this.myFamily.feasibilityCases) {
@@ -708,7 +793,7 @@ export default {
     },
     selectedMonth: {
       get () {
-        return this.myFamily.currentMonth
+        return this.myFamily.currentMonth || 1
       },
       set (val) {
         const vm = this
@@ -723,7 +808,6 @@ export default {
       },
       set (val) {
         const vm = this
-        console.log(val)
         const res = JSON.parse(JSON.stringify(vm.myFamily))
         res.keyCommodity = val
         vm.updateMyFamily(res)
@@ -759,19 +843,15 @@ export default {
     },
     selectedCropListFiltered () {
       const vm = this
-      if (!vm.selectedCropList) {
-        return
+      if (!vm.feasibilityCaseByMonth) {
+        return []
+      } else {
+        return vm.feasibilityCaseByMonth.filter(item => item.text !== '--------------------')
       }
-      return vm.selectedCropList.map((item, index) => {
-        return {
-          text: item,
-          value: index
-        }
-      }).filter(item => item.text !== '')
     },
     currentTarget () {
       const temp = this.myApp.familyCases
-      if (!temp) {
+      if (!temp || (temp === 't')) {
         return []
       }
       let res = []
@@ -810,7 +890,7 @@ export default {
     },
     familyList () {
       const temp = this.myApp.familyCases
-      if (!temp) {
+      if (!temp || (temp === 't')) {
         return []
       }
       return temp.map((val) => {
@@ -823,12 +903,36 @@ export default {
   },
   methods: {
     /**
+     * feasibilityCaseの更新
+     * @param val
+     */
+    onFeasibilityCaseChange (val) {
+      const vm = this
+      const dat = JSON.parse(JSON.stringify(this.myFamily))
+      dat.feasibilityCases = dat.feasibilityCases.map((item) => {
+        if ((item.month === vm.myFamily.currentMonth) && (item.index === vm.selectedFeasibilityCase)) {
+          return val
+        } else {
+          return item
+        }
+      })
+      let familyCaseTemp = JSON.parse(JSON.stringify(this.$store.state.fire.myApp.familyCases))
+      familyCaseTemp = familyCaseTemp.map((item) => {
+        if (item.name === dat.name) {
+          return dat
+        } else {
+          return item
+        }
+      })
+      this.$store.dispatch('fire/updateFamilyCases', familyCaseTemp)
+      this.$store.dispatch('fire/setHasDocumentChanged', true)
+    },
+    /**
      * cropの選択した値をもとにデータ更新
      * @param value
      * @returns {Promise<void>}
      */
-    async onChangeCrop (value) {
-      console.log(value)
+    onChangeCrop (value) {
       const vm = this
       // 作業用のmyFamilyコピー作成
       const dat = vm.myFamily.feasibilityCases.map((item) => {
@@ -851,9 +955,12 @@ export default {
         return item
       })
       // myFamilyを更新
-      await this.updateMyFamily(dat)
+      this.updateMyFamily(dat)
     },
     updateMyFamily (val) {
+      if (this.myApp.familyCases === 't') {
+        return false
+      }
       let res = JSON.parse(JSON.stringify(this.myApp.familyCases))
       res = res.map((item) => {
         let res2 = item
@@ -864,7 +971,7 @@ export default {
       })
       this.$store.dispatch('fire/updateMyFamily', res)
     },
-    updatePageMemo (val) {
+    updateFeasibilityPageMemo (val) {
       this.$store.dispatch('fire/updateMyFamily', val)
       this.$store.dispatch('fire/fireSaveAppdata')
     },
@@ -896,38 +1003,6 @@ export default {
       this.$store.dispatch('fire/removeFamily', val)
       const newVal = this.familyList[0]
       this.$store.dispatch('fire/updateCurrentFamilyName', newVal)
-    },
-    /**
-     * カテゴリ毎のスコアを集計して戻す
-     * @param keys カテゴリとQA_idのペア
-     * @param dat ansList[pageId]
-     * @returns {any[]}
-     */
-    summarizeQA (keys, dat) {
-      const vm = this
-      const res = Array(this.qaCategoryCount).fill(0)
-      let res2 = []
-      // カテゴリ毎の集計
-      keys.forEach(function (key) {
-        res[key.categoryID - 1] += (dat[key.itemID - 1] > 0 ? dat[key.itemID - 1] : 0)
-      })
-      // 集計結果と合わせてカテゴリ情報をObjectにまとめる
-      res2 = res.map(function (item, index) {
-        const qaCategory = vm.qaList[index]
-        return {
-          id: qaCategory.categoryID,
-          text: qaCategory.categoryText,
-          value: Math.round(10 * item / (3 * qaCategory.itemsQA.length))
-        }
-      })
-      // 合計値をobjectに加える
-      const sumTemp = res2.reduce((p, x) => p + x.value, 0)
-      res2.push({
-        id: 0,
-        text: 'total score',
-        value: sumTemp
-      })
-      return res2
     },
     changeFamily (val) {
       this.$store.dispatch('fire/updateCurrentFamilyName', val)

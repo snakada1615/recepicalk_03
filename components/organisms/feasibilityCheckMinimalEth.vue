@@ -1,6 +1,6 @@
 <template>
   <b-container class="px-0" style="max-width: 540px;">
-    <b-row class="mt-2">
+    <b-row v-if="!noHeader" class="mt-0">
       <b-col class="mx-0 mb-0 py-2 bg-dark rounded text-light font-weight-bold">
         Feasibility score
       </b-col>
@@ -11,7 +11,7 @@
       header-bg-variant="success"
       bg-variant="light"
       border-variant="success"
-      class="mx-1 px-0 my-2"
+      class="mx-1 px-0 mb-2 mt-0"
     >
       <template #header>
         <div>Feasibility score</div>
@@ -179,6 +179,10 @@ export default {
     nutritionBar
   },
   props: {
+    noHeader: {
+      type: Boolean,
+      default: false
+    },
     myDri: {
       type: Array,
       required: true

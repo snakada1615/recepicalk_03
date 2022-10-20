@@ -44,6 +44,9 @@
       <template #header>
         <div>Selected Commodities</div>
       </template>
+      <div v-if="cropListByMonth">
+        please select candidate commodities first
+      </div>
 
       <b-list-group>
         <b-list-group-item

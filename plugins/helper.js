@@ -747,3 +747,37 @@ export function myUid () {
 
   return String(year) + String(month) + String(day) + '-' + s4() + s4()
 }
+
+/**
+ * カテゴリ毎のスコアを集計して戻す
+ * @param categories
+ * @param ansList
+ * @param qaList
+ * @returns {{id: *, text: *, value: number}[]}
+ */
+export function summarizeQA (categories, ansList, qaList) {
+  const categoryCount = categories.reduce((a, b) => a.categoryID < b.categoryID ? a.categoryID : b.categoryID)
+  const res = Array(categoryCount).fill(0)
+  let res2 = []
+  // カテゴリ毎の集計
+  categories.forEach(function (category) {
+    res[category.categoryID - 1] += (ansList[category.itemID - 1] > 0 ? ansList[category.itemID - 1] : 0)
+  })
+  // 集計結果と合わせてカテゴリ情報をObjectにまとめる
+  res2 = res.map(function (item, index) {
+    const qaCategory = qaList[index]
+    return {
+      id: qaCategory.categoryID,
+      text: qaCategory.categoryText,
+      value: Math.round(10 * item / (3 * qaCategory.itemsQA.length))
+    }
+  })
+  // 合計値をobjectに加える
+  const sumTemp = res2.reduce((p, x) => p + x.value, 0)
+  res2.push({
+    id: 0,
+    text: 'total score',
+    value: sumTemp
+  })
+  return res2
+}

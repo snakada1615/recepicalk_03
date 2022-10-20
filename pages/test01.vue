@@ -1,5 +1,39 @@
 <template>
   <b-container>
+    <b-row>
+      <b-col>
+        <div class=" mb-2 ml-3">
+          identified nutrient gap:
+          <span class="text-danger font-weight-bold">
+            {{ myFamily.keyNutrient }}
+          </span>
+        </div>
+        <div class=" mb-2 ml-3">
+          selected month:
+          <span class="text-danger font-weight-bold">
+            {{ myFamily.currentMonth }}
+          </span>
+        </div>
+      </b-col>
+    </b-row>
+    <!--   ページ情報とページの切り替え   -->
+    <b-card class="px-5" border-variant="light">
+      <b-row class="mt-2">
+        <b-col class="mx-0 mb-0 py-2 bg-dark rounded text-light font-weight-bold">
+          Feasibility assessment result
+          <b-form-select v-model="selectedFiesibilityCase" :options="feasibilityCaseByMonth" />
+          <div class="d-flex flex-row">
+            <b-form-input
+              v-model="feasibilityPageMemo"
+              placeholder="memo for this page"
+              :state="stateMemoInput"
+              class="my-1"
+            />
+          </div>
+        </b-col>
+      </b-row>
+    </b-card>
+
     <feasibility-check-minimal-eth
       :feasibility-case.sync="feasibilityCase"
       :nutrient="nutrient"
@@ -8,6 +42,7 @@
       :my-questions="question"
       :my-dri="dri"
       :my-fct="fct"
+      :no-header="true"
     />
   </b-container>
 </template>
@@ -22,23 +57,52 @@ export default {
     return {
       cropList: [],
       selectedNutrient: '',
-      selectedMonth: 4
+      selectedFiesibilityCase: 0
     }
   },
   computed: {
+    /**
+     * noteの記入状態
+     * @returns {boolean}
+     */
+    stateMemoInput () {
+      return (this.feasibilityPageMemo.length > 3)
+    },
     myFamily () {
       const vm = this
       const app = vm.$store.state.fire.myApp
       const res = app.familyCases.find(item => item.name === app.currentFamily)
       return res || []
     },
+    feasibilityCaseByMonth: {
+      get () {
+        const vm = this
+        return vm.myFamily.feasibilityCases.filter(item => item.month === vm.myFamily.currentMonth).map((item2) => {
+          return {
+            value: item2.index,
+            text: item2.selectedCrop.Name || '--------------------',
+            disabled: !Object.keys(item2.selectedCrop).length
+          }
+        })
+      }
+    },
     feasibilityCase: {
       get () {
         const vm = this
-        return vm.myFamily.feasibilityCases.find(item => (item.month === vm.myFamily.currentMonth) && (item.index === 3))
+        return vm.myFamily.feasibilityCases.find(
+          item => (item.month === vm.myFamily.currentMonth) && (item.index === vm.selectedFiesibilityCase)
+        )
       },
       set (val) {
         this.onFeasibilityCaseChange(val)
+      }
+    },
+    feasibilityPageMemo: {
+      get () {
+        return this.feasibilityCase.note
+      },
+      set (val) {
+        this.updatefeasibilityPageMemo(val)
       }
     },
     myDataSet: {
@@ -90,9 +154,10 @@ export default {
   },
   methods: {
     onFeasibilityCaseChange (val) {
+      const vm = this
       const dat = JSON.parse(JSON.stringify(this.myFamily))
       dat.feasibilityCases = dat.feasibilityCases.map((item) => {
-        if ((item.month === 2) && (item.index === 3)) {
+        if ((item.month === vm.myFamily.currentMonth) && (item.index === vm.selectedFiesibilityCase)) {
           return val
         } else {
           return item
@@ -108,6 +173,18 @@ export default {
       })
       this.$store.dispatch('fire/updateFamilyCases', familyCaseTemp)
       this.$store.dispatch('fire/setHasDocumentChanged', true)
+    },
+    /**
+     * ページメモの更新：
+     * @param newVal
+     */
+    updatefeasibilityPageMemo (newVal) {
+      // 作業用のmyFamilyコピー作成
+      const dat = JSON.parse(JSON.stringify(this.feasibilityCase))
+      // 更新されたmenuを入れ替える
+      dat.note = newVal
+      // 更新されたmyFamilyをemit
+      this.onFeasibilityCaseChange(dat)
     }
   }
 }
