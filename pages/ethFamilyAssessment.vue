@@ -82,6 +82,7 @@
             </b-col>
           </b-row>
         </b-tab>
+
         <b-tab title="current diet" :disabled="!stateDiet">
           <b-card no-body>
             <diet-calk-comp-eth
@@ -100,72 +101,15 @@
           </b-card>
         </b-tab>
 
-        <b-tab title="priority commodity" :disabled="!statePriotiry">
-          <b-card
-            style="min-width: 530px;"
-            header-bg-variant="success"
-            bg-variant="light"
-            border-variant="success"
-            class="mx-1 px-0 my-2"
-          >
-            <template #header>
-              <div>Select key nutrient for your target family/HH</div>
-            </template>
-            <b-row>
-              <b-col>
-                <b-form-group
-                  v-if="myFamily.name"
-                  class="ml-2"
-                >
-                  <b-form-radio-group
-                    v-model="selectedNutrient"
-                    :options="keyNutrients"
-                    button-variant="outline-primary"
-                    buttons
-                    stacked
-                    class="ml-4"
-                  />
-                </b-form-group>
-              </b-col>
-              <b-col>
-                <div>Month</div>
-                <b-form-select
-                  v-model="monthValue"
-                  :options="monthOptions"
-                />
-              </b-col>
-            </b-row>
-          </b-card>
-          <b-card
-            style="min-width: 530px;"
-            header-bg-variant="success"
-            bg-variant="light"
-            border-variant="success"
-            class="mx-1 px-0 my-2"
-          >
-            <template #header>
-              <div>Selected Commodities</div>
-            </template>
-
-            <b-list-group>
-              <b-list-group-item
-                v-for="pageId in maxPage"
-                v-if="selectedCropList"
-                :key="pageId"
-              >
-                <div class="d-flex justify-content-between">
-                  <span>Case {{ pageId }}: {{ selectedCropList[pageId - 1] }}</span>
-                  <span>
-                    <b-button
-                      size="sm"
-                      variant="info"
-                      @click="showFctDialogue(pageId)"
-                    >select</b-button>
-                  </span>
-                </div>
-              </b-list-group-item>
-            </b-list-group>
-          </b-card>
+        <b-tab title="priority commodity" :disabled="!statePriority">
+          <priority-commodity
+            :crop-list="priorityCropList"
+            :crop-calendar="myApp.dataSet.cropCalendar"
+            :fct="myApp.dataSet.fct"
+            :selected-nutrient.sync="selectedNutrient"
+            :selected-month.sync="selectedMonth"
+            @changeCrop="onChangeCrop"
+          />
         </b-tab>
 
         <b-tab
@@ -181,16 +125,16 @@
             </span>
           </div>
           <div class=" mb-2 ml-3">
-            selected commodity:
+            selected month:
             <span
               class="text-danger font-weight-bold"
             >
-              {{ selectedCropList[pageId3] }}
+              {{ monthValueText }}
             </span>
           </div>
           <b-row>
             <feasibility-check-component-eth
-              v-if="myFamily.name && selectedNutrient && myFamily.feasibilityCases[0].prodTarget"
+              v-if="myFamily.name && selectedNutrient && (selectedMonth !== -1)"
               :my-family="myFamily"
               :my-dri="myApp.dataSet.dri"
               :my-fct="myApp.dataSet.fct"
@@ -202,6 +146,7 @@
             />
           </b-row>
         </b-tab>
+
         <b-tab
           title="crop feasibility assessment summary"
           :disabled="!stateFeasibilityCheck"
@@ -335,33 +280,25 @@
         </b-tab>
       </b-tabs>
     </b-card>
-
-    <fct-table-modal
-      my-name="modalTest"
-      my-modal-header="Food Composition Table"
-      :show-modal.sync="showFct"
-      :items="fctFilterByMonth"
-      @modalOk="onCropSelected($event, {index: addCropId, month: monthValue})"
-    />
   </b-container>
 </template>
 <script>
 import driSelectMulti from '../components/molecules/driSelectMulti'
 import dietCalkCompEth from '../components/organisms/dietCalkCompEth'
 import feasibilityCheckComponentEth from '../components/organisms/feasibilityCheckComponentEth'
-import fctTableModal from '../components/organisms/FctTableModal'
-import { getNutritionDemand, getNutritionSupply, getProductionTarget } from '../plugins/helper'
 import nutritionBar2 from '../components/molecules/nutritionBar2'
 import summaryDietEth from '../components/organisms/summaryDietEth'
+import { getNutritionDemand, getNutritionSupply, getProductionTarget } from '@/plugins/helper'
+import priorityCommodity from '@/components/organisms/priorityCommodity'
 
 export default {
   components: {
     driSelectMulti,
     dietCalkCompEth,
     feasibilityCheckComponentEth,
-    fctTableModal,
     nutritionBar2,
-    summaryDietEth
+    summaryDietEth,
+    priorityCommodity
   },
   layout: 'defaultEth',
   data () {
@@ -402,10 +339,6 @@ export default {
         { value: 11, text: 'Nov' },
         { value: 12, text: 'Dec' }
       ],
-      /**
-       * 選択された月
-       */
-      monthValue: -1,
       familyName: '',
       keyNutrients: [
         { text: 'Energy', value: 'En' },
@@ -413,10 +346,6 @@ export default {
         { text: 'Vitamin A', value: 'Va' },
         { text: 'Iron', value: 'Fe' }
       ],
-      /**
-       * fctTableModal表示用のフラグ
-       */
-      showFct: false,
       /**
        * 質問と回答一覧
        */
@@ -626,6 +555,24 @@ export default {
     }
   },
   computed: {
+    /**
+     * 現在選択された月をtext表示
+     */
+    monthValueText: {
+      get () {
+        const vm = this
+        return vm.monthOptions.find(item => item.value === vm.selectedMonth).text
+      }
+    },
+    priorityCropList () {
+      return this.myApp.familyCases.find(item => item.name === this.familyName).feasibilityCases.map((item2) => {
+        return {
+          month: item2.month,
+          index: item2.index,
+          selectedCrop: item2.selectedCrop
+        }
+      })
+    },
     menuUpdated () {
       const vm = this
       if (!vm.myFamily.feasibilityCases) {
@@ -717,7 +664,7 @@ export default {
       }
       return (vm.familyName.length > 3)
     },
-    statePriotiry () {
+    statePriority () {
       const vm = this
       let res = false
       if (vm.myFamily) {
@@ -756,6 +703,17 @@ export default {
         const vm = this
         const res = JSON.parse(JSON.stringify(vm.myFamily))
         res.keyNutrient = val
+        vm.updateMyFamily(res)
+      }
+    },
+    selectedMonth: {
+      get () {
+        return this.myFamily.currentMonth
+      },
+      set (val) {
+        const vm = this
+        const res = JSON.parse(JSON.stringify(vm.myFamily))
+        res.currentMonth = val
         vm.updateMyFamily(res)
       }
     },
@@ -831,11 +789,11 @@ export default {
       return JSON.parse(JSON.stringify(this.myApp.dataSet.fct))
     },
     fctFilterByMonth () {
-      if (this.monthValue === -1) {
+      if (this.selectedMonth === -1) {
         return JSON.parse(JSON.stringify(this.myApp.dataSet.fct))
       }
       const myFilter = this.myApp.dataSet.cropCalendar.filter(item =>
-        (item[this.monthValue] === '1') || (item[this.monthValue] === '2'))
+        (item[this.selectedMonth] === '1') || (item[this.selectedMonth] === '2'))
       const filteredId = myFilter.map((item) => {
         return item.FCT_id
       })
@@ -865,56 +823,35 @@ export default {
   },
   methods: {
     /**
-     * cropの選択の変更をmyFamilyに組み込んでemitで通知
+     * cropの選択した値をもとにデータ更新
      * @param value
-     * @param index
+     * @returns {Promise<void>}
      */
-    async onCropSelected (value, option) {
-      const res = {}
-      res.Name = value.Name || 0
-      res.id = value.id || 0
-      res.En = Number(value.En) || 0
-      res.Pr = Number(value.Pr) || 0
-      res.Va = Number(value.Va) || 0
-      res.Fe = Number(value.Fe) || 0
-      // 暫定的に100gにセット
-      res.Wt = 100
-
+    async onChangeCrop (value) {
+      console.log(value)
+      const vm = this
       // 作業用のmyFamilyコピー作成
-      const dat = JSON.parse(JSON.stringify(this.myFamily))
+      const dat = vm.myFamily.feasibilityCases.map((item) => {
+        if ((item.month === value.month) && (item.index === value.index)) {
+          item.selectedCrop = value.selectedCrop
 
-      // selectedCropを更新
-      dat.feasibilityCases[option.index - 1].selectedCrop[0] = res
+          // 生産目標を計算
+          const demand = getNutritionDemand(vm.myFamily.member, this.dri)
+          const supply = getNutritionSupply([value.selectedCrop])
+          const Wt = getProductionTarget(demand, supply, vm.myFamily.keyNutrient, 100)
 
-      // 生産目標を計算
-      const demand = getNutritionDemand(dat.member, this.dri)
-      const supply = getNutritionSupply(dat.feasibilityCases[option.index - 1].selectedCrop)
-      const Wt = getProductionTarget(demand, supply, dat.keyNutrient, 100)
+          // prodTargetを更新
+          item.prodTarget.share = 100
+          item.prodTarget.Wt = Wt
+          item.prodTarget.Wt365 = Wt * 365
 
-      // prodTargetを更新
-      dat.feasibilityCases[option.index - 1].prodTarget.share = 100
-      dat.feasibilityCases[option.index - 1].prodTarget.Wt = Wt
-      dat.feasibilityCases[option.index - 1].prodTarget.Wt365 = Wt * 365
-
-      // selectedCrop[0]を更新
-      dat.feasibilityCases[option.index - 1].selectedCrop[0].Wt = Wt
-
-      // monthを更新
-      dat.feasibilityCases[option.index - 1].month = option.month
-
+          // selectedCrop[0]を更新
+          item.selectedCrop.Wt = Wt
+        }
+        return item
+      })
       // myFamilyを更新
       await this.updateMyFamily(dat)
-    },
-    /**
-     * fctダイアログのトリガー
-     */
-    showFctDialogue (index) {
-      if (this.fctFilterByMonth.length === 0) {
-        alert('there is no available crop for this month')
-        return
-      }
-      this.addCropId = index
-      this.showFct = !this.showFct
     },
     updateMyFamily (val) {
       let res = JSON.parse(JSON.stringify(this.myApp.familyCases))

@@ -54,6 +54,7 @@
             <span>{{ crop }}</span>
             <span>
               <b-button
+                :disabled="!selectedNutrientComputed || !selectedMonthComputed"
                 size="sm"
                 variant="info"
                 @click="showFctDialogue(index)"
@@ -152,10 +153,8 @@ export default {
         if (vm.selectedMonthComputed === -1) {
           return []
         }
-        return vm.cropList.filter((item) => {
-          return item.month === vm.selectedMonthComputed
-        }).map((item2) => {
-          return item2.selectedCrop[0] || ''
+        return vm.cropList.filter(item => item.month === vm.selectedMonthComputed).map((item2) => {
+          return Object.keys(item2.selectedCrop).length ? item2.selectedCrop.Name : ''
         })
       }
     },
@@ -198,17 +197,32 @@ export default {
       this.addCropId = index
       this.showFct = !this.showFct
     },
+    /**
+     * cropの選択した値をもとにデータ更新
+     * @param val
+     * @param options
+     */
     onCropSelected (val, options) {
-      console.log(val)
-      console.log(options)
-      const res = JSON.parse(JSON.stringify(this.cropList))
-      const returnValue = res.map((item) => {
-        if ((item.month = options.month) && (item.index = options.index)) {
-          console.log(returnValue)
+      // 選択された作物の重量を100gにセット
+      val.Wt = 100
+      // cropList全体を更新する場合
+      const returnValue = this.cropList.map((item) => {
+        if ((item.month === options.month) && (item.index === options.index)) {
+          return {
+            month: item.month,
+            index: item.index,
+            selectedCrop: JSON.parse(JSON.stringify(val))
+          }
+        } else {
+          return item
         }
-        return item
       })
-      return false
+      this.$emit('update:cropList', returnValue)
+      this.$emit('changeCrop', {
+        month: options.month,
+        index: options.index,
+        selectedCrop: val
+      })
     }
   }
 }

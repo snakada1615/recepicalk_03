@@ -4,12 +4,12 @@
  * @param key sortするkey
  * @returns {Promise<*>}
  */
-export async function objectSort(objects, key) {
+export function objectSort (objects, key) {
   objects.sort(function (a, b) {
     if (a[key] > b[key]) {
-      return 1;
+      return 1
     } else {
-      return -1;
+      return -1
     }
   })
   return objects
@@ -21,29 +21,29 @@ export async function objectSort(objects, key) {
  * @param unitKey
  * @returns {string}
  */
-export function setDigit(val, unitKey) {
+export function setDigit (val, unitKey) {
   let res
   const units = [
-    {1: ' KC', 2: ' MC', 3: ' GC'},   // for dietary energy
-    {1: ' g', 2: ' kg', 3: ' t'},    // for protein
-    {1: ' µg', 2: ' mg', 3: ' g'},    // for vit-A
-    {1: ' mg', 2: ' g', 3: ' kt'},    // for iron
+    { 1: ' KC', 2: ' MC', 3: ' GC' }, // for dietary energy
+    { 1: ' g', 2: ' kg', 3: ' t' }, // for protein
+    { 1: ' µg', 2: ' mg', 3: ' g' }, // for vit-A
+    { 1: ' mg', 2: ' g', 3: ' kt' } // for iron
   ]
-  const item = Number(val ? val : 0)
+  const item = Number(val || 0)
   switch (true) {
     case (item < 1000):
-      res = String(Math.round(item)) + units[unitKey - 1]["1"]
-      break;
+      res = String(Math.round(item)) + units[unitKey - 1]['1']
+      break
     case (item >= 1000 && item < 1000000):
-      res = String(Math.round(item / 1000)) + units[unitKey - 1]["2"]
-      break;
+      res = String(Math.round(item / 1000)) + units[unitKey - 1]['2']
+      break
     case (item >= 1000000):
-      res = String(Math.round(item / 1000000)) + units[unitKey - 1]["3"]
-      break;
+      res = String(Math.round(item / 1000000)) + units[unitKey - 1]['3']
+      break
     default:
       console.log('parameter not valid:setDigit')
       res = ''
-      break;
+      break
   }
   return res
 }
@@ -54,28 +54,27 @@ export function setDigit(val, unitKey) {
  * @param object2 検査対象2
  * @returns {boolean}
  */
-export function isObjectDeepEqual(object1, object2) {
-  const keys1 = Object.keys(object1);
-  const keys2 = Object.keys(object2);
+export function isObjectDeepEqual (object1, object2) {
+  const keys1 = Object.keys(object1)
+  const keys2 = Object.keys(object2)
   if (keys1.length !== keys2.length) {
-    return false;
+    return false
   }
   for (const key of keys1) {
-    const val1 = object1[key];
-    const val2 = object2[key];
-    const areObjects = isObject(val1) && isObject(val2);
+    const val1 = object1[key]
+    const val2 = object2[key]
+    const areObjects = isObject(val1) && isObject(val2)
     if (
-      areObjects && !isObjectDeepEqual(val1, val2) ||
-      !areObjects && val1 !== val2
+      (areObjects && !isObjectDeepEqual(val1, val2)) ||
+      (!areObjects && val1 !== val2)
     ) {
       console.log(val1)
       console.log(val2)
-      return false;
+      return false
     }
   }
-  return true;
+  return true
 }
-
 
 /**
  * object validation
@@ -84,9 +83,9 @@ export function isObjectDeepEqual(object1, object2) {
  * @param key チェックするkey(String表記)
  * @returns {boolean}
  */
-export function isKeyContained(myObject, key) {
+export function isKeyContained (myObject, key) {
   const keys = Object.keys(myObject)
-  return (keys.indexOf(key) >= 0)
+  return (keys.includes(key))
 }
 
 /**
@@ -95,8 +94,8 @@ export function isKeyContained(myObject, key) {
  * @param item 検査対象の変数
  * @returns {boolean}
  */
-export function isArray(item) {
-  return Object.prototype.toString.call(item) === '[object Array]';
+export function isArray (item) {
+  return Object.prototype.toString.call(item) === '[object Array]'
 }
 
 /**
@@ -105,10 +104,9 @@ export function isArray(item) {
  * @param item 検査対象の変数
  * @returns {boolean}
  */
-export function isObject(item) {
-  return typeof item === 'object' && item !== null && !isArray(item);
+export function isObject (item) {
+  return typeof item === 'object' && item !== null && !isArray(item)
 }
-
 
 /**
  * Validator for complex object
@@ -127,27 +125,27 @@ export function isObject(item) {
  *     ）
  * @returns {*[]} dataに存在しないkeyを抽出
  */
-export function validateObject(data, types) {
-  let errors = [];
-  types.forEach(type => {
-    const keys = type.split('.');
+export function validateObject (data, types) {
+  const errors = []
+  types.forEach((type) => {
+    const keys = type.split('.')
     let datum = {
       ...data
-    };
+    }
     // Loop through the keys
-    for (let [index, key] of keys.entries()) {
+    for (const [index, key] of keys.entries()) {
       // Check if the key is not available in the data
       // then push the corresponding key to the errors array
       // and break the loop
-      //以下の行を、if (!datum[key]) { とすればkeyの存在＋値の有無をチェックする
+      // 以下の行を、if (!datum[key]) { とすればkeyの存在＋値の有無をチェックする
       if (datum[key] === undefined) {
-        errors.push(keys.slice(0, index + 1).join('.'));
-        break;
+        errors.push(keys.slice(0, index + 1).join('.'))
+        break
       }
-      datum = datum[key];
+      datum = datum[key]
     }
   })
-  return errors;
+  return errors
 }
 
 /**
@@ -155,8 +153,8 @@ export function validateObject(data, types) {
  * @param dat 検証するmyApp
  * @returns {false|boolean}
  */
-export function validateMyApp(dat) {
-  //myAppの型設計
+export function validateMyApp (dat) {
+  // myAppの型設計
   const typeName = [
     'user', 'dataSet', 'sceneCount', 'scene', 'menuCases',
     'feasibilityCases', 'saveDate',
@@ -176,10 +174,10 @@ export function validateMyApp(dat) {
   return isObject(dat) && res
 }
 
-export function validateMyFamily(dat) {
-  //myFamilyの型設計
+export function validateMyFamily (dat) {
+  // myFamilyの型設計
   const typeName = [
-    'name', 'member', 'menuCases', 'feasibilityCases',
+    'name', 'member', 'menuCases', 'feasibilityCases'
   ]
   let res = true
   const myError = validateObject(dat, typeName)
@@ -197,8 +195,8 @@ export function validateMyFamily(dat) {
  * @param dat 検証するFCT
  * @returns {false|boolean}
  */
-export function validateFct(dat) {
-  //FCTの型設計
+export function validateFct (dat) {
+  // FCTの型設計
   const typeName = [
     'Carbohydrate',
     'Energy',
@@ -226,8 +224,8 @@ export function validateFct(dat) {
  * @param dat 検証するportionUnit
  * @returns {false|boolean}
  */
-export function validatePortionUnit(dat) {
-  //portionUnitの型設計
+export function validatePortionUnit (dat) {
+  // portionUnitの型設計
   const typeName = [
     'id',
     'FCT_id',
@@ -244,7 +242,7 @@ export function validatePortionUnit(dat) {
   return isObject(dat) && res
 }
 
-export function validateMacroNutrient(dat) {
+export function validateMacroNutrient (dat) {
   const check1 = (dat.length === 3 || dat.length === 4)
   let check2 = false
   const typeName = [
@@ -276,13 +274,13 @@ export function validateMacroNutrient(dat) {
  * @param dri
  * @returns {*}
  */
-export function getNutritionDemand(target, dri) {
+export function getNutritionDemand (target, dri) {
   const initObj = {
-    'En': 0,
-    'Pr': 0,
-    'Va': 0,
-    'Fe': 0,
-    'Wt': 0,
+    En: 0,
+    Pr: 0,
+    Va: 0,
+    Fe: 0,
+    Wt: 0
   }
   if (!target || (target.length === 0)) {
     return initObj
@@ -306,9 +304,9 @@ export function getNutritionDemand(target, dri) {
  * @param dietCalkCheck dietCalkCheckから呼び出されたかどうかチェック
  * @returns {*}
  */
-export function getNutritionDemandList(targetGroup, dri, dietCalkCheck = 0) {
+export function getNutritionDemandList (targetGroup, dri, dietCalkCheck = 0) {
   return targetGroup.map(function (item) {
-    //targetGroupの構造が呼び出し元によって異なるため、フラグで切り分けられるように設定
+    // targetGroupの構造が呼び出し元によって異なるため、フラグで切り分けられるように設定
     if (dietCalkCheck) {
       return getNutritionDemand(item.target, dri)
     } else {
@@ -323,9 +321,9 @@ export function getNutritionDemandList(targetGroup, dri, dietCalkCheck = 0) {
  * @param stapleCheck
  * @returns {*}
  */
-export function getNutritionSupply(datArray, stapleCheck = 0) {
+export function getNutritionSupply (datArray, stapleCheck = 0) {
   return datArray.reduce((accumulator, item) => {
-    //Pr, Fe, Fatについて、別変数を用意
+    // Pr, Fe, Fatについて、別変数を用意
     let myPr = item.Pr ? item.Pr : 0
     let myFe = item.Fe ? item.Fe : 0
     let myFat = item.Fat ? item.Fat : 0
@@ -336,7 +334,7 @@ export function getNutritionSupply(datArray, stapleCheck = 0) {
       myFe = 0
       myFat = 0
     }
-    //循環参照を回避するため定数に切り替えて代入
+    // 循環参照を回避するため定数に切り替えて代入
     const En = item.En ? item.En : 0
     const Va = item.Va ? item.Va : 0
     const Carbohydrate = item.Carbohydrate ? item.Carbohydrate : 0
@@ -351,13 +349,13 @@ export function getNutritionSupply(datArray, stapleCheck = 0) {
     accumulator.Wt += Number(Wt)
     return accumulator
   }, {
-    'En': 0,
-    'Pr': 0,
-    'Va': 0,
-    'Fe': 0,
-    'Wt': 0,
-    'Carbohydrate': 0,
-    'Fat': 0
+    En: 0,
+    Pr: 0,
+    Va: 0,
+    Fe: 0,
+    Wt: 0,
+    Carbohydrate: 0,
+    Fat: 0
   })
 }
 
@@ -369,7 +367,7 @@ export function getNutritionSupply(datArray, stapleCheck = 0) {
  * @param share
  * @returns {number|number}
  */
-export function getProductionTarget(nutrientsDemand, nutrientsSupply, keyNutrient, share) {
+export function getProductionTarget (nutrientsDemand, nutrientsSupply, keyNutrient, share) {
   const rep1 = nutrientsDemand[keyNutrient] ? nutrientsDemand[keyNutrient] : 0
   const rep2 = nutrientsSupply ? nutrientsSupply[keyNutrient] : 0
   return rep2 ? Math.round((rep1 * 100 / rep2) * share / 100) : 0
@@ -382,17 +380,17 @@ export function getProductionTarget(nutrientsDemand, nutrientsSupply, keyNutrien
  * @param stapleCheck
  * @returns {{Pr: number, Fat: number, En: number, Carbohydrate: number, Va: number, Wt: number, Fe: number}[]|*}
  */
-export function getNutritionSupplyList(crops, count, stapleCheck = 1) {
+export function getNutritionSupplyList (crops, count, stapleCheck = 1) {
   const initObj = {
-    'En': 0,
-    'Pr': 0,
-    'Va': 0,
-    'Fe': 0,
-    'Wt': 0,
-    'Carbohydrate': 0,
-    'Fat': 0
+    En: 0,
+    Pr: 0,
+    Va: 0,
+    Fe: 0,
+    Wt: 0,
+    Carbohydrate: 0,
+    Fat: 0
   }
-  //作物未選択の場合、初期値（全て0）を設定
+  // 作物未選択の場合、初期値（全て0）を設定
   if (crops.length === 0) {
     return [...Array(count)].map(() => initObj)
   }
@@ -418,7 +416,7 @@ export function getNutritionSupplyList(crops, count, stapleCheck = 1) {
  * labelに指定した値が表示用に使われる。空白の場合はvalの値が表示される
  *
  */
-export function updatePfc(supply) {
+export function updatePfc (supply) {
   return supply.map((dat) => {
     const Pr = Math.round(dat.Pr * 4)
     const Fat = Math.round(dat.Fat * 9)
@@ -446,7 +444,7 @@ export function updatePfc(supply) {
  * @param rating
  * @returns {*}
  */
-export function getPfcScale(rating) {
+export function getPfcScale (rating) {
   return rating.map((item) => {
     const res = item.En / 10
     if (res < 0.5) {
@@ -464,7 +462,7 @@ export function getPfcScale(rating) {
  * @param nutritionSupplyList
  * @returns {{Pr: number, Fat: number, En: number, Carbohydrate: number, Va: number, Wt: number, Fe: number}}
  */
-export function getAverageNutritionSupply(nutritionSupplyList) {
+export function getAverageNutritionSupply (nutritionSupplyList) {
   let count = 0
   const supplySum = nutritionSupplyList.reduce((accumulator, item) => {
     if (item.Wt > 0) {
@@ -479,22 +477,22 @@ export function getAverageNutritionSupply(nutritionSupplyList) {
     }
     return accumulator
   }, {
-    'En': 0,
-    'Pr': 0,
-    'Va': 0,
-    'Fe': 0,
-    'Wt': 0,
-    'Carbohydrate': 0,
-    'Fat': 0
+    En: 0,
+    Pr: 0,
+    Va: 0,
+    Fe: 0,
+    Wt: 0,
+    Carbohydrate: 0,
+    Fat: 0
   })
   return {
-    'En': supplySum.En / count,
-    'Pr': supplySum.Pr / count,
-    'Va': supplySum.Va / count,
-    'Fe': supplySum.Fe / count,
-    'Wt': supplySum.Wt / count,
-    'Carbohydrate': supplySum.Carbohydrate / count,
-    'Fat': supplySum.Fat / count,
+    En: supplySum.En / count,
+    Pr: supplySum.Pr / count,
+    Va: supplySum.Va / count,
+    Fe: supplySum.Fe / count,
+    Wt: supplySum.Wt / count,
+    Carbohydrate: supplySum.Carbohydrate / count,
+    Fat: supplySum.Fat / count
   }
 }
 
@@ -503,7 +501,7 @@ export function getAverageNutritionSupply(nutritionSupplyList) {
  * @param nutritionDemandList
  * @returns {{Pr: number, En: number, Va: number, Wt: number, Fe: number}}
  */
-export function getAverageNutritionDemand(nutritionDemandList) {
+export function getAverageNutritionDemand (nutritionDemandList) {
   let count = 0
   const demandSum = nutritionDemandList.reduce((accumulator, item) => {
     if (item.En > 0) {
@@ -516,18 +514,18 @@ export function getAverageNutritionDemand(nutritionDemandList) {
     }
     return accumulator
   }, {
-    'En': 0,
-    'Pr': 0,
-    'Va': 0,
-    'Fe': 0,
-    'Wt': 0,
+    En: 0,
+    Pr: 0,
+    Va: 0,
+    Fe: 0,
+    Wt: 0
   })
   return {
-    'En': demandSum.En / count,
-    'Pr': demandSum.Pr / count,
-    'Va': demandSum.Va / count,
-    'Fe': demandSum.Fe / count,
-    'Wt': demandSum.Wt / count,
+    En: demandSum.En / count,
+    Pr: demandSum.Pr / count,
+    Va: demandSum.Va / count,
+    Fe: demandSum.Fe / count,
+    Wt: demandSum.Wt / count
   }
 }
 
@@ -538,20 +536,24 @@ export function getAverageNutritionDemand(nutritionDemandList) {
  * @param count
  * @returns {*[]}
  */
-export function getRating(nutritionSupply, nutritionDemand, count) {
+export function getRating (nutritionSupply, nutritionDemand, count) {
   const res = []
   for (let i = 0; i < count; i++) {
     const supply = nutritionSupply[i]
     const demand = nutritionDemand[i]
     res.push({
-      En: demand.En ?
-        Math.round(100 * supply.En / demand.En) / 10 : 0,
-      Pr: demand.Pr ?
-        Math.round(100 * supply.Pr / demand.Pr) / 10 : 0,
-      Va: demand.Va ?
-        Math.round(100 * supply.Va / demand.Va) / 10 : 0,
-      Fe: demand.Fe ?
-        Math.round(100 * supply.Fe / demand.Fe) / 10 : 0
+      En: demand.En
+        ? Math.round(100 * supply.En / demand.En) / 10
+        : 0,
+      Pr: demand.Pr
+        ? Math.round(100 * supply.Pr / demand.Pr) / 10
+        : 0,
+      Va: demand.Va
+        ? Math.round(100 * supply.Va / demand.Va) / 10
+        : 0,
+      Fe: demand.Fe
+        ? Math.round(100 * supply.Fe / demand.Fe) / 10
+        : 0
     })
   }
   return res
@@ -563,27 +565,27 @@ export function getRating(nutritionSupply, nutritionDemand, count) {
  * @param foodGroup
  * @returns {*}
  */
-export function getDiversityStatusForTable(menuCases, foodGroup) {
+export function getDiversityStatusForTable (menuCases, foodGroup) {
   if (!Object.keys(menuCases).length) {
     return {}
   }
   return menuCases.map((foodsTemp, index) => {
-    let res = {}
-    let colorVariant = {}
-    res['case'] = foodsTemp.note || 'Case' + (index + 1)
-    colorVariant['case'] = 'primary'
+    const res = {}
+    const colorVariant = {}
+    res.case = foodsTemp.note || 'Case' + (index + 1)
+    colorVariant.case = 'primary'
     foodGroup.forEach((foodItem) => {
       res[foodItem] = ''
       colorVariant[foodItem] = 'danger'
     })
     if (foodsTemp.menu.length) {
       foodsTemp.menu.forEach((dat1) => {
-        if (foodGroup.indexOf(dat1.Group) >= 0) {
+        if (foodGroup.includes(dat1.Group)) {
           colorVariant[dat1.Group] = 'info'
         }
       })
     }
-    res['_cellVariants'] = colorVariant
+    res._cellVariants = colorVariant
     return res
   })
 }
@@ -592,11 +594,11 @@ export function getDiversityStatusForTable(menuCases, foodGroup) {
  * menuCasesに含まれるfood Groupから、何種類の食品群が含まれるか判定
  * @returns {*[]}
  */
-export function getDiversityStatus(menuCases, foodGroup) {
+export function getDiversityStatus (menuCases, foodGroup) {
   if (menuCases !== []) {
     return menuCases.map((foodsTemp) => {
-      let res = foodGroup.map((groupTemp) => {
-        return {[groupTemp]: false}
+      const res = foodGroup.map((groupTemp) => {
+        return { [groupTemp]: false }
       })
       if (foodsTemp.menu.length) {
         foodsTemp.menu.forEach((dat1) => {
@@ -617,9 +619,9 @@ export function getDiversityStatus(menuCases, foodGroup) {
  * FCTからfood Groupを抽出
  * @returns {*}
  */
-export function getFoodGroup(fct) {
+export function getFoodGroup (fct) {
   return fct.reduce((accumulator, dat) => {
-    if (accumulator.indexOf(dat.Group) < 0) {
+    if (!accumulator.includes(dat.Group)) {
       accumulator.push(dat.Group)
     }
     return accumulator
@@ -630,7 +632,7 @@ export function getFoodGroup(fct) {
  * jsonをCSVに変換
  * key0: [key1: value] 形式 → Array of CSV (val1, val2, val3, val4)
  */
-export function json2Csv(datJson) {
+export function json2Csv (datJson) {
   const commaDelimitedArray = []
   if (datJson) {
     const myKeys = Object.keys(Object.values(datJson)[0])
@@ -659,7 +661,7 @@ export function json2Csv(datJson) {
   return csvText
 }
 
-export function makeToast(vm, message = 'test', options = {}) {
+export function makeToast (vm, message = 'test', options = {}) {
   vm.$bvToast.toast(message, {
     title: options.title || 'message',
     variant: options.variant || 'danger',
@@ -676,7 +678,7 @@ export function makeToast(vm, message = 'test', options = {}) {
  * @param searchReg
  * @returns {boolean}
  */
-export function checkUserRegion(currentUser, searchReg) {
+export function checkUserRegion (currentUser, searchReg) {
   let res1 = true
   let res2 = true
   let res3 = true
@@ -697,24 +699,24 @@ export function checkUserRegion(currentUser, searchReg) {
   return (res1 && res2 && res3 && res4)
 }
 
-export function constructForceUpdateItem(param) {
+export function constructForceUpdateItem (param) {
   this.searchReg = {
     country: param.country || '',
     subnational1: param.subnational1 || '',
     subnational2: param.subnational2 || '',
-    subnational3: param.subnational3 || '',
+    subnational3: param.subnational3 || ''
   }
   this.setData = {
     fctId: param.fctId || '',
     driId: param.driId || '',
     portionUnitId: param.portionUnitId || '',
     questionsId: param.questionsId || '',
-    cropCalendarId: param.cropCalendarId || '',
+    cropCalendarId: param.cropCalendarId || ''
   }
 }
 
-export function array2JSON(array, key) {
-  let res = {}
+export function array2JSON (array, key) {
+  const res = {}
   array.forEach((item, index) => {
     if (key) {
       if (item[key]) {
@@ -729,19 +731,19 @@ export function array2JSON(array, key) {
   return res
 }
 
-export function myUid() {
-  let s4 = () => {
+export function myUid () {
+  const s4 = () => {
     return Math.floor((1 + Math.random()) * 0x10000)
       .toString(16)
-      .substring(1);
+      .substring(1)
   }
-//今日の日付データを変数hidukeに格納
-  let today = new Date();
+  // 今日の日付データを変数hidukeに格納
+  const today = new Date()
 
-//年・月・日・曜日を取得する
-  let year = today.getFullYear();
-  let month = today.getMonth() + 1;
-  let day = today.getDate();
+  // 年・月・日・曜日を取得する
+  const year = today.getFullYear()
+  const month = today.getMonth() + 1
+  const day = today.getDate()
 
   return String(year) + String(month) + String(day) + '-' + s4() + s4()
 }

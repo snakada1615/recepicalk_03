@@ -40,7 +40,7 @@ function createNewFeasibilityCases (myCount) {
   const arr = []
   for (let mon = 1; mon < 13; mon++) {
     for (let i = 0; i < myCount; i++) {
-      const selectedCrop = []
+      const selectedCrop = {}
       const month = mon
       const note = ''
       const index = i
@@ -794,13 +794,13 @@ export const actions = {
 
     // feasibilityリストの初期値設定
     const arr2 = createNewFeasibilityCases(state.myApp.sceneCount)
-    console.log(arr2)
 
     currentFamily.push({
       name: payload.name,
       member: payload.member,
       keyNutrient: '',
       keyCommodity: '',
+      currentMonth: 1,
       menuCases: arr,
       feasibilityCases: arr2
     })
