@@ -6,30 +6,35 @@
           header-bg-variant="success"
           border-variant="success"
           bg-variant="light"
-          class="my-2">
+          class="my-2"
+        >
           <template #header>
-            <div class="font-weight-bold">Case information</div>
+            <div class="font-weight-bold">
+              Case information
+            </div>
           </template>
-          <b-form-select v-if="!hideCaseInfo" v-model="pageIdComputed" :options="pageOptions"></b-form-select>
+          <b-form-select v-if="!hideCaseInfo" v-model="pageIdComputed" :options="pageOptions" />
           <div class="d-flex flex-row">
             <b-form-input
               v-model="pageMemo[pageIdComputed]"
               placeholder="note for this family"
               :state="noteInputState"
+              class="my-1"
               @update="updatePageMemo(pageMemo[pageIdComputed])"
-              class="my-1">
-            </b-form-input>
+            />
           </div>
           <b-button
-            @click="showFct = !showFct"
             variant="info"
-          >add crop
+            @click="showFct = !showFct"
+          >
+            add crop
           </b-button>
           <b-button
             v-if="!useCommonTarget"
-            @click="showDriSelect = !showDriSelect"
             variant="info"
-          >set family
+            @click="showDriSelect = !showDriSelect"
+          >
+            set family
           </b-button>
         </b-card>
       </b-col>
@@ -38,17 +43,21 @@
           header-bg-variant="success"
           border-variant="success"
           bg-variant="light"
-          class="my-2">
+          class="my-2"
+        >
           <template #header>
-            <div class="font-weight-bold">Dietary diversity</div>
+            <div class="font-weight-bold">
+              Dietary diversity
+            </div>
           </template>
           <div
             v-for="(grp, index) in foodGroup"
+            :key="index"
             class="border my-1 px-1"
             :class="{
-                'bg-warning': !diversityStatus[pageIdComputed][index][grp],
-                'bg-success': diversityStatus[pageIdComputed][index][grp]
-              }"
+              'bg-warning': !diversityStatus[pageIdComputed][index][grp],
+              'bg-success': diversityStatus[pageIdComputed][index][grp]
+            }"
           >
             {{ grp }}
           </div>
@@ -59,25 +68,35 @@
           header-bg-variant="success"
           border-variant="success"
           bg-variant="light"
-          class="my-2">
+          class="my-2"
+        >
           <template #header>
-            <div class="font-weight-bold">Key Nutrients Sufficiency</div>
+            <div class="font-weight-bold">
+              Key Nutrients Sufficiency
+            </div>
           </template>
           <b-row>
-            <b-col cols="2" class="d-flex justify-content-center">Target</b-col>
-            <b-col cols="2" class="d-flex justify-content-center">Supply</b-col>
-            <b-col class="d-flex justify-content-start pl-5">sufficiency rate</b-col>
+            <b-col cols="2" class="d-flex justify-content-center">
+              Target
+            </b-col>
+            <b-col cols="2" class="d-flex justify-content-center">
+              Supply
+            </b-col>
+            <b-col class="d-flex justify-content-start pl-5">
+              sufficiency rate
+            </b-col>
           </b-row>
           <nutrition-bar2
-            v-for="index in 4" :key="index"
-            :colWidthFirst="3"
-            :colwidthSecond="2"
-            :colwidthThird="5"
-            :colwidthFourth="2"
+            v-for="index in 4"
+            :key="index"
+            :col-width-first="3"
+            :colwidth-second="2"
+            :colwidth-third="5"
+            :colwidth-fourth="2"
             :label="nutritionLabel[index-1]"
             :max-rating="maxRating"
             :rating="rating[pageIdComputed][nutritionLabel[index-1]]"
-            :maxRatingAbsolute="nutritionSupplyWatcher[pageIdComputed][nutritionLabel[index-1]]"
+            :max-rating-absolute="nutritionSupplyWatcher[pageIdComputed][nutritionLabel[index-1]]"
           />
           <b-row>
             <b-col>
@@ -88,18 +107,25 @@
           </b-row>
         </b-card>
       </b-col>
-      <b-col cols="12" lg="6">
+      <b-col v-if="!hidePie" cols="12" lg="6">
         <b-card
           header-bg-variant="success"
           border-variant="success"
           bg-variant="light"
-          class="my-2">
+          class="my-2"
+        >
           <template #header>
-            <div class="font-weight-bold">Dietary energy supply from PFC(Protein, Fat, Carbohydrate)</div>
+            <div class="font-weight-bold">
+              Dietary energy supply from PFC(Protein, Fat, Carbohydrate)
+            </div>
           </template>
           <b-row>
-            <b-col cols="6">Recommended</b-col>
-            <b-col cols="6">Current</b-col>
+            <b-col cols="6">
+              Recommended
+            </b-col>
+            <b-col cols="6">
+              Current
+            </b-col>
           </b-row>
           <b-row>
             <b-col cols="6">
@@ -121,14 +147,14 @@
           </b-row>
           <b-row fluid class="mt-2 text-center">
             <b-col>
-              <legend-set :legend-dataset="legendDataset"/>
+              <legend-set :legend-dataset="legendDataset" />
             </b-col>
           </b-row>
           <b-row fluid class="mt-0 text-right">
-            <b-col><span v-b-toggle.pieTable01 class="pointer"><b-icon-table scale="0.8"/></span></b-col>
+            <b-col><span v-b-toggle.pieTable01 class="pointer"><b-icon-table scale="0.8" /></span></b-col>
           </b-row>
           <b-collapse id="pieTable01">
-            <pfc-table :items="currentMenu[pageIdComputed]"/>
+            <pfc-table :items="currentMenu[pageIdComputed]" />
           </b-collapse>
         </b-card>
       </b-col>
@@ -137,15 +163,18 @@
           header-bg-variant="success"
           border-variant="success"
           bg-variant="light"
-          class="my-2">
+          class="my-2"
+        >
           <template #header>
-            <div class="font-weight-bold">Record of Diet</div>
+            <div class="font-weight-bold">
+              Record of Diet
+            </div>
           </template>
           <recepi-table
             :items="currentMenu[pageIdComputed]"
             @itemDeleted="notifiRecepiEdit"
             @rowClick="notifiRecepiEdit"
-          ></recepi-table>
+          />
         </b-card>
       </b-col>
     </b-row>
@@ -156,34 +185,33 @@
       :menu-cases.sync="currentMenu[pageIdComputed]"
       :portion-units="myPortion"
       @update:menuCases="updateSupply($event, pageIdComputed)"
-    ></fctTableModal2>
+    />
     <dri-select-modal
       v-if="!useCommonTarget"
       my-modal-header="nutrition target"
       my-name="driModal"
       :show-modal.sync="showDriSelect"
-      :targetSwitch.sync="myFamilyWatcher.menuCases[pageIdComputed].isTargetSingle"
+      :target-switch.sync="myFamilyWatcher.menuCases[pageIdComputed].isTargetSingle"
       :max="maxPopulation"
-      :driPopulations="myFamilyWatcher.menuCases[pageIdComputed].target"
-      :driItems="myDri"
+      :dri-populations="myFamilyWatcher.menuCases[pageIdComputed].target"
+      :dri-items="myDri"
       @update:target="updateDemand($event, pageIdComputed)"
     />
   </b-container>
 </template>
 
 <script>
-import pieChart from "../atoms/pieChart";
-import driSelectModal from "@/components/organisms/driSelectModal";
-import recepiTable from "@/components/molecules/recepiTable"
-import pfcTable from "../molecules/pfcTable";
-import nutritionBar2 from "@/components/molecules/nutritionBar2"
-import macroNutrientBar from "@/components/molecules/macroNutrientBar";
-import fctTableModal2 from "@/components/organisms/FctTableModal2";
-import legendSet from "../atoms/legendSet";
+import pieChart from '../atoms/pieChart'
+import pfcTable from '../molecules/pfcTable'
+import legendSet from '../atoms/legendSet'
 import {
   getNutritionSupplyList, validateMyFamily,
   getNutritionDemandList, updatePfc, getPfcScale, getDiversityStatus
-} from "../../plugins/helper";
+} from '../../plugins/helper'
+import driSelectModal from '@/components/organisms/driSelectModal'
+import recepiTable from '@/components/molecules/recepiTable'
+import nutritionBar2 from '@/components/molecules/nutritionBar2'
+import fctTableModal2 from '@/components/organisms/FctTableModal2'
 
 /**
  * @desc 6つのコンポーネントを組み合わせて食事評価
@@ -206,12 +234,76 @@ export default {
     pfcTable,
     nutritionBar2,
     driSelectModal,
-    macroNutrientBar,
     fctTableModal2,
     pieChart,
     legendSet
   },
-  data() {
+  props: {
+    myFamily: {
+      type: Object,
+      required: true,
+      validator: function (value) {
+        return validateMyFamily(value)
+      }
+    },
+    myDri: {
+      type: Array,
+      required: true
+    },
+    myFct: {
+      type: Array,
+      required: true
+    },
+    myPortion: {
+      type: Array,
+      required: true
+    },
+    /**
+     * 複数インスタンスを作成する場合のindex
+     */
+    pageId: {
+      type: Number,
+      required: true
+    },
+    /**
+     * 作成するページ数
+     */
+    maxPage: {
+      type: Number,
+      required: true
+    },
+    /**
+     * 共通のDRIを使うか、ケース毎に異なるDRIを設定するか決めるフラグ
+     */
+    useCommonTarget: {
+      type: Boolean,
+      default: true
+    },
+    /**
+     * 最初のページを表示しないためのフラグ
+     */
+    disabledOption: {
+      type: Array,
+      default () {
+        return []
+      }
+    },
+    /**
+     * 冒頭のCase infoを非表示にする（familyCaseの場合）
+     */
+    hideCaseInfo: {
+      type: Boolean,
+      default: false
+    },
+    /**
+     * PieChartを非表示にするオプション
+     */
+    hidePie: {
+      type: Boolean,
+      default: true
+    }
+  },
+  data () {
     return {
       pfcBalanceCurrent: [],
       chartBaseHeight: window.innerHeight / 4,
@@ -229,36 +321,36 @@ export default {
        */
       legendDataset: {
         rectOptions: {
-          'x': '10',
-          'y': '10',
-          'width': '70',
-          'height': '14',
+          x: '10',
+          y: '10',
+          width: '70',
+          height: '14'
         },
         dataset: [
           {
-            'text': 'Protein',
-            'x': 20,
-            'y': 20,
-            'bgColor': 'lightGreen',
-            'textColor': 'black',
-            'fontSize': '10px'
+            text: 'Protein',
+            x: 20,
+            y: 20,
+            bgColor: 'lightGreen',
+            textColor: 'black',
+            fontSize: '10px'
           },
           {
-            'text': 'Fat',
-            'x': 20,
-            'y': 20,
-            'bgColor': 'hotPink',
-            'textColor': 'black',
-            'fontSize': '10px'
+            text: 'Fat',
+            x: 20,
+            y: 20,
+            bgColor: 'hotPink',
+            textColor: 'black',
+            fontSize: '10px'
           },
           {
-            'text': 'Carbo.',
-            'x': 20,
-            'y': 20,
-            'bgColor': 'lightSkyBlue',
-            'textColor': 'black',
-            'fontSize': '10px'
-          },
+            text: 'Carbo.',
+            x: 20,
+            y: 20,
+            bgColor: 'lightSkyBlue',
+            textColor: 'black',
+            fontSize: '10px'
+          }
         ]
       },
       /**
@@ -334,7 +426,7 @@ export default {
           {
             label: 'Data One',
             backgroundColor: ['lightGreen', 'hotPink', 'lightSkyBlue'],
-            data: [35, 10, 55],
+            data: [35, 10, 55]
           }
         ]
       },
@@ -342,75 +434,17 @@ export default {
        * currentとrecommendを比較した場合のエネルギー量の充足度
        * rating[].Enの値を1.5と0.5で足切りしたもの
        */
-      pfcScale: [],
-    }
-  },
-  props: {
-    myFamily: {
-      type: Object,
-      required: true,
-      validator: function (value) {
-        return validateMyFamily(value)
-      },
-    },
-    myDri: {
-      type: Array,
-      required: true
-    },
-    myFct: {
-      type: Array,
-      required: true
-    },
-    myPortion: {
-      type: Array,
-      required: true
-    },
-    /**
-     * 複数インスタンスを作成する場合のindex
-     */
-    pageId: {
-      type: Number,
-      required: true
-    },
-    /**
-     * 作成するページ数
-     */
-    maxPage: {
-      type: Number,
-      required: true
-    },
-    /**
-     * 共通のDRIを使うか、ケース毎に異なるDRIを設定するか決めるフラグ
-     */
-    useCommonTarget: {
-      type: Boolean,
-      default: true
-    },
-    /**
-     * 最初のページを表示しないためのフラグ
-     */
-    disabledOption: {
-      type: Array,
-      default() {
-        return []
-      }
-    },
-    /**
-     * 冒頭のCase infoを非表示にする（familyCaseの場合）
-     */
-    hideCaseInfo: {
-      type: Boolean,
-      default: false
+      pfcScale: []
     }
   },
   computed: {
-    myChartStyles() {
+    myChartStyles () {
       return {
         height: `${this.chartBaseHeight * this.pfcScale[this.pageIdComputed]}px`,
         position: 'relative'
       }
     },
-    myChartStylesOriginal() {
+    myChartStylesOriginal () {
       return {
         height: `${this.chartBaseHeight}px`,
         position: 'relative'
@@ -424,15 +458,15 @@ export default {
         return this.pageId
       },
       set: function (newVal) {
-        if (this.pageId !== newVal) this.$emit('update:pageId', newVal)
+        if (this.pageId !== newVal) { this.$emit('update:pageId', newVal) }
       }
     },
     /**
      * ページ一覧：リストからページ選択するためのarray option
      * @returns {*[]}
      */
-    pageOptions() {
-      let res = []
+    pageOptions () {
+      const res = []
       for (let i = 0; i < this.maxPage; i++) {
         res.push({
           value: i,
@@ -446,9 +480,9 @@ export default {
      * FCTからfood Groupを抽出
      * @returns {*}
      */
-    foodGroup() {
+    foodGroup () {
       return this.myFct.reduce((accumulator, dat) => {
-        if (accumulator.indexOf(dat.Group) < 0) {
+        if (!accumulator.includes(dat.Group)) {
           accumulator.push(dat.Group)
         }
         return accumulator
@@ -458,7 +492,7 @@ export default {
      * menuCasesに含まれるfood Groupから、何種類の食品群が含まれるか判定
      * @returns {*[]}
      */
-    diversityStatus() {
+    diversityStatus () {
       const vm = this
       return getDiversityStatus(vm.myFamilyWatcher.menuCases, vm.foodGroup)
     },
@@ -466,7 +500,7 @@ export default {
      * noteの記入状態
      * @returns {boolean}
      */
-    noteInputState() {
+    noteInputState () {
       if (this.pageMemo.length === 0) {
         return false
       }
@@ -479,7 +513,7 @@ export default {
      */
     myFamily: {
       deep: true,
-      handler(newVal) {
+      handler (newVal) {
         const vm = this
         vm.myFamilyWatcher = JSON.parse(JSON.stringify(newVal))
         let memberSetList = []
@@ -526,12 +560,12 @@ export default {
           updatePfc(vm.nutritionSupplyWatcher)
         ))
       }
-    },
+    }
   },
   /**
    * 初期値の代入
    */
-  created() {
+  created () {
     const vm = this
     vm.myFamilyWatcher = JSON.parse(JSON.stringify(vm.myFamily))
 
@@ -569,7 +603,7 @@ export default {
     ))
   },
   methods: {
-    enlargeChart() {
+    enlargeChart () {
       this.chartBaseHeight += 10
       console.log(this.chartBaseHeight)
     },
@@ -577,19 +611,19 @@ export default {
      * ページメモの更新：
      * @param newVal
      */
-    updatePageMemo(newVal) {
-      //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
-      //更新されたmenuを入れ替える
+    updatePageMemo (newVal) {
+      // 作業用のmyAppコピー作成
+      const dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
+      // 更新されたmenuを入れ替える
       dat.menuCases[this.pageIdComputed].note = newVal
-      //更新されたmyAppをemit
+      // 更新されたmyAppをemit
       this.$emit('update:myFamily', dat)
     },
     /**
      * nutritionSupplyとnutritionDemandの値に基づいて栄養素の充足率を算出
      * @returns {*[]} 栄養素ごとの充足率
      */
-    ratingGetter(supplyCases, demandCases) {
+    ratingGetter (supplyCases, demandCases) {
       const res = []
       for (let i = 0; i < this.maxPage; i++) {
         const supply = supplyCases[i]
@@ -599,14 +633,18 @@ export default {
                 const demand = this.nutritionDemandWatcher[i]
         */
         res.push({
-          En: demand.En ?
-            Math.round(100 * supply.En / demand.En) / 10 : 0,
-          Pr: demand.Pr ?
-            Math.round(100 * supply.Pr / demand.Pr) / 10 : 0,
-          Va: demand.Va ?
-            Math.round(100 * supply.Va / demand.Va) / 10 : 0,
-          Fe: demand.Fe ?
-            Math.round(100 * supply.Fe / demand.Fe) / 10 : 0
+          En: demand.En
+            ? Math.round(100 * supply.En / demand.En) / 10
+            : 0,
+          Pr: demand.Pr
+            ? Math.round(100 * supply.Pr / demand.Pr) / 10
+            : 0,
+          Va: demand.Va
+            ? Math.round(100 * supply.Va / demand.Va) / 10
+            : 0,
+          Fe: demand.Fe
+            ? Math.round(100 * supply.Fe / demand.Fe) / 10
+            : 0
         })
       }
       return res
@@ -615,14 +653,14 @@ export default {
      * @param val
      * @param index
      */
-    updateSupply(val, index) {
+    updateSupply (val, index) {
       console.log('updateSupply')
       console.log(val)
-      //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
-      //更新されたmenuを入れ替える
+      // 作業用のmyAppコピー作成
+      const dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
+      // 更新されたmenuを入れ替える
       dat.menuCases[index].menu = val
-      //更新されたmyAppをemit
+      // 更新されたmyAppをemit
       this.$emit('update:myFamily', dat)
     },
     /**
@@ -630,33 +668,33 @@ export default {
      * @param val
      * @param index
      */
-    updateDemand(val, index) {
+    updateDemand (val, index) {
       const vm = this
-      //targetが固定の場合は何もせず終了
+      // targetが固定の場合は何もせず終了
       if (vm.useCommonTarget) {
         return
       }
-      //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(vm.myFamilyWatcher))
-      //更新されたtargetを入れ替える
+      // 作業用のmyAppコピー作成
+      const dat = JSON.parse(JSON.stringify(vm.myFamilyWatcher))
+      // 更新されたtargetを入れ替える
       dat.menuCases[index].target = JSON.parse(JSON.stringify(val))
-      //更新されたmyAppをemit
+      // 更新されたmyAppをemit
       this.$emit('update:myFamily', dat)
     },
     /**
      * ユーザーによりrecepiTableがクリックされた際に、行の内容を組み込んでfoodModalを開く
      * @param val
      */
-    onRecepiClicked(val) {
+    onRecepiClicked (val) {
       this.items_modal.length = 0
       this.items_modal.push({
-        'id': val.id,
-        'Name': val.Name,
-        'Group': val.Group,
-        'En': val.En,
-        'Pr': val.Pr,
-        'Va': val.Va,
-        'Fe': val.Fe,
+        id: val.id,
+        Name: val.Name,
+        Group: val.Group,
+        En: val.En,
+        Pr: val.Pr,
+        Va: val.Va,
+        Fe: val.Fe
       })
       this.menuName_modal = val.menuName
       this.value_model = val.Wt
@@ -666,18 +704,18 @@ export default {
      * ユーザーによりfctTableがクリックされた時に行の内容を組み込んでfoodModalを開く
      * @param val
      */
-    onFctClick(val) {
+    onFctClick (val) {
       this.items_modal.length = 0
       this.items_modal.push({
-        'id': val.id,
-        'Name': val.Name,
-        'Group': val.Group,
-        'En': val.En,
-        'Pr': val.Pr,
-        'Va': val.Va,
-        'Fe': val.Fe,
-        'Carbohydrate': val.Carbohydrate,
-        'Fat': val.Fat,
+        id: val.id,
+        Name: val.Name,
+        Group: val.Group,
+        En: val.En,
+        Pr: val.Pr,
+        Va: val.Va,
+        Fe: val.Fe,
+        Carbohydrate: val.Carbohydrate,
+        Fat: val.Fat
       })
       this.value_model = 0
       this.showModal = true
@@ -687,9 +725,9 @@ export default {
      * 新規なら追加、変更なら更新
      * @param val 更新されたmenu
      */
-    addSupply(val) {
+    addSupply (val) {
       const vm = this
-      //menuを更新する
+      // menuを更新する
       let existing = false
       let newMenu = []
       newMenu = vm.myFamilyWatcher.menuCases[vm.pageIdComputed].menu.map((item) => {
@@ -703,30 +741,30 @@ export default {
       if (!existing) {
         newMenu.push(val)
       }
-      //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(vm.myFamilyWatcher))
-      //更新されたmenuを入れ替える
+      // 作業用のmyAppコピー作成
+      const dat = JSON.parse(JSON.stringify(vm.myFamilyWatcher))
+      // 更新されたmenuを入れ替える
       dat.menuCases[vm.pageIdComputed].menu = newMenu
-      //更新されたmyAppをemit
+      // 更新されたmyAppをemit
       this.$emit('update:myFamily', dat)
     },
     /**
      * menuが削除された際に、栄養素供給量合計を再計算してemit
      * @param val 更新されたmenu
      */
-    deleteSupply(val) {
-      //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
-      //更新されたmenuを入れ替える
+    deleteSupply (val) {
+      // 作業用のmyAppコピー作成
+      const dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
+      // 更新されたmenuを入れ替える
       dat.menuCases[this.pageIdComputed].menu = val
-      //更新されたmyAppをemit
+      // 更新されたmyAppをemit
       this.$emit('update:myFamily', dat)
     },
-    //fctとdriの表示調整
-    toggleFctDri() {
+    // fctとdriの表示調整
+    toggleFctDri () {
       console.log('test')
     },
-    notifiRecepiEdit() {
+    notifiRecepiEdit () {
       alert('you can edit diet record by clicking [add crop] button')
     }
   }
