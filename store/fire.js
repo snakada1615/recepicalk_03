@@ -425,7 +425,6 @@ export const mutations = {
    * @param payload
    */
   updateQuestionsId: function (state, payload) {
-    console.log(payload)
     state.myApp.dataSet.questionsId = payload
   },
   /**
@@ -434,7 +433,6 @@ export const mutations = {
    * @param payload
    */
   updateCropCalendarId (state, payload) {
-    console.log(payload)
     state.myApp.dataSet.cropCalendarId = payload
   },
   /**
@@ -525,9 +523,7 @@ export const mutations = {
    * @param payload
    */
   updateForcedUpdateInfoId: function (state, payload) {
-    console.log('g00000oooooo00000ooooo')
     state.myApp.dataSet.forcedUpdateInfoId = payload
-    console.log('hey g00000oooooo00000ooooo')
   },
   /**
    * ユーザー情報をfireAuthから得たログイン情報に基づいて初期化する
@@ -804,7 +800,6 @@ export const actions = {
       menuCases: arr,
       feasibilityCases: arr2
     })
-    console.log(currentFamily)
     await dispatch('updateCurrentFamilyName', currentFamily[0].name)
     await dispatch('updateFamilyCases', currentFamily)
     await dispatch('setHasDocumentChanged', true)
@@ -818,7 +813,6 @@ export const actions = {
    * @returns {Promise<void>}
    */
   async addNewCommunity ({ state, dispatch }, payload) {
-    console.log(payload)
     const currentCommunity = JSON.parse(JSON.stringify(state.myApp.communityCases))
     const arr = []
     for (let i = 0; i < state.myApp.sceneCount; i++) {
@@ -842,7 +836,6 @@ export const actions = {
       menuCases: arr,
       feasibilityCases: arr2
     })
-    console.log(currentCommunity)
     await dispatch('updateCurrentCommunityName', currentCommunity[0].name)
     await dispatch('updateCommunityCases', currentCommunity)
     await dispatch('setHasDocumentChanged', true)

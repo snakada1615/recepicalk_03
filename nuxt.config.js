@@ -26,7 +26,6 @@ export default {
     background: 'white'
   },
 
-
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
     '@/assets/scss/app.scss'
@@ -34,8 +33,8 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    {src: '@/plugins/helper'},
-    {src: '@/plugins/firebasePlugin'}
+    { src: '@/plugins/helper' },
+    { src: '@/plugins/firebasePlugin' }
   ],
 
   //
@@ -79,7 +78,8 @@ export default {
         'BIconTrash',
         'BIconTrashFill',
         'BIconPencilSquare',
-        'BIconTable'
+        'BIconTable',
+        'BIconExclamationCircle'
       ],
       componentPlugins: [
         'NavbarPlugin',
@@ -108,12 +108,12 @@ export default {
         'ImagePlugin',
         'ProgressPlugin',
         'OverlayPlugin'
-      ],
+      ]
     }],
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
     // https://go.nuxtjs.dev/pwa
-    '@nuxtjs/pwa',
+    '@nuxtjs/pwa'
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios

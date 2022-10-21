@@ -2,51 +2,51 @@
   <b-container class="my-0 px-0">
     <div>
       <b-table
+        ref="table"
         striped
         bordered
         small
         sticky-header
-        ref="table"
         :items="itemWeighted"
         :fields="fields"
-        @input="onInput"
-        @row-clicked="rowClick"
         foot-clone
         no-footer-sorting
-        v-bind="$attrs">
-
+        v-bind="$attrs"
+        @input="onInput"
+        @row-clicked="rowClick"
+      >
         <!-- A custom formatted footer cell for field 'name' -->
-        <template #head(menuName)="data">
+        <template #head(menuName)>
           <span>Menu</span>
         </template>
-        <template #foot(menuName)="data">
+        <template #foot(menuName)>
           <span>Menu</span>
         </template>
         <!-- A custom formatted footer cell for field 'name' -->
-        <template #head(Name)="data">
+        <template #head(Name)>
           <span>ingredients</span>
         </template>
-        <template #foot(Name)="data">
+        <template #foot(Name)>
           <span>total</span>
         </template>
         <!-- A custom formatted footer cell for field 'En' -->
-        <template #foot(En)="data">
+        <template #foot(En)>
           <span class="text-info" style="font-size: small">{{ setDigit(Number(nutritionSum.En), 3) }}</span>
         </template>
         <!-- A custom formatted footer cell for field 'Pr' -->
-        <template #foot(Pr)="data">
+        <template #foot(Pr)>
           <span class="text-info" style="font-size: small">{{ setDigit(Number(nutritionSum.Pr), 0) }}</span>
         </template>
         <!-- A custom formatted footer cell for field 'Va' -->
-        <template #foot(Va)="data">
+        <template #foot(Va)>
           <span class="text-info" style="font-size: small">{{ setDigit(Number(nutritionSum.Va), 1) }}</span>
         </template>
         <!-- A custom formatted footer cell for field 'Fe' -->
-        <template #foot(Fe)="data">
+        <template #foot(Fe)>
           <span class="text-info" style="font-size: small">{{ setDigit(Number(nutritionSum.Fe), 2) }}</span>
         </template>
         <!-- A custom formatted footer cell for field 'Wt' -->
-        <template #foot(Wt)="data">
+        <template #foot(Wt)>
           <span class="text-info" style="font-size: small">{{ setDigit(Number(nutritionSum.Wt), 0) }}</span>
         </template>
 
@@ -55,13 +55,17 @@
           <span class="text-info pointer" style="font-size: small">{{ data.value }}</span>
           <b-button class="px-0 py-0 mx-0 my-0" variant="light" @click="delClick(data.index)">
             <b-badge variant="gray-400" class="px-0 py-0">
-              <b-icon icon="X"></b-icon>
+              <b-icon icon="X" />
             </b-badge>
           </b-button>
         </template>
         <!-- A custom formatted cell for field 'menuName' -->
         <template #cell(menuName)="data">
-          <span class="text-info" style="font-size: small">{{ data.value }}</span>
+          <span class="text-info" style="font-size: small">
+            <!-- 'new'と表記されている場合に「!」マークを表示-->
+            <b-icon v-if="addExclamation(data.value)" icon="exclamation-circle" aria-hidden="true" class="text-danger" />
+            {{ data.value }}
+          </span>
         </template>
         <!-- A custom formatted cell for field 'En' -->
         <template #cell(En)="data">
@@ -102,35 +106,14 @@ export default {
      */
     items: {
       type: Array,
-      required: true,
+      required: true
     },
-    dummyDrawFlag:{
+    dummyDrawFlag: {
       type: Number,
       default: 0
     }
   },
-  watch: {
-    items: {
-      immediate: true,
-      deep: true,
-      handler(value) {
-        if (value.length === 0) {
-          this.nutritionSum = {
-            En: 0,
-            Pr: 0,
-            Va: 0,
-            Fe: 0,
-            Wt: 0,
-          }
-          this.itemWeighted.splice(0, this.itemWeighted.length)
-        } else {
-          this.itemWeighted = this.updateItemWeight(value)
-          this.nutritionSum = {...this.updateSum(this.itemWeighted)}
-        }
-      }
-    }
-  },
-  data() {
+  data () {
     return {
       /**
        * itemに含まれる全ての作物の栄養成分の合計値
@@ -144,48 +127,72 @@ export default {
        * テーブルのフィールド毎の書式設定
        */
       fields: [
-        {key: 'id', sortable: false, tdClass: 'd-none', thClass: 'd-none'},
-        {key: 'Group', sortable: true, tdClass: 'd-none', thClass: 'd-none'},
-        {key: 'menuName', sortable: true, tdClass: 'text-center', thClass: 'text-center'},
-        {key: 'Name', sortable: true},
-        {key: 'En', sortable: true, tdClass: 'text-center', thClass: 'text-center'},
-        {key: 'Pr', sortable: true, tdClass: 'text-center', thClass: 'text-center'},
-        {key: 'Va', sortable: true, tdClass: 'text-center', thClass: 'text-center'},
-        {key: 'Fe', sortable: true, tdClass: 'text-center', thClass: 'text-center'},
-        {key: 'Wt', sortable: true, tdClass: 'text-center', thClass: 'text-center'},
-      ],
+        { key: 'id', sortable: false, tdClass: 'd-none', thClass: 'd-none' },
+        { key: 'Group', sortable: true, tdClass: 'd-none', thClass: 'd-none' },
+        { key: 'menuName', sortable: true, tdClass: 'text-center', thClass: 'text-center' },
+        { key: 'Name', sortable: true },
+        { key: 'En', sortable: true, tdClass: 'text-center', thClass: 'text-center' },
+        { key: 'Pr', sortable: true, tdClass: 'text-center', thClass: 'text-center' },
+        { key: 'Va', sortable: true, tdClass: 'text-center', thClass: 'text-center' },
+        { key: 'Fe', sortable: true, tdClass: 'text-center', thClass: 'text-center' },
+        { key: 'Wt', sortable: true, tdClass: 'text-center', thClass: 'text-center' }
+      ]
+    }
+  },
+  watch: {
+    items: {
+      immediate: true,
+      deep: true,
+      handler (value) {
+        if (value.length === 0) {
+          this.nutritionSum = {
+            En: 0,
+            Pr: 0,
+            Va: 0,
+            Fe: 0,
+            Wt: 0
+          }
+          this.itemWeighted.splice(0, this.itemWeighted.length)
+        } else {
+          this.itemWeighted = this.updateItemWeight(value)
+          this.nutritionSum = { ...this.updateSum(this.itemWeighted) }
+        }
+      }
     }
   },
   methods: {
+    addExclamation (val) {
+      return val === 'new'
+    },
     /**
      * 各栄養素の値の表示用に、桁数を調整
      * @param item
      * @param unitKey
      * @returns {string}
      */
-    setDigit(item, unitKey) {
+    setDigit (item, unitKey) {
       let res = ''
       const units = [
-        {1: ' g', 2: ' kg', 3: ' t'},
-        {1: ' µg', 2: ' mg', 3: ' g'},
-        {1: ' mg', 2: ' g', 3: ' kt'},
-        {1: ' KC', 2: ' MC', 3: ' GC'},
+        { 1: ' g', 2: ' kg', 3: ' t' },
+        { 1: ' µg', 2: ' mg', 3: ' g' },
+        { 1: ' mg', 2: ' g', 3: ' kt' },
+        { 1: ' KC', 2: ' MC', 3: ' GC' }
       ]
-      const itemConv = item ? item : 0
+      const itemConv = item || 0
       switch (true) {
         case (itemConv < 1000):
-          res = String(Math.round(itemConv)) + units[unitKey]["1"]
-          break;
+          res = String(Math.round(itemConv)) + units[unitKey]['1']
+          break
         case (itemConv >= 1000 && itemConv < 1000000):
-          res = String(Math.round(itemConv / 1000)) + units[unitKey]["2"]
-          break;
+          res = String(Math.round(itemConv / 1000)) + units[unitKey]['2']
+          break
         case (itemConv >= 1000000):
-          res = String(Math.round(itemConv / 1000000)) + units[unitKey]["3"]
-          break;
+          res = String(Math.round(itemConv / 1000000)) + units[unitKey]['3']
+          break
         default:
           console.error('parameter not valid:setDigit:' + itemConv)
           res = ''
-          break;
+          break
       }
       return res
     },
@@ -194,7 +201,7 @@ export default {
      * @param array
      * @returns {*}
      */
-    updateSum(array) {
+    updateSum (array) {
       return array.reduce((accumulator, item) => {
         accumulator.En = (accumulator.En || 0) + Number(item.En ? item.En : 0)
         accumulator.Pr = (accumulator.Pr || 0) + Number(item.Pr ? item.Pr : 0)
@@ -208,7 +215,7 @@ export default {
      * itemの各要素の値に重量を掛け合わせる
      * @param array
      */
-    updateItemWeight(array) {
+    updateItemWeight (array) {
       return array.map((val) => {
         return {
           id: val.id,
@@ -226,29 +233,29 @@ export default {
     /**
      * itemの構成が変わるたびに、合計値をemit
      */
-    onInput() {
+    onInput () {
       this.$emit('totalChanged', this.nutritionSum)
     },
     /**
      * テーブルの特定行がクリックされた場合、当該行の内容をemit
      * @param record
      */
-    rowClick(record) {
+    rowClick (record) {
       this.$emit('rowClick', record)
     },
     /**
      * 特定行の×ボタンをクリックした場合に、当該行を削除
      * @param id
      */
-    delClick(id) {
-      let res = []
+    delClick (id) {
+      const res = []
       this.items.forEach(function (val, index) {
         if (index !== id) {
           res.push(val)
         }
       })
       this.$emit('itemDeleted', res)
-    },
+    }
   }
 }
 </script>

@@ -140,22 +140,24 @@
           </div>
 
           <!--   ページ情報とページの切り替え   -->
-          <b-card class="px-3" border-variant="light">
-            <b-row class="mt-2">
-              <b-col class="mx-0 mb-0 py-2 bg-dark rounded text-light font-weight-bold">
-                Feasibility assessment result
-                <b-form-select v-model="selectedFeasibilityCase" :options="feasibilityCaseByMonth" />
-                <div class="d-flex flex-row">
-                  <b-form-input
-                    v-model="feasibilityPageMemo"
-                    placeholder="memo for this page"
-                    :state="stateMemoInput"
-                    class="my-1"
-                  />
-                </div>
-              </b-col>
-            </b-row>
-          </b-card>
+          <b-row class="d-flex justify-content-center">
+            <b-card border-variant="light" style="width: 590px;">
+              <b-row class="mt-2">
+                <b-col class="mx-0 mb-0 py-2 bg-dark rounded text-light font-weight-bold">
+                  Feasibility assessment result
+                  <b-form-select v-model="selectedFeasibilityCase" :options="feasibilityCaseByMonth" />
+                  <div class="d-flex flex-row">
+                    <b-form-input
+                      v-model="feasibilityPageMemo"
+                      placeholder="memo for this page"
+                      :state="stateMemoInput"
+                      class="my-1"
+                    />
+                  </div>
+                </b-col>
+              </b-row>
+            </b-card>
+          </b-row>
 
           <!-- feasibility checkの実施 -->
           <b-row>
@@ -287,7 +289,7 @@
         </b-tab>
 
         <b-tab
-          v-if="selectedCommodityId"
+          v-if="selectedCommodityId >= 0"
           title="overall result"
         >
           <div class=" mb-0 ml-3">
@@ -673,15 +675,20 @@ export default {
       if (!this.myApp.familyCases || !Array.isArray(this.myApp.familyCases)) {
         return []
       }
-      return this.myApp.familyCases.find(item => item.name === this.familyName).feasibilityCases.map((item2) => {
-        return {
-          month: item2.month,
-          index: item2.index,
-          selectedCrop: item2.selectedCrop
-        }
-      })
+      const familyCasesTemp = this.myApp.familyCases.find(item => item.name === this.familyName)
+      if (!familyCasesTemp) {
+        return []
+      } else {
+        return familyCasesTemp.feasibilityCases.map((item2) => {
+          return {
+            month: item2.month,
+            index: item2.index,
+            selectedCrop: item2.selectedCrop
+          }
+        })
+      }
     },
-    menuUpdated () {
+    updatedMenu () {
       const vm = this
       if (!vm.myFamily.feasibilityCases) {
         console.log('dataset is broken in feasibilityCases: null')
@@ -692,16 +699,13 @@ export default {
         return []
       }
       const res = JSON.parse(JSON.stringify(vm.myFamily.menuCases[0].menu))
-      const addedCommodity = vm.myFamily.feasibilityCases.find((item) => {
-        if (item.selectedCrop.length > 0) {
-          return item.selectedCrop[0].Name === vm.selectedCommodity
-        } else {
-          return false
-        }
-      })
+      const addedCommodity = vm.myFamily.feasibilityCases.find(
+        item => (item.index === vm.selectedCommodityId) && (item.month === vm.selectedMonth)
+      )
       // 追加品目が存在する場合にはこれを追加、存在しない場合はもともとのmenuを返す
-      if (addedCommodity && addedCommodity.selectedCrop.length > 0) {
-        res.push(addedCommodity.selectedCrop[0])
+      if (addedCommodity && Object.keys(addedCommodity.selectedCrop).length > 0) {
+        addedCommodity.selectedCrop.menuName = 'new'
+        res.push(addedCommodity.selectedCrop)
       }
       return res
     },
@@ -718,7 +722,7 @@ export default {
           },
           {
             note: 'improved',
-            menu: vm.menuUpdated
+            menu: vm.updatedMenu
           }
         ],
         member: vm.myFamily.member,
