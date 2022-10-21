@@ -96,7 +96,6 @@
               :disabled-option="[1,2,3,4,5,6,7,8,9]"
               :hide-case-info="true"
               @update:myFamily="updateMyFamily"
-              @update:feasibilityPageMemo="updateFeasibilityPageMemo"
             />
           </b-card>
         </b-tab>
@@ -113,9 +112,9 @@
         </b-tab>
 
         <b-tab
-          v-if="stateFeasibilityCase"
+          v-if="Array.isArray(selectedCropListFiltered) && selectedCropListFiltered.length"
           title="crop feasibility"
-          :disabled="familyList.length === 0 || !myFamily.keyNutrient"
+          :disabled="!myFamily.currentMonth || !myFamily.keyNutrient"
         >
           <div class=" mb-2 ml-3">
             identified nutrient gap:
@@ -165,7 +164,7 @@
         </b-tab>
 
         <b-tab
-          v-if="selectedCropListFiltered.length"
+          v-if="Array.isArray(selectedCropListFiltered) && selectedCropListFiltered.length"
           title="crop feasibility assessment summary"
         >
           <b-row>
@@ -228,7 +227,6 @@
             >
               <!--   スコアの総括票     -->
               <b-card
-                style="min-width: 530px;"
                 header-bg-variant="success"
                 bg-variant="light"
                 border-variant="success"
@@ -236,7 +234,7 @@
               >
                 <template #header>
                   <div class="font-weight-bolder text-white">
-                    {{ crop.text|| 'not selected' }}:
+                    {{ crop.text || 'not selected' }}:
                     {{ myFamily.feasibilityCases[index0].note }}
                   </div>
                 </template>
@@ -280,9 +278,8 @@
         </b-tab>
 
         <b-tab
-          v-if="stateFeasibilityCase"
+          v-if="selectedCommodityId"
           title="overall result"
-          :disabled="!stateFeasibilityCheck"
         >
           <div class=" mb-0 ml-3">
             identified nutrient gap:
@@ -620,14 +617,20 @@ export default {
       }
     },
     /**
-     * feasibilityPageMemoの更新
+     * feasibilityPageMemoの取得と更新
      */
     feasibilityPageMemo: {
       get () {
         return this.feasibilityCase ? this.feasibilityCase.note : ''
       },
       set (val) {
-        this.updateFeasibilityPageMemo(val)
+        // 作業用のmyFamilyコピー作成
+        const dat = JSON.parse(JSON.stringify(this.feasibilityCase))
+        // 更新されたmenuを入れ替える
+        dat.note = val
+
+        // 更新されたmyFamilyをemit
+        this.onFeasibilityCaseChange(dat)
       }
     },
     member: {
@@ -645,6 +648,9 @@ export default {
       }
     },
     priorityCropList () {
+      if (!this.myApp.familyCases || !Array.isArray(this.myApp.familyCases)) {
+        return []
+      }
       return this.myApp.familyCases.find(item => item.name === this.familyName).feasibilityCases.map((item2) => {
         return {
           month: item2.month,
@@ -760,6 +766,9 @@ export default {
     },
     stateFeasibilityCase: {
       get () {
+        if (!this.feasibilityCase) {
+          return false
+        }
         return Object.keys(this.feasibilityCase.selectedCrop).length > 0
       }
     },
@@ -782,6 +791,9 @@ export default {
     },
     selectedNutrient: {
       get () {
+        if (!this.myApp.familyCases || !Array.isArray(this.myApp.familyCases)) {
+          return ''
+        }
         return this.myFamily.keyNutrient
       },
       set (val) {
@@ -830,6 +842,9 @@ export default {
     },
     myFamily () {
       const vm = this
+      if (!vm.myApp.familyCases || !Array.isArray(vm.myApp.familyCases)) {
+        return []
+      }
       const res = vm.myApp.familyCases.find(item => item.name === vm.myApp.currentFamily)
       return res || []
     },
@@ -851,7 +866,7 @@ export default {
     },
     currentTarget () {
       const temp = this.myApp.familyCases
-      if (!temp || (temp === 't')) {
+      if (!temp || !Array.isArray(temp)) {
         return []
       }
       let res = []
@@ -890,7 +905,7 @@ export default {
     },
     familyList () {
       const temp = this.myApp.familyCases
-      if (!temp || (temp === 't')) {
+      if (!temp || (!Array.isArray(temp))) {
         return []
       }
       return temp.map((val) => {
@@ -908,7 +923,7 @@ export default {
      */
     onFeasibilityCaseChange (val) {
       const vm = this
-      const dat = JSON.parse(JSON.stringify(this.myFamily))
+      const dat = JSON.parse(JSON.stringify(vm.myFamily))
       dat.feasibilityCases = dat.feasibilityCases.map((item) => {
         if ((item.month === vm.myFamily.currentMonth) && (item.index === vm.selectedFeasibilityCase)) {
           return val
@@ -970,10 +985,6 @@ export default {
         return res2
       })
       this.$store.dispatch('fire/updateMyFamily', res)
-    },
-    updateFeasibilityPageMemo (val) {
-      this.$store.dispatch('fire/updateMyFamily', val)
-      this.$store.dispatch('fire/fireSaveAppdata')
     },
     updateFamily (name, member) {
       this.$store.dispatch('fire/updateFamilyCase', { name, member })
