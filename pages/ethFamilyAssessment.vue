@@ -100,6 +100,15 @@
           </b-card>
         </b-tab>
 
+        <!-- crop calendarの編集 -->
+        <b-tab title="crop availability">
+          <edit-calendar-eth
+            :calendar-id.sync="calendarId"
+            :fct="$store.state.fire.myApp.dataSet.fct"
+          />
+        </b-tab>
+
+        <!-- 作物ごとのfeasibilityの判定 -->
         <b-tab title="priority commodity" :disabled="!statePriority">
           <priority-commodity
             :crop-list="priorityCropList"
@@ -311,9 +320,10 @@ import driSelectMulti from '../components/molecules/driSelectMulti'
 import dietCalkCompEth from '../components/organisms/dietCalkCompEth'
 import nutritionBar2 from '../components/molecules/nutritionBar2'
 import summaryDietEth from '../components/organisms/summaryDietEth'
-import feasibilityCheckMinimalEth from '@/components/organisms/feasibilityCheckMinimalEth'
-import { getNutritionDemand, getNutritionSupply, getProductionTarget, summarizeQA } from '@/plugins/helper'
-import priorityCommodity from '@/components/organisms/priorityCommodity'
+import editCalendarEth from '../components/molecules/editCalendarEth'
+import feasibilityCheckMinimalEth from '../components/organisms/feasibilityCheckMinimalEth'
+import { getNutritionDemand, getNutritionSupply, getProductionTarget, summarizeQA } from '../plugins/helper'
+import priorityCommodity from '../components/organisms/priorityCommodity'
 
 export default {
   components: {
@@ -322,7 +332,8 @@ export default {
     feasibilityCheckMinimalEth,
     nutritionBar2,
     summaryDietEth,
-    priorityCommodity
+    priorityCommodity,
+    editCalendarEth
   },
   layout: 'defaultEth',
   data () {
@@ -580,6 +591,17 @@ export default {
     }
   },
   computed: {
+    /**
+     * crop calendarの表示・編集用ID
+     */
+    calendarId: {
+      get () {
+        return this.$store.state.fire.myApp.dataSet.cropCalendarId
+      },
+      set (val) {
+        this.$store.dispatch('fire/updateCropCalendarId', val)
+      }
+    },
     /**
      * noteの記入状態
      * @returns {boolean}

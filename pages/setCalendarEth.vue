@@ -10,7 +10,7 @@
         <b-form-checkbox v-model="addNewCalendarFlag" switch @change="onChangeSwitch">
           add new calendar
         </b-form-checkbox>
-        <b-input-group class="mt-3" v-if="!addNewCalendarFlag">
+        <b-input-group v-if="!addNewCalendarFlag" class="mt-3">
           <template #prepend>
             <b-overlay
               :show="busy"
@@ -23,7 +23,8 @@
               <b-button
                 variant="info"
                 @click="getFileList('dataset')"
-              >get list
+              >
+                get list
               </b-button>
             </b-overlay>
           </template>
@@ -39,7 +40,8 @@
               <b-button
                 variant="gray-200"
                 @click="loadCalendar(currentCalendarName)"
-              >load
+              >
+                load
               </b-button>
             </b-overlay>
 
@@ -57,14 +59,15 @@
                 variant="info"
                 :disabled="!currentCalendarName"
                 @click="fireSaveCalendar"
-              >use this calendar
+              >
+                use this calendar
               </b-button>
             </b-overlay>
           </template>
           <b-form-select
             v-model="currentCalendarName"
             :options="myListFiltered"
-          ></b-form-select>
+          />
         </b-input-group>
         <b-input-group v-else class="mt-3" prepend="cropCalendar_">
           <template #append>
@@ -72,7 +75,8 @@
               variant="gray-200"
               :disabled="!stateNewCalendarName"
               @click="onNameRegister(newCalendarName)"
-            >initialize
+            >
+              initialize
             </b-button>
             <b-overlay
               :show="busy3"
@@ -86,14 +90,15 @@
                 variant="info"
                 :disabled="!stateNewCalendarName || (currentCalendar.length === 0)"
                 @click="fireSaveCalendar"
-              >add this calendar
+              >
+                add this calendar
               </b-button>
             </b-overlay>
           </template>
           <b-form-input
             v-model="newName"
             :state="stateNewCalendarName"
-          ></b-form-input>
+          />
         </b-input-group>
         <b-input-group
           v-if="currentCalendar.length"
@@ -101,11 +106,11 @@
           prepend="filter"
         >
           <b-form-input
+            id="filterInput"
             v-model="filter"
             type="search"
-            id="filterInput"
             placeholder="Type to Search"
-          ></b-form-input>
+          />
           <template #append>
             <b-input-group-text>Group</b-input-group-text>
             <b-form-select
@@ -418,16 +423,12 @@
   </b-container>
 </template>
 <script>
-import JsonViewer from 'vue-json-viewer'
-import {fireGetDoc, getFileList} from "../plugins/firebasePlugin";
-import {makeToast} from "../plugins/helper";
+import { fireGetDoc, getFileList } from '../plugins/firebasePlugin'
+import { makeToast } from '../plugins/helper'
 
 export default {
   layout: 'defaultEth',
-  components: {
-    JsonViewer,
-  },
-  data() {
+  data () {
     return {
       /**
        * cropList用のfilter by Group
@@ -439,8 +440,8 @@ export default {
        */
       collection3: '',
       collectionList: [
-        {value: 'dataset', text: 'dataset'},
-        {value: 'users', text: 'user data'},
+        { value: 'dataset', text: 'dataset' },
+        { value: 'users', text: 'user data' }
       ],
       busy: false,
       busy2: false,
@@ -464,22 +465,22 @@ export default {
        * テーブルに表示するfieldの定義
        */
       fields: [
-        {key: 'id', sortable: false, tdClass: 'd-none', thClass: 'd-none'},
-        {key: 'Group', sortable: true, tdClass: 'd-none', thClass: 'd-none'},
-        {key: 'crop name', sortable: true, thStyle: {width: "200px"}},
-        {key: '1', sortable: false, thStyle: {width: "10px"}, label: 'Jan'},
-        {key: '2', sortable: false, thStyle: {width: "10px"}, label: 'Feb'},
-        {key: '3', sortable: false, thStyle: {width: "10px"}, label: 'Mar'},
-        {key: '4', sortable: false, thStyle: {width: "10px"}, label: 'Apr'},
-        {key: '5', sortable: false, thStyle: {width: "10px"}, label: 'May'},
-        {key: '6', sortable: false, thStyle: {width: "10px"}, label: 'Jun'},
-        {key: '7', sortable: false, thStyle: {width: "10px"}, label: 'Jul'},
-        {key: '8', sortable: false, thStyle: {width: "10px"}, label: 'Aug'},
-        {key: '9', sortable: false, thStyle: {width: "10px"}, label: 'Sep'},
-        {key: '10', sortable: false, thStyle: {width: "10px"}, label: 'Oct'},
-        {key: '11', sortable: false, thStyle: {width: "10px"}, label: 'Nov'},
-        {key: '12', sortable: false, thStyle: {width: "10px"}, label: 'Dec'}
-      ],
+        { key: 'id', sortable: false, tdClass: 'd-none', thClass: 'd-none' },
+        { key: 'Group', sortable: true, tdClass: 'd-none', thClass: 'd-none' },
+        { key: 'crop name', sortable: true, thStyle: { width: '200px' } },
+        { key: '1', sortable: false, thStyle: { width: '10px' }, label: 'Jan' },
+        { key: '2', sortable: false, thStyle: { width: '10px' }, label: 'Feb' },
+        { key: '3', sortable: false, thStyle: { width: '10px' }, label: 'Mar' },
+        { key: '4', sortable: false, thStyle: { width: '10px' }, label: 'Apr' },
+        { key: '5', sortable: false, thStyle: { width: '10px' }, label: 'May' },
+        { key: '6', sortable: false, thStyle: { width: '10px' }, label: 'Jun' },
+        { key: '7', sortable: false, thStyle: { width: '10px' }, label: 'Jul' },
+        { key: '8', sortable: false, thStyle: { width: '10px' }, label: 'Aug' },
+        { key: '9', sortable: false, thStyle: { width: '10px' }, label: 'Sep' },
+        { key: '10', sortable: false, thStyle: { width: '10px' }, label: 'Oct' },
+        { key: '11', sortable: false, thStyle: { width: '10px' }, label: 'Nov' },
+        { key: '12', sortable: false, thStyle: { width: '10px' }, label: 'Dec' }
+      ]
     }
   },
   computed: {
@@ -488,88 +489,88 @@ export default {
      * @returns {*[]}
      * @constructor
      */
-    FoodGrp() {
-      let uniqueGroup = []
+    FoodGrp () {
+      const uniqueGroup = []
       const calendar = this.$store.state.fire.myApp.dataSet.cropCalendar
       if (calendar) {
         calendar.forEach(function (elem) {
-          if (uniqueGroup.indexOf(elem.Group) === -1) {
+          if (!uniqueGroup.includes(elem.Group)) {
             uniqueGroup.push(elem.Group)
           }
         })
       }
       return uniqueGroup
     },
-    currentCalendarFiltered() {
+    currentCalendarFiltered () {
       if (!this.groupFilter) {
         return this.currentCalendar
       } else {
-        return this.currentCalendar.filter((item) => item.Group === this.groupFilter)
+        return this.currentCalendar.filter(item => item.Group === this.groupFilter)
       }
     },
-    newCalendarName() {
+    newCalendarName () {
       return 'cropCalendar_' + this.newName
     },
-    myListFiltered() {
-      return this.myList.filter((item) => item.indexOf('cropCalendar') >= 0)
+    myListFiltered () {
+      return this.myList.filter(item => item.includes('cropCalendar'))
     },
-    stateNewCalendarName() {
+    stateNewCalendarName () {
       return this.newName.length > 4 && !this.myListFiltered.includes(this.newCalendarName)
-    },
+    }
   },
-  created() {
+  created () {
 
   },
   methods: {
-    async getFileList(myCollection) {
+    async getFileList (myCollection) {
       this.busy = true
       const queryResult = await getFileList(myCollection)
       this.busy = false
       this.myList.length = 0
       this.myList = queryResult
     },
-    async loadCalendar(docName) {
+    async loadCalendar (docName) {
       this.busy2 = true
       const res = await fireGetDoc('dataset', docName)
       await this.$store.dispatch('fire/updateCropCalendarId', docName)
       this.busy2 = false
       this.currentCalendar = Object.values(res)
     },
-    async onNameRegister(docName) {
+    async onNameRegister (docName) {
       await this.$store.dispatch('fire/updateCropCalendarId', docName)
       this.currentCalendar = this.newCropCalendar()
     },
-    setBadgeColor(val) {
+    setBadgeColor (val) {
       switch (val) {
         case '1':
-          return 'info';
+          return 'info'
         case '2':
-          return 'danger';
+          return 'danger'
         default:
-          return 'light';
+          return 'light'
       }
     },
-    setIcon(val) {
+    setIcon (val) {
       switch (val) {
         case '1':
-          return 'info';
+          return 'info'
         case '2':
-          return 'danger';
+          return 'danger'
         default:
-          return 'warning';
+          return 'warning'
       }
     },
     /**
      * 特定行の×ボタンをクリックした場合に、インクリメント
      * @param data
      */
-    onCalendarClick(data) {
+    onCalendarClick (data) {
       let res = Number(data.value)
       res += 1
       if (res > 2) {
         res = 0
       }
-      //this.currentCalendar[data.index][data.field.key] = String(res)
+      // this.currentCalendar[data.index][data.field.key] = String(res)
       this.currentCalendar.forEach((item) => {
         if (item.id === data.item.id) {
           this.$set(item, data.field.key, String(res))
@@ -580,17 +581,17 @@ export default {
      * currentCalendarをJsonに変換
      * @returns {{}}
      */
-    calendar2JSON(myCalendar) {
+    calendar2JSON (myCalendar) {
       if (myCalendar.length === 0) {
         return {}
       }
-      let res = {}
+      const res = {}
       myCalendar.forEach((item) => {
         res[item.FCT_id] = item
       })
       return res
     },
-    async fireSaveCalendar() {
+    async fireSaveCalendar () {
       this.busy3 = true
       await this.$store.dispatch('fire/updateCropCalendar', this.currentCalendar)
       await this.$store.dispatch(
@@ -605,34 +606,34 @@ export default {
       makeToast(
         this,
         'crop calendar is set to ' + this.$store.state.fire.myApp.dataSet.cropCalendarId,
-        {variant: 'info'}
+        { variant: 'info' }
       )
     },
-    onChangeSwitch() {
+    onChangeSwitch () {
       this.currentCalendar.splice(0)
     },
-    newCropCalendar() {
+    newCropCalendar () {
       return this.$store.state.fire.myApp.dataSet.fct.map((item, index) => {
         return {
-          'FCT_id': item.id,
-          'Group': item.Group,
+          FCT_id: item.id,
+          Group: item.Group,
           'crop name': item.Name,
-          'id': index,
-          '1': '0',
-          '2': '0',
-          '3': '0',
-          '4': '0',
-          '5': '0',
-          '6': '0',
-          '7': '0',
-          '8': '0',
-          '9': '0',
-          '10': '0',
-          '11': '0',
-          '12': '0'
+          id: index,
+          1: '0',
+          2: '0',
+          3: '0',
+          4: '0',
+          5: '0',
+          6: '0',
+          7: '0',
+          8: '0',
+          9: '0',
+          10: '0',
+          11: '0',
+          12: '0'
         }
       })
     }
-  },
+  }
 }
 </script>
