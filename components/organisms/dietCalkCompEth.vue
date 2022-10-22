@@ -13,14 +13,21 @@
               Case information
             </div>
           </template>
-          <b-form-select v-if="!hideCaseInfo" v-model="pageIdComputed" :options="pageOptions" />
+          <b-input-group prepend="select">
+            <b-form-select v-if="!hideCaseInfo" v-model="pageIdComputed" :options="pageOptions" />
+            <b-input-group-append>
+              <b-button @click="$bvModal.show(nameInputBox)">
+                change name
+              </b-button>
+            </b-input-group-append>
+          </b-input-group>
           <div class="d-flex flex-row">
             <b-form-input
               v-model="pageMemo[pageIdComputed]"
               placeholder="note for this family"
               :state="noteInputState"
               class="my-1"
-              @update="updatePageMemo(pageMemo[pageIdComputed])"
+              @update="updatePageMemo(pageMemo[pageIdComputed], pageIdComputed)"
             />
           </div>
           <b-button
@@ -197,6 +204,9 @@
       :dri-items="myDri"
       @update:target="updateDemand($event, pageIdComputed)"
     />
+    <input-box
+      :modal-name="nameInputBox"
+    />
   </b-container>
 </template>
 
@@ -212,6 +222,7 @@ import driSelectModal from '@/components/organisms/driSelectModal'
 import recepiTable from '@/components/molecules/recepiTable'
 import nutritionBar2 from '@/components/molecules/nutritionBar2'
 import fctTableModal2 from '@/components/organisms/FctTableModal2'
+import inputBox from '@/components/atoms/inputBox'
 
 /**
  * @desc 6つのコンポーネントを組み合わせて食事評価
@@ -236,7 +247,8 @@ export default {
     driSelectModal,
     fctTableModal2,
     pieChart,
-    legendSet
+    legendSet,
+    inputBox
   },
   props: {
     myFamily: {
@@ -305,6 +317,7 @@ export default {
   },
   data () {
     return {
+      nameInputBox: 'test',
       pfcBalanceCurrent: [],
       chartBaseHeight: window.innerHeight / 4,
       chartBaseWidth: window.innerHeight / 4,
@@ -610,12 +623,13 @@ export default {
     /**
      * ページメモの更新：
      * @param newVal
+     * @param index
      */
-    updatePageMemo (newVal) {
+    updatePageMemo (newVal, index) {
       // 作業用のmyAppコピー作成
       const dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
       // 更新されたmenuを入れ替える
-      dat.menuCases[this.pageIdComputed].note = newVal
+      dat.menuCases[index].note = newVal
       // 更新されたmyAppをemit
       this.$emit('update:myFamily', dat)
     },
