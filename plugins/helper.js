@@ -460,9 +460,10 @@ export function getPfcScale (rating) {
 /**
  * nutritionSupplyの平均値
  * @param nutritionSupplyList
+ * @param noAverage  平均値でなく単に合計を求めたい場合に1を指定（初期値は0）
  * @returns {{Pr: number, Fat: number, En: number, Carbohydrate: number, Va: number, Wt: number, Fe: number}}
  */
-export function getAverageNutritionSupply (nutritionSupplyList) {
+export function getAverageNutritionSupply (nutritionSupplyList, noAverage = 0) {
   let count = 0
   const supplySum = nutritionSupplyList.reduce((accumulator, item) => {
     if (item.Wt > 0) {
@@ -485,6 +486,9 @@ export function getAverageNutritionSupply (nutritionSupplyList) {
     Carbohydrate: 0,
     Fat: 0
   })
+  if (noAverage === 1) {
+    count = 1
+  }
   return {
     En: supplySum.En / count,
     Pr: supplySum.Pr / count,
@@ -499,9 +503,10 @@ export function getAverageNutritionSupply (nutritionSupplyList) {
 /**
  * nutritionDemandGetterの平均値
  * @param nutritionDemandList
+ * @param noAverage 平均値でなく単に合計を求めたい場合に1を指定（初期値は0）
  * @returns {{Pr: number, En: number, Va: number, Wt: number, Fe: number}}
  */
-export function getAverageNutritionDemand (nutritionDemandList) {
+export function getAverageNutritionDemand (nutritionDemandList, noAverage = 0) {
   let count = 0
   const demandSum = nutritionDemandList.reduce((accumulator, item) => {
     if (item.En > 0) {
@@ -520,6 +525,9 @@ export function getAverageNutritionDemand (nutritionDemandList) {
     Fe: 0,
     Wt: 0
   })
+  if (noAverage === 1) {
+    count = 1
+  }
   return {
     En: demandSum.En / count,
     Pr: demandSum.Pr / count,
@@ -758,13 +766,12 @@ export function myUid () {
 export function summarizeQA (categories, ansList, qaList) {
   const categoryCount = categories.reduce((a, b) => a.categoryID < b.categoryID ? a.categoryID : b.categoryID)
   const res = Array(categoryCount).fill(0)
-  let res2 = []
   // カテゴリ毎の集計
   categories.forEach(function (category) {
     res[category.categoryID - 1] += (ansList[category.itemID - 1] > 0 ? ansList[category.itemID - 1] : 0)
   })
   // 集計結果と合わせてカテゴリ情報をObjectにまとめる
-  res2 = res.map(function (item, index) {
+  const res2 = res.map(function (item, index) {
     const qaCategory = qaList[index]
     return {
       id: qaCategory.categoryID,

@@ -6,7 +6,7 @@
       header-bg-variant="success-5"
     >
       <b-tabs card>
-        <b-tab title="set family">
+        <b-tab v-if="statePage1" title="set family">
           <b-row>
             <b-col class="d-flex justify-content-end">
               <b-form-checkbox v-model="addNewFamilyFlag" switch>
@@ -51,6 +51,7 @@
               />
             </b-col>
           </b-row>
+
           <b-row v-if="!addNewFamilyFlag" class="justify-content-center border-primary">
             <b-col cols="12" lg="8">
               <b-input-group size="sm" class="mb-2">
@@ -83,7 +84,7 @@
           </b-row>
         </b-tab>
 
-        <b-tab title="current diet" :disabled="!stateDiet">
+        <b-tab v-if="statePage2" title="current diet">
           <b-card no-body>
             <diet-calk-comp-eth
               v-if="myFamily.name"
@@ -101,7 +102,7 @@
         </b-tab>
 
         <!-- crop calendarの編集 -->
-        <b-tab title="crop availability">
+        <b-tab v-if="statePage3" title="crop availability">
           <edit-calendar-eth
             :calendar-id.sync="calendarId"
             :fct="$store.state.fire.myApp.dataSet.fct"
@@ -109,7 +110,7 @@
         </b-tab>
 
         <!-- 作物ごとのfeasibilityの判定 -->
-        <b-tab title="priority commodity" :disabled="!statePriority">
+        <b-tab v-if="statePage4" title="priority commodity">
           <priority-commodity
             :crop-list="priorityCropList"
             :crop-calendar="myApp.dataSet.cropCalendar"
@@ -121,7 +122,7 @@
         </b-tab>
 
         <b-tab
-          v-if="Array.isArray(selectedCropListFiltered) && selectedCropListFiltered.length"
+          v-if="statePage5"
           title="crop feasibility"
           :disabled="!myFamily.currentMonth || !myFamily.keyNutrient"
         >
@@ -175,7 +176,7 @@
         </b-tab>
 
         <b-tab
-          v-if="Array.isArray(selectedCropListFiltered) && selectedCropListFiltered.length"
+          v-if="statePage6"
           title="crop feasibility assessment summary"
         >
           <b-row>
@@ -289,9 +290,11 @@
         </b-tab>
 
         <b-tab
-          v-if="selectedCommodityId >= 0"
+          v-if="statePage7"
           title="overall result"
         >
+          {{ statePage7 }}
+          {{ selectedCommodityId }}
           <div class=" mb-0 ml-3">
             identified nutrient gap:
             <span class="text-danger font-weight-bold">
@@ -324,8 +327,8 @@ import nutritionBar2 from '../components/molecules/nutritionBar2'
 import summaryDietEth from '../components/organisms/summaryDietEth'
 import editCalendarEth from '../components/molecules/editCalendarEth'
 import feasibilityCheckMinimalEth from '../components/organisms/feasibilityCheckMinimalEth'
-import { getNutritionDemand, getNutritionSupply, getProductionTarget, summarizeQA } from '../plugins/helper'
 import priorityCommodity from '../components/organisms/priorityCommodity'
+import { getNutritionDemand, getNutritionSupply, getProductionTarget, summarizeQA } from '@/plugins/helper'
 
 export default {
   components: {
@@ -602,6 +605,44 @@ export default {
       },
       set (val) {
         this.$store.dispatch('fire/updateCropCalendarId', val)
+      }
+    },
+    statePage1: {
+      get () {
+        return true
+      }
+    },
+    statePage2: {
+      get () {
+        return this.stateDiet
+      }
+    },
+    statePage3: {
+      get () {
+        return (this.statePage2 && (this.myFamily.menuCases[0].menu.length > 0))
+      }
+    },
+    statePage4: {
+      get () {
+        return (this.statePage3 && this.statePriority)
+      }
+    },
+    statePage5: {
+      get () {
+        return (
+          this.statePage4 && Array.isArray(this.selectedCropListFiltered) && this.selectedCropListFiltered.length &&
+            this.myFamily.currentMonth && this.keyNutrients
+        )
+      }
+    },
+    statePage6: {
+      get () {
+        return this.statePage5
+      }
+    },
+    statePage7: {
+      get () {
+        return (this.statePage6 && this.selectedCommodityId && (this.selectedCommodityId >= 0))
       }
     },
     /**
@@ -1031,6 +1072,9 @@ export default {
       // 変数のクリア
       this.newFamilyName = ''
       this.newTarget = []
+
+      // 画面を新規追加から選択画面へ移す
+      this.addNewFamilyFlag = false
     },
     removeFamily (val) {
       if (this.familyList.length === 1) {

@@ -6,29 +6,34 @@
           header-bg-variant="success"
           border-variant="success"
           bg-variant="light"
-          class="my-2">
+          class="my-2"
+        >
           <template #header>
-            <div class="font-weight-bold">Case information</div>
+            <div class="font-weight-bold">
+              Case information
+            </div>
           </template>
-          <b-form-select v-model="pageIdComputed" :options="pageOptions"></b-form-select>
+          <b-form-select v-model="pageIdComputed" :options="pageOptions" />
           <div class="d-flex flex-row">
             <b-form-input
               v-model="pageMemo[pageIdComputed]"
               placeholder="note for this family"
               :state="noteInputState"
+              class="my-1"
               @update="updatePageMemo(pageMemo[pageIdComputed])"
-              class="my-1">
-            </b-form-input>
+            />
           </div>
           <b-button
-            @click="showDriSelect = !showDriSelect"
             variant="info"
-          >set family
+            @click="showDriSelect = !showDriSelect"
+          >
+            set family
           </b-button>
           <b-button
-            @click="showFct = !showFct"
             variant="info"
-          >add crop
+            @click="showFct = !showFct"
+          >
+            add crop
           </b-button>
         </b-card>
       </b-col>
@@ -37,17 +42,21 @@
           header-bg-variant="success"
           border-variant="success"
           bg-variant="light"
-          class="my-2">
+          class="my-2"
+        >
           <template #header>
-            <div class="font-weight-bold">Dietary diversity</div>
+            <div class="font-weight-bold">
+              Dietary diversity
+            </div>
           </template>
           <div
             v-for="(grp, index) in foodGroup"
+            :key="index"
             class="border my-1 px-1"
             :class="{
-                'bg-warning': !diversityStatus[pageIdComputed][index][grp],
-                'bg-success': diversityStatus[pageIdComputed][index][grp]
-              }"
+              'bg-warning': !diversityStatus[pageIdComputed][index][grp],
+              'bg-success': diversityStatus[pageIdComputed][index][grp]
+            }"
           >
             {{ grp }}
           </div>
@@ -58,25 +67,35 @@
           header-bg-variant="success"
           border-variant="success"
           bg-variant="light"
-          class="my-2">
+          class="my-2"
+        >
           <template #header>
-            <div class="font-weight-bold">Key Nutrients Sufficiency</div>
+            <div class="font-weight-bold">
+              Key Nutrients Sufficiency
+            </div>
           </template>
           <b-row>
-            <b-col cols="2" class="d-flex justify-content-center">Target</b-col>
-            <b-col cols="2" class="d-flex justify-content-center">Supply</b-col>
-            <b-col class="d-flex justify-content-start pl-5">sufficiency rate</b-col>
+            <b-col cols="2" class="d-flex justify-content-center">
+              Target
+            </b-col>
+            <b-col cols="2" class="d-flex justify-content-center">
+              Supply
+            </b-col>
+            <b-col class="d-flex justify-content-start pl-5">
+              sufficiency rate
+            </b-col>
           </b-row>
           <nutrition-bar2
-            v-for="index in 4" :key="index"
-            :colWidthFirst="3"
-            :colwidthSecond="2"
-            :colwidthThird="5"
-            :colwidthFourth="2"
+            v-for="index in 4"
+            :key="index"
+            :col-width-first="3"
+            :colwidth-second="2"
+            :colwidth-third="5"
+            :colwidth-fourth="2"
             :label="nutritionLabel[index-1]"
             :max-rating="maxRating"
             :rating="rating[pageIdComputed][nutritionLabel[index-1]]"
-            :maxRatingAbsolute="nutritionSupplyWatcher[pageIdComputed][nutritionLabel[index-1]]"
+            :max-rating-absolute="nutritionSupplyWatcher[pageIdComputed][nutritionLabel[index-1]]"
           />
           <b-row>
             <b-col>
@@ -92,9 +111,12 @@
           header-bg-variant="success"
           border-variant="success"
           bg-variant="light"
-          class="my-2">
+          class="my-2"
+        >
           <template #header>
-            <div class="font-weight-bold">Dietary energy supply from PFC(Protein, Fat, Carbohydrate)</div>
+            <div class="font-weight-bold">
+              Dietary energy supply from PFC(Protein, Fat, Carbohydrate)
+            </div>
           </template>
           <b-row>
             <b-col cols="4">
@@ -107,7 +129,7 @@
                   {val: 10, color: 'yellow', label: '%'},
                   {val: 55, color: 'red', label: '%'},
                 ]"
-              ></macro-nutrient-bar>
+              />
             </b-col>
           </b-row>
           <b-row>
@@ -117,7 +139,7 @@
             <b-col cols="7">
               <macro-nutrient-bar
                 :chart-values="pfcBalanceCurrent[pageIdComputed]"
-              ></macro-nutrient-bar>
+              />
             </b-col>
           </b-row>
           <!--
@@ -137,15 +159,18 @@
           header-bg-variant="success"
           border-variant="success"
           bg-variant="light"
-          class="my-2">
+          class="my-2"
+        >
           <template #header>
-            <div class="font-weight-bold">Record of Diet</div>
+            <div class="font-weight-bold">
+              Record of Diet
+            </div>
           </template>
           <recepi-table
             :items="currentMenu"
             @itemDeleted="notifiRecepiEdit"
             @rowClick="notifiRecepiEdit"
-          ></recepi-table>
+          />
         </b-card>
       </b-col>
     </b-row>
@@ -156,27 +181,27 @@
       :menu-cases.sync="currentMenu"
       :portion-units="myPortion"
       @update:menuCases="updateSupply($event, pageIdComputed)"
-    ></fctTableModal2>
+    />
     <dri-select-modal
       my-modal-header="nutrition target"
       my-name="driModal"
       :show-modal.sync="showDriSelect"
-      :targetSwitch="false"
+      :target-switch="false"
       :max="maxPopulation"
-      :driPopulations="newTarget"
-      :driItems="dri"
+      :dri-populations="newTarget"
+      :dri-items="dri"
       @update:target="updateDemand"
     />
   </b-container>
 </template>
 
 <script>
-import driSelectModal from "@/components/organisms/driSelectModal";
-import recepiTable from "@/components/molecules/recepiTable"
-import nutritionBar2 from "@/components/molecules/nutritionBar2"
-import macroNutrientBar from "@/components/molecules/macroNutrientBar";
-import fctTableModal2 from "@/components/organisms/FctTableModal2";
-import {validateMyFamily, updatePfc, getDiversityStatus} from "../../plugins/helper";
+import { validateMyFamily, updatePfc, getDiversityStatus } from '@/plugins/helper'
+import driSelectModal from '@/components/organisms/driSelectModal'
+import recepiTable from '@/components/molecules/recepiTable'
+import nutritionBar2 from '@/components/molecules/nutritionBar2'
+import macroNutrientBar from '@/components/molecules/macroNutrientBar'
+import fctTableModal2 from '@/components/organisms/FctTableModal2'
 
 /**
  * @desc 6つのコンポーネントを組み合わせて食事評価
@@ -201,7 +226,49 @@ export default {
     macroNutrientBar,
     fctTableModal2
   },
-  data() {
+  props: {
+    myFamily: {
+      type: Object,
+      required: true,
+      validator: function (value) {
+        return validateMyFamily(value)
+      }
+    },
+    myDri: {
+      type: Array,
+      required: true
+    },
+    myFct: {
+      type: Array,
+      required: true
+    },
+    myPortion: {
+      type: Array,
+      required: true
+    },
+    /**
+     * 複数インスタンスを作成する場合のindex
+     */
+    pageId: {
+      type: Number,
+      required: true
+    },
+    /**
+     * 作成するページ数
+     */
+    maxPage: {
+      type: Number,
+      required: true
+    },
+    /**
+     * 最初のページを表示しないためのフラグ
+     */
+    disabledOption: {
+      type: Array,
+      default: () => ([])
+    }
+  },
+  data () {
     return {
       /**
        * 使用する全変数のobject
@@ -272,167 +339,125 @@ export default {
        */
       pfcBalanceStandard: [
         [
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 55, color: 'red', label: '%'},
+          { val: 35, color: 'green', label: '%' },
+          { val: 10, color: 'yellow', label: '%' },
+          { val: 55, color: 'red', label: '%' }
         ],
         [
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 55, color: 'red', label: '%'},
+          { val: 35, color: 'green', label: '%' },
+          { val: 10, color: 'yellow', label: '%' },
+          { val: 55, color: 'red', label: '%' }
         ],
         [
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 55, color: 'red', label: '%'},
+          { val: 35, color: 'green', label: '%' },
+          { val: 10, color: 'yellow', label: '%' },
+          { val: 55, color: 'red', label: '%' }
         ],
         [
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 55, color: 'red', label: '%'},
+          { val: 35, color: 'green', label: '%' },
+          { val: 10, color: 'yellow', label: '%' },
+          { val: 55, color: 'red', label: '%' }
         ],
         [
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 55, color: 'red', label: '%'},
+          { val: 35, color: 'green', label: '%' },
+          { val: 10, color: 'yellow', label: '%' },
+          { val: 55, color: 'red', label: '%' }
         ],
         [
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 55, color: 'red', label: '%'},
+          { val: 35, color: 'green', label: '%' },
+          { val: 10, color: 'yellow', label: '%' },
+          { val: 55, color: 'red', label: '%' }
         ],
         [
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 55, color: 'red', label: '%'},
+          { val: 35, color: 'green', label: '%' },
+          { val: 10, color: 'yellow', label: '%' },
+          { val: 55, color: 'red', label: '%' }
         ],
         [
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 55, color: 'red', label: '%'},
+          { val: 35, color: 'green', label: '%' },
+          { val: 10, color: 'yellow', label: '%' },
+          { val: 55, color: 'red', label: '%' }
         ],
         [
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 55, color: 'red', label: '%'},
+          { val: 35, color: 'green', label: '%' },
+          { val: 10, color: 'yellow', label: '%' },
+          { val: 55, color: 'red', label: '%' }
         ],
         [
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 55, color: 'red', label: '%'},
-        ],
+          { val: 35, color: 'green', label: '%' },
+          { val: 10, color: 'yellow', label: '%' },
+          { val: 55, color: 'red', label: '%' }
+        ]
       ],
       /**
        * PFCバランスの現状
        */
       pfcBalanceCurrent: [
         [
-          {val: 55, color: 'red', label: '%'},
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 500, color: 'silver', label: '$'},
+          { val: 55, color: 'red', label: '%' },
+          { val: 35, color: 'green', label: '%' },
+          { val: 10, color: 'yellow', label: '%' },
+          { val: 500, color: 'silver', label: '$' }
         ],
         [
-          {val: 55, color: 'red', label: '%'},
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 500, color: 'silver', label: '$'},
+          { val: 55, color: 'red', label: '%' },
+          { val: 35, color: 'green', label: '%' },
+          { val: 10, color: 'yellow', label: '%' },
+          { val: 500, color: 'silver', label: '$' }
         ],
         [
-          {val: 55, color: 'red', label: '%'},
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 500, color: 'silver', label: '$'},
+          { val: 55, color: 'red', label: '%' },
+          { val: 35, color: 'green', label: '%' },
+          { val: 10, color: 'yellow', label: '%' },
+          { val: 500, color: 'silver', label: '$' }
         ],
         [
-          {val: 55, color: 'red', label: '%'},
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 500, color: 'silver', label: '$'},
+          { val: 55, color: 'red', label: '%' },
+          { val: 35, color: 'green', label: '%' },
+          { val: 10, color: 'yellow', label: '%' },
+          { val: 500, color: 'silver', label: '$' }
         ],
         [
-          {val: 55, color: 'red', label: '%'},
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 500, color: 'silver', label: '$'},
+          { val: 55, color: 'red', label: '%' },
+          { val: 35, color: 'green', label: '%' },
+          { val: 10, color: 'yellow', label: '%' },
+          { val: 500, color: 'silver', label: '$' }
         ],
         [
-          {val: 55, color: 'red', label: '%'},
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 500, color: 'silver', label: '$'},
+          { val: 55, color: 'red', label: '%' },
+          { val: 35, color: 'green', label: '%' },
+          { val: 10, color: 'yellow', label: '%' },
+          { val: 500, color: 'silver', label: '$' }
         ],
         [
-          {val: 55, color: 'red', label: '%'},
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 500, color: 'silver', label: '$'},
+          { val: 55, color: 'red', label: '%' },
+          { val: 35, color: 'green', label: '%' },
+          { val: 10, color: 'yellow', label: '%' },
+          { val: 500, color: 'silver', label: '$' }
         ],
         [
-          {val: 55, color: 'red', label: '%'},
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 500, color: 'silver', label: '$'},
+          { val: 55, color: 'red', label: '%' },
+          { val: 35, color: 'green', label: '%' },
+          { val: 10, color: 'yellow', label: '%' },
+          { val: 500, color: 'silver', label: '$' }
         ],
         [
-          {val: 55, color: 'red', label: '%'},
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 500, color: 'silver', label: '$'},
+          { val: 55, color: 'red', label: '%' },
+          { val: 35, color: 'green', label: '%' },
+          { val: 10, color: 'yellow', label: '%' },
+          { val: 500, color: 'silver', label: '$' }
         ],
         [
-          {val: 55, color: 'red', label: '%'},
-          {val: 35, color: 'green', label: '%'},
-          {val: 10, color: 'yellow', label: '%'},
-          {val: 500, color: 'silver', label: '$'},
-        ],
+          { val: 55, color: 'red', label: '%' },
+          { val: 35, color: 'green', label: '%' },
+          { val: 10, color: 'yellow', label: '%' },
+          { val: 500, color: 'silver', label: '$' }
+        ]
       ]
     }
   },
-  props: {
-    myFamily: {
-      type: Object,
-      required: true,
-      validator: function (value) {
-        return validateMyFamily(value)
-      },
-    },
-    myDri: {
-      type: Array,
-      required: true
-    },
-    myFct: {
-      type: Array,
-      required: true
-    },
-    myPortion: {
-      type: Array,
-      required: true
-    },
-    /**
-     * 複数インスタンスを作成する場合のindex
-     */
-    pageId: {
-      type: Number,
-      required: true
-    },
-    /**
-     * 作成するページ数
-     */
-    maxPage: {
-      type: Number,
-      required: true
-    },
-    /**
-     * 最初のページを表示しないためのフラグ
-     */
-    disabledOption: {
-      type: Array,
-      default: () => ([])
-    }
-  },
   computed: {
-    currentMenu() {
+    currentMenu () {
       return this.myFamilyWatcher.menuCases[this.pageIdComputed].menu
     },
     /**
@@ -456,19 +481,19 @@ export default {
         return this.pageId
       },
       set: function (newVal) {
-        if (this.pageId !== newVal) this.$emit('update:pageId', newVal)
+        if (this.pageId !== newVal) { this.$emit('update:pageId', newVal) }
       }
     },
     /**
      * 全ページ数
      * @returns {*[]}
      */
-    pageOptions() {
-      let res = []
+    pageOptions () {
+      const res = []
       for (let i = 0; i < this.maxPage; i++) {
         res.push({
           value: i,
-          text: 'page' + i + ': ' + this.pageMemo[i],
+          text: this.pageMemo[i] ? this.pageMemo[i] : '------------',
           disabled: this.disabledOption.includes(i)
         })
       }
@@ -478,9 +503,9 @@ export default {
      * FCTからfood Groupを抽出
      * @returns {*}
      */
-    foodGroup() {
+    foodGroup () {
       return this.myFct.reduce((accumulator, dat) => {
-        if (accumulator.indexOf(dat.Group) < 0) {
+        if (!accumulator.includes(dat.Group)) {
           accumulator.push(dat.Group)
         }
         return accumulator
@@ -490,7 +515,7 @@ export default {
      * menuCasesに含まれるfood Groupから、何種類の食品群が含まれるか判定
      * @returns {*[]}
      */
-    diversityStatus() {
+    diversityStatus () {
       const vm = this
       return getDiversityStatus(vm.myFamilyWatcher.menuCases, vm.foodGroup)
     },
@@ -498,7 +523,7 @@ export default {
      * noteの記入状態
      * @returns {boolean}
      */
-    noteInputState() {
+    noteInputState () {
       if (this.pageMemo.length === 0) {
         return false
       }
@@ -511,7 +536,7 @@ export default {
      */
     myFamily: {
       deep: true,
-      handler(newVal) {
+      handler (newVal) {
         const vm = this
         vm.myFamilyWatcher = JSON.parse(JSON.stringify(newVal))
         this.nutritionDemandWatcher = JSON.parse(JSON.stringify(vm.nutritionDemandGetter(
@@ -526,16 +551,16 @@ export default {
         vm.pageMemo = vm.myFamily.menuCases.map((item2) => {
           return item2.note
         })
-        this.pfcBalanceCurrent  = JSON.parse(JSON.stringify(
+        this.pfcBalanceCurrent = JSON.parse(JSON.stringify(
           updatePfc(this.nutritionSupplyWatcher)
         ))
       }
-    },
+    }
   },
   /**
    * 初期値の代入
    */
-  created() {
+  created () {
     const vm = this
     vm.myFamilyWatcher = JSON.parse(JSON.stringify(vm.myFamily))
     this.nutritionDemandWatcher = JSON.parse(JSON.stringify(vm.nutritionDemandGetter(
@@ -550,7 +575,7 @@ export default {
     vm.pageMemo = vm.myFamily.menuCases.map((item2) => {
       return item2.note
     })
-    this.pfcBalanceCurrent  = JSON.parse(JSON.stringify(
+    this.pfcBalanceCurrent = JSON.parse(JSON.stringify(
       updatePfc(this.nutritionSupplyWatcher)
     ))
   },
@@ -559,12 +584,12 @@ export default {
      * ページメモの更新：
      * @param newVal
      */
-    updatePageMemo(newVal) {
-      //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
-      //更新されたmenuを入れ替える
+    updatePageMemo (newVal) {
+      // 作業用のmyAppコピー作成
+      const dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
+      // 更新されたmenuを入れ替える
       dat.menuCases[this.pageIdComputed].note = newVal
-      //更新されたmyAppをemit
+      // 更新されたmyAppをemit
       this.$emit('update:myFamily', dat)
     },
     /**
@@ -573,13 +598,13 @@ export default {
      * @param driAll
      * @returns {{Pr: number, En: number, Va: number, Wt: number, Fe: number}|*}
      */
-    nutritionDemandCalk(member, driAll) {
+    nutritionDemandCalk (member, driAll) {
       const initObj = {
-        'En': 0,
-        'Pr': 0,
-        'Va': 0,
-        'Fe': 0,
-        'Wt': 0,
+        En: 0,
+        Pr: 0,
+        Va: 0,
+        Fe: 0,
+        Wt: 0
       }
       if (!member || (member.length === 0)) {
         return initObj
@@ -599,19 +624,19 @@ export default {
      * myApp.menuCases.targetの値を集計してnutritionDemandWatcherに代入するための関数
      * @returns {*[]} 栄養素必要量の合計値
      */
-    nutritionDemandGetter(member, dri, count) {
+    nutritionDemandGetter (member, dri, count) {
       const res = this.nutritionDemandCalk(member, dri)
-      return [...Array(count)].map(() => res);
+      return [...Array(count)].map(() => res)
     },
-    nutritionSupplyCalk(menu) {
+    nutritionSupplyCalk (menu) {
       const initObj = {
-        'En': 0,
-        'Pr': 0,
-        'Va': 0,
-        'Fe': 0,
-        'Wt': 0,
-        'Carbohydrate': 0,
-        'Fat': 0
+        En: 0,
+        Pr: 0,
+        Va: 0,
+        Fe: 0,
+        Wt: 0,
+        Carbohydrate: 0,
+        Fat: 0
       }
       if (menu === []) {
         return initObj
@@ -642,17 +667,17 @@ export default {
      * ただしfood_grp_idがStapleの場合、PrとFeを無視する
      * @returns {*[]} 栄養素供給量の合計値
      */
-    nutritionSupplyGetter(menuCases) {
+    nutritionSupplyGetter (menuCases) {
       const initObj = {
-        'En': 0,
-        'Pr': 0,
-        'Va': 0,
-        'Fe': 0,
-        'Wt': 0,
-        'Carbohydrate': 0,
-        'Fat': 0
+        En: 0,
+        Pr: 0,
+        Va: 0,
+        Fe: 0,
+        Wt: 0,
+        Carbohydrate: 0,
+        Fat: 0
       }
-      //return vm.myApp.menuCases.map((datArray) => {
+      // return vm.myApp.menuCases.map((datArray) => {
       if (menuCases.length === 0) {
         return [...Array(this.$store.state.fire.myApp.sceneCount)].map(() => initObj)
       }
@@ -668,7 +693,7 @@ export default {
      * nutritionSupplyとnutritionDemandの値に基づいて栄養素の充足率を算出
      * @returns {*[]} 栄養素ごとの充足率
      */
-    ratingGetter(supplyCases, demandCases) {
+    ratingGetter (supplyCases, demandCases) {
       const res = []
       for (let i = 0; i < this.maxPage; i++) {
         const supply = supplyCases[i]
@@ -678,14 +703,18 @@ export default {
                 const demand = this.nutritionDemandWatcher[i]
         */
         res.push({
-          En: demand.En ?
-            Math.round(100 * supply.En * this.driRange / demand.En) / 10 : 0,
-          Pr: demand.Pr ?
-            Math.round(100 * supply.Pr * this.driRange / demand.Pr) / 10 : 0,
-          Va: demand.Va ?
-            Math.round(100 * supply.Va * this.driRange / demand.Va) / 10 : 0,
-          Fe: demand.Fe ?
-            Math.round(100 * supply.Fe * this.driRange / demand.Fe) / 10 : 0
+          En: demand.En
+            ? Math.round(100 * supply.En * this.driRange / demand.En) / 10
+            : 0,
+          Pr: demand.Pr
+            ? Math.round(100 * supply.Pr * this.driRange / demand.Pr) / 10
+            : 0,
+          Va: demand.Va
+            ? Math.round(100 * supply.Va * this.driRange / demand.Va) / 10
+            : 0,
+          Fe: demand.Fe
+            ? Math.round(100 * supply.Fe * this.driRange / demand.Fe) / 10
+            : 0
         })
       }
       return res
@@ -694,77 +723,74 @@ export default {
      * @param val
      * @param index
      */
-    updateSupply(val, index) {
-      //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
-      //更新されたmenuを入れ替える
+    updateSupply (val, index) {
+      // 作業用のmyAppコピー作成
+      const dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
+      // 更新されたmenuを入れ替える
       dat.menuCases[index].menu = val
-      //更新されたmyAppをemit
+      // 更新されたmyAppをemit
       this.$emit('update:myFamily', dat)
     },
     /**
      * ユーザーによりtergetが変更された際に、栄養素必要量合計を再計算してemit
      * @param val 更新されたグループ構成
      */
-    updateDemand(val) {
+    updateDemand (val) {
       const vm = this
-      //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(vm.myFamilyWatcher))
-      //更新されたtargetを入れ替える
+      // 作業用のmyAppコピー作成
+      const dat = JSON.parse(JSON.stringify(vm.myFamilyWatcher))
+      // 更新されたtargetを入れ替える
       dat.member = JSON.parse(JSON.stringify(val))
-      //更新されたmyAppをemit
+      // 更新されたmyAppをemit
       this.$emit('update:myFamily', dat)
-    }
-    ,
+    },
     /**
      * ユーザーによりrecepiTableがクリックされた際に、行の内容を組み込んでfoodModalを開く
      * @param val
      */
-    onRecepiClicked(val) {
+    onRecepiClicked (val) {
       this.items_modal.length = 0
       this.items_modal.push({
-        'id': val.id,
-        'Name': val.Name,
-        'Group': val.Group,
-        'En': val.En,
-        'Pr': val.Pr,
-        'Va': val.Va,
-        'Fe': val.Fe,
+        id: val.id,
+        Name: val.Name,
+        Group: val.Group,
+        En: val.En,
+        Pr: val.Pr,
+        Va: val.Va,
+        Fe: val.Fe
       })
       this.menuName_modal = val.menuName
       this.value_model = val.Wt
       this.showModal = true
-    }
-    ,
+    },
     /**
      * ユーザーによりfctTableがクリックされた時に行の内容を組み込んでfoodModalを開く
      * @param val
      */
-    onFctClick(val) {
+    onFctClick (val) {
       this.items_modal.length = 0
       this.items_modal.push({
-        'id': val.id,
-        'Name': val.Name,
-        'Group': val.Group,
-        'En': val.En,
-        'Pr': val.Pr,
-        'Va': val.Va,
-        'Fe': val.Fe,
-        'Carbohydrate': val.Carbohydrate,
-        'Fat': val.Fat,
+        id: val.id,
+        Name: val.Name,
+        Group: val.Group,
+        En: val.En,
+        Pr: val.Pr,
+        Va: val.Va,
+        Fe: val.Fe,
+        Carbohydrate: val.Carbohydrate,
+        Fat: val.Fat
       })
       this.value_model = 0
       this.showModal = true
-    }
-    ,
+    },
     /**
      * menuが変更・追加された際に、栄養素供給量合計を再計算してemit
      * 新規なら追加、変更なら更新
      * @param val 更新されたmenu
      */
-    addSupply(val) {
+    addSupply (val) {
       const vm = this
-      //menuを更新する
+      // menuを更新する
       let existing = false
       let newMenu = []
       newMenu = vm.myFamilyWatcher.menuCases[vm.pageIdComputed].menu.map((item) => {
@@ -778,32 +804,30 @@ export default {
       if (!existing) {
         newMenu.push(val)
       }
-      //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(vm.myFamilyWatcher))
-      //更新されたmenuを入れ替える
+      // 作業用のmyAppコピー作成
+      const dat = JSON.parse(JSON.stringify(vm.myFamilyWatcher))
+      // 更新されたmenuを入れ替える
       dat.menuCases[vm.pageIdComputed].menu = newMenu
-      //更新されたmyAppをemit
+      // 更新されたmyAppをemit
       this.$emit('update:myFamily', dat)
-    }
-    ,
+    },
     /**
      * menuが削除された際に、栄養素供給量合計を再計算してemit
      * @param val 更新されたmenu
      */
-    deleteSupply(val) {
-      //作業用のmyAppコピー作成
-      let dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
-      //更新されたmenuを入れ替える
+    deleteSupply (val) {
+      // 作業用のmyAppコピー作成
+      const dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
+      // 更新されたmenuを入れ替える
       dat.menuCases[this.pageIdComputed].menu = val
-      //更新されたmyAppをemit
+      // 更新されたmyAppをemit
       this.$emit('update:myFamily', dat)
-    }
-    ,
-    //fctとdriの表示調整
-    toggleFctDri() {
+    },
+    // fctとdriの表示調整
+    toggleFctDri () {
       console.log('test')
     },
-    notifiRecepiEdit() {
+    notifiRecepiEdit () {
       alert('you can edit diet record by clicking [add crop] button')
     }
   }

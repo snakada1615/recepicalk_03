@@ -833,6 +833,7 @@ export const actions = {
       member: payload.member,
       keyNutrient: '',
       keyCommodity: '',
+      currentMonth: 1,
       menuCases: arr,
       feasibilityCases: arr2
     })

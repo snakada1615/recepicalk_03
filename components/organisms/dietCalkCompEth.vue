@@ -207,7 +207,7 @@ import legendSet from '../atoms/legendSet'
 import {
   getNutritionSupplyList, validateMyFamily,
   getNutritionDemandList, updatePfc, getPfcScale, getDiversityStatus
-} from '../../plugins/helper'
+} from '@/plugins/helper'
 import driSelectModal from '@/components/organisms/driSelectModal'
 import recepiTable from '@/components/molecules/recepiTable'
 import nutritionBar2 from '@/components/molecules/nutritionBar2'
@@ -470,7 +470,7 @@ export default {
       for (let i = 0; i < this.maxPage; i++) {
         res.push({
           value: i,
-          text: 'page' + i + ': ' + this.pageMemo[i],
+          text: this.pageMemo[i] ? this.pageMemo[i] : '------------',
           disabled: this.disabledOption.includes(i)
         })
       }
