@@ -496,7 +496,9 @@ export function getAverageNutritionSupply (nutritionSupplyList, noAverage = 0) {
     Fe: supplySum.Fe / count,
     Wt: supplySum.Wt / count,
     Carbohydrate: supplySum.Carbohydrate / count,
-    Fat: supplySum.Fat / count
+    Fat: supplySum.Fat / count,
+    menuName: 'average',
+    Name: 'Mixed crops'
   }
 }
 

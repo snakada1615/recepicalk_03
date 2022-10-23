@@ -10,26 +10,36 @@
         >
           <template #header>
             <div class="font-weight-bold">
-              Case information
+              Family information
             </div>
           </template>
-          <b-input-group prepend="select">
-            <b-form-select v-if="!hideCaseInfo" v-model="pageIdComputed" :options="pageOptions" />
+          <b-input-group prepend="select" class="mb-2">
+            <b-form-select
+              v-if="!hideCaseInfo"
+              v-model="pageIdComputed"
+              :options="pageOptions"
+              :state="stateFamilyNameSelection"
+              aria-describedby="invalid-familyName"
+            />
             <b-input-group-append>
-              <b-button @click="$bvModal.show(nameInputBox)">
+              <b-button @click="$bvModal.show('nameInputBox')">
                 change name
               </b-button>
             </b-input-group-append>
+            <!-- This will only be shown if the preceding input has an invalid state -->
+            <b-form-invalid-feedback id="invalid-familyName">
+              please change family name
+            </b-form-invalid-feedback>
           </b-input-group>
-          <div class="d-flex flex-row">
-            <b-form-input
-              v-model="pageMemo[pageIdComputed]"
-              placeholder="note for this family"
-              :state="noteInputState"
-              class="my-1"
-              @update="updatePageMemo(pageMemo[pageIdComputed], pageIdComputed)"
-            />
-          </div>
+
+          <input-box
+            modal-name="nameInputBox"
+            title="Set family name"
+            label="Input family name"
+            :text-input.sync="pageMemo[pageIdComputed]"
+            @update:textInput="updatePageMemo(pageMemo[pageIdComputed], pageIdComputed)"
+          />
+
           <b-button
             variant="info"
             @click="showFct = !showFct"
@@ -204,9 +214,6 @@
       :dri-items="myDri"
       @update:target="updateDemand($event, pageIdComputed)"
     />
-    <input-box
-      :modal-name="nameInputBox"
-    />
   </b-container>
 </template>
 
@@ -317,7 +324,6 @@ export default {
   },
   data () {
     return {
-      nameInputBox: 'test',
       pfcBalanceCurrent: [],
       chartBaseHeight: window.innerHeight / 4,
       chartBaseWidth: window.innerHeight / 4,
@@ -510,14 +516,13 @@ export default {
       return getDiversityStatus(vm.myFamilyWatcher.menuCases, vm.foodGroup)
     },
     /**
-     * noteの記入状態
+     * familyNameの選択状態
      * @returns {boolean}
      */
-    noteInputState () {
-      if (this.pageMemo.length === 0) {
-        return false
+    stateFamilyNameSelection: {
+      get () {
+        return this.pageMemo[this.pageIdComputed] !== ''
       }
-      return (this.pageMemo[this.pageIdComputed].length > 3)
     }
   },
   watch: {
@@ -618,7 +623,6 @@ export default {
   methods: {
     enlargeChart () {
       this.chartBaseHeight += 10
-      console.log(this.chartBaseHeight)
     },
     /**
      * ページメモの更新：
@@ -668,8 +672,6 @@ export default {
      * @param index
      */
     updateSupply (val, index) {
-      console.log('updateSupply')
-      console.log(val)
       // 作業用のmyAppコピー作成
       const dat = JSON.parse(JSON.stringify(this.myFamilyWatcher))
       // 更新されたmenuを入れ替える

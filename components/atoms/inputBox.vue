@@ -35,7 +35,7 @@ export default {
       type: String,
       required: true
     },
-    defaultValue: {
+    textInput: {
       type: String,
       default: ''
     },
@@ -61,7 +61,7 @@ export default {
       return valid
     },
     resetModal () {
-      this.userText = this.defaultValue
+      this.userText = this.textInput
       this.stateInput = null
     },
     handleOk (bvModalEvent) {
@@ -76,7 +76,7 @@ export default {
         return
       }
       // Push the userText to parent
-      this.$emit('update:defaultValue', this.userText)
+      this.$emit('update:textInput', this.userText)
 
       // Hide the modal manually
       this.$nextTick(() => {

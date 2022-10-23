@@ -200,7 +200,7 @@ export default {
      */
     currentFamily: {
       type: String,
-      required: true
+      default: ''
     },
     /**
      * monthの指定をした場合は挙動を変える
