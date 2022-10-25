@@ -13,9 +13,9 @@
               Comparison of Diet assessment
             </div>
           </template>
-          <b-card>
+          <b-card v-if="myAppComputed">
             Note for each case
-            <div v-for="pageId in sceneCount" v-if="myAppComputed" :key="pageId" class="border bg-light">
+            <div v-for="pageId in sceneCount" :key="pageId" class="border bg-light">
               <div v-if="sceneCount === 2">
                 {{ caseTitles[pageId - 1] }}
               </div>
@@ -58,9 +58,9 @@
             </div>
           </template>
           <b-row>
-            <template v-for="pageId in sceneCount">
+            <div v-for="(pageId, index0) in sceneCount" :key="index0">
               <b-col v-if="(pageId === 1) && (isAverageIncluded)" cols="12">
-                <b-card class="my-1">
+                <b-card class="my-1" border-variant="danger">
                   <div v-if="sceneCount === 2">
                     {{ caseTitles[pageId - 1] }}
                   </div>
@@ -113,7 +113,7 @@
                   />
                 </b-card>
               </b-col>
-            </template>
+            </div>
           </b-row>
         </b-card>
       </b-col>
@@ -130,7 +130,7 @@
             </div>
           </template>
           <b-row>
-            <template v-for="pageId in sceneCount">
+            <div v-for="(pageId, index) in sceneCount" :key="index">
               <b-col
                 v-if="(isAverageIncluded && (pageId === 1)) || !isAverageIncluded"
                 cols="12"
@@ -183,7 +183,7 @@
                   </b-collapse>
                 </b-card>
               </b-col>
-            </template>
+            </div>
           </b-row>
         </b-card>
         <b-card
@@ -207,17 +207,17 @@
   </b-container>
 </template>
 <script>
+import pieChart from '../atoms/pieChart'
+import recepiTable from '../molecules/recepiTable'
+import legendSet from '../atoms/legendSet'
+import pfcTable from '../molecules/pfcTable'
 import {
   getDiversityStatusForTable, getFoodGroup,
   getNutritionDemandList,
   getNutritionSupplyList,
   getRating,
   updatePfc
-} from '../../plugins/helper'
-import pieChart from '../atoms/pieChart'
-import recepiTable from '../molecules/recepiTable'
-import legendSet from '../atoms/legendSet'
-import pfcTable from '../molecules/pfcTable'
+} from '@/plugins/helper'
 import nutritionBar2 from '@/components/molecules/nutritionBar2'
 
 export default {

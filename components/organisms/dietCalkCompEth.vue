@@ -13,9 +13,8 @@
               Family information
             </div>
           </template>
-          <b-input-group prepend="select" class="mb-2">
+          <b-input-group v-if="!hideCaseInfo" prepend="select" class="mb-2">
             <b-form-select
-              v-if="!hideCaseInfo"
               v-model="pageIdComputed"
               :options="pageOptions"
               :state="stateFamilyNameSelection"
@@ -621,9 +620,6 @@ export default {
     ))
   },
   methods: {
-    enlargeChart () {
-      this.chartBaseHeight += 10
-    },
     /**
      * ページメモの更新：
      * @param newVal
@@ -775,10 +771,6 @@ export default {
       dat.menuCases[this.pageIdComputed].menu = val
       // 更新されたmyAppをemit
       this.$emit('update:myFamily', dat)
-    },
-    // fctとdriの表示調整
-    toggleFctDri () {
-      console.log('test')
     },
     notifiRecepiEdit () {
       alert('you can edit diet record by clicking [add crop] button')

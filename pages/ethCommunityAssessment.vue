@@ -86,7 +86,6 @@
         <b-tab v-if="statePage2" title="sample diet pattern">
           <b-card no-body>
             <diet-calk-comp-eth
-              v-if="myCommunity.name"
               :my-family="myCommunity"
               :my-dri="myApp.dataSet.dri"
               :my-fct="myApp.dataSet.fct"
@@ -108,7 +107,15 @@
           />
         </b-tab>
 
-        <b-tab v-if="statePage4" title="priority commodity">
+        <!-- crop calendarの編集 -->
+        <b-tab v-if="statePage4" title="crop availability">
+          <edit-calendar-eth
+            :calendar-id.sync="calendarId"
+            :fct="$store.state.fire.myApp.dataSet.fct"
+          />
+        </b-tab>
+
+        <b-tab v-if="statePage5" title="priority commodity">
           <priority-commodity
             :crop-list="priorityCropList"
             :crop-calendar="myApp.dataSet.cropCalendar"
@@ -120,7 +127,7 @@
         </b-tab>
 
         <b-tab
-          v-if="statePage5"
+          v-if="statePage6"
           title="feasibility check"
         >
           <div class=" mb-2 ml-3">
@@ -173,7 +180,7 @@
         </b-tab>
 
         <b-tab
-          v-if="statePage6"
+          v-if="statePage7"
           title="crop feasibility assessment summary"
         >
           <b-row>
@@ -288,7 +295,7 @@
         </b-tab>
 
         <b-tab
-          v-if="statePage7"
+          v-if="statePage8"
           title="overall result"
         >
           <div class=" mb-0 ml-3">
@@ -337,6 +344,7 @@ import {
 } from '@/plugins/helper'
 import priorityCommodity from '@/components/organisms/priorityCommodity'
 import feasibilityCheckMinimalEth from '@/components/organisms/feasibilityCheckMinimalEth'
+import editCalendarEth from '@/components/molecules/editCalendarEth'
 
 export default {
   components: {
@@ -346,7 +354,8 @@ export default {
     nutritionBar2,
     summaryDietEth,
     priorityCommodity,
-    feasibilityCheckMinimalEth
+    feasibilityCheckMinimalEth,
+    editCalendarEth
   },
   layout: 'defaultEth',
   data () {
@@ -405,6 +414,7 @@ export default {
       showFct: false,
       /**
        * 質問と回答一覧
+       * #TODO: QaListをfireStoreから読み込むように変更
        */
       qaList: [
         {
@@ -413,7 +423,7 @@ export default {
           itemsQA: [
             {
               id: 1,
-              questionText: 'Is required amount for nutrition target feasible?',
+              questionText: 'Can you prepare required target commodity everyday?',
               answerList: [
                 { value: -99, text: 'please select', disabled: true },
                 { value: 3, text: 'yes' },
@@ -612,6 +622,17 @@ export default {
     }
   },
   computed: {
+    /**
+     * crop calendarの表示・編集用ID
+     */
+    calendarId: {
+      get () {
+        return this.$store.state.fire.myApp.dataSet.cropCalendarId
+      },
+      set (val) {
+        this.$store.dispatch('fire/updateCropCalendarId', val)
+      }
+    },
     statePage1: {
       get () {
         return true
@@ -629,23 +650,28 @@ export default {
     },
     statePage4: {
       get () {
-        return (this.statePage2 && this.statePriority)
+        return (this.statePage3 && (this.myCommunity.menuCases[0].menu.length > 0))
       }
     },
     statePage5: {
       get () {
-        return this.statePage4 && (this.selectedCropList && this.communityList.length &&
-          this.myCommunity.keyNutrient && this.myCommunity.currentMonth)
+        return (this.statePage4 && this.statePriority)
       }
     },
     statePage6: {
       get () {
-        return (this.statePage5 && this.stateFeasibilityCheck)
+        return this.statePage5 && (this.selectedCropList && this.communityList.length &&
+          this.myCommunity.keyNutrient && this.myCommunity.currentMonth)
       }
     },
     statePage7: {
       get () {
-        return (this.statePage6 && this.myCommunity.keyCommodity)
+        return (this.statePage6 && this.stateFeasibilityCheck)
+      }
+    },
+    statePage8: {
+      get () {
+        return (this.statePage7 && this.myCommunity.keyCommodity)
       }
     },
     /**
@@ -747,30 +773,6 @@ export default {
           }
         })
       }
-    },
-    menuUpdated () {
-      const vm = this
-      if (!vm.myCommunity.feasibilityCases) {
-        console.log('dataset is broken in feasibilityCases: null')
-        return []
-      }
-      if (vm.myCommunity.feasibilityCases.length === 0) {
-        console.log('dataset is broken in feasibilityCases: length is 0')
-        return []
-      }
-      const res = JSON.parse(JSON.stringify(vm.myCommunity.menuCases[0].menu))
-      const addedCommodity = vm.myCommunity.feasibilityCases.find((item) => {
-        if (item.selectedCrop.Name !== '') {
-          return item.selectedCrop.Name === vm.selectedCommodity
-        } else {
-          return false
-        }
-      })
-      // 追加品目が存在する場合にはこれを追加、存在しない場合はもともとのmenuを返す
-      if (addedCommodity && addedCommodity.selectedCrop.length > 0) {
-        res.push(addedCommodity.selectedCrop[0])
-      }
-      return res
     },
     /**
      * menuCasesの中から値の含まれるものを抽出
@@ -1127,6 +1129,7 @@ export default {
   },
   created () {
     this.communityName = this.myApp.currentCommunity
+    // this.qaList = JSON.parse(JSON.stringify(this.myApp.dataSet.questions))
   },
   methods: {
     /**

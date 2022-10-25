@@ -34,6 +34,7 @@ function Target(id, count) {
  * @returns {*[]}
  */
 function createNewFeasibilityCases (myCount) {
+  // #TODO: 月、栄養素、作物でグループを作成する。このために品目リストのArrayサイズを固定長でなく可変長にする
   if (!myCount) {
     return []
   }
@@ -96,6 +97,7 @@ function formatDri (dri) {
   }
   return res
 }
+
 /**
  * JSON -→ array of objectに変換
  * @param dat (JSON形式)
@@ -113,6 +115,7 @@ function formatPortionUnit (dat) {
   }
   return res
 }
+
 /**
  * JSON -→ array of objectに変換
  * @param dat (JSON形式)
@@ -130,6 +133,7 @@ function formatQuestions (dat) {
   }
   return res
 }
+
 /**
  * menuCasesとfeasibilityCasesの初期化した配列を返す
  *
@@ -192,7 +196,7 @@ export const state = () => ({
       /**
        * fctのid
        */
-      fctId: 'fct_eth',
+      fctId: 'fct_eth0729',
       /**
        * driのid
        */
@@ -208,11 +212,11 @@ export const state = () => ({
       /**
        * portionUnitのid
        */
-      portionUnitId: 'portionUnit1',
+      portionUnitId: 'portion_0927',
       /**
        * questionのid
        */
-      questionsId: 'questions01',
+      questionsId: 'question_nakada02',
       /**
        * forcedUpdateInfoのId
        */
@@ -236,7 +240,7 @@ export const state = () => ({
       /**
        * cropCalendarのID
        */
-      cropCalendarId: 'cropCalendar01',
+      cropCalendarId: 'cropCalendar_221010',
       /**
        * cropCalendarのデータ
        */
@@ -273,7 +277,7 @@ export const state = () => ({
             fctId: 'fct_eth0729',
             driId: '',
             portionUnitId: 'portion_0927',
-            questionsId: 'question_eth2',
+            questionsId: 'question_nakada02',
             cropCalendarId: ''
           }
         }
@@ -1274,7 +1278,7 @@ export const actions = {
     if ((!state.myApp.dataSet.questionsId) || (!state.myApp.dataSet.questionsId.includes('question'))) {
       alert('feasibility questions are not initialized. data will be loaded from original copy')
       // questionのオリジナルデータをコピーしてfireStoreに保存
-      const questions = await fireGetDoc('dataset', 'questions01')
+      const questions = await fireGetDoc('dataset', 'question_nakada02')
       const newQuestionsId = 'question_' + state.myApp.user.displayName
       const ref = await doc(firestoreDb, 'dataset', newQuestionsId)
       await setDoc(ref, questions).catch((err) => {
@@ -1364,18 +1368,24 @@ export const actions = {
    * @returns {Promise<void>}
    */
   async forcedUpdate ({ dispatch, state }) {
-    // forcedUpdateInfoが存在しなければ終了
-    if (!state.myApp.dataSet.forcedUpdateInfo) {
-      return
+    // #TODO: fireStore本体に共通のforcedUpdateを保存して読み込むように変更
+    // forcedUpdateInfoが登録されていなければ読み込んで再起動
+    if (state.myApp.dataSet.forcedUpdateInfoId == null) {
+      console.log('There are no information for forcedUpdateInfo. The app will be updated')
+      dispatch('updateForcedUpdateInfoId', 'forcedUpdateInfoId01')
+      await dispatch('fireSaveAppdata')
+      await this.$router.push('/')
     }
 
     // forcedUpdateInfoの値がblank/nullの場合は終了
-    if (Array.isArray(state.myApp.dataSet.forcedUpdateInfo) && !state.myApp.dataSet.forcedUpdateInfo.length) {
+    if ((Array.isArray(state.myApp.dataSet.forcedUpdateInfo) && !state.myApp.dataSet.forcedUpdateInfo.length) ||
+      (state.myApp.dataSet.forcedUpdateInfo == null)) {
       return
     }
 
     // 現在のuserが合致している検索条件を抽出
     const myUser = state.myApp.user
+    console.log(state.myApp.dataSet.forcedUpdateInfo)
     const filtered = state.myApp.dataSet.forcedUpdateInfo.filter((item) => {
       return checkUserRegion(myUser, item.searchReg)
     })

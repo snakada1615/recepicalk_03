@@ -87,7 +87,6 @@
         <b-tab v-if="statePage2" title="current diet">
           <b-card no-body>
             <diet-calk-comp-eth
-              v-if="myFamily.name"
               :my-family="myFamily"
               :my-dri="myApp.dataSet.dri"
               :my-fct="myApp.dataSet.fct"
@@ -389,6 +388,7 @@ export default {
       ],
       /**
        * 質問と回答一覧
+       * #TODO: QaListをfireStoreから読み込むように変更
        */
       qaList: [
         {
@@ -397,7 +397,7 @@ export default {
           itemsQA: [
             {
               id: 1,
-              questionText: 'Is required amount for nutrition target feasible?',
+              questionText: 'Can you prepare required target commodity everyday?',
               answerList: [
                 { value: -99, text: 'please select', disabled: true },
                 { value: 3, text: 'yes' },
@@ -619,6 +619,7 @@ export default {
     },
     statePage3: {
       get () {
+        // return false
         return (this.statePage2 && (this.myFamily.menuCases[0].menu.length > 0))
       }
     },
@@ -982,6 +983,7 @@ export default {
   },
   created () {
     this.familyName = this.myApp.currentFamily
+    // this.qaList = JSON.parse(JSON.stringify(this.myApp.dataSet.questions))
   },
   methods: {
     /**

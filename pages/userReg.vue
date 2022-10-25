@@ -8,58 +8,79 @@
     >
       <b-row class="my-2">
         <b-col class="px-2">
-          <div class="text-muted">--- required info---</div>
+          <div class="text-muted">
+            --- required info---
+          </div>
           <b-input-group class="my-1">
             <b-input-group-prepend class="w-25">
-              <b-input-group-text class="w-100">user Name</b-input-group-text>
+              <b-input-group-text class="w-100">
+                user Name
+              </b-input-group-text>
             </b-input-group-prepend>
-            <b-form-input v-model="newUser" placeholder="Enter username" :state="stateName"/>
+            <b-form-input v-model="newUser" placeholder="Enter username" :state="stateName" />
           </b-input-group>
           <b-input-group class="my-1">
             <b-input-group-prepend class="w-25">
-              <b-input-group-text class="w-100">password</b-input-group-text>
+              <b-input-group-text class="w-100">
+                password
+              </b-input-group-text>
             </b-input-group-prepend>
-            <b-form-input v-model="newPass" :type="typePass" placeholder="Enter password" :state="statePass"/>
+            <b-form-input v-model="newPass" :type="typePass" placeholder="Enter password" :state="statePass" />
             <b-input-group-append>
               <b-input-group-text>
-                <b-icon v-if="typePass==='password'" icon="eye" @click="togglePass"/>
-                <b-icon v-if="typePass==='text'" icon="eyeSlash" @click="togglePass"/>
+                <b-icon v-if="typePass==='password'" icon="eye" @click="togglePass" />
+                <b-icon v-if="typePass==='text'" icon="eyeSlash" @click="togglePass" />
               </b-input-group-text>
             </b-input-group-append>
           </b-input-group>
-          <div v-if="errorMessage" class="text-danger" size="sm">({{ errorMessage }})</div>
+          <div v-if="errorMessage" class="text-danger" size="sm">
+            ({{ errorMessage }})
+          </div>
           <hr>
-          <div class="text-muted">--- optional info---</div>
+          <div class="text-muted">
+            --- optional info---
+          </div>
           <b-input-group class="my-1">
             <b-input-group-prepend class="w-25">
-              <b-input-group-text class="w-100">country</b-input-group-text>
+              <b-input-group-text class="w-100">
+                country
+              </b-input-group-text>
             </b-input-group-prepend>
-            <country-names :key1.sync="user.country"/>
+            <country-names :key1.sync="user.country" />
             <region-select
               v-if="user.country === 'Ethiopia'"
               :key3.sync="user.subnational3"
               :key2.sync="user.subnational2"
-              :key1.sync="user.subnational1"/>
+              :key1.sync="user.subnational1"
+            />
           </b-input-group>
           <b-input-group class="my-1">
             <b-input-group-prepend class="w-25">
-              <b-input-group-text class="w-100">organization</b-input-group-text>
+              <b-input-group-text class="w-100">
+                organization
+              </b-input-group-text>
             </b-input-group-prepend>
             <b-form-input
               v-model="user.organization"
-              placeholder="Enter your organization"/>
+              placeholder="Enter your organization"
+            />
           </b-input-group>
           <b-input-group class="my-1">
             <b-input-group-prepend class="w-25">
-              <b-input-group-text class="w-100 text-capitalize">title</b-input-group-text>
+              <b-input-group-text class="w-100 text-capitalize">
+                title
+              </b-input-group-text>
             </b-input-group-prepend>
             <b-form-input
               v-model="user.title"
-              placeholder="Enter your role in the organization"/>
+              placeholder="Enter your role in the organization"
+            />
           </b-input-group>
           <b-input-group class="my-1">
             <b-input-group-prepend class="w-25">
-              <b-input-group-text class="w-100">user type</b-input-group-text>
+              <b-input-group-text class="w-100">
+                user type
+              </b-input-group-text>
             </b-input-group-prepend>
             <b-form-radio-group
               v-model="user.userType"
@@ -72,10 +93,11 @@
           </b-input-group>
           <hr>
           <b-button
-            @click="register"
             variant="primary"
             :disabled="!inputValidate"
-          >register
+            @click="register"
+          >
+            register
           </b-button>
         </b-col>
       </b-row>
@@ -93,10 +115,10 @@
 </template>
 
 <script>
-import regionSelect from "@/components/atoms/regionSelect";
-import countryNames from "@/components/atoms/countryNames";
-import passCheckDialogue from "../components/atoms/passCheckDialogue";
-import {makeToast} from "../plugins/helper";
+import passCheckDialogue from '../components/atoms/passCheckDialogue'
+import { makeToast } from '@/plugins/helper'
+import regionSelect from '@/components/atoms/regionSelect'
+import countryNames from '@/components/atoms/countryNames'
 
 export default {
   components: {
@@ -104,7 +126,7 @@ export default {
     countryNames,
     passCheckDialogue
   },
-  data() {
+  data () {
     return {
       /**
        * 新規登録用のユーザー名
@@ -129,8 +151,8 @@ export default {
        * userの権限設定
        */
       userOptions: [
-        {text: 'normal user', value: 'normal'},
-        {text: 'admin user', value: 'admin'},
+        { text: 'normal user', value: 'normal' },
+        { text: 'admin user', value: 'admin' }
       ],
       newPass: '',
       typePass: 'password',
@@ -144,30 +166,30 @@ export default {
     }
   },
   computed: {
-    stateName() {
+    stateName () {
       return (/^[\w]{3,30}?$/).test(this.newUser)
     },
-    statePass() {
-      return (this.newPass.length >= 6 && this.newPass.length <= 20)
+    statePass () {
+      return (this.newPass.length >= 3 && this.newPass.length <= 20)
     },
-    inputValidate() {
+    inputValidate () {
       return this.statePass && this.stateName
-    },
+    }
   },
-  created() {
+  created () {
     this.myPass = this.$store.state.fire.adminPass
   },
   methods: {
-    togglePass() {
+    togglePass () {
       if (this.typePass === 'text') {
         this.typePass = 'password'
       } else {
         this.typePass = 'text'
       }
     },
-    async register() {
+    async register () {
       let loginFail = false
-      await this.$store.dispatch('fire/registerEmail', {name: this.newUser, password: this.newPass})
+      await this.$store.dispatch('fire/registerEmail', { name: this.newUser, password: this.newPass })
         .catch((err) => {
           console.log(err)
           loginFail = true
@@ -184,8 +206,8 @@ export default {
       makeToast(this, 'user data registered!')
       this.$router.push('/startPageEth')
     },
-    async updateUserInfo() {
-      let myUser = JSON.parse(JSON.stringify(this.$store.state.fire.myApp.user))
+    async updateUserInfo () {
+      const myUser = JSON.parse(JSON.stringify(this.$store.state.fire.myApp.user))
       myUser.country = this.user.country
       myUser.organization = this.user.organization
       myUser.title = this.user.title
@@ -194,21 +216,21 @@ export default {
       myUser.subnational2 = this.user.subnational2
       myUser.subnational3 = this.user.subnational3
 
-      //storeのアップデート
+      // storeのアップデート
       await this.$store.dispatch('fire/updateUser', myUser)
       await this.$store.dispatch('fire/fireSaveAppdata')
       console.log('user profile updated')
     },
-    onUserTypeChange(val) {
+    onUserTypeChange (val) {
       if (val === 'admin') {
         this.openPassCheckFlag = true
       }
     },
-    onWrongInput() {
+    onWrongInput () {
       alert('please check admin password')
       this.user.userType = 'normal'
     },
-    onCorrectInput() {
+    onCorrectInput () {
       makeToast(this, 'admin status have set')
     }
   }
