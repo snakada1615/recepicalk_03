@@ -7,6 +7,7 @@ import {
   createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile
 } from 'firebase/auth'
 import { doc, setDoc } from 'firebase/firestore'
+import { fireGetDocRemoteFirst } from '../plugins/firebasePlugin'
 import { checkUserRegion } from '@/plugins/helper'
 import { fireGetDoc, firestoreDb } from '~/plugins/firebasePlugin'
 
@@ -1377,6 +1378,9 @@ export const actions = {
       await this.$router.push('/')
     }
 
+    // サーバーから最新のforcedUpdateを取得してstoreに読み込む
+    await dispatch('fetchForcedUpdateInfoFromFire')
+
     // forcedUpdateInfoの値がblank/nullの場合は終了
     if ((Array.isArray(state.myApp.dataSet.forcedUpdateInfo) && !state.myApp.dataSet.forcedUpdateInfo.length) ||
       (state.myApp.dataSet.forcedUpdateInfo == null)) {
@@ -1606,13 +1610,14 @@ export const actions = {
       throw new Error('fetchQuestionsFromFire fail: no data')
     }
   },
-  async fetchForcedUpdateInfoFromFire ({ state }) {
-    // ForcedUpdateInfoをfireStoreからfetch (forcedUpdateInfoIdを使う)
-    const forcedUpdateInfo = await fireGetDoc('dataset', state.myApp.dataSet.forcedUpdateInfoId).catch((err) => {
+  async fetchForcedUpdateInfoFromFire ({ state, commit }) {
+    // ForcedUpdateInfoをfireStoreからfetch (forcedUpdateInfoIdを使う) → fireGetDocRemoteFirst（サーバー → ローカルの順にデータチェック）
+    const forcedUpdateInfo = await fireGetDocRemoteFirst('dataset', state.myApp.dataSet.forcedUpdateInfoId).catch((err) => {
       throw new Error(err)
     })
     if (forcedUpdateInfo) {
-      return Object.values(forcedUpdateInfo)
+      commit('updateForcedUpdateInfo', Object.values(forcedUpdateInfo))
+      // return Object.values(forcedUpdateInfo)
     } else {
       return []
     }
