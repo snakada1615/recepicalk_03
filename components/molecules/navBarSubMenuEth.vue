@@ -90,6 +90,12 @@
       <div v-if="$nuxt.isOffline" class="text-light small">
         <b-icon icon="reception0" />
       </div>
+      <b-icon
+        icon="chat-right-dots"
+        class="text-white ml-1 pointer"
+        animation="cylon-vertical"
+        @click="test"
+      />
     </b-navbar>
   </b-container>
 </template>
@@ -180,6 +186,9 @@ export default {
     })
   },
   methods: {
+    test () {
+      alert('hey')
+    },
     /**
      * ページの遷移前にユーザーに確認し、
      * @param event

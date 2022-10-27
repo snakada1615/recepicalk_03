@@ -32,6 +32,9 @@ export default async function ({ store, redirect, route }) {
       await store.dispatch('fire/initFirebaseNewVariable')
 
       // 特定の地域に対して適用するdbを指定
+      await store.dispatch('fire/checkUpdate')
+
+      // 特定の地域に対して適用するdbを指定
       await store.dispatch('fire/forcedUpdate')
 
       /*

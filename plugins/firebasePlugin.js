@@ -72,7 +72,6 @@ export async function fireGetDoc (collectionId, docId) {
     return await getDocFromServer(ref)
   })
   if (docSnap.exists()) {
-    console.log('getData success')
     return docSnap.data()
   } else {
     console.log('getData fail: no data in Cache or Server')
@@ -88,7 +87,6 @@ export async function fireGetDocRemoteFirst (collectionId, docId) {
     return await getDocFromCache(ref)
   })
   if (docSnap.exists()) {
-    console.log('getData success')
     return docSnap.data()
   } else {
     console.log('getData fail: no data in Cache or Server')

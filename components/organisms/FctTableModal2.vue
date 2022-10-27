@@ -1,8 +1,8 @@
 <template>
   <b-container>
     <b-modal
-      v-model="showModalComputed"
       :id="myName"
+      v-model="showModalComputed"
       :title="myModalHeader"
       static
       @ok="clickOk"
@@ -14,19 +14,23 @@
       >
         <!--    ここからFCTテーブル      -->
         <b-row class="mb-0">
-          <div class="font-weight-bold ml-3 text-primary">food composition table</div>
+          <div class="font-weight-bold ml-3 text-primary">
+            food composition table
+          </div>
         </b-row>
         <b-row class="my-0">
-          <div class="small ml-3 text-muted">(1) select food item from the list below</div>
+          <div class="small ml-3 text-muted">
+            (1) select food item from the list below
+          </div>
         </b-row>
         <b-row class="my-0">
           <fct-table
             :items="items"
             head-row-variant="success"
             table-variant="light"
-            @fctClick="onFctClick"
             class="mb-0"
-          ></fct-table>
+            @fctClick="onFctClick"
+          />
         </b-row>
       </b-card>
       <b-card
@@ -41,8 +45,8 @@
           <b-button
             class="px-0 py-0 mx-0 my-0"
             variant="light"
-            @click="showModalInput = !showModalInput"
             :disabled="!stateSelectedItem"
+            @click="showModalInput = !showModalInput"
           >
             <b-badge variant="danger" class="px-1 py-1">
               +
@@ -51,7 +55,9 @@
         </b-row>
 
         <b-row>
-          <div class="small ml-3 text-muted">(2) add food item by clicking +</div>
+          <div class="small ml-3 text-muted">
+            (2) add food item by clicking +
+          </div>
         </b-row>
 
         <b-table
@@ -62,11 +68,11 @@
           outlined
         >
           <!-- A custom formatted header cell for field 'name' -->
-          <template #head(menuName)="data">
+          <template #head(menuName)>
             <span>Menu</span>
           </template>
           <!-- A custom formatted header cell for field 'name' -->
-          <template #head(Name)="data">
+          <template #head(Name)>
             <span>ingredients</span>
           </template>
           <!-- A custom formatted cell for field 'name' -->
@@ -119,8 +125,8 @@
 
     <!--  ここからデータ入力用modal  -->
     <b-modal
-      v-model="showModalInput"
       id="modalInputWeight"
+      v-model="showModalInput"
       hide-header
       hide-footer
     >
@@ -137,21 +143,23 @@
         header-bg-variant="success"
         border-variant="success"
         bg-variant="light"
-        class="my-2">
-
+        class="my-2"
+      >
         <span class="font-weight-bold text-success">set diet name</span>
         <b-input-group
           size="sm"
           class="mx-0"
         >
           <template #prepend>
-            <b-button size="sm" variant="info">diet name</b-button>
+            <b-button size="sm" variant="info">
+              diet name
+            </b-button>
           </template>
           <b-form-input
             id="inputFoodName"
             v-model="foodName"
             :state="stateFoodName"
-          ></b-form-input>
+          />
         </b-input-group>
         <b-row>
           <b-col>
@@ -169,32 +177,34 @@
           </b-col>
         </b-row>
         <span class="small text-muted">
-            select or type at least
-            4 letters to identify the name of the diet (ex. breakfast,
-            lunch, or specific name of the dish)
-          </span>
+          select or type at least
+          4 letters to identify the name of the diet (ex. breakfast,
+          lunch, or specific name of the dish)
+        </span>
       </b-card>
 
       <b-card
         header-bg-variant="success"
         border-variant="success"
         bg-variant="light"
-        class="my-2">
-
+        class="my-2"
+      >
         <span class="font-weight-bold text-success">set volume</span>
         <b-input-group
           size="sm"
           class="mx-0"
         >
           <template #prepend>
-            <b-button size="sm" variant="info">portion count</b-button>
+            <b-button size="sm" variant="info">
+              portion count
+            </b-button>
           </template>
           <b-form-input
             id="inputVolume"
             v-model="portionCount"
             type="number"
             :state="stateFoodVolume"
-          ></b-form-input>
+          />
         </b-input-group>
         <b-row class="mt-2">
           <b-col>
@@ -209,10 +219,9 @@
               :items="portionList"
               :fields="fields1"
               @row-selected="onPortionSelected"
-            >
-            </b-table>
+            />
             <b-card class="border-0 py-2 px-2" align="center">
-              <b-img-lazy :src="portionImg" fluid alt="Loading"></b-img-lazy>
+              <b-img-lazy :src="portionImg" fluid alt="no-image" onerror="this.src='/img/crops/no_image.png'" />
             </b-card>
           </b-col>
         </b-row>
@@ -227,14 +236,16 @@
             size="sm"
             :disabled="!stateFoodName || !stateFoodVolume"
             @click="addItem"
-          >Add
+          >
+            Add
           </b-button>
 
           <b-button
             class="mx-1"
             size="sm"
             @click="showModalInput = false"
-          >Cancel
+          >
+            Cancel
           </b-button>
         </b-col>
       </b-row>
@@ -243,8 +254,8 @@
 </template>
 
 <script>
-import FctTable from "@/components/molecules/FctTable"
-import recepiTable from "@/components/molecules/recepiTable";
+import FctTable from '@/components/molecules/FctTable'
+import recepiTable from '@/components/molecules/recepiTable'
 
 /**
  * @desc FctTableをModal化したもの
@@ -264,7 +275,7 @@ export default {
      */
     myName: {
       type: String,
-      required: true,
+      required: true
     },
     /**
      * モーダルのタイトル
@@ -292,7 +303,7 @@ export default {
      */
     portionUnits: {
       type: Array,
-      required: true,
+      required: true
     },
     /**
      * モーダルの表示用トリガー
@@ -303,110 +314,7 @@ export default {
       required: true
     }
   },
-  computed: {
-    /**
-     * 食材の重さの入力値
-     */
-    foodVolume() {
-      return this.portionCount * this.portionSize
-    },
-    /**
-     * 重量計算用のportion一覧表
-     * @returns {[{count_method: string, FCT_id: string, id: string,
-     *     unit_weight: number},{count_method: string, FCT_id: string,
-     *     id: string, unit_weight: number},{count_method: string,
-     *     FCT_id: string, id: string, unit_weight: number}]|*[]}
-     */
-    portionList() {
-      const vm = this
-      if ((vm.items.length === 0) || (vm.selectedItem === '')) {
-        return [
-          {
-            'FCT_id': '0',
-            'id': '999',
-            'count_method': 'ton',
-            'unit_weight': 1000000,
-          },
-          {
-            'FCT_id': '0',
-            'id': '998',
-            'count_method': 'Kg',
-            'unit_weight': 1000,
-          },
-          {
-            'FCT_id': '0',
-            'id': '997',
-            'count_method': 'gram',
-            'unit_weight': 1,
-          }
-        ]
-      }
-      const res = this.portionUnits.filter((dat) => {
-        return dat.FCT_id === vm.selectedItem.id
-      })
-      res.push(
-        {
-          'FCT_id': '0',
-          'id': '999',
-          'count_method': 'ton',
-          'unit_weight': 1000000,
-        },
-        {
-          'FCT_id': '0',
-          'id': '998',
-          'count_method': 'Kg',
-          'unit_weight': 1000,
-        },
-        {
-          'FCT_id': '0',
-          'id': '997',
-          'count_method': 'gram',
-          'unit_weight': 1,
-        }
-      )
-      return res
-    },
-    /**
-     * ダイアログで食材の量が入力されているかどうかのフラグ
-     * @returns {boolean}
-     */
-    stateFoodVolume() {
-      return (this.portionCount > 0 && this.portionSize > 0)
-    },
-    /**
-     * ダイアログで食事の名称が入力されているかどうかのフラグ
-     * @returns {boolean}
-     */
-    stateFoodName() {
-      return (this.foodName.length > 3)
-    },
-    /**
-     * FCTで食材が選択されているかどうかのフラグ
-     * @returns {boolean}
-     */
-    stateSelectedItem() {
-      return (this.selectedItem !== '')
-    },
-    /**
-     * 選択されたFCT行を配列に変換
-     * @returns {string[]}
-     */
-    selectedItemArray() {
-      return [this.selectedItem]
-    },
-    /**
-     * モーダル表示用のフラグ
-     */
-    showModalComputed: {
-      get() {
-        return this.showModal
-      },
-      set(val) {
-        this.$emit('update:showModal', val)
-      }
-    }
-  },
-  data() {
+  data () {
     return {
       /**
        * 画像表示用property
@@ -424,11 +332,11 @@ export default {
        * portion表示用設定
        */
       fields1: [
-        {key: 'id', tdClass: 'd-none', thClass: 'd-none'},
-        {key: 'FCT_id', tdClass: 'd-none', thClass: 'd-none'},
-        {key: 'name', tdClass: 'd-none', thClass: 'd-none'},
-        {key: 'count_method', label:'Portion'},
-        {key: 'unit_weight'},
+        { key: 'id', tdClass: 'd-none', thClass: 'd-none' },
+        { key: 'FCT_id', tdClass: 'd-none', thClass: 'd-none' },
+        { key: 'name', tdClass: 'd-none', thClass: 'd-none' },
+        { key: 'count_method', label: 'Portion' },
+        { key: 'unit_weight' }
       ],
       /**
        * portionの画像リンク
@@ -458,15 +366,15 @@ export default {
        * 選択された作物(selectedItem)の表示用
        */
       fieldsSelected: [
-        {key: 'id', sortable: false, tdClass: 'd-none', thClass: 'd-none'},
-        {key: 'Group', sortable: true, tdClass: 'd-none', thClass: 'd-none'},
-        {key: 'menuName', sortable: true, tdClass: 'text-center', thClass: 'text-center'},
-        {key: 'Name', sortable: true},
-        {key: 'En', sortable: true, tdClass: 'text-center', thClass: 'text-center'},
-        {key: 'Pr', sortable: true, tdClass: 'text-center', thClass: 'text-center'},
-        {key: 'Va', sortable: true, tdClass: 'text-center', thClass: 'text-center'},
-        {key: 'Fe', sortable: true, tdClass: 'text-center', thClass: 'text-center'},
-        {key: 'Wt', sortable: true, tdClass: 'text-center', thClass: 'text-center'},
+        { key: 'id', sortable: false, tdClass: 'd-none', thClass: 'd-none' },
+        { key: 'Group', sortable: true, tdClass: 'd-none', thClass: 'd-none' },
+        { key: 'menuName', sortable: true, tdClass: 'text-center', thClass: 'text-center' },
+        { key: 'Name', sortable: true },
+        { key: 'En', sortable: true, tdClass: 'text-center', thClass: 'text-center' },
+        { key: 'Pr', sortable: true, tdClass: 'text-center', thClass: 'text-center' },
+        { key: 'Va', sortable: true, tdClass: 'text-center', thClass: 'text-center' },
+        { key: 'Fe', sortable: true, tdClass: 'text-center', thClass: 'text-center' },
+        { key: 'Wt', sortable: true, tdClass: 'text-center', thClass: 'text-center' }
       ],
       typicalMenu: [
         '1st meal',
@@ -475,15 +383,117 @@ export default {
         '4th meal',
         '1st snack',
         '2nd snack',
-        '3rd snack',
-      ],
+        '3rd snack'
+      ]
+    }
+  },
+  computed: {
+    /**
+     * 食材の重さの入力値
+     */
+    foodVolume () {
+      return this.portionCount * this.portionSize
+    },
+    /**
+     * 重量計算用のportion一覧表
+     * @returns {[{count_method: string, FCT_id: string, id: string,
+     *     unit_weight: number},{count_method: string, FCT_id: string,
+     *     id: string, unit_weight: number},{count_method: string,
+     *     FCT_id: string, id: string, unit_weight: number}]|*[]}
+     */
+    portionList () {
+      const vm = this
+      if ((vm.items.length === 0) || (vm.selectedItem === '')) {
+        return [
+          {
+            FCT_id: '0',
+            id: '999',
+            count_method: 'ton',
+            unit_weight: 1000000
+          },
+          {
+            FCT_id: '0',
+            id: '998',
+            count_method: 'Kg',
+            unit_weight: 1000
+          },
+          {
+            FCT_id: '0',
+            id: '997',
+            count_method: 'gram',
+            unit_weight: 1
+          }
+        ]
+      }
+      const res = this.portionUnits.filter((dat) => {
+        return dat.FCT_id === vm.selectedItem.id
+      })
+      res.push(
+        {
+          FCT_id: '0',
+          id: '999',
+          count_method: 'ton',
+          unit_weight: 1000000
+        },
+        {
+          FCT_id: '0',
+          id: '998',
+          count_method: 'Kg',
+          unit_weight: 1000
+        },
+        {
+          FCT_id: '0',
+          id: '997',
+          count_method: 'gram',
+          unit_weight: 1
+        }
+      )
+      return res
+    },
+    /**
+     * ダイアログで食材の量が入力されているかどうかのフラグ
+     * @returns {boolean}
+     */
+    stateFoodVolume () {
+      return (this.portionCount > 0 && this.portionSize > 0)
+    },
+    /**
+     * ダイアログで食事の名称が入力されているかどうかのフラグ
+     * @returns {boolean}
+     */
+    stateFoodName () {
+      return (this.foodName.length > 3)
+    },
+    /**
+     * FCTで食材が選択されているかどうかのフラグ
+     * @returns {boolean}
+     */
+    stateSelectedItem () {
+      return (this.selectedItem !== '')
+    },
+    /**
+     * 選択されたFCT行を配列に変換
+     * @returns {string[]}
+     */
+    selectedItemArray () {
+      return [this.selectedItem]
+    },
+    /**
+     * モーダル表示用のフラグ
+     */
+    showModalComputed: {
+      get () {
+        return this.showModal
+      },
+      set (val) {
+        this.$emit('update:showModal', val)
+      }
     }
   },
   methods: {
-    onPortionSelected(item){
-      console.log(item)
-      if (item.length){
-        this.portionImg = item[0].photoLink ? item[0].photoLink[0]: '/img/crops/no_image.png'
+    onPortionSelected (item) {
+      if (item.length) {
+        this.portionImg = item[0].photoLink ? item[0].photoLink[0] : '/img/crops/no_image.png'
         this.portionSize = item[0].unit_weight
       }
     },
@@ -493,29 +503,29 @@ export default {
      * @param unitKey
      * @returns {string}
      */
-    setDigit(item, unitKey) {
+    setDigit (item, unitKey) {
       let res = ''
       const units = [
-        {1: ' g', 2: ' kg', 3: ' t'},
-        {1: ' µg', 2: ' mg', 3: ' g'},
-        {1: ' mg', 2: ' g', 3: ' kt'},
-        {1: ' KC', 2: ' MC', 3: ' GC'},
+        { 1: ' g', 2: ' kg', 3: ' t' },
+        { 1: ' µg', 2: ' mg', 3: ' g' },
+        { 1: ' mg', 2: ' g', 3: ' kt' },
+        { 1: ' KC', 2: ' MC', 3: ' GC' }
       ]
-      const itemConv = item ? item : 0
+      const itemConv = item || 0
       switch (true) {
         case (itemConv < 1000):
-          res = String(Math.round(itemConv)) + units[unitKey]["1"]
-          break;
+          res = String(Math.round(itemConv)) + units[unitKey]['1']
+          break
         case (itemConv >= 1000 && itemConv < 1000000):
-          res = String(Math.round(itemConv / 1000)) + units[unitKey]["2"]
-          break;
+          res = String(Math.round(itemConv / 1000)) + units[unitKey]['2']
+          break
         case (itemConv >= 1000000):
-          res = String(Math.round(itemConv / 1000000)) + units[unitKey]["3"]
-          break;
+          res = String(Math.round(itemConv / 1000000)) + units[unitKey]['3']
+          break
         default:
           console.error('parameter not valid:setDigit:' + itemConv)
           res = ''
-          break;
+          break
       }
       return res
     },
@@ -523,16 +533,16 @@ export default {
      * 行をクリックされた場合にその内容をselectedItemにコピー
      * @param rec
      */
-    onFctClick(rec) {
+    onFctClick (rec) {
       this.selectedItem = JSON.parse(JSON.stringify(rec))
     },
     /**
      * 最終結果(menuCases)をemit
      */
-    clickOk() {
+    clickOk () {
       const vm = this
       vm.$emit('modalOk', vm.menuCases)
-      //データをクリアして入力用ダイアログを閉じる
+      // データをクリアして入力用ダイアログを閉じる
       vm.selectedItem = ''
       vm.portionCount = 0
       vm.portionSize = 1
@@ -542,8 +552,8 @@ export default {
     /**
      * 捜査内容を破棄して戻る
      */
-    clickCancel() {
-      //データをクリアして入力用ダイアログを閉じる
+    clickCancel () {
+      // データをクリアして入力用ダイアログを閉じる
       const vm = this
       vm.selectedItem = ''
       vm.portionCount = 0
@@ -554,10 +564,10 @@ export default {
     /**
      * 入力ダイアログの内容をselectedItemに追記して、menuCasesの配列に追加後、更新のためemit
      */
-    addItem() {
+    addItem () {
       const vm = this
 
-      //selectedItemの値を更新
+      // selectedItemの値を更新
       vm.selectedItem.Wt = Number(vm.foodVolume)
       vm.selectedItem.menuName = vm.foodName
 
@@ -579,10 +589,10 @@ export default {
         res.push(vm.selectedItem)
       }
 
-      //更新した値をemit
+      // 更新した値をemit
       this.$emit('update:menuCases', res)
 
-      //データをクリアして入力用ダイアログを閉じる
+      // データをクリアして入力用ダイアログを閉じる
       vm.selectedItem = ''
       vm.portionCount = 0
       vm.portionSize = 1
@@ -594,8 +604,8 @@ export default {
      *     削除後の値をemitしてmenuCasesを更新
      * @param val
      */
-    deleteSupply(val) {
-      //更新した値をemit
+    deleteSupply (val) {
+      // 更新した値をemit
       this.$emit('update:menuCases', val)
     },
     /**
@@ -604,13 +614,13 @@ export default {
      *     編集用ダイアログを開く
      * @param val
      */
-    onRecepiClicked(val) {
+    onRecepiClicked (val) {
       this.selectedItem = JSON.parse(JSON.stringify(val))
       this.foodName = this.selectedItem.menuName
       this.portionSize = 1
       this.portionCount = this.selectedItem.Wt
       this.showModalInput = true
-    },
+    }
   }
 }
 

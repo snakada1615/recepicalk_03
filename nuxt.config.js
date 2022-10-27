@@ -79,7 +79,8 @@ export default {
         'BIconTrashFill',
         'BIconPencilSquare',
         'BIconTable',
-        'BIconExclamationCircle'
+        'BIconExclamationCircle',
+        'BIconChatRightDots'
       ],
       componentPlugins: [
         'NavbarPlugin',

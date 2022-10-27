@@ -7,8 +7,8 @@ import {
   createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile
 } from 'firebase/auth'
 import { doc, setDoc } from 'firebase/firestore'
-import { fireGetDocRemoteFirst } from '../plugins/firebasePlugin'
-import { checkUserRegion } from '@/plugins/helper'
+import { fireGetDocRemoteFirst } from '@/plugins/firebasePlugin'
+import { filterUpdateInfo } from '@/plugins/helper'
 import { fireGetDoc, firestoreDb } from '~/plugins/firebasePlugin'
 
 /*
@@ -268,6 +268,7 @@ export const state = () => ({
       forcedUpdateInfo: [
         // Eth限定のデータセット
         {
+          date: '',
           searchReg: {
             country: 'Ethiopia',
             subnational1: '',
@@ -327,6 +328,7 @@ export const state = () => ({
       jsDate: 0,
       date: ''
     },
+    dateOfLatestUpdate: 1666909589274,
     /**
      * 食材の解説用データベース名
      */
@@ -383,6 +385,14 @@ export const getters = {
 }
 
 export const mutations = {
+  /**
+   * dateOfLatestUpdateの値更新
+   * @param state
+   * @param payload
+   */
+  updateDateOfLatestUpdate: function (state, payload) {
+    state.myApp.dateOfLatestUpdate = payload
+  },
   /**
    * 保存した日付を記録
    * @param state
@@ -1362,6 +1372,38 @@ export const actions = {
       await this.$router.push('/')
     }
   },
+  async checkUpdate ({ dispatch, state }) {
+    // forcedUpdateInfoが登録されていなければ読み込んで再起動
+    if (state.myApp.dataSet.forcedUpdateInfoId == null) {
+      console.log('There are no information for forcedUpdateInfo. The app will be updated')
+      dispatch('updateForcedUpdateInfoId', 'forcedUpdateInfoId01')
+      await dispatch('fireSaveAppdata')
+      await this.$router.push('/')
+    }
+
+    const updateInfo = await fireGetDoc('dataset', state.myApp.dataSet.forcedUpdateInfoId)
+    if (!updateInfo) {
+      // itemsの値がblank/nullの場合は終了
+      return false
+    }
+
+    // itemsの値がblank/nullの場合は終了
+    const items = Object.values(updateInfo)
+    if ((Array.isArray(items) && !items.length) || (items == null)) {
+      return false
+    }
+
+    // 現在のuser情報に合致する更新情報を取得
+    const filtered = filterUpdateInfo(state.myApp.user, items)
+
+    // 該当する更新情報がない場合は終了
+    if (Object.keys(filtered).length === 0) {
+      return false
+    }
+
+    console.log(filtered)
+    console.log(state.myApp)
+  },
   /**
    * 特定の国・地域に対して強制的に基本データを指定
    * @param dispatch
@@ -1387,46 +1429,13 @@ export const actions = {
       return
     }
 
-    // 現在のuserが合致している検索条件を抽出
+    // 現在のuser情報に合致している検索条件を抽出
     const myUser = state.myApp.user
-    console.log(state.myApp.dataSet.forcedUpdateInfo)
-    const filtered = state.myApp.dataSet.forcedUpdateInfo.filter((item) => {
-      return checkUserRegion(myUser, item.searchReg)
-    })
-
-    // 一つも合致していない場合は終了
-    if (!filtered.length) {
-      return
-    }
-
-    // 複数合致している場合は最もdeepな検索条件を抽出
-    let maxIndex = 0
-    if (filtered.length > 0) {
-      const depth = filtered.map((item2) => {
-        let count = 0
-        if (item2.country) {
-          count += 1
-        }
-        if (item2.subnational1) {
-          count += 1
-        }
-        if (item2.subnational2) {
-          count += 1
-        }
-        if (item2.subnational3) {
-          count += 1
-        }
-        return count
-      })
-      const maxDepth = depth.reduce((a, b) => {
-        return Math.max(a, b)
-      })
-      maxIndex = depth.indexOf(maxDepth)
-    }
+    const filtered = filterUpdateInfo(myUser, state.myApp.dataSet.forcedUpdateInfo)
 
     // 指定されたdocument-Idでデータ更新
     let needInitialization = false
-    const forcedDatasets = filtered[maxIndex].setData
+    const forcedDatasets = filtered.setData
     if (forcedDatasets.fctId && state.myApp.dataSet.fctId !== forcedDatasets.fctId) {
       // fctNameをstoreに保存
       await dispatch('updateFctId', forcedDatasets.fctId)
@@ -1617,7 +1626,7 @@ export const actions = {
     })
     if (forcedUpdateInfo) {
       commit('updateForcedUpdateInfo', Object.values(forcedUpdateInfo))
-      // return Object.values(forcedUpdateInfo)
+      return Object.values(forcedUpdateInfo)
     } else {
       return []
     }
@@ -1719,6 +1728,7 @@ export const actions = {
       await dispatch('initProdTarget', state.myApp.dataSet.dri)
       await dispatch('initFeasibility', { data: state.myApp.dataSet.dri, count: state.myApp.sceneCount })
       await dispatch('fireSaveAppdata')
+      await commit('updateDateOfLatestUpdate', 1666909589274)
       console.log('initAll: all done')
     } catch (err) {
       console.log('Error: initAll')

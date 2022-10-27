@@ -709,6 +709,50 @@ export function checkUserRegion (currentUser, searchReg) {
   return (res1 && res2 && res3 && res4)
 }
 
+/**
+ * user情報に合致する更新情報(updateInfo)を抽出
+ * @param userInfo
+ * @param updateInfo
+ * @returns {{}|*}
+ */
+export function filterUpdateInfo (userInfo, updateInfo) {
+  // 現在のuserが合致している検索条件を抽出
+  const filtered = updateInfo.filter((item) => {
+    return checkUserRegion(userInfo, item.searchReg)
+  })
+
+  // 一つも合致していない場合は終了
+  if (!filtered.length) {
+    return {}
+  }
+
+  // 複数合致している場合は最もdeepな検索条件を抽出
+  let maxIndex = 0
+  if (filtered.length > 0) {
+    const depth = filtered.map((item2) => {
+      let count = 0
+      if (item2.country) {
+        count += 1
+      }
+      if (item2.subnational1) {
+        count += 1
+      }
+      if (item2.subnational2) {
+        count += 1
+      }
+      if (item2.subnational3) {
+        count += 1
+      }
+      return count
+    })
+    const maxDepth = depth.reduce((a, b) => {
+      return Math.max(a, b)
+    })
+    maxIndex = depth.indexOf(maxDepth)
+  }
+  return filtered[maxIndex]
+}
+
 export function constructForceUpdateItem (param) {
   this.searchReg = {
     country: param.country || '',
