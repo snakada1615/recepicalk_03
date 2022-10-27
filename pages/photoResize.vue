@@ -7,23 +7,22 @@
 </template>
 
 <script>
-import uploadPicture from "../components/atoms/uploadPicture";
+import uploadPicture from '../components/atoms/uploadPicture'
 
 export default {
-  layout: 'defaultEth',
   components: {
-    uploadPicture,
+    uploadPicture
   },
-  data() {
+  layout: 'defaultEth',
+  data () {
     return {
-      newImage: [],
+      newImage: []
     }
   },
   methods: {
-    getLink(val){
+    getLink (val) {
       console.log(val)
     }
   }
 }
 </script>
-

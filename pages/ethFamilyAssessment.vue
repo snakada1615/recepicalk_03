@@ -10,7 +10,7 @@
           <b-row>
             <b-col class="d-flex justify-content-end">
               <b-form-checkbox v-model="addNewFamilyFlag" switch>
-                add new family
+                add new
               </b-form-checkbox>
             </b-col>
           </b-row>
@@ -614,12 +614,11 @@ export default {
     },
     statePage2: {
       get () {
-        return this.stateDiet
+        return this.statePage1 && this.stateDiet && (Object.keys(this.myFamily).length > 0)
       }
     },
     statePage3: {
       get () {
-        // return false
         return (this.statePage2 && (this.myFamily.menuCases[0].menu.length > 0))
       }
     },
@@ -911,10 +910,10 @@ export default {
     myFamily () {
       const vm = this
       if (!vm.myApp.familyCases || !Array.isArray(vm.myApp.familyCases)) {
-        return []
+        return {}
       }
       const res = vm.myApp.familyCases.find(item => item.name === vm.myApp.currentFamily)
-      return res || []
+      return res || {}
     },
     selectedCropList () {
       if (!this.myFamily.feasibilityCases) {
