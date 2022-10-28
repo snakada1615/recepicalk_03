@@ -64,6 +64,7 @@ export default {
         'BIconPersonCircle',
         'BIconHouseFill',
         'BIconExclamationCircleFill',
+        'BIconExclamationSquare',
         'BIconCheck',
         'BIconPeopleFill',
         'BIconX',

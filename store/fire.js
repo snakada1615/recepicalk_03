@@ -7,9 +7,8 @@ import {
   createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile
 } from 'firebase/auth'
 import { doc, setDoc } from 'firebase/firestore'
-import { fireGetDocRemoteFirst } from '@/plugins/firebasePlugin'
-import { filterUpdateInfo } from '@/plugins/helper'
-import { fireGetDoc, firestoreDb } from '~/plugins/firebasePlugin'
+import { fireGetDocRemoteFirst, fireGetDoc, firestoreDb } from '~/plugins/firebasePlugin'
+import { filterUpdateInfo } from '~/plugins/helper'
 
 /*
 function MenuItem(id, Group, Name, En, Pr, Va, Fe, Wt) {
@@ -286,6 +285,10 @@ export const state = () => ({
       ]
     },
     /**
+     * データベースの更新の有無
+     */
+    isUpdateAvailable: false,
+    /**
      * シナリオの数（各シナリオに10の食事パターンが存在）
      */
     sceneCount: 10,
@@ -385,6 +388,9 @@ export const getters = {
 }
 
 export const mutations = {
+  updateIsUpdateAvailable: function (state, payload) {
+    state.myApp.isUpdateAvailable = payload
+  },
   /**
    * dateOfLatestUpdateの値更新
    * @param state
@@ -1199,9 +1205,10 @@ export const actions = {
    * @param commit
    * @param payload ログイン情報
    *     {payload.name, payload.password}
+   * @param state
    * @returns {Promise<void>}
    */
-  async loginEmail ({ commit }, payload) {
+  async loginEmail ({ commit, state }, payload) {
     const auth = getAuth()
     const email = payload.name + '@ifna.app'
     const res = await signInWithEmailAndPassword(auth, email, payload.password)
@@ -1223,8 +1230,18 @@ export const actions = {
     await setPersistence(auth, browserLocalPersistence)
       .then(() => {
         console.log('keeping state')
+
         // topページに移動
         this.$router.push('/')
+
+        // // ユーザーの国がEthiopiaの場合とそうでない場合で飛び先を変更
+        // console.log(state.myApp.user)
+        // console.log(state.myApp.user.country)
+        // if (state.myApp.user.country === 'Ethiopia') {
+        //   this.$router.push('/startPageEth')
+        // } else {
+        //   this.$router.push('/')
+        // }
       })
       .catch((error) => {
         const errorCode = error.code
@@ -1372,7 +1389,7 @@ export const actions = {
       await this.$router.push('/')
     }
   },
-  async checkUpdate ({ dispatch, state }) {
+  async checkUpdate ({ dispatch, commit, state }) {
     // forcedUpdateInfoが登録されていなければ読み込んで再起動
     if (state.myApp.dataSet.forcedUpdateInfoId == null) {
       console.log('There are no information for forcedUpdateInfo. The app will be updated')
@@ -1384,25 +1401,80 @@ export const actions = {
     const updateInfo = await fireGetDoc('dataset', state.myApp.dataSet.forcedUpdateInfoId)
     if (!updateInfo) {
       // itemsの値がblank/nullの場合は終了
+      commit('updateIsUpdateAvailable', false)
       return false
     }
 
     // itemsの値がblank/nullの場合は終了
     const items = Object.values(updateInfo)
     if ((Array.isArray(items) && !items.length) || (items == null)) {
+      commit('updateIsUpdateAvailable', false)
       return false
     }
 
     // 現在のuser情報に合致する更新情報を取得
     const filtered = filterUpdateInfo(state.myApp.user, items)
+    console.log(filtered)
 
     // 該当する更新情報がない場合は終了
     if (Object.keys(filtered).length === 0) {
+      commit('updateIsUpdateAvailable', false)
       return false
     }
 
-    console.log(filtered)
-    console.log(state.myApp)
+    // 最新の更新情報の有無を登録
+    const res = (filtered.date > state.myApp.dateOfLatestUpdate)
+    commit('updateIsUpdateAvailable', res)
+    console.log(res)
+    return res
+  },
+  /**
+   * 指定されたupdateInfoに従ってoriginalInfoを更新
+   * @param dispatch
+   * @param payload
+   * @returns {Promise<void>}
+   */
+  async goUpdate ({ dispatch }, payload) {
+    // まず更新日をアップデートする: , updateInfo, originalInfo, date
+    await dispatch('updateDateOfLatestUpdate', payload.date)
+
+    // 指定されたdocument-Idでデータ更新
+    let needInitialization = false
+    const forcedDatasets = payload.updateInfo.setData
+    // if (forcedDatasets.fctId && state.myApp.dataSet.fctId !== forcedDatasets.fctId) {
+    if (forcedDatasets.fctId && payload.originalInfo.fctId !== forcedDatasets.fctId) {
+      // fctNameをstoreに保存
+      await dispatch('updateFctId', forcedDatasets.fctId)
+      // fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
+      await dispatch('fetchFctFromFire')
+      needInitialization = true
+    }
+    if (forcedDatasets.driId && payload.originalInfo.driId !== forcedDatasets.driId) {
+      // fctNameをstoreに保存
+      await dispatch('updateDriId', forcedDatasets.driId)
+      // fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
+      await dispatch('fetchDriFromFire')
+      needInitialization = true
+    }
+    if (forcedDatasets.portionUnitId && payload.originalInfo.portionUnitId !== forcedDatasets.portionUnitId) {
+      // fctNameをstoreに保存
+      await dispatch('updatePortionUnitId', forcedDatasets.portionUnitId)
+      // fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
+      await dispatch('fetchPortionUnitFromFire')
+      needInitialization = true
+    }
+    if (forcedDatasets.cropCalendarId && payload.originalInfo.cropCalendarId !== forcedDatasets.cropCalendarId) {
+      // fctNameをstoreに保存
+      await dispatch('updatePortionUnitId', forcedDatasets.cropCalendarId)
+      // fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
+      await dispatch('fetchCropCalendarFromFire')
+      needInitialization = true
+    }
+
+    if (needInitialization) {
+      await dispatch('fireSaveAppdata')
+      await this.$router.push('/startPageEth')
+    }
   },
   /**
    * 特定の国・地域に対して強制的に基本データを指定
@@ -1483,12 +1555,17 @@ export const actions = {
   initFirebaseAuth ({ commit, dispatch, state }) {
     return new Promise((resolve, reject) => {
       const unsubscribe = getAuth().onAuthStateChanged(async (user) => {
+        console.log('initFirebaseAuth:' + state.hasMyAppLoaded)
         if (user) {
+          console.log('initFirebaseAuth:' + 2)
           commit('updateIsLoggedIn', true)
+          console.log('initFirebaseAuth:' + 3)
           // ログイン成功したら、ユーザーデータ(myApp)がすでに読み込まれているかチェック
           if (!state.hasMyAppLoaded) {
+            console.log('initFirebaseAuth:' + 4)
             // ユーザーデータ(myApp)が読み込まれていない場合、fireStoreからfetch
             await dispatch('loadMyApp', user.uid).catch(async () => {
+              console.log('initFirebaseAuth:' + 5)
               alert('no data registered, load initial dataset')
               await dispatch('initAll', user)
               dispatch('myAppLoadedComplete')
@@ -1714,6 +1791,7 @@ export const actions = {
    * @param commit
    */
   async initAll ({ dispatch, state, commit }, payload) {
+    console.error('now we are in initAll')
     if (!payload) {
       throw new Error('Error: initAll → no registered user-info')
     }
@@ -1729,6 +1807,7 @@ export const actions = {
       await dispatch('initFeasibility', { data: state.myApp.dataSet.dri, count: state.myApp.sceneCount })
       await dispatch('fireSaveAppdata')
       await commit('updateDateOfLatestUpdate', 1666909589274)
+      console.error(state.myApp)
       console.log('initAll: all done')
     } catch (err) {
       console.log('Error: initAll')
@@ -1743,7 +1822,7 @@ export const actions = {
    * @returns {Promise<void>}
    */
   async loadMyApp ({ state, commit }, payload) {
-    const myApp = await fireGetDoc('users', payload)
+    const myApp = await fireGetDocRemoteFirst('users', payload)
     if (myApp) {
       commit('updateMyApp', myApp)
       // 初期データ読み込み時のみ、hasDocumentChangedをfalseにセット

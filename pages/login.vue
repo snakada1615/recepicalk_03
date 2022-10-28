@@ -1,42 +1,52 @@
 <template>
   <b-container>
     <b-button
-      @click="login"
       variant="primary"
       :disabled="!inputValidate"
-    >login</b-button>
+      @click="login"
+    >
+      login
+    </b-button>
     <b-button
       to="/userReg"
       variant="info-2"
       class="text-white"
-    >register</b-button>
+    >
+      register
+    </b-button>
     <b-button
       to="/userEdit"
       variant="info-2"
       class="text-white"
-    >edit current user</b-button>
+    >
+      edit current user
+    </b-button>
     <b-button
-      @click="logOut"
       variant="warning"
       :disabled="logOutValidate"
-    >logout</b-button>
+      @click="logOut"
+    >
+      logout
+    </b-button>
     <b-row class="my-2">
       <b-col cols="11">
-        <b-form-input v-model="user" placeholder="Enter username" :state="stateName"/>
+        <b-form-input v-model="user" placeholder="Enter username" :state="stateName" />
       </b-col>
     </b-row>
     <b-row class="my-2">
       <b-col cols="11">
-        <b-form-input v-model="pass" :type="typePass" placeholder="Enter password" :state="statePass"/>
+        <b-form-input v-model="pass" :type="typePass" placeholder="Enter password" :state="statePass" />
       </b-col>
       <b-col cols="1" class="py-1 px-0">
         <p class="h5">
-          <b-icon v-if="typePass==='password'" icon="eye" @click="togglePass"/>
-          <b-icon v-if="typePass==='text'" icon="eyeSlash" @click="togglePass"/>
+          <b-icon v-if="typePass==='password'" icon="eye" @click="togglePass" />
+          <b-icon v-if="typePass==='text'" icon="eyeSlash" @click="togglePass" />
         </p>
       </b-col>
     </b-row>
-    <div v-if="errorMessage" class="text-warning" size="sm">({{errorMessage}})</div>
+    <div v-if="errorMessage" class="text-warning" size="sm">
+      ({{ errorMessage }})
+    </div>
     <b-card bg-variant="light">
       <div>
         login status:
@@ -50,69 +60,69 @@
 </template>
 <script>
 export default {
-  data() {
+  data () {
     return {
       user: '',
       pass: '',
       typePass: 'password',
-      errorMessage:'',
+      errorMessage: '',
       errorMessageList: [
         'login error: username or password does not match',
         'registration error: username already in use'
       ]
     }
   },
-  computed:{
-    stateName(){
+  computed: {
+    stateName () {
       return (/^[\w]{3,30}?$/).test(this.user)
     },
-    statePass(){
+    statePass () {
       return (this.pass.length >= 6 && this.pass.length <= 20)
     },
-    inputValidate(){
+    inputValidate () {
       return this.statePass && this.stateName
     },
-    logOutValidate(){
+    logOutValidate () {
       return !this.$store.state.fire.isLoggedIn
     }
   },
   methods: {
-    togglePass(){
-      if(this.typePass==='text'){
-        this.typePass='password'
+    togglePass () {
+      if (this.typePass === 'text') {
+        this.typePass = 'password'
       } else {
-        this.typePass='text'
+        this.typePass = 'text'
       }
     },
-    async register() {
-      await this.$store.dispatch('fire/registerEmail', {name: this.user, password: this.pass})
+    async register () {
+      await this.$store.dispatch('fire/registerEmail', { name: this.user, password: this.pass })
         .catch((err) => {
           console.log(err)
-          if (err.message.indexOf('auth/email-already-in-use')){
+          if (err.message.indexOf('auth/email-already-in-use')) {
             this.user = ''
             this.pass = ''
             this.errorMessage = this.errorMessageList[1]
           }
         })
     },
-    async login() {
-      await this.$store.dispatch('fire/loginEmail', {name: this.user, password: this.pass})
+    async login () {
+      await this.$store.dispatch('fire/loginEmail', { name: this.user, password: this.pass })
         .catch((err) => {
           console.log(err)
-          if (err.message.indexOf('auth/internal-error')){
+          if (err.message.indexOf('auth/internal-error')) {
             this.user = ''
             this.pass = ''
             this.errorMessage = this.errorMessageList[0]
           }
         })
     },
-    google() {
+    google () {
       this.$store.dispatch('fire/loginGoogle')
     },
-    anonymous() {
+    anonymous () {
       this.$store.dispatch('fire/loginGuest')
     },
-    logOut() {
+    logOut () {
       this.$store.dispatch('fire/logOut')
     }
   }

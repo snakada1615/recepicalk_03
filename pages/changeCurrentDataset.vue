@@ -89,8 +89,8 @@
 import selectDbFromFire from '../components/organisms/selectDbFromFire'
 import countryNames from '../components/atoms/countryNames'
 import regionSelect from '../components/atoms/regionSelect'
-import { getFileList } from '@/plugins/firebasePlugin'
-import { array2JSON, isObjectDeepEqual, makeToast } from '@/plugins/helper'
+import { getFileList } from '../plugins/firebasePlugin'
+import { array2JSON, isObjectDeepEqual, makeToast } from '../plugins/helper'
 
 export default {
   components: {
@@ -213,9 +213,6 @@ export default {
       })
       )
 
-      // 更新日を記録
-      vm.myForcedUpdateInfo.date = Date.now()
-
       // setDataの更新
       vm.myForcedUpdateInfo.setData.fctId =
         vm.myDataSet[0].docName !== vm.originalDocName[0] ? vm.myDataSet[0].docName : ''
@@ -243,8 +240,9 @@ export default {
       vm.originalForcedUpdateInfo = vm.originalForcedUpdateInfo.map((item) => {
         if (isObjectDeepEqual(item.searchReg, vm.myForcedUpdateInfo.searchReg)) {
           myFlag = false
+          // 更新日の情報も追加して情報を更新
           return {
-            date: vm.myForcedUpdateInfo.date,
+            date: Date.now(),
             searchReg: vm.myForcedUpdateInfo.searchReg,
             setData: vm.myForcedUpdateInfo.setData
           }
@@ -255,7 +253,6 @@ export default {
       if (myFlag) {
         vm.originalForcedUpdateInfo.push(vm.myForcedUpdateInfo)
       }
-      console.log(vm.originalForcedUpdateInfo)
 
       await vm.$store.dispatch('fire/fireSaveForceUpdateInfo', array2JSON(vm.originalForcedUpdateInfo))
       await vm.$store.dispatch('fire/fireSaveAppdata')

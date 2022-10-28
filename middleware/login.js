@@ -31,11 +31,11 @@ export default async function ({ store, redirect, route }) {
       // （下位互換のための例外措置）
       await store.dispatch('fire/initFirebaseNewVariable')
 
-      // 特定の地域に対して適用するdbを指定
+      // 特定の地域に対してdbの更新が必要かどうか判定して登録
       await store.dispatch('fire/checkUpdate')
 
       // 特定の地域に対して適用するdbを指定
-      await store.dispatch('fire/forcedUpdate')
+      // await store.dispatch('fire/forcedUpdate')
 
       /*
       if ((route.name === 'changeCurrentDataset') && store.state.fire.myApp.user.userType !== 'admin'){

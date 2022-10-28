@@ -694,7 +694,9 @@ export function checkUserRegion (currentUser, searchReg) {
   let res3 = true
   let res4 = true
 
-  if (searchReg.country) {
+  if (!searchReg.country) {
+    return false
+  } else {
     res1 = (currentUser.country === searchReg.country)
   }
   if (searchReg.subnational1) {
@@ -717,9 +719,7 @@ export function checkUserRegion (currentUser, searchReg) {
  */
 export function filterUpdateInfo (userInfo, updateInfo) {
   // 現在のuserが合致している検索条件を抽出
-  const filtered = updateInfo.filter((item) => {
-    return checkUserRegion(userInfo, item.searchReg)
-  })
+  const filtered = updateInfo.filter(item => checkUserRegion(userInfo, item.searchReg))
 
   // 一つも合致していない場合は終了
   if (!filtered.length) {

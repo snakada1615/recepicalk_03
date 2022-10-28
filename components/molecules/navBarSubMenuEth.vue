@@ -9,7 +9,17 @@
 
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto" :small="true">
-        <b-nav-item-dropdown ref="rootMenu" text="Menu" right>
+        <div class="d-flex align-items-center">
+          <b-icon
+            v-if="$store.state.fire.myApp.isUpdateAvailable"
+            icon="exclamation-circle"
+            font-scale="2"
+            class="text-white ml-1 pointer"
+            animation="fade"
+            @click="confirmUpdate"
+          />
+        </div>
+        <b-nav-item-dropdown ref="rootMenu" text="Menu" class="text-white" right>
           <b-dropdown-item to="/startPageEth">
             top
           </b-dropdown-item>
@@ -54,7 +64,7 @@
         <b-nav-item-dropdown right>
           <!-- Using 'button-content' slot -->
           <template #button-content>
-            <em>User</em>
+            <b-icon icon="person-circle" class="text-white" />
           </template>
           <b-dropdown-item
             v-for="item in uerInfoFiltered"
@@ -90,12 +100,6 @@
       <div v-if="$nuxt.isOffline" class="text-light small">
         <b-icon icon="reception0" />
       </div>
-      <b-icon
-        icon="chat-right-dots"
-        class="text-white ml-1 pointer"
-        animation="cylon-vertical"
-        @click="test"
-      />
     </b-navbar>
   </b-container>
 </template>
@@ -132,8 +136,7 @@ export default {
         return (
           ['displayName', 'country',
             'subnational1', 'subnational2',
-            'subnational3',
-            'organization', 'title'].includes(key))
+            'subnational3', 'organization', 'title'].includes(key))
       }).map(([key, value]) => {
         const res = {}
         let myKey = key
@@ -186,8 +189,17 @@ export default {
     })
   },
   methods: {
-    test () {
-      alert('hey')
+    confirmUpdate () {
+      const msg = 'This will update your dataset to the latest version. do you proceed now?'
+      const result = confirm(msg)
+      if (result) {
+        // this.$store.dispatch('fire/goUpdate', {
+        //   updateInfo: 'aho',
+        //   originalInfo: this.$store.state.fire.myApp,
+        //   date: 'baka'
+        // })
+        console.log('っこここまで')
+      }
     },
     /**
      * ページの遷移前にユーザーに確認し、
