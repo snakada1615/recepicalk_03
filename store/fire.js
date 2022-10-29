@@ -707,6 +707,9 @@ export const mutations = {
   }
 }
 export const actions = {
+  updateIsLoggedIn ({ commit }, payload) {
+    commit('updateIsLoggedIn', payload)
+  },
   /**
    * FamilyCasesを更新
    * @param dispatch
@@ -1588,6 +1591,20 @@ export const actions = {
       })
     })
   },
+  getCurrentLogin () {
+    return new Promise((resolve, reject) => {
+      const unsubscribe = getAuth().onAuthStateChanged((user) => {
+        // user オブジェクトを resolve
+        if (user) {
+          resolve(user)
+        } else {
+          reject(new Error('no login'))
+        }
+        // 登録解除
+        unsubscribe()
+      })
+    })
+  },
   /**
    * ********************************************************
    * @description ここからfirestore関連機能
@@ -1792,6 +1809,7 @@ export const actions = {
    */
   async initAll ({ dispatch, state, commit }, payload) {
     console.error('now we are in initAll')
+    console.log(payload)
     if (!payload) {
       throw new Error('Error: initAll → no registered user-info')
     }
@@ -1805,8 +1823,10 @@ export const actions = {
       await dispatch('initMenu', { data: state.myApp.dataSet.dri, count: state.myApp.sceneCount })
       await dispatch('initProdTarget', state.myApp.dataSet.dri)
       await dispatch('initFeasibility', { data: state.myApp.dataSet.dri, count: state.myApp.sceneCount })
-      await dispatch('fireSaveAppdata')
       await commit('updateDateOfLatestUpdate', 1666909589274)
+
+      // 更新したmyAppをfireStoreに保存
+      await dispatch('fireSaveAppdata')
       console.error(state.myApp)
       console.log('initAll: all done')
     } catch (err) {
@@ -1822,11 +1842,24 @@ export const actions = {
    * @returns {Promise<void>}
    */
   async loadMyApp ({ state, commit }, payload) {
-    const myApp = await fireGetDocRemoteFirst('users', payload)
+    const myApp = await fireGetDoc('users', payload)
     if (myApp) {
       commit('updateMyApp', myApp)
+      console.log(myApp)
       // 初期データ読み込み時のみ、hasDocumentChangedをfalseにセット
       commit('setHasDocumentChanged', false)
+    } else {
+      throw new Error('loadMyApp fail: no data on fireStore')
+    }
+  },
+  async loadMyStore ({ state, commit }, payload) {
+    const myApp = await fireGetDoc('users', payload)
+    if (myApp) {
+      commit('updateMyApp', myApp)
+      console.log(myApp)
+      // 初期データ読み込み時のみ、hasDocumentChangedをfalseにセット
+      commit('setHasDocumentChanged', false)
+      return true
     } else {
       throw new Error('loadMyApp fail: no data on fireStore')
     }
@@ -1878,7 +1911,7 @@ export const actions = {
     setDoc(ref, state.myApp).catch((err) => {
       throw new Error('Error in fireSaveAppdata:' + err)
     })
-    // myAppの変更内容をferestoreに保存できたらhasDocumentChangedをfalseにセット
+    // myAppの変更内容をfirestoreに保存できたらhasDocumentChangedをfalseにセット
     dispatch('setHasDocumentChanged', false)
     console.log('saveAppdata: success')
   },

@@ -94,6 +94,21 @@ export async function fireGetDocRemoteFirst (collectionId, docId) {
   }
 }
 
+export async function fireGetDocRemoteOnly (collectionId, docId) {
+  const ref = await doc(firestoreDb, collectionId, docId)
+  console.log('getData from server')
+  const docSnap = await getDocFromServer(ref).catch((err) => {
+    console.error(err)
+    throw new Error('getData fail: no internet access.')
+  })
+  if (docSnap.exists()) {
+    return docSnap.data()
+  } else {
+    console.log('getData fail: no data in Server')
+    return ''
+  }
+}
+
 export async function getFileList (myCollection) {
   const res = []
   const querySnapshot = await getDocs(collection(firestoreDb, myCollection))

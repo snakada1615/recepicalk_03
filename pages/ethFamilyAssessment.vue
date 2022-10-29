@@ -102,6 +102,7 @@
 
         <!-- crop calendarの編集 -->
         <b-tab v-if="statePage3" title="crop availability">
+          {{ calendarId }}
           <edit-calendar-eth
             :calendar-id.sync="calendarId"
             :fct="$store.state.fire.myApp.dataSet.fct"
@@ -619,6 +620,7 @@ export default {
     },
     statePage3: {
       get () {
+        console.log(this.myFamily)
         return (this.statePage2 && (this.myFamily.menuCases[0].menu.length > 0))
       }
     },

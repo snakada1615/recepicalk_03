@@ -202,8 +202,13 @@ export default {
       if (loginFail) {
         return
       }
+      // user情報を更新
       await this.updateUserInfo()
       makeToast(this, 'user data registered!')
+
+      // myAppを初期化
+      await this.$store.dispatch('fire/initAll', this.$store.state.fire.myApp.user)
+      makeToast(this, 'user data initialized!')
 
       // ユーザーの国がEthiopiaの場合とそうでない場合で飛び先を変更
       if (this.user.country === 'Ethiopia') {

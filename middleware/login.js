@@ -4,13 +4,25 @@ export default async function ({ store, redirect, route }) {
    * ログイン○、myAppのfetch×、の場合にはfireStoreからfetch(initFirebaseAuthの機能)●
    */
   console.log('middleware: Check login status')
-  await store.dispatch('fire/initFirebaseAuth').catch((err) => {
-    console.log(err)
-    console.log('login-middleware: Error')
+  const user = await store.dispatch('fire/getCurrentLogin').catch((err) => {
+    console.error(err)
     alert('please login/register first to use all function')
   })
+  if (user) {
+    console.log(user)
+
+    // ログイン状態を更新
+    await store.dispatch('fire/updateIsLoggedIn', true)
+
+    // firebaseからmyAppを読み込む（キャッシュから優先）
+    await store.dispatch('fire/loadMyStore', user.uid).catch((err) => {
+      console.error(err)
+      alert('no data is recorded for this user. please register another user again')
+    })
+  }
   if (
     route.name !== 'login' &&
+    route.name !== 'userReg' &&
     route.name &&
     route.name !== 'index' &&
     route.name !== 'startPageEth' &&
@@ -29,7 +41,7 @@ export default async function ({ store, redirect, route }) {
     if (store.state.fire.isLoggedIn) {
       // 初期化されていない変数があった場合、firebaseからオリジナル変数をダウンロードして際読み込む
       // （下位互換のための例外措置）
-      await store.dispatch('fire/initFirebaseNewVariable')
+      // await store.dispatch('fire/initFirebaseNewVariable')
 
       // 特定の地域に対してdbの更新が必要かどうか判定して登録
       await store.dispatch('fire/checkUpdate')
