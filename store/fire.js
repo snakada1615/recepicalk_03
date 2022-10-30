@@ -1808,8 +1808,6 @@ export const actions = {
    * @param commit
    */
   async initAll ({ dispatch, state, commit }, payload) {
-    console.error('now we are in initAll')
-    console.log(payload)
     if (!payload) {
       throw new Error('Error: initAll → no registered user-info')
     }
@@ -1827,7 +1825,6 @@ export const actions = {
 
       // 更新したmyAppをfireStoreに保存
       await dispatch('fireSaveAppdata')
-      console.error(state.myApp)
       console.log('initAll: all done')
     } catch (err) {
       console.log('Error: initAll')
@@ -1845,7 +1842,6 @@ export const actions = {
     const myApp = await fireGetDoc('users', payload)
     if (myApp) {
       commit('updateMyApp', myApp)
-      console.log(myApp)
       // 初期データ読み込み時のみ、hasDocumentChangedをfalseにセット
       commit('setHasDocumentChanged', false)
     } else {
@@ -1856,7 +1852,6 @@ export const actions = {
     const myApp = await fireGetDoc('users', payload)
     if (myApp) {
       commit('updateMyApp', myApp)
-      console.log(myApp)
       // 初期データ読み込み時のみ、hasDocumentChangedをfalseにセット
       commit('setHasDocumentChanged', false)
       return true

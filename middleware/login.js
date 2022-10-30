@@ -1,3 +1,4 @@
+
 export default async function ({ store, redirect, route }) {
   /**
    * ログイン状態をチェックし、ログインしていなければログイン画面にリダイレクト
@@ -9,8 +10,6 @@ export default async function ({ store, redirect, route }) {
     alert('please login/register first to use all function')
   })
   if (user) {
-    console.log(user)
-
     // ログイン状態を更新
     await store.dispatch('fire/updateIsLoggedIn', true)
 

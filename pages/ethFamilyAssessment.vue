@@ -620,7 +620,6 @@ export default {
     },
     statePage3: {
       get () {
-        console.log(this.myFamily)
         return (this.statePage2 && (this.myFamily.menuCases[0].menu.length > 0))
       }
     },

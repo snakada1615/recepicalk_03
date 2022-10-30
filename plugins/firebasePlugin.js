@@ -2,8 +2,10 @@
 import { initializeApp } from 'firebase/app'
 import {
   initializeFirestore, CACHE_SIZE_UNLIMITED,
-  enableMultiTabIndexedDbPersistence, doc, getDocFromCache, getDocFromServer, getDocs, collection
+  enableMultiTabIndexedDbPersistence, doc, getDocFromCache, getDocFromServer,
+  getDocs, collection, query, where, deleteDoc
 } from 'firebase/firestore'
+import { getAuth, deleteUser } from 'firebase/auth'
 import { getStorage } from 'firebase/storage'
 
 /**
@@ -83,7 +85,7 @@ export async function fireGetDocRemoteFirst (collectionId, docId) {
   const ref = await doc(firestoreDb, collectionId, docId)
   console.log('getData from server')
   const docSnap = await getDocFromServer(ref).catch(async () => {
-    console.log('getData fail: no remote access. getData from local chache')
+    console.log('getData fail: no remote access. getData from local cache')
     return await getDocFromCache(ref)
   })
   if (docSnap.exists()) {
@@ -109,11 +111,58 @@ export async function fireGetDocRemoteOnly (collectionId, docId) {
   }
 }
 
-export async function getFileList (myCollection) {
+export async function getFileList (myCollection, returnValue = 1) {
   const res = []
   const querySnapshot = await getDocs(collection(firestoreDb, myCollection))
   querySnapshot.forEach((item) => {
-    res.push(item.id)
+    if (returnValue === 2) {
+      res.push({
+        id: item.id,
+        name: item.data().user.displayName
+      })
+    } else {
+      res.push(item.id)
+    }
   })
   return res
+}
+
+export async function getDocByName (displayName) {
+  const q = query(collection(firestoreDb, 'users'), where('user.displayName', '==', displayName))
+  const querySnapshot = await getDocs(q)
+  console.log(querySnapshot)
+  return querySnapshot
+}
+
+export async function deleteDocByName (displayName) {
+  const docName = await getDocByName(displayName).docs[0].id
+  if (docName) {
+    // 単一のドキュメントリファレンスを取得
+    const docRef = doc(firestoreDb, 'users', docName)
+    // 削除
+    await deleteDoc(docRef)
+    return true
+  } else {
+    return false
+  }
+}
+
+export async function deleteAccountByName (displayName) {
+  const auth = getAuth()
+  const docId = await getDocByName(displayName).docs[0].id
+  auth.deleteUser(docId)
+    .then(() => {
+      console.log('Successfully deleted user:', displayName)
+      return true
+    })
+    .catch((error) => {
+      console.log('Error deleting user:', error)
+      return false
+    })
+}
+
+export async function removeUserByName (displayName) {
+  console.log(displayName)
+  await deleteDocByName(displayName)
+  await deleteAccountByName(displayName)
 }
