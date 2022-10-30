@@ -193,12 +193,7 @@ export default {
       const msg = 'This will update your dataset to the latest version. do you proceed now?'
       const result = confirm(msg)
       if (result) {
-        // this.$store.dispatch('fire/goUpdate', {
-        //   updateInfo: 'aho',
-        //   originalInfo: this.$store.state.fire.myApp,
-        //   date: 'baka'
-        // })
-        console.log('っこここまで')
+        this.$store.dispatch('fire/checkUpdate', true)
       }
     },
     /**

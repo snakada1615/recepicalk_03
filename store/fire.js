@@ -8,7 +8,7 @@ import {
 } from 'firebase/auth'
 import { doc, setDoc } from 'firebase/firestore'
 import { fireGetDocRemoteFirst, fireGetDoc, firestoreDb } from '~/plugins/firebasePlugin'
-import { filterUpdateInfo } from '~/plugins/helper'
+import { filterUpdateInfo, makeToast } from '~/plugins/helper'
 
 /*
 function MenuItem(id, Group, Name, En, Pr, Va, Fe, Wt) {
@@ -1392,7 +1392,7 @@ export const actions = {
       await this.$router.push('/')
     }
   },
-  async checkUpdate ({ dispatch, commit, state }) {
+  async checkUpdate ({ dispatch, commit, state }, goUpdate = false) {
     // forcedUpdateInfoが登録されていなければ読み込んで再起動
     if (state.myApp.dataSet.forcedUpdateInfoId == null) {
       console.log('There are no information for forcedUpdateInfo. The app will be updated')
@@ -1427,9 +1427,16 @@ export const actions = {
 
     // 最新の更新情報の有無を登録
     const res = (filtered.date > state.myApp.dateOfLatestUpdate)
-    commit('updateIsUpdateAvailable', res)
-    console.log(res)
-    return res
+    if (!goUpdate) {
+      commit('updateIsUpdateAvailable', res)
+      return true
+    } else {
+      dispatch('goUpdate', {
+        date: Date.now(),
+        updateInfo: filtered,
+        originalInfo: state.myApp.dataSet.forcedUpdateInfo
+      })
+    }
   },
   /**
    * 指定されたupdateInfoに従ってoriginalInfoを更新
@@ -1437,47 +1444,45 @@ export const actions = {
    * @param payload
    * @returns {Promise<void>}
    */
-  async goUpdate ({ dispatch }, payload) {
+  async goUpdate ({ dispatch, state, commit }, payload) {
     // まず更新日をアップデートする: , updateInfo, originalInfo, date
-    await dispatch('updateDateOfLatestUpdate', payload.date)
+    commit('updateDateOfLatestUpdate', payload.date)
 
     // 指定されたdocument-Idでデータ更新
-    let needInitialization = false
     const forcedDatasets = payload.updateInfo.setData
+    const originalInfoData = payload.originalInfo.setData
+
     // if (forcedDatasets.fctId && state.myApp.dataSet.fctId !== forcedDatasets.fctId) {
-    if (forcedDatasets.fctId && payload.originalInfo.fctId !== forcedDatasets.fctId) {
+    if (forcedDatasets.fctId && originalInfoData.fctId !== forcedDatasets.fctId) {
       // fctNameをstoreに保存
       await dispatch('updateFctId', forcedDatasets.fctId)
       // fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
       await dispatch('fetchFctFromFire')
-      needInitialization = true
     }
-    if (forcedDatasets.driId && payload.originalInfo.driId !== forcedDatasets.driId) {
+    if (forcedDatasets.driId && originalInfoData.driId !== forcedDatasets.driId) {
       // fctNameをstoreに保存
       await dispatch('updateDriId', forcedDatasets.driId)
       // fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
       await dispatch('fetchDriFromFire')
-      needInitialization = true
     }
-    if (forcedDatasets.portionUnitId && payload.originalInfo.portionUnitId !== forcedDatasets.portionUnitId) {
+    if (forcedDatasets.portionUnitId && originalInfoData.portionUnitId !== forcedDatasets.portionUnitId) {
       // fctNameをstoreに保存
       await dispatch('updatePortionUnitId', forcedDatasets.portionUnitId)
       // fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
       await dispatch('fetchPortionUnitFromFire')
-      needInitialization = true
     }
-    if (forcedDatasets.cropCalendarId && payload.originalInfo.cropCalendarId !== forcedDatasets.cropCalendarId) {
+    if (forcedDatasets.cropCalendarId && originalInfoData.cropCalendarId !== forcedDatasets.cropCalendarId) {
       // fctNameをstoreに保存
       await dispatch('updatePortionUnitId', forcedDatasets.cropCalendarId)
       // fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
       await dispatch('fetchCropCalendarFromFire')
-      needInitialization = true
     }
 
-    if (needInitialization) {
-      await dispatch('fireSaveAppdata')
-      await this.$router.push('/startPageEth')
-    }
+    await dispatch('fireSaveAppdata').then(() => {
+      makeToast(this, 'data have been updated')
+      window.location.reload(true)
+    })
+    // await this.$router.push('/startPageEth')
   },
   /**
    * 特定の国・地域に対して強制的に基本データを指定
@@ -1821,7 +1826,7 @@ export const actions = {
       await dispatch('initMenu', { data: state.myApp.dataSet.dri, count: state.myApp.sceneCount })
       await dispatch('initProdTarget', state.myApp.dataSet.dri)
       await dispatch('initFeasibility', { data: state.myApp.dataSet.dri, count: state.myApp.sceneCount })
-      await commit('updateDateOfLatestUpdate', 1666909589274)
+      commit('updateDateOfLatestUpdate', 1666909589274)
 
       // 更新したmyAppをfireStoreに保存
       await dispatch('fireSaveAppdata')
