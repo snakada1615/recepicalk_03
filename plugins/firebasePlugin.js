@@ -5,7 +5,7 @@ import {
   enableMultiTabIndexedDbPersistence, doc, getDocFromCache, getDocFromServer,
   getDocs, collection, query, where, deleteDoc
 } from 'firebase/firestore'
-import { getAuth, deleteUser } from 'firebase/auth'
+import { getAuth, deleteUser, getUserByEmail } from 'firebase/auth'
 import { getStorage } from 'firebase/storage'
 
 /**
@@ -130,12 +130,27 @@ export async function getFileList (myCollection, returnValue = 1) {
 export async function getDocByName (displayName) {
   const q = query(collection(firestoreDb, 'users'), where('user.displayName', '==', displayName))
   const querySnapshot = await getDocs(q)
-  console.log(querySnapshot)
-  return querySnapshot
+  const res = []
+  querySnapshot.forEach((doc) => {
+    // doc.data() is never undefined for query doc snapshots
+    res.push(doc.data())
+  })
+  return res
+}
+
+export async function getAuthAccountByEmail (email) {
+  // #TODO getUserByEmailが使えない問題への対応
+  const account = await getAuth().getUserByEmail(email).catch((err) => {
+    console.log('Error fetching user data:', err)
+    return false
+  })
+  return account
 }
 
 export async function deleteDocByName (displayName) {
-  const docName = await getDocByName(displayName).docs[0].id
+  const docBody = await getDocByName(displayName)
+  console.log(docBody)
+  const docName = docBody[0].user.uid
   if (docName) {
     // 単一のドキュメントリファレンスを取得
     const docRef = doc(firestoreDb, 'users', docName)
@@ -147,12 +162,13 @@ export async function deleteDocByName (displayName) {
   }
 }
 
-export async function deleteAccountByName (displayName) {
+export async function deleteAccountByEmail (email) {
   const auth = getAuth()
-  const docId = await getDocByName(displayName).docs[0].id
+  const docBody = await getAuthAccountByEmail(email)
+  const docId = docBody[0].user.uid
   auth.deleteUser(docId)
     .then(() => {
-      console.log('Successfully deleted user:', displayName)
+      console.log('Successfully deleted user:', email)
       return true
     })
     .catch((error) => {
@@ -164,5 +180,5 @@ export async function deleteAccountByName (displayName) {
 export async function removeUserByName (displayName) {
   console.log(displayName)
   await deleteDocByName(displayName)
-  await deleteAccountByName(displayName)
+  await deleteAccountByEmail(displayName + '@ifna.app')
 }
