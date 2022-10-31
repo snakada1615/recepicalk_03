@@ -5,7 +5,7 @@ import {
   enableMultiTabIndexedDbPersistence, doc, getDocFromCache, getDocFromServer,
   getDocs, collection, query, where, deleteDoc
 } from 'firebase/firestore'
-import { getAuth, deleteUser, getUserByEmail } from 'firebase/auth'
+import { getAuth, deleteUser } from 'firebase/auth'
 import { getStorage } from 'firebase/storage'
 
 /**
