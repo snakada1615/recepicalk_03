@@ -5,7 +5,7 @@ import {
   enableMultiTabIndexedDbPersistence, doc, getDocFromCache, getDocFromServer,
   getDocs, collection, query, where, deleteDoc
 } from 'firebase/firestore'
-import { getAuth, deleteUser } from 'firebase/auth'
+import { getAuth } from 'firebase/auth'
 import { getStorage } from 'firebase/storage'
 
 /**
@@ -84,12 +84,12 @@ export async function fireGetDoc (collectionId, docId) {
 export async function fireGetDocRemoteFirst (collectionId, docId) {
   const ref = await doc(firestoreDb, collectionId, docId)
   console.log('getData from server')
-  const docSnap = await getDocFromServer(ref).catch(async () => {
+  const docSnap = await getDocFromServer(ref).catch((err) => {
     console.log('getData fail: no remote access. getData from local cache')
-    return await getDocFromCache(ref)
+    console.log(err)
   })
   if (docSnap.exists()) {
-    return docSnap.data()
+    return docSnap.data().myApp.dateOfLatestUpdate
   } else {
     console.log('getData fail: no data in Cache or Server')
     return ''

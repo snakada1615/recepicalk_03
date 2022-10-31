@@ -7,7 +7,7 @@ import {
   createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile
 } from 'firebase/auth'
 import { doc, setDoc } from 'firebase/firestore'
-import { fireGetDoc, firestoreDb } from '~/plugins/firebasePlugin'
+import { fireGetDoc, fireGetDocRemoteFirst, firestoreDb } from '~/plugins/firebasePlugin'
 import { filterUpdateInfo } from '~/plugins/helper'
 
 /*
@@ -1392,7 +1392,7 @@ export const actions = {
       await this.$router.push('/')
     }
   },
-  async checkUpdate ({ dispatch, commit, state }, goUpdate = false) {
+  async checkUpdate ({ dispatch, commit, state }, goUpdateFlag = false) {
     // forcedUpdateInfoが登録されていなければ読み込んで再起動
     if (state.myApp.dataSet.forcedUpdateInfoId == null) {
       console.log('There are no information for forcedUpdateInfo. The app will be updated')
@@ -1417,7 +1417,6 @@ export const actions = {
 
     // 現在のuser情報に合致する更新情報を取得
     const filtered = filterUpdateInfo(state.myApp.user, items)
-    console.log(filtered)
 
     // 該当する更新情報がない場合は終了
     if (Object.keys(filtered).length === 0) {
@@ -1426,16 +1425,32 @@ export const actions = {
     }
 
     // 最新の更新情報の有無を登録
-    const res = (filtered.date > state.myApp.dateOfLatestUpdate)
-    if (!goUpdate) {
+    const oldDate = state.myApp.dateOfLatestUpdate
+    const newDate = filtered.date
+    const res = (newDate > oldDate)
+    if (!goUpdateFlag) {
+      console.log('old_date:' + oldDate)
+      console.log('new_date:' + newDate)
       commit('updateIsUpdateAvailable', res)
       return true
     } else {
-      dispatch('goUpdate', {
+      await dispatch('goUpdate', {
         date: Date.now(),
         updateInfo: filtered,
         originalInfo: state.myApp.dataSet.forcedUpdateInfo
       })
+      // ブラウザ内のキャッシュを更新するため一旦fireStoreからデータを読み込む
+      const date = dispatch('fetchDateOfLatestUpdateFromServer')
+
+      // データ更新がうまくいった場合は普通に再起動、うまくいっていない場合はその旨伝えて再起動
+      console.log(typeof date)
+      console.log(typeof oldDate)
+      if (date == oldDate) {
+        alert('network connection may not be strong enough. you can try update later')
+      } else {
+        alert('data updating have been completed, now program will restart')
+      }
+      window.location.reload(true)
     }
   },
   /**
@@ -1482,9 +1497,7 @@ export const actions = {
 
     await dispatch('fireSaveAppdata').then(() => {
       console.log('data have been updated')
-      window.location.reload(true)
     })
-    // await this.$router.push('/startPageEth')
   },
   /**
    * 特定の国・地域に対して強制的に基本データを指定
@@ -1617,6 +1630,14 @@ export const actions = {
    * @description ここからfirestore関連機能
    * ********************************************************
    */
+  async fetchDateOfLatestUpdateFromServer ({ state }) {
+    const res = await fireGetDocRemoteFirst('users', state.myApp.user.uid)
+    if (res) {
+      return res.myApp.dateOfLatestUpdate
+    } else {
+      return ''
+    }
+  },
   /**
    * fctの初期データをdataset/fct01から読み込んでstoreに反映
    *     データが存在しない場合はエラー
