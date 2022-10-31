@@ -2,7 +2,8 @@
 export default async function ({ store, redirect, route }) {
   /**
    * ログイン状態をチェックし、ログインしていなければログイン画面にリダイレクト
-   * ログイン○、myAppのfetch×、の場合にはfireStoreからfetch(initFirebaseAuthの機能)●
+   * ログイン後にmyAppのfetch
+   * forcedUpdateInfoを確認して、更新情報があればnavbarに表示(checkUpdate)
    */
   console.log('middleware: Check login status')
   const user = await store.dispatch('fire/getCurrentLogin').catch((err) => {
@@ -41,7 +42,6 @@ export default async function ({ store, redirect, route }) {
       // 特定の地域に対してdbの更新が必要かどうか判定して更新情報を登録
       await store.dispatch('fire/checkUpdate')
     }
-    console.log(store.state.fire.myApp.dateOfLatestUpdate)
     console.log('autologin complete:')
   }
 }

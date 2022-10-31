@@ -1429,23 +1429,18 @@ export const actions = {
     const newDate = filtered.date
     const res = (newDate > oldDate)
     if (!goUpdateFlag) {
-      console.log('old_date:' + oldDate)
-      console.log('new_date:' + newDate)
       commit('updateIsUpdateAvailable', res)
       return true
     } else {
       await dispatch('goUpdate', {
-        date: Date.now(),
-        updateInfo: filtered,
-        originalInfo: state.myApp.dataSet.forcedUpdateInfo
+        date: newDate,
+        updateInfo: JSON.parse(JSON.stringify(filtered))
       })
       // ブラウザ内のキャッシュを更新するため一旦fireStoreからデータを読み込む
-      const date = dispatch('fetchDateOfLatestUpdateFromServer')
+      const date = await dispatch('fetchDateOfLatestUpdateFromServer')
 
       // データ更新がうまくいった場合は普通に再起動、うまくいっていない場合はその旨伝えて再起動
-      console.log(typeof date)
-      console.log(typeof oldDate)
-      if (date == oldDate) {
+      if (Number(date) === oldDate) {
         alert('network connection may not be strong enough. you can try update later')
       } else {
         alert('data updating have been completed, now program will restart')
@@ -1456,39 +1451,38 @@ export const actions = {
   /**
    * 指定されたupdateInfoに従ってoriginalInfoを更新
    * @param dispatch
+   * @param state
+   * @param commit
    * @param payload
    * @returns {Promise<void>}
    */
   async goUpdate ({ dispatch, state, commit }, payload) {
     // まず更新日をアップデートする: , updateInfo, originalInfo, date
     commit('updateDateOfLatestUpdate', payload.date)
-    console.log('updateDateOfLatestUpdate')
-    console.log(state.myApp.dateOfLatestUpdate)
 
     // 指定されたdocument-Idでデータ更新
     const forcedDatasets = payload.updateInfo.setData
-    const originalInfoData = payload.originalInfo.setData
 
     // if (forcedDatasets.fctId && state.myApp.dataSet.fctId !== forcedDatasets.fctId) {
-    if (forcedDatasets.fctId && originalInfoData.fctId !== forcedDatasets.fctId) {
+    if (forcedDatasets.fctId !== '') {
       // fctNameをstoreに保存
       await dispatch('updateFctId', forcedDatasets.fctId)
       // fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
       await dispatch('fetchFctFromFire')
     }
-    if (forcedDatasets.driId && originalInfoData.driId !== forcedDatasets.driId) {
+    if (forcedDatasets.driId !== '') {
       // fctNameをstoreに保存
       await dispatch('updateDriId', forcedDatasets.driId)
       // fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
       await dispatch('fetchDriFromFire')
     }
-    if (forcedDatasets.portionUnitId && originalInfoData.portionUnitId !== forcedDatasets.portionUnitId) {
+    if (forcedDatasets.portionUnitId !== '') {
       // fctNameをstoreに保存
       await dispatch('updatePortionUnitId', forcedDatasets.portionUnitId)
       // fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
       await dispatch('fetchPortionUnitFromFire')
     }
-    if (forcedDatasets.cropCalendarId && originalInfoData.cropCalendarId !== forcedDatasets.cropCalendarId) {
+    if (forcedDatasets.cropCalendarId !== '') {
       // fctNameをstoreに保存
       await dispatch('updatePortionUnitId', forcedDatasets.cropCalendarId)
       // fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
@@ -1497,118 +1491,6 @@ export const actions = {
 
     await dispatch('fireSaveAppdata').then(() => {
       console.log('data have been updated')
-    })
-  },
-  /**
-   * 特定の国・地域に対して強制的に基本データを指定
-   * @param dispatch
-   * @param state
-   * @returns {Promise<void>}
-   */
-  async forcedUpdate ({ dispatch, state }) {
-    // #TODO: fireStore本体に共通のforcedUpdateを保存して読み込むように変更
-    // forcedUpdateInfoが登録されていなければ読み込んで再起動
-    if (state.myApp.dataSet.forcedUpdateInfoId == null) {
-      console.log('There are no information for forcedUpdateInfo. The app will be updated')
-      dispatch('updateForcedUpdateInfoId', 'forcedUpdateInfoId01')
-      await dispatch('fireSaveAppdata')
-      await this.$router.push('/')
-    }
-
-    // サーバーから最新のforcedUpdateを取得してstoreに読み込む
-    await dispatch('fetchForcedUpdateInfoFromFire')
-
-    // forcedUpdateInfoの値がblank/nullの場合は終了
-    if ((Array.isArray(state.myApp.dataSet.forcedUpdateInfo) && !state.myApp.dataSet.forcedUpdateInfo.length) ||
-      (state.myApp.dataSet.forcedUpdateInfo == null)) {
-      return
-    }
-
-    // 現在のuser情報に合致している検索条件を抽出
-    const myUser = state.myApp.user
-    const filtered = filterUpdateInfo(myUser, state.myApp.dataSet.forcedUpdateInfo)
-
-    // 指定されたdocument-Idでデータ更新
-    let needInitialization = false
-    const forcedDatasets = filtered.setData
-    if (forcedDatasets.fctId && state.myApp.dataSet.fctId !== forcedDatasets.fctId) {
-      // fctNameをstoreに保存
-      await dispatch('updateFctId', forcedDatasets.fctId)
-      // fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
-      await dispatch('fetchFctFromFire')
-      needInitialization = true
-    }
-    if (forcedDatasets.driId && state.myApp.dataSet.driId !== forcedDatasets.driId) {
-      // fctNameをstoreに保存
-      await dispatch('updateDriId', forcedDatasets.driId)
-      // fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
-      await dispatch('fetchDriFromFire')
-      needInitialization = true
-    }
-    if (forcedDatasets.portionUnitId && state.myApp.dataSet.portionUnitId !== forcedDatasets.portionUnitId) {
-      // fctNameをstoreに保存
-      await dispatch('updatePortionUnitId', forcedDatasets.portionUnitId)
-      // fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
-      await dispatch('fetchPortionUnitFromFire')
-      needInitialization = true
-    }
-    if (forcedDatasets.cropCalendarId && state.myApp.dataSet.cropCalendarId !== forcedDatasets.cropCalendarId) {
-      // fctNameをstoreに保存
-      await dispatch('updatePortionUnitId', forcedDatasets.cropCalendarId)
-      // fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
-      await dispatch('fetchCropCalendarFromFire')
-      needInitialization = true
-    }
-
-    if (needInitialization) {
-      await dispatch('fireSaveAppdata')
-      await this.$router.push('/startPageEth')
-    }
-  },
-  /**
-   * ページ遷移・リロードの度にログイン状態を確認(middleware:login.js)、
-   *     ログインされてる場合 → ユーザー情報がfetchされているか確認（hasMyAppLoaded）
-   *     → fetchされていない場合はfireStoreからfetch
-   *     → ログインされていない場合 → Topページに移動
-   * @param commit
-   * @param dispatch
-   * @param state
-   * @returns {Promise<unknown>}
-   */
-  initFirebaseAuth ({ commit, dispatch, state }) {
-    return new Promise((resolve, reject) => {
-      const unsubscribe = getAuth().onAuthStateChanged(async (user) => {
-        console.log('initFirebaseAuth:' + state.hasMyAppLoaded)
-        if (user) {
-          console.log('initFirebaseAuth:' + 2)
-          commit('updateIsLoggedIn', true)
-          console.log('initFirebaseAuth:' + 3)
-          // ログイン成功したら、ユーザーデータ(myApp)がすでに読み込まれているかチェック
-          if (!state.hasMyAppLoaded) {
-            console.log('initFirebaseAuth:' + 4)
-            // ユーザーデータ(myApp)が読み込まれていない場合、fireStoreからfetch
-            await dispatch('loadMyApp', user.uid).catch(async () => {
-              console.log('initFirebaseAuth:' + 5)
-              alert('no data registered, load initial dataset')
-              await dispatch('initAll', user)
-              dispatch('myAppLoadedComplete')
-              console.log('initFirebaseAuth: data fetch from fireStore')
-            })
-          }
-          console.log('initFirebaseAuth:success')
-          // user オブジェクトを resolve
-          resolve(user)
-        } else {
-          if (state.myApp.length) {
-            commit('clearMyApp')
-          }
-          commit('updateIsLoggedIn', false)
-          reject(new Error('initFirebaseAuth:fail'))
-        }
-
-        // 登録解除
-        unsubscribe()
-      })
     })
   },
   getCurrentLogin () {
@@ -1633,7 +1515,7 @@ export const actions = {
   async fetchDateOfLatestUpdateFromServer ({ state }) {
     const res = await fireGetDocRemoteFirst('users', state.myApp.user.uid)
     if (res) {
-      return res.myApp.dateOfLatestUpdate
+      return res.dateOfLatestUpdate
     } else {
       return ''
     }

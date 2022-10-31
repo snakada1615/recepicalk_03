@@ -89,7 +89,8 @@ export async function fireGetDocRemoteFirst (collectionId, docId) {
     console.log(err)
   })
   if (docSnap.exists()) {
-    return docSnap.data().myApp.dateOfLatestUpdate
+    console.log(docSnap.data())
+    return docSnap.data()
   } else {
     console.log('getData fail: no data in Cache or Server')
     return ''
@@ -140,11 +141,10 @@ export async function getDocByName (displayName) {
 
 export async function getAuthAccountByEmail (email) {
   // #TODO getUserByEmailが使えない問題への対応
-  const account = await getAuth().getUserByEmail(email).catch((err) => {
+  return await getAuth().getUserByEmail(email).catch((err) => {
     console.log('Error fetching user data:', err)
     return false
   })
-  return account
 }
 
 export async function deleteDocByName (displayName) {

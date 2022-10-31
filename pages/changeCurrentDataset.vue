@@ -90,7 +90,7 @@ import selectDbFromFire from '../components/organisms/selectDbFromFire'
 import countryNames from '../components/atoms/countryNames'
 import regionSelect from '../components/atoms/regionSelect'
 import { getFileList } from '../plugins/firebasePlugin'
-import { array2JSON, isObjectDeepEqual, makeToast } from '../plugins/helper'
+import { array2JSON, isObjectDeepEqual } from '../plugins/helper'
 
 export default {
   components: {
@@ -186,11 +186,6 @@ export default {
     }
   },
   async created () {
-    this.myDataSet[0].docName = this.$store.state.fire.myApp.dataSet.fctId
-    this.myDataSet[1].docName = this.$store.state.fire.myApp.dataSet.driId
-    this.myDataSet[2].docName = this.$store.state.fire.myApp.dataSet.portionUnitId
-    this.myDataSet[3].docName = this.$store.state.fire.myApp.dataSet.questionsId
-    this.myDataSet[4].docName = this.$store.state.fire.myApp.dataSet.cropCalendarId
     this.originalDocName.push(this.$store.state.fire.myApp.dataSet.fctId)
     this.originalDocName.push(this.$store.state.fire.myApp.dataSet.driId)
     this.originalDocName.push(this.$store.state.fire.myApp.dataSet.portionUnitId)
@@ -252,12 +247,8 @@ export default {
       await vm.$store.dispatch('fire/fireSaveForceUpdateInfo', array2JSON(vm.originalForcedUpdateInfo))
       await vm.$store.dispatch('fire/fireSaveAppdata')
 
-      makeToast(
-        this,
-        'data have been successfully updated',
-        { variant: 'info' }
-      )
       console.log('setMyDoc: data have been successfully updated')
+      alert('data have been successfully updated')
     }
   }
 }
