@@ -7,8 +7,8 @@ import {
   createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile
 } from 'firebase/auth'
 import { doc, setDoc } from 'firebase/firestore'
-import { fireGetDocRemoteFirst, fireGetDoc, firestoreDb } from '~/plugins/firebasePlugin'
-import { filterUpdateInfo, makeToast } from '~/plugins/helper'
+import { fireGetDoc, firestoreDb } from '~/plugins/firebasePlugin'
+import { filterUpdateInfo } from '~/plugins/helper'
 
 /*
 function MenuItem(id, Group, Name, En, Pr, Va, Fe, Wt) {
@@ -556,13 +556,13 @@ export const mutations = {
     state.myApp.user.displayName = payload.displayName
     state.myApp.user.email = payload.email
     state.myApp.user.phoneNumber = payload.phoneNumber
-    state.myApp.user.country = ''
-    state.myApp.user.subnational1 = ''
-    state.myApp.user.subnational2 = ''
-    state.myApp.user.subnational3 = ''
-    state.myApp.user.organization = ''
-    state.myApp.user.title = ''
-    state.myApp.user.userType = 'normal'
+    state.myApp.user.country = payload.country || ''
+    state.myApp.user.subnational1 = payload.subnational1 || ''
+    state.myApp.user.subnational2 = payload.subnational2 || ''
+    state.myApp.user.subnational3 = payload.subnational3 || ''
+    state.myApp.user.organization = payload.organization || ''
+    state.myApp.user.title = payload.title || ''
+    state.myApp.user.userType = payload.userType || 'normal'
   },
   /**
    * user.Uidを更新
@@ -1447,6 +1447,8 @@ export const actions = {
   async goUpdate ({ dispatch, state, commit }, payload) {
     // まず更新日をアップデートする: , updateInfo, originalInfo, date
     commit('updateDateOfLatestUpdate', payload.date)
+    console.log('updateDateOfLatestUpdate')
+    console.log(state.myApp.dateOfLatestUpdate)
 
     // 指定されたdocument-Idでデータ更新
     const forcedDatasets = payload.updateInfo.setData
@@ -1479,7 +1481,7 @@ export const actions = {
     }
 
     await dispatch('fireSaveAppdata').then(() => {
-      makeToast(this, 'data have been updated')
+      console.log('data have been updated')
       window.location.reload(true)
     })
     // await this.$router.push('/startPageEth')
@@ -1720,7 +1722,7 @@ export const actions = {
   },
   async fetchForcedUpdateInfoFromFire ({ state, commit }) {
     // ForcedUpdateInfoをfireStoreからfetch (forcedUpdateInfoIdを使う) → fireGetDocRemoteFirst（サーバー → ローカルの順にデータチェック）
-    const forcedUpdateInfo = await fireGetDocRemoteFirst('dataset', state.myApp.dataSet.forcedUpdateInfoId).catch((err) => {
+    const forcedUpdateInfo = await fireGetDoc('dataset', state.myApp.dataSet.forcedUpdateInfoId).catch((err) => {
       throw new Error(err)
     })
     if (forcedUpdateInfo) {
@@ -1927,13 +1929,8 @@ export const actions = {
     if (!res) {
       return
     }
-    commit('clearMyApp') // 全ての情報を初期化
     await dispatch('initAll', payload).catch((err) => {
       console.log('Error: fireResetAppdata')
-      throw err
-    })
-    commit('initUser', payload) // user情報を戻す
-    await dispatch('fireSaveAppdata').catch((err) => {
       throw err
     })
     console.log('fireResetAppdata: complete')

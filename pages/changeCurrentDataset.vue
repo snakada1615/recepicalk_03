@@ -214,16 +214,11 @@ export default {
       )
 
       // setDataの更新
-      vm.myForcedUpdateInfo.setData.fctId =
-        vm.myDataSet[0].docName !== vm.originalDocName[0] ? vm.myDataSet[0].docName : ''
-      vm.myForcedUpdateInfo.setData.driId =
-        vm.myDataSet[1].docName !== vm.originalDocName[1] ? vm.myDataSet[1].docName : ''
-      vm.myForcedUpdateInfo.setData.portionUnitId =
-        vm.myDataSet[2].docName !== vm.originalDocName[2] ? vm.myDataSet[2].docName : ''
-      vm.myForcedUpdateInfo.setData.questionsId =
-        vm.myDataSet[3].docName !== vm.originalDocName[3] ? vm.myDataSet[3].docName : ''
-      vm.myForcedUpdateInfo.setData.cropCalendarId =
-        vm.myDataSet[4].docName !== vm.originalDocName[4] ? vm.myDataSet[4].docName : ''
+      vm.myForcedUpdateInfo.setData.fctId = vm.myDataSet[0].docName
+      vm.myForcedUpdateInfo.setData.driId = vm.myDataSet[1].docName
+      vm.myForcedUpdateInfo.setData.portionUnitId = vm.myDataSet[2].docName
+      vm.myForcedUpdateInfo.setData.questionsId = vm.myDataSet[3].docName
+      vm.myForcedUpdateInfo.setData.cropCalendarId = vm.myDataSet[4].docName
 
       // searchRegの更新
       vm.myForcedUpdateInfo.searchReg.country = vm.userScope.country

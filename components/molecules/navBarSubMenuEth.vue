@@ -29,6 +29,7 @@
           <b-dropdown-item to="/ethCommunityAssessment">
             community assessment
           </b-dropdown-item>
+          <b-dropdown-divider />
 
           <!-- メニューグループ1 導入 -->
           <b-dropdown id="subMenu-0" size="sm" text="other function" class="m-md-2" variant="light">
@@ -55,6 +56,9 @@
             </b-dropdown-item>
             <b-dropdown-item to="/changeCurrentDataset">
               change dataset
+            </b-dropdown-item>
+            <b-dropdown-item @click="resetData">
+              reset user data
             </b-dropdown-item>
           </b-dropdown>
         </b-nav-item-dropdown>
