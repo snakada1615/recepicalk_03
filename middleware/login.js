@@ -32,11 +32,12 @@ export default async function ({ store, redirect, route }) {
     alert('please login/register first to use all functions')
     console.log('not login')
     // エチオピア版の場合は startPageEth に飛ぶ
-    if (route.name.includes('eth')) {
-      return redirect('/startPageEth')
-    } else {
-      return redirect('/')
-    }
+    return redirect('/startPageEth')
+    // if (route.name.includes('eth')) {
+    //   return redirect('/startPageEth')
+    // } else {
+    //   return redirect('/')
+    // }
   } else {
     if (store.state.fire.isLoggedIn) {
       // 特定の地域に対してdbの更新が必要かどうか判定して更新情報を登録

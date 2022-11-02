@@ -26,7 +26,9 @@ import { getFileList, removeUserByName } from '@/plugins/firebasePlugin'
 
 export default {
   async asyncData () {
+    console.log('tes1')
     const myList = await getFileList('users', 2)
+    console.log('tes2')
     return {
       myList
     }

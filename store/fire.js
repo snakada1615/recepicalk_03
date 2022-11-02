@@ -6,8 +6,8 @@ import {
   GoogleAuthProvider, browserLocalPersistence, signOut,
   createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile
 } from 'firebase/auth'
-import { doc, setDoc } from 'firebase/firestore'
-import { fireGetDoc, fireGetDocRemoteFirst, firestoreDb } from '~/plugins/firebasePlugin'
+import { doc, getDocFromServer, setDoc } from 'firebase/firestore'
+import { fireGetDoc, fireGetDocRemoteFirst, fireGetDocRemoteOnly, firestoreDb } from '~/plugins/firebasePlugin'
 import { filterUpdateInfo } from '~/plugins/helper'
 
 /*
@@ -212,7 +212,7 @@ export const state = () => ({
       /**
        * portionUnitのid
        */
-      portionUnitId: 'portion_0927',
+      portionUnitId: 'portion_nakada01',
       /**
        * questionのid
        */
@@ -1529,7 +1529,7 @@ export const actions = {
    * @returns {Promise<void>}
    */
   async fetchFctFromFire ({ commit, dispatch, state }) {
-    const fct = await fireGetDoc('dataset', state.myApp.dataSet.fctId)
+    const fct = await fireGetDocRemoteOnly('dataset', state.myApp.dataSet.fctId)
     if (fct) {
       // ObjectをArrayに変換
       const fctArray = formatFct(fct)
@@ -1547,7 +1547,7 @@ export const actions = {
    * @returns {Promise<void>}
    */
   async fetchDriFromFire ({ commit, dispatch, state }) {
-    const dri = await fireGetDoc('dataset', state.myApp.dataSet.driId)
+    const dri = await fireGetDocRemoteOnly('dataset', state.myApp.dataSet.driId)
     if (dri) {
       const driArray = formatDri(dri)
       commit('updateDri', driArray)
@@ -1564,7 +1564,7 @@ export const actions = {
    */
   async fetchPortionUnitFromFire ({ state, commit, dispatch }) {
     // portionUnitをfireStoreからfetch (portionUnitIdを使う)
-    const portionUnit = await fireGetDoc('dataset', state.myApp.dataSet.portionUnitId).catch((err) => {
+    const portionUnit = await fireGetDocRemoteOnly('dataset', state.myApp.dataSet.portionUnitId).catch((err) => {
       throw new Error(err)
     })
 
@@ -1589,9 +1589,10 @@ export const actions = {
       await commit('updateCropCalendarId', payload)
     }
     // cropCalendarをfireStoreからfetch (cropCalendarIdを使う)
-    const cropCalendar = await fireGetDoc('dataset', state.myApp.dataSet.cropCalendarId).catch((err) => {
-      throw new Error(err)
-    })
+    const cropCalendar = await fireGetDocRemoteOnly('dataset', state.myApp.dataSet.cropCalendarId)
+      .catch((err) => {
+        throw new Error(err)
+      })
 
     // cropCalendarをstoreに保存
     if (cropCalendar) {
@@ -1611,7 +1612,7 @@ export const actions = {
    */
   async fetchQuestionsFromFire ({ state, commit, dispatch }) {
     // questionsをfireStoreからfetch (questionsIdを使う)
-    const questions = await fireGetDoc('dataset', state.myApp.dataSet.questionsId).catch((err) => {
+    const questions = await fireGetDocRemoteOnly('dataset', state.myApp.dataSet.questionsId).catch((err) => {
       throw new Error(err)
     })
 
@@ -1723,11 +1724,7 @@ export const actions = {
     }
     try {
       await commit('initUser', payload)
-      await dispatch('fetchFctFromFire')
-      await dispatch('fetchDriFromFire')
-      await dispatch('fetchPortionUnitFromFire')
-      await dispatch('fetchQuestionsFromFire')
-      await dispatch('fetchCropCalendarFromFire')
+      await dispatch('fetchBaseDataFromFire')
       await dispatch('initMenu', { data: state.myApp.dataSet.dri, count: state.myApp.sceneCount })
       await dispatch('initProdTarget', state.myApp.dataSet.dri)
       await dispatch('initFeasibility', { data: state.myApp.dataSet.dri, count: state.myApp.sceneCount })
@@ -1742,22 +1739,25 @@ export const actions = {
     }
   },
   /**
-   * myAppをfirestoreからfetchしてstoreに保存
+   * 基本データベースをサーバーから一括ダウンロード
+   * @param dispatch
+   * @returns {Promise<boolean>}
+   */
+  async fetchBaseDataFromFire ({ dispatch }) {
+    await dispatch('fetchFctFromFire')
+    await dispatch('fetchDriFromFire')
+    await dispatch('fetchPortionUnitFromFire')
+    await dispatch('fetchQuestionsFromFire')
+    await dispatch('fetchCropCalendarFromFire')
+    return true
+  },
+  /**
+   * myAppをfirestoreからfetchしてstoreに保存(chache優先)
    * @param state
    * @param commit
    * @param payload
    * @returns {Promise<void>}
    */
-  async loadMyApp ({ state, commit }, payload) {
-    const myApp = await fireGetDoc('users', payload)
-    if (myApp) {
-      commit('updateMyApp', myApp)
-      // 初期データ読み込み時のみ、hasDocumentChangedをfalseにセット
-      commit('setHasDocumentChanged', false)
-    } else {
-      throw new Error('loadMyApp fail: no data on fireStore')
-    }
-  },
   async loadMyStore ({ state, commit }, payload) {
     const myApp = await fireGetDoc('users', payload)
     if (myApp) {
@@ -1765,6 +1765,26 @@ export const actions = {
       // 初期データ読み込み時のみ、hasDocumentChangedをfalseにセット
       commit('setHasDocumentChanged', false)
       return true
+    } else {
+      throw new Error('loadMyApp fail: no data on fireStore')
+    }
+  },
+  /**
+   * myAppをfirestoreからfetchしてstoreに保存(server限定)
+   * @param state
+   * @param commit
+   * @param payload
+   * @returns {Promise<void>}
+   */
+  async loadMyStoreFromServer ({ state, commit, dispatch }, payload) {
+    const myApp = await fireGetDocRemoteOnly('users', payload)
+    if (myApp) {
+      commit('updateMyApp', myApp)
+      await dispatch('fetchBaseDataFromFire')
+      await dispatch('fireSaveAppdata')
+      // 初期データ読み込み時のみ、hasDocumentChangedをfalseにセット
+      commit('setHasDocumentChanged', false)
+      return myApp
     } else {
       throw new Error('loadMyApp fail: no data on fireStore')
     }
@@ -1818,6 +1838,13 @@ export const actions = {
     })
     // myAppの変更内容をfirestoreに保存できたらhasDocumentChangedをfalseにセット
     dispatch('setHasDocumentChanged', false)
+    console.log('saveAppdata: success')
+  },
+  fireUpdateOriginalFct ({ state, dispatch }, payload) {
+    const ref = doc(firestoreDb, 'dataset', state.myApp.dataSet.fctId)
+    setDoc(ref, payload).catch((err) => {
+      throw new Error('Error in fireSaveAppdata:' + err)
+    })
     console.log('saveAppdata: success')
   },
   /**

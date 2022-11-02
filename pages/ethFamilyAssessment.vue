@@ -643,7 +643,7 @@ export default {
     },
     statePage7: {
       get () {
-        return (this.statePage6 && this.selectedCommodityId && (this.selectedCommodityId >= 0))
+        return (this.statePage6 && (this.selectedCommodityId >= 0))
       }
     },
     /**

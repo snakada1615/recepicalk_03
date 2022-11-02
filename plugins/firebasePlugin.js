@@ -5,7 +5,7 @@ import {
   enableMultiTabIndexedDbPersistence, doc, getDocFromCache, getDocFromServer,
   getDocs, collection, query, where, deleteDoc
 } from 'firebase/firestore'
-import { getAuth } from 'firebase/auth'
+import { getAuth, deleteUser } from 'firebase/auth'
 import { getStorage } from 'firebase/storage'
 
 /**
@@ -147,38 +147,29 @@ export async function getAuthAccountByEmail (email) {
   })
 }
 
-export async function deleteDocByName (displayName) {
+export async function removeUserByName (displayName) {
   const docBody = await getDocByName(displayName)
-  console.log(docBody)
   const docName = docBody[0].user.uid
+
   if (docName) {
     // 単一のドキュメントリファレンスを取得
     const docRef = doc(firestoreDb, 'users', docName)
     // 削除
     await deleteDoc(docRef)
+    console.log('user document have successfully been deleted')
+
+    getAuth()
+      .deleteUser(docName)
+      .then(() => {
+        console.log('Successfully deleted user')
+      })
+      .catch((error) => {
+        console.log('Error deleting user:', error)
+      })
+    console.log('user auth account have successfully been deleted')
+
     return true
   } else {
     return false
   }
-}
-
-export async function deleteAccountByEmail (email) {
-  const auth = getAuth()
-  const docBody = await getAuthAccountByEmail(email)
-  const docId = docBody[0].user.uid
-  auth.deleteUser(docId)
-    .then(() => {
-      console.log('Successfully deleted user:', email)
-      return true
-    })
-    .catch((error) => {
-      console.log('Error deleting user:', error)
-      return false
-    })
-}
-
-export async function removeUserByName (displayName) {
-  console.log(displayName)
-  await deleteDocByName(displayName)
-  await deleteAccountByEmail(displayName + '@ifna.app')
 }

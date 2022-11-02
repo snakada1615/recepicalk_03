@@ -54,11 +54,17 @@
             <b-dropdown-item to="/foodGroupInfo">
               about FoodGroup
             </b-dropdown-item>
+            <b-dropdown-item to="/editFct">
+              edit FCT
+            </b-dropdown-item>
             <b-dropdown-item to="/changeCurrentDataset">
               change dataset
             </b-dropdown-item>
+            <b-dropdown-item @click="downloadMyApp">
+              download user data
+            </b-dropdown-item>
             <b-dropdown-item @click="resetData">
-              reset user data
+              initialize user data
             </b-dropdown-item>
           </b-dropdown>
         </b-nav-item-dropdown>
@@ -105,19 +111,31 @@
         <b-icon icon="reception0" />
       </div>
     </b-navbar>
+    <input-box
+      modal-name="loadingBox"
+      title="data downloading..."
+      label=""
+      :hide-footer="true"
+      :show-spinner="true"
+    />
   </b-container>
 </template>
 <script>
 
 import { makeToast } from '@/plugins/helper'
+import inputBox from '@/components/atoms/inputBox'
 
 export default {
+  components: {
+    inputBox
+  },
   data () {
     return {
       /**
        * ドロップダウンメニューの開閉動作を抑制するためのフラグ
        */
-      isSubMenuVisible: false
+      isSubMenuVisible: false,
+      showOverLay: false
     }
   },
   computed: {
@@ -194,7 +212,7 @@ export default {
   },
   methods: {
     confirmUpdate () {
-      const msg = 'This will update your dataset to the latest version. do you proceed now?'
+      const msg = 'You have update version of the App. Would you like to download now?'
       const result = confirm(msg)
       if (result) {
         this.$store.dispatch('fire/checkUpdate', true)
@@ -224,6 +242,26 @@ export default {
         throw err
       })
       this.$router.push('/')
+    },
+    async downloadMyApp () {
+      const res = window.confirm('You need to have internet connection and it may take a little time. Do you proceed?')
+      if (res) {
+        this.$bvModal.show('loadingBox')
+        const res2 = await this.$store.dispatch('fire/loadMyStoreFromServer',
+          this.$store.state.fire.myApp.user.uid).catch(() => {
+          alert('internet connection may not be strong enough, please try again later')
+        })
+        if (res2) {
+          // 更新日をアップデートする: , updateInfo, originalInfo, date
+          // await this.$store.dispatch('updateDateOfLatestUpdate', Date.now())
+          console.log('downloadMyApp success')
+          makeToast(this, 'data successfully downloaded')
+        } else {
+          console.error('downloadMyApp fail')
+          alert('data cannot be found, please start from user registration')
+        }
+        this.$bvModal.hide('loadingBox')
+      }
     }
   }
 }

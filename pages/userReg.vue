@@ -211,11 +211,12 @@ export default {
       makeToast(this, 'user data initialized!')
 
       // ユーザーの国がEthiopiaの場合とそうでない場合で飛び先を変更
-      if (this.user.country === 'Ethiopia') {
-        await this.$router.push('/startPageEth')
-      } else {
-        await this.$router.push('/')
-      }
+      this.$router.push('/startPageEth')
+      // if (this.user.country === 'Ethiopia') {
+      //   await this.$router.push('/startPageEth')
+      // } else {
+      //   await this.$router.push('/')
+      // }
     },
     async updateUserInfo () {
       const myUser = JSON.parse(JSON.stringify(this.$store.state.fire.myApp.user))

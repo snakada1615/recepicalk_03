@@ -4,26 +4,29 @@
     ref="modal"
     :title="title"
     header-bg-variant="info"
+    :hide-footer="hideFooter"
     @show="resetModal"
     @hidden="resetModal"
     @ok="handleOk"
   >
-    <form ref="form" @submit.stop.prevent="handleSubmit">
-      <b-form-group
-        :label="label"
-        label-for="text-input"
-        invalid-feedback="please fill the text. no space at the beginning or end"
-        :state="stateInput"
-      >
-        <b-form-input
-          id="text-input"
-          v-model="userText"
+    <b-overlay :show="showSpinner" rounded="sm">
+      <form ref="form" @submit.stop.prevent="handleSubmit">
+        <b-form-group
+          :label="label"
+          label-for="text-input"
+          invalid-feedback="please fill the text. no space at the beginning or end"
           :state="stateInput"
-          required
-          pattern="\w.*\w$"
-        />
-      </b-form-group>
-    </form>
+        >
+          <b-form-input
+            id="text-input"
+            v-model="userText"
+            :state="stateInput"
+            required
+            pattern="\w.*\w$"
+          />
+        </b-form-group>
+      </form>
+    </b-overlay>
   </b-modal>
 </template>
 
@@ -46,6 +49,14 @@ export default {
     label: {
       type: String,
       default: 'type text'
+    },
+    showSpinner: {
+      type: Boolean,
+      default: false
+    },
+    hideFooter: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
