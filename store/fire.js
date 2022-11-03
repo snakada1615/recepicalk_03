@@ -6,8 +6,8 @@ import {
   GoogleAuthProvider, browserLocalPersistence, signOut,
   createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile
 } from 'firebase/auth'
-import { doc, getDocFromServer, setDoc } from 'firebase/firestore'
-import { fireGetDoc, fireGetDocRemoteFirst, fireGetDocRemoteOnly, firestoreDb } from '~/plugins/firebasePlugin'
+import { doc, setDoc } from 'firebase/firestore'
+import { fireGetDoc, fireGetDocRemoteOnly, firestoreDb } from '~/plugins/firebasePlugin'
 import { filterUpdateInfo } from '~/plugins/helper'
 
 /*
@@ -353,8 +353,11 @@ export const state = () => ({
   /**
    * ページ内容（myApp）がfirebaseから読み込まれたかどうか判定
    */
-  hasMyAppLoaded: false
-
+  hasMyAppLoaded: false,
+  /**
+   * サーバーとの通信が行われる場合に進捗状況を示すためのフラグ
+   */
+  loadingStatus: false
 })
 
 export const getters = {
@@ -388,6 +391,14 @@ export const getters = {
 }
 
 export const mutations = {
+  /**
+   * 外部データの読み込み時のstatus表示用フラグ
+   * @param state
+   * @param payload
+   */
+  updateLoadingState: function (state, payload) {
+    state.loadingStatus = payload
+  },
   updateIsUpdateAvailable: function (state, payload) {
     state.myApp.isUpdateAvailable = payload
   },
@@ -707,6 +718,14 @@ export const mutations = {
   }
 }
 export const actions = {
+  /**
+   * loadingStatusの更新
+   * @param commit
+   * @param payload
+   */
+  updateLoadingState ({ commit }, payload) {
+    commit('updateLoadingState', payload)
+  },
   updateIsLoggedIn ({ commit }, payload) {
     commit('updateIsLoggedIn', payload)
   },
@@ -1435,16 +1454,13 @@ export const actions = {
       await dispatch('goUpdate', {
         date: newDate,
         updateInfo: JSON.parse(JSON.stringify(filtered))
-      })
-      // ブラウザ内のキャッシュを更新するため一旦fireStoreからデータを読み込む
-      const date = await dispatch('fetchDateOfLatestUpdateFromServer')
-
-      // データ更新がうまくいった場合は普通に再起動、うまくいっていない場合はその旨伝えて再起動
-      if (Number(date) === oldDate) {
+      }).catch((err) => {
+        console.log(err)
         alert('network connection may not be strong enough. you can try update later')
-      } else {
-        alert('data updating have been completed, now program will restart')
-      }
+      })
+
+      // データ更新がうまくいった場合は普通に再起動、うまくいっていない場合はそのまま戻る
+      alert('data updating have been completed, now program will restart')
       window.location.reload(true)
     }
   },
@@ -1457,41 +1473,46 @@ export const actions = {
    * @returns {Promise<void>}
    */
   async goUpdate ({ dispatch, state, commit }, payload) {
-    // まず更新日をアップデートする: , updateInfo, originalInfo, date
-    commit('updateDateOfLatestUpdate', payload.date)
-
     // 指定されたdocument-Idでデータ更新
     const forcedDatasets = payload.updateInfo.setData
 
-    // if (forcedDatasets.fctId && state.myApp.dataSet.fctId !== forcedDatasets.fctId) {
-    if (forcedDatasets.fctId !== '') {
-      // fctNameをstoreに保存
-      await dispatch('updateFctId', forcedDatasets.fctId)
-      // fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
-      await dispatch('fetchFctFromFire')
-    }
-    if (forcedDatasets.driId !== '') {
-      // fctNameをstoreに保存
-      await dispatch('updateDriId', forcedDatasets.driId)
-      // fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
-      await dispatch('fetchDriFromFire')
-    }
-    if (forcedDatasets.portionUnitId !== '') {
-      // fctNameをstoreに保存
-      await dispatch('updatePortionUnitId', forcedDatasets.portionUnitId)
-      // fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
-      await dispatch('fetchPortionUnitFromFire')
-    }
-    if (forcedDatasets.cropCalendarId !== '') {
-      // fctNameをstoreに保存
-      await dispatch('updatePortionUnitId', forcedDatasets.cropCalendarId)
-      // fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
-      await dispatch('fetchCropCalendarFromFire')
-    }
+    try {
+      // if (forcedDatasets.fctId && state.myApp.dataSet.fctId !== forcedDatasets.fctId) {
+      if (forcedDatasets.fctId !== '') {
+        // fctNameをstoreに保存
+        await dispatch('updateFctId', forcedDatasets.fctId)
+        // fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
+        await dispatch('fetchFctFromFire')
+      }
+      if (forcedDatasets.driId !== '') {
+        // fctNameをstoreに保存
+        await dispatch('updateDriId', forcedDatasets.driId)
+        // fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
+        await dispatch('fetchDriFromFire')
+      }
+      if (forcedDatasets.portionUnitId !== '') {
+        // fctNameをstoreに保存
+        await dispatch('updatePortionUnitId', forcedDatasets.portionUnitId)
+        // fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
+        await dispatch('fetchPortionUnitFromFire')
+      }
+      if (forcedDatasets.cropCalendarId !== '') {
+        // fctNameをstoreに保存
+        await dispatch('updatePortionUnitId', forcedDatasets.cropCalendarId)
+        // fctNameに基づいてfctを初期化（firestoreからfetch → storeに保存）
+        await dispatch('fetchCropCalendarFromFire')
+      }
 
-    await dispatch('fireSaveAppdata').then(() => {
-      console.log('data have been updated')
-    })
+      // 更新日をアップデートする: , updateInfo, originalInfo, date
+      commit('updateDateOfLatestUpdate', payload.date)
+
+      await dispatch('fireSaveAppdata').then(() => {
+        console.log('data have been updated')
+      })
+    } catch (err) {
+      console.log(err)
+      throw err
+    }
   },
   getCurrentLogin () {
     return new Promise((resolve, reject) => {
@@ -1512,14 +1533,6 @@ export const actions = {
    * @description ここからfirestore関連機能
    * ********************************************************
    */
-  async fetchDateOfLatestUpdateFromServer ({ state }) {
-    const res = await fireGetDocRemoteFirst('users', state.myApp.user.uid)
-    if (res) {
-      return res.dateOfLatestUpdate
-    } else {
-      return ''
-    }
-  },
   /**
    * fctの初期データをdataset/fct01から読み込んでstoreに反映
    *     データが存在しない場合はエラー
@@ -1728,7 +1741,7 @@ export const actions = {
       await dispatch('initMenu', { data: state.myApp.dataSet.dri, count: state.myApp.sceneCount })
       await dispatch('initProdTarget', state.myApp.dataSet.dri)
       await dispatch('initFeasibility', { data: state.myApp.dataSet.dri, count: state.myApp.sceneCount })
-      commit('updateDateOfLatestUpdate', 1666909589274)
+      commit('updateDateOfLatestUpdate', Date.now())
 
       // 更新したmyAppをfireStoreに保存
       await dispatch('fireSaveAppdata')
@@ -1773,8 +1786,9 @@ export const actions = {
    * myAppをfirestoreからfetchしてstoreに保存(server限定)
    * @param state
    * @param commit
+   * @param dispatch
    * @param payload
-   * @returns {Promise<void>}
+   * @returns {Promise<*>}
    */
   async loadMyStoreFromServer ({ state, commit, dispatch }, payload) {
     const myApp = await fireGetDocRemoteOnly('users', payload)

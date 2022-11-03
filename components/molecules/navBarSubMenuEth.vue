@@ -111,23 +111,19 @@
         <b-icon icon="reception0" />
       </div>
     </b-navbar>
-    <input-box
-      modal-name="loadingBox"
-      title="data downloading..."
-      label=""
-      :hide-footer="true"
-      :show-spinner="true"
+    <loading-box
+      :open-flag="$store.state.fire.loadingStatus"
     />
   </b-container>
 </template>
 <script>
 
 import { makeToast } from '@/plugins/helper'
-import inputBox from '@/components/atoms/inputBox'
+import loadingBox from '@/components/atoms/loadingBox'
 
 export default {
   components: {
-    inputBox
+    loadingBox
   },
   data () {
     return {
@@ -211,11 +207,17 @@ export default {
     })
   },
   methods: {
-    confirmUpdate () {
+    async confirmUpdate () {
       const msg = 'You have update version of the App. Would you like to download now?'
       const result = confirm(msg)
       if (result) {
-        this.$store.dispatch('fire/checkUpdate', true)
+        // set loading status
+        await this.$store.dispatch('fire/updateLoadingState', true)
+        await this.$store.dispatch('fire/checkUpdate', true).catch(async () => {
+          await this.$store.dispatch('fire/updateLoadingState', false)
+        })
+        // release loading status
+        await this.$store.dispatch('fire/updateLoadingState', false)
       }
     },
     /**
@@ -246,21 +248,24 @@ export default {
     async downloadMyApp () {
       const res = window.confirm('You need to have internet connection and it may take a little time. Do you proceed?')
       if (res) {
-        this.$bvModal.show('loadingBox')
+        // set loading status
+        await this.$store.dispatch('fire/updateLoadingState', true)
         const res2 = await this.$store.dispatch('fire/loadMyStoreFromServer',
           this.$store.state.fire.myApp.user.uid).catch(() => {
           alert('internet connection may not be strong enough, please try again later')
+          this.$store.dispatch('fire/updateLoadingState', false)
+          console.error('downloadMyApp fail')
+          return false
         })
         if (res2) {
-          // 更新日をアップデートする: , updateInfo, originalInfo, date
-          // await this.$store.dispatch('updateDateOfLatestUpdate', Date.now())
           console.log('downloadMyApp success')
           makeToast(this, 'data successfully downloaded')
         } else {
           console.error('downloadMyApp fail')
           alert('data cannot be found, please start from user registration')
         }
-        this.$bvModal.hide('loadingBox')
+        // release loading status
+        await this.$store.dispatch('fire/updateLoadingState', false)
       }
     }
   }
