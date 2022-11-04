@@ -40,6 +40,7 @@ export default async function ({ store, redirect, route }) {
     // }
   } else {
     if (store.state.fire.isLoggedIn) {
+      // await store.dispatch('fire/initFirebaseNewVariable')
       // 特定の地域に対してdbの更新が必要かどうか判定して更新情報を登録
       await store.dispatch('fire/checkUpdate')
     }

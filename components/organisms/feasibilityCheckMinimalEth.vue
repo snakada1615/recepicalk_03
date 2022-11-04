@@ -6,47 +6,51 @@
       </b-col>
     </b-row>
     <!--   スコアの総括票     -->
-    <b-card
-      style="min-width: 530px;"
-      header-bg-variant="success"
-      bg-variant="light"
-      border-variant="success"
-      class="mx-1 px-0 mb-2 mt-0"
-    >
-      <template #header>
-        <div>Feasibility score</div>
-      </template>
-      <b-row>
-        <b-col class="text-center">
-          Crop name:
-        </b-col>
-        <b-col class="text-info">
-          {{ currentCrop }}
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col cols="6" class="text-center">
-          total score:
-        </b-col>
-        <b-col cols="6">
-          {{ qaScore[qaScore.length - 1].value }} /
-          {{ 10 * qaList.length }}
-        </b-col>
-      </b-row>
-      <b-row v-for="(qa, index) in qaScore" :key="index">
-        <nutrition-bar
-          v-if="qa.id > 0"
-          :col-width-first="6"
-          :colwidth-second="0"
-          :show-max-number="false"
-          :max="10"
-          :nutrition-target="0"
-          :crop-name="qa.text"
-          :rating="qa.value"
-          :label="qa.text"
-        />
-      </b-row>
-    </b-card>
+    <b-row>
+      <b-col class="px-0 mx-0">
+        <b-card
+          header-bg-variant="success"
+          style="min-width: 530px;"
+          bg-variant="light"
+          border-variant="success"
+          class="mx-1 px-0 mb-2 mt-0"
+        >
+          <template #header>
+            <div>Feasibility score</div>
+          </template>
+          <b-row>
+            <b-col class="text-center">
+              Crop name:
+            </b-col>
+            <b-col class="text-info">
+              {{ currentCrop }}
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col cols="6" class="text-center">
+              total score:
+            </b-col>
+            <b-col cols="6">
+              {{ qaScore[qaScore.length - 1].value }} /
+              {{ 10 * qaList.length }}
+            </b-col>
+          </b-row>
+          <b-row v-for="(qa, index) in qaScore" :key="index">
+            <nutrition-bar
+              v-if="qa.id > 0"
+              :col-width-first="6"
+              :colwidth-second="0"
+              :show-max-number="false"
+              :max="10"
+              :nutrition-target="0"
+              :crop-name="qa.text"
+              :rating="qa.value"
+              :label="qa.text"
+            />
+          </b-row>
+        </b-card>
+      </b-col>
+    </b-row>
 
     <!--  ここから質問項目のはじまり  -->
     <b-row class="mt-2">

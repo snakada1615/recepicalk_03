@@ -77,7 +77,7 @@
                 :target="currentTarget"
                 :max="maxPopulation"
                 class="multi"
-                @update:target="updateFamily(communityName, $event)"
+                @update:target="updateCommunitySize(communityName, $event)"
               />
             </b-col>
           </b-row>
@@ -671,7 +671,7 @@ export default {
     },
     statePage8: {
       get () {
-        return (this.statePage7 && this.myCommunity.keyCommodity)
+        return (this.statePage7 && (this.myCommunity.keyCommodity >= 0))
       }
     },
     /**
@@ -1277,8 +1277,16 @@ export default {
       this.$store.dispatch('fire/updateCommunityCase', val)
       this.$store.dispatch('fire/fireSaveAppdata')
     },
-    updateFamily (name, member) {
-      this.$store.dispatch('fire/updateFamilyCase', { name, member })
+    updateCommunitySize (name, member) {
+      let res = JSON.parse(JSON.stringify(this.$store.state.fire.myApp.communityCases))
+      res = res.map((item) => {
+        if (item.name === name) {
+          item.member = member
+        }
+        return item
+      })
+      console.log(res)
+      this.$store.dispatch('fire/updateCommunityCases', res)
     },
     updateNewCommunity (val) {
       this.newTarget = JSON.parse(JSON.stringify(val))

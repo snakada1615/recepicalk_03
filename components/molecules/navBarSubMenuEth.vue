@@ -213,7 +213,7 @@ export default {
       if (result) {
         // set loading status
         await this.$store.dispatch('fire/updateLoadingState', true)
-        await this.$store.dispatch('fire/checkUpdate', true).catch(async () => {
+        await this.$store.dispatch('fire/checkUpdate', 1).catch(async () => {
           await this.$store.dispatch('fire/updateLoadingState', false)
         })
         // release loading status

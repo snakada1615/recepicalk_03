@@ -65,6 +65,7 @@
                     {{ caseTitles[pageId - 1] }}
                   </div>
                   <div v-else>
+                    <!-- #TODO averageの表示が横幅いっぱいになるよう調整 -->
                     <div v-if="myAppComputed.menuCases[pageId - 1].note">
                       {{ myAppComputed.menuCases[pageId - 1].note }}
                     </div>
@@ -86,7 +87,7 @@
                   />
                 </b-card>
               </b-col>
-              <b-col v-else cols="6">
+              <b-col v-else>
                 <b-card class="my-1">
                   <div v-if="sceneCount === 2">
                     {{ caseTitles[pageId - 1] }}

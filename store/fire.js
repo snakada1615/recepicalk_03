@@ -45,7 +45,7 @@ function createNewFeasibilityCases (myCount) {
       const month = mon
       const note = ''
       const index = i
-      const ansList = [-99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99]
+      const ansList = [-99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99]
       const prodTarget = { share: 100, Wt: 0, Wt365: 0 }
       arr.push({ selectedCrop, note, ansList, prodTarget, month, index })
     }
@@ -1411,7 +1411,7 @@ export const actions = {
       await this.$router.push('/')
     }
   },
-  async checkUpdate ({ dispatch, commit, state }, goUpdateFlag = false) {
+  async checkUpdate ({ dispatch, commit, state }, goUpdateFlag = 0) {
     // forcedUpdateInfoが登録されていなければ読み込んで再起動
     if (state.myApp.dataSet.forcedUpdateInfoId == null) {
       console.log('There are no information for forcedUpdateInfo. The app will be updated')
@@ -1446,8 +1446,10 @@ export const actions = {
     // 最新の更新情報の有無を登録
     const oldDate = state.myApp.dateOfLatestUpdate
     const newDate = filtered.date
+    console.log(oldDate)
+    console.log(newDate)
     const res = (newDate > oldDate)
-    if (!goUpdateFlag) {
+    if (goUpdateFlag === 0) {
       commit('updateIsUpdateAvailable', res)
       return true
     } else {
@@ -1458,6 +1460,9 @@ export const actions = {
         console.log(err)
         alert('network connection may not be strong enough. you can try update later')
       })
+
+      // キャッシュデータを更新するため一度ForcedUpdateInfoをサーバーから読み込む
+      await dispatch('fetchForcedUpdateInfoFromFire')
 
       // データ更新がうまくいった場合は普通に再起動、うまくいっていない場合はそのまま戻る
       alert('data updating have been completed, now program will restart')
@@ -1639,7 +1644,7 @@ export const actions = {
   },
   async fetchForcedUpdateInfoFromFire ({ state, commit }) {
     // ForcedUpdateInfoをfireStoreからfetch (forcedUpdateInfoIdを使う) → fireGetDocRemoteFirst（サーバー → ローカルの順にデータチェック）
-    const forcedUpdateInfo = await fireGetDoc('dataset', state.myApp.dataSet.forcedUpdateInfoId).catch((err) => {
+    const forcedUpdateInfo = await fireGetDocRemoteOnly('dataset', state.myApp.dataSet.forcedUpdateInfoId).catch((err) => {
       throw new Error(err)
     })
     if (forcedUpdateInfo) {

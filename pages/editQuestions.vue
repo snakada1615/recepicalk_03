@@ -67,7 +67,7 @@ export default {
       this.qaList.forEach((item, index) => {
         res[index] = item
       })
-      await this.$store.dispatch('fire/fireSaveQu////////estions', res)
+      await this.$store.dispatch('fire/fireSaveQuestions', res)
       return true
     }
   }
