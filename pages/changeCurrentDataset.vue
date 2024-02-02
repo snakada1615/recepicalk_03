@@ -89,8 +89,8 @@
 import selectDbFromFire from '../components/organisms/selectDbFromFire'
 import countryNames from '../components/atoms/countryNames'
 import regionSelect from '../components/atoms/regionSelect'
-import { getFileList } from '../plugins/firebasePlugin'
-import { array2JSON, isObjectDeepEqual } from '../plugins/helper'
+import { getFileList } from '~/plugins/firebasePlugin'
+import { array2JSON, isObjectDeepEqual } from '~/plugins/helper'
 
 export default {
   components: {
@@ -98,7 +98,20 @@ export default {
     countryNames,
     regionSelect
   },
-  layout: 'defaultEth',
+  layout: 'default',
+  // Use a function to dynamically set the layout.
+  // layout () {
+  //   // The context parameter allows you to access the store and other useful properties.
+  //   // Assuming you have the user status stored in Vuex state:
+  //   let layoutName = 'defaultEth' // Default layout
+  //
+  //   // Determine layout based on user status.
+  //   if (this.userScope.country !== 'Ethiopia') {
+  //     // Set layout for logged-in users.
+  //     layoutName = 'default'
+  //   }
+  //   return layoutName // Return the layout name based on the condition.
+  // },
   async asyncData () {
     const queryResult = await getFileList('dataset')
     return {
